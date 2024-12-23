@@ -1,0 +1,20 @@
+#+title: LucidPlan
+#+options: toc:nil num:nil
+
+🚧 work in progress
+
+/free and open project management for everyone/
+
+LucidPlan is a project management tool made for hackers and business-people alike.
+
+This tool is the fruit of years of experience using bloated proprietary systems like Jira/Trello, and experiencing the insane frustrations they bring.
+
+This is free software (free as in freedom), licensed under the GNU General Public License v3 or newer.
+
+** Key features
+
+- *Fully Customizable:* Hack the behavior and content of each UI element with Scheme code.
+- *Cross-platform:* Runs anywhere that Guile Scheme can run, and exposes web endpoints, and is thus accessible from computers, phones, etc.
+- *Free Software*: Contribute to its development or extend it with your own custom features.
+
+
