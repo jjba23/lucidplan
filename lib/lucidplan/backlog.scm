@@ -27,22 +27,25 @@
   #:use-module (ice-9 format)
   #:use-module (ice-9 string-fun)
   #:use-module (ice-9 iconv)
+  #:use-module (ice-9 hash-table)
   #:use-module (ice-9 threads)
   #:use-module (artanis route))
 
-(define t
-  `((title . "Manual for SSS - keybindings, tips")))
-
-(define tt
-  `((title . "Bootstrap script for SSS")))
-
 (define (some-backlog project)
   `((project . ,project)
-    (tickets . ,#(("7b954ba2-dd82-46a7-9b2f-04d64bd72366" . t)
-                  ("727dfeed-6364-4f6c-a9c6-4990621039a0" . t)
-                  )
-             )
-    (sorting . ,#("7b954ba2-dd82-46a7-9b2f-04d64bd72366" "727dfeed-6364-4f6c-a9c6-4990621039a0"))
+    (tickets . (("7b954ba2-dd82-46a7-9b2f-04d64bd72366" . ((title . "Manual for SSS - info, tips, keybindings")
+                                                           (description . "* Manual for SSS\ngenerate manual, documentation and cheatsheet for SSS easily")))
+                ("727dfeed-6364-4f6c-a9c6-4990621039a0" . ((title . "Bootstrap script for SSS - easy onboarding")
+                                                           (description . "create simple bootstrap script for first-setup to help adoption of sss")))
+                ("01e35983-c88d-49ab-aebd-1bb466158170" . ((title . "User factory for SSS - profiles")
+                                                           (description . "**** create a user factory which is by default configured to joe's settings but is easily tweaked and with no duplication it creates new users.")))
+                ))
+    (highest-priority-tickets . ,#("7b954ba2-dd82-46a7-9b2f-04d64bd72366" "727dfeed-6364-4f6c-a9c6-4990621039a0"))
+    (closed-tickets . ,#())
+    (in-progress-tickets . ,#("7b954ba2-dd82-46a7-9b2f-04d64bd72366" ))
+    (in-review-tickets . ,#())
+    (by-priority-sorting . ,#("7b954ba2-dd82-46a7-9b2f-04d64bd72366" "727dfeed-6364-4f6c-a9c6-4990621039a0" "01e35983-c88d-49ab-aebd-1bb466158170"))
+    (user-sorting . ,#("01e35983-c88d-49ab-aebd-1bb466158170" "727dfeed-6364-4f6c-a9c6-4990621039a0" "7b954ba2-dd82-46a7-9b2f-04d64bd72366"))
     ))
 
 (define-public (get-backlog project)
@@ -50,4 +53,4 @@
   )
 
 
-;; ("" . ((title . "")))
+
