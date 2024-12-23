@@ -30,16 +30,24 @@
   #:use-module (ice-9 threads)
   #:use-module (artanis route))
 
+(define t
+  `((title . "Manual for SSS - keybindings, tips")))
 
+(define tt
+  `((title . "Bootstrap script for SSS")))
 
 (define (some-backlog project)
   `((project . ,project)
-    ;; (tickets . ((("7b954ba2-dd82-46a7-9b2f-04d64bd72366" . ((title . "Manual for SSS - keybindings, tips")))
-    ;;              ("727dfeed-6364-4f6c-a9c6-4990621039a0" . ((title . "Bootstrap script for SSS")))))
-    ;;          )
+    (tickets . ,#(("7b954ba2-dd82-46a7-9b2f-04d64bd72366" . t)
+                  ("727dfeed-6364-4f6c-a9c6-4990621039a0" . t)
+                  )
+             )
     (sorting . ,#("7b954ba2-dd82-46a7-9b2f-04d64bd72366" "727dfeed-6364-4f6c-a9c6-4990621039a0"))
     ))
 
 (define-public (get-backlog project)
   (some-backlog project)
   )
+
+
+;; ("" . ((title . "")))
