@@ -93,34 +93,31 @@
   "document.getElementById('details-~a').toggleAttribute('hidden')")
 
 (define (render-ticket-listitem ticket)
-  `((div (@(draggable "true") (ondragstart "dragBacklogItem(event)") (id ,(format #f "listitem-~a"
-                                                                                  (assoc-ref ticket
-                                                                                             'id)))
-          (class
-            "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer rounded-xl")
-          (onclick ,(format #f ticket-listitem-reveal-details-js-template
-                            (assoc-ref ticket
-                                       'id))))
-         (small (@ (class "font-mono text-stone-500 text-sm"))
-                ,(assoc-ref ticket
-                            'human-id))
-         (h5 (@ (class "font-mono text-stone-700 text-lg"))
-             ,(assoc-ref ticket
-                         'title)))
-    (div (@ (id ,(format #f "details-~a"
+  `((div (@ (draggable "true")
+            (ondragstart "dragBacklogItem(event)")
+            (class "flex flex-col gap-2")
+            (id ,(format #f "listitem-~a"
                          (assoc-ref ticket
                                     'id)))
-            (class "")
-            (hidden ""))
-         ,(render-ticket ticket))
-
+            (onclick ,(format #f ticket-listitem-reveal-details-js-template
+                              (assoc-ref ticket
+                                         'id))))
+         (div (@ (class
+                   "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer rounded-xl"))
+              (small (@ (class "font-mono text-stone-500 text-sm"))
+                     ,(assoc-ref ticket
+                                 'human-id))
+              (h5 (@ (class "font-mono text-stone-700 text-lg"))
+                  ,(assoc-ref ticket
+                              'title)))
+         (div (@ (id ,(format #f "details-~a"
+                              (assoc-ref ticket
+                                         'id)))
+                 (class "ml-4")
+                 (hidden ""))
+              ,(render-ticket ticket)))
+    
     ))
-
-
-;; <div id="div1" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-
-;; <img id="drag1" src="img_logo.gif" draggable="true" ondragstart="drag(event)" width="336" height="69">
-
 
 (define (html-from-backlog backlog)
   `(html (head (title "LucidPlan - My Backlog")
@@ -140,17 +137,22 @@
                (script (@ (src "/js/backlog.js")) ()))
          (body (@ (class "bg-stone-200 p-2"))
                (div (@ (class
-                         "my-6 flex flex-row flex-wrap justify-center gap-2"))
-                    (div (@(class "flex flex-col gap-2 p-2"))
-                         (a (@(class "text-sm uppercase text-stone-600 font-bold")(href "/board/JOE")) "Board")
-                         (a (@(class "text-sm uppercase text-stone-600 font-bold")(href "/backlog/JOE")) "Backlog")
-                         )
-                    (div (@(ondrop "dropBacklogItem(event)")(ondragover "allowDrop(event)")(class "flex flex-col gap-2 container"))
+                        "my-6 flex flex-row flex-wrap justify-center gap-2"))
+                    (div (@ (class "flex flex-col gap-2 p-2"))
+                         (a (@ (class
+                                "text-sm uppercase text-stone-600 font-bold")
+                               (href "/board/JOE")) "Board")
+                         (a (@ (class
+                                "text-sm uppercase text-stone-600 font-bold")
+                               (href "/backlog/JOE")) "Backlog"))
+                    (div (@ (id "lucidplan-backlog-list")
+                            (ondrop "dropBacklogItem(event)")
+                            (ondragover "allowDrop(event)")
+                            (class "flex flex-col gap-2 container"))
                          ,(map (lambda (t)
                                  (render-ticket-listitem (cdr t)))
                                (assoc-ref backlog
-                                          'tickets)))
-                    )
+                                          'tickets))))
                (footer ,(page-footer)))))
 
 (define-public (get-backlog-html project)

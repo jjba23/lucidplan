@@ -9,6 +9,13 @@ function dragBacklogItem(ev) {
 
 function dropBacklogItem(ev) {
   ev.preventDefault();
+  // console.log("ev.dataTransfer");
+  // console.log(ev.dataTransfer);
   var data = ev.dataTransfer.getData("text");
-  ev.target.appendChild(document.getElementById(data));
+  // console.log("ev.target");
+  // console.log(ev.target);
+  // console.log("ev.target.parentNode.parentNode");
+  // console.log(ev.target.parentNode.parentNode);    
+  //ev.target.parentNode.parentNode.appendChild(document.getElementById(data));
+  document.getElementById('lucidplan-backlog-list').appendChild(document.getElementById(data));
 }
