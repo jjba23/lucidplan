@@ -78,7 +78,7 @@
                   "free and open project management for everyone")))))
 
 (define (render-ticket ticket)
-  `((div (@(class "flex flex-col gap-2"))
+  `((div (@ (class "flex flex-col gap-2"))
          (h4 (@ (class "font-mono text-stone-700 text-lg"))
              ,(assoc-ref ticket
                          'title))
@@ -87,25 +87,33 @@
                         'description))
          (small (@ (class "font-mono text-stone-600 text-xs"))
                 ,(assoc-ref ticket
-                            'id)))
-    ))
+                            'id)))))
 
 (define ticket-listitem-reveal-details-js-template
   "document.getElementById('details-~a').toggleAttribute('hidden')")
 
 (define (render-ticket-listitem ticket)
-  `((div (@(id ,(format #f "listitem-~a" (assoc-ref ticket 'id)))
-          (class "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer")
-          (onclick ,(format #f ticket-listitem-reveal-details-js-template (assoc-ref ticket 'id)))
-          )
-         (small (@(class "font-mono text-stone-500 text-sm"))
-                ,(assoc-ref ticket 'human-id))
+  `((div (@ (id ,(format #f "listitem-~a"
+                         (assoc-ref ticket
+                                    'id)))
+            (class
+             "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer")
+            (onclick ,(format #f ticket-listitem-reveal-details-js-template
+                              (assoc-ref ticket
+                                         'id))))
+         (small (@ (class "font-mono text-stone-500 text-sm"))
+                ,(assoc-ref ticket
+                            'human-id))
          (h5 (@ (class "font-mono text-stone-700 text-lg"))
-             ,(assoc-ref ticket 'title)))
-    (div (@(id ,(format #f "details-~a" (assoc-ref ticket 'id)))(class "")(hidden ""))
-         ,(render-ticket ticket)
-         )
-    
+             ,(assoc-ref ticket
+                         'title)))
+    (div (@ (id ,(format #f "details-~a"
+                         (assoc-ref ticket
+                                    'id)))
+            (class "")
+            (hidden ""))
+         ,(render-ticket ticket))
+
     ))
 
 (define (html-from-backlog backlog)
@@ -125,8 +133,8 @@
                (script (@ (src "/js/tailwind.config.js")) ()))
          (body (@ (class "bg-stone-200 p-2"))
                (div (@ (class
-                         "my-6 container flex flex-row flex-wrap justify-center"))
-                    (div (@(class "flex flex-col gap-2"))
+                        "my-6 container flex flex-row flex-wrap justify-center"))
+                    (div (@ (class "flex flex-col gap-2"))
                          ,(map (lambda (t)
                                  (render-ticket-listitem (cdr t)))
                                (assoc-ref backlog
