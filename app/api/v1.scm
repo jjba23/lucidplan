@@ -5,9 +5,16 @@
 ; DO NOT REMOVE THIS LINE!!!
 
 (import (lucidplan backlog))
+(import (lucidplan projects))
 
 (get "/api/v1/backlog/:project"
      #:mime 'json
      (lambda (rc)
        (:mime rc
-              (get-backlog (params rc "project")))))
+        (get-backlog (params rc "project")))))
+
+(get "/api/v1/projects"
+     #:mime 'json
+     (lambda (rc)
+       (:mime rc
+        (get-projects))))

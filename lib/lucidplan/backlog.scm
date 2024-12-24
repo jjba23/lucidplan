@@ -29,6 +29,7 @@
   #:use-module (ice-9 iconv)
   #:use-module (ice-9 hash-table)
   #:use-module (ice-9 threads)
+  #:use-module (lucidplan html)
   #:use-module (artanis route))
 
 (define (some-backlog project)
@@ -36,17 +37,17 @@
     (tickets ("7b954ba2-dd82-46a7-9b2f-04d64bd72366"
               (title . "Manual for SSS - info, tips, keybindings")
               (description . "* Manual for SSS\ngenerate manual, documentation and cheatsheet for SSS easily")
-              (human-id . "SSS-1")
+              (human-id . 1)
               (id . "7b954ba2-dd82-46a7-9b2f-04d64bd72366"))
              ("727dfeed-6364-4f6c-a9c6-4990621039a0"
               (title . "Bootstrap script for SSS - easy onboarding")
               (description . "* bootstrap script for first-setup to help adoption of sss")
-              (human-id . "SSS-2")
+              (human-id . 2)
               (id . "727dfeed-6364-4f6c-a9c6-4990621039a0"))
              ("01e35983-c88d-49ab-aebd-1bb466158170"
               (title . "User factory for SSS - profiles")
               (description . "** user factory which is by default configured to joe's settings but is easily tweaked and with no duplication it creates new users.")
-              (human-id . "SSS-3")
+              (human-id . 3)
               (id . "01e35983-c88d-49ab-aebd-1bb466158170")))
     (highest-priority-tickets unquote
                               #("7b954ba2-dd82-46a7-9b2f-04d64bd72366" "727dfeed-6364-4f6c-a9c6-4990621039a0"))
@@ -61,30 +62,20 @@
 (define-public (get-backlog project)
   (some-backlog project))
 
-(define-public (page-footer)
-  `((div (@ (class "block text-center font-mono"))
-         (div (@ (class
-                  "mt-4 flex flex-row flex-wrap gap-4 justify-center align-center"))
-              (p (@ (class "text-sm text-stone-600"))
-                 "find the source code here:")
-              (a (@ (class "text-orange-700 font-bold cursor-pointer text-sm")
-                    (href "https://codeberg.org/jjba23/lucidplan"))
-                 "https://codeberg.org/jjba23/lucidplan"))
-         (p (@ (class "mt-4"))
-            (em (@ (class "text-md text-stone-600"))
-                "Copyright 2025 - Josep Bigorra"))
-         (p (@ (class "mt-4"))
-            (span (@ (class "text-sm text-stone-600"))
-                  "free and open project management for everyone")))))
 
-(define (render-ticket ticket)
+(define (render-ticket project ticket)
   `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl"))
+         (small (@(class "font-mono text-stone-400 text-xs font-light")) "title:")
          (h4 (@ (class "font-mono text-stone-700 text-lg"))
              ,(assoc-ref ticket
                          'title))
+         (small (@(class "font-mono text-stone-400 text-xs font-light")) "description:")
          (p (@ (class "font-mono text-stone-600 text-md max-w-prose"))
             ,(assoc-ref ticket
                         'description))
+         (small (@(class "font-mono text-stone-400 text-xs font-light")) "meta:")
+         (small (@ (class "font-mono text-stone-500 text-xs"))
+                ,(format #f "~a-~a" project (assoc-ref ticket 'human-id)))
          (small (@ (class "font-mono text-stone-500 text-xs"))
                 ,(assoc-ref ticket
                             'id)))))
@@ -92,7 +83,7 @@
 (define ticket-listitem-reveal-details-js-template
   "document.getElementById('details-~a').toggleAttribute('hidden')")
 
-(define (render-ticket-listitem ticket)
+(define (render-ticket-listitem project ticket)
   `((div (@ (draggable "true")
             (ondragstart "dragBacklogItem(event)")
             (class "flex flex-col gap-2")
@@ -105,8 +96,8 @@
          (div (@ (class
                    "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer rounded-xl"))
               (small (@ (class "font-mono text-stone-500 text-sm"))
-                     ,(assoc-ref ticket
-                                 'human-id))
+                     ,(format #f "~a-~a" project (assoc-ref ticket
+                                                            'human-id)))
               (h5 (@ (class "font-mono text-stone-700 text-lg"))
                   ,(assoc-ref ticket
                               'title)))
@@ -115,46 +106,23 @@
                                          'id)))
                  (class "ml-4")
                  (hidden ""))
-              ,(render-ticket ticket)))
+              ,(render-ticket project ticket)))
     
     ))
 
-(define (html-from-backlog backlog)
-  `(html (head (title "LucidPlan - My Backlog")
-               (link (@ (rel "preconnect")
-                        (href "https://fonts.googleapis.com")))
-               (link (@ (rel "preconnect")
-                        (href "https://fonts.gstatic.com")
-                        (crossorigin "")))
-               (link (@ (rel "stylesheet")
-                        (href "https://fonts.cdnfonts.com/css/liberation-sans")))
-               (link (@ (rel "stylesheet")
-                        (href "/css/fonts.css")))
-               (meta (@ (name "viewport")
-                        (content "width=device-width, initial-scale=1.0")))
-               (script (@ (src "https://cdn.tailwindcss.com")) "")
-               (script (@ (src "/js/tailwind.config.js")) ())
-               (script (@ (src "/js/backlog.js")) ()))
-         (body (@ (class "bg-stone-200 p-2"))
-               (div (@ (class
-                        "my-6 flex flex-row flex-wrap justify-center gap-2"))
-                    (div (@ (class "flex flex-col gap-2 p-2"))
-                         (a (@ (class
-                                "text-sm uppercase text-stone-600 font-bold")
-                               (href "/board/JOE")) "Board")
-                         (a (@ (class
-                                "text-sm uppercase text-stone-600 font-bold")
-                               (href "/backlog/JOE")) "Backlog"))
-                    (div (@ (id "lucidplan-backlog-list")
-                            (ondrop "dropBacklogItem(event)")
-                            (ondragover "allowDrop(event)")
-                            (class "flex flex-col gap-2 container"))
-                         ,(map (lambda (t)
-                                 (render-ticket-listitem (cdr t)))
-                               (assoc-ref backlog
-                                          'tickets))))
-               (footer ,(page-footer)))))
+(define (html-from-backlog project backlog)
+  (html-template
+   `(div (@ (id "lucidplan-backlog-list")
+            (ondrop "dropBacklogItem(event)")
+            (ondragover "allowDrop(event)")
+            (class "flex flex-col gap-2 container"))
+         ,(map (lambda (t)
+                 (render-ticket-listitem project (cdr t)))
+               (assoc-ref backlog
+                          'tickets)))
+   
+   ))
 
 (define-public (get-backlog-html project)
-  (html-from-backlog (some-backlog project)))
+  (html-from-backlog project (some-backlog project)))
 
