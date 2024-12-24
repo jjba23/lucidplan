@@ -2,7 +2,7 @@
 ;; Please add your license header here.
 ;; This file is generated automatically by GNU Artanis.
 (define-restful-api v1)
-                                        ; DO NOT REMOVE THIS LINE!!!
+; DO NOT REMOVE THIS LINE!!!
 
 (import (lucidplan backlog))
 
@@ -10,4 +10,4 @@
      #:mime 'json
      (lambda (rc)
        (:mime rc
-        (get-backlog (params rc "project")))))
+              (get-backlog (params rc "project")))))
