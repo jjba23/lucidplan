@@ -78,14 +78,14 @@
                   "free and open project management for everyone")))))
 
 (define (render-ticket ticket)
-  `((div (@ (class "flex flex-col gap-2"))
+  `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl"))
          (h4 (@ (class "font-mono text-stone-700 text-lg"))
              ,(assoc-ref ticket
                          'title))
-         (p (@ (class "font-mono text-stone-600 text-md"))
+         (p (@ (class "font-mono text-stone-600 text-md max-w-prose"))
             ,(assoc-ref ticket
                         'description))
-         (small (@ (class "font-mono text-stone-600 text-xs"))
+         (small (@ (class "font-mono text-stone-500 text-xs"))
                 ,(assoc-ref ticket
                             'id)))))
 
@@ -93,14 +93,14 @@
   "document.getElementById('details-~a').toggleAttribute('hidden')")
 
 (define (render-ticket-listitem ticket)
-  `((div (@ (id ,(format #f "listitem-~a"
-                         (assoc-ref ticket
-                                    'id)))
-            (class
-             "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer")
-            (onclick ,(format #f ticket-listitem-reveal-details-js-template
-                              (assoc-ref ticket
-                                         'id))))
+  `((div (@(draggable "true") (ondragstart "dragBacklogItem(event)") (id ,(format #f "listitem-~a"
+                                                                                  (assoc-ref ticket
+                                                                                             'id)))
+          (class
+            "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer rounded-xl")
+          (onclick ,(format #f ticket-listitem-reveal-details-js-template
+                            (assoc-ref ticket
+                                       'id))))
          (small (@ (class "font-mono text-stone-500 text-sm"))
                 ,(assoc-ref ticket
                             'human-id))
@@ -116,6 +116,12 @@
 
     ))
 
+
+;; <div id="div1" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+
+;; <img id="drag1" src="img_logo.gif" draggable="true" ondragstart="drag(event)" width="336" height="69">
+
+
 (define (html-from-backlog backlog)
   `(html (head (title "LucidPlan - My Backlog")
                (link (@ (rel "preconnect")
@@ -130,15 +136,21 @@
                (meta (@ (name "viewport")
                         (content "width=device-width, initial-scale=1.0")))
                (script (@ (src "https://cdn.tailwindcss.com")) "")
-               (script (@ (src "/js/tailwind.config.js")) ()))
+               (script (@ (src "/js/tailwind.config.js")) ())
+               (script (@ (src "/js/backlog.js")) ()))
          (body (@ (class "bg-stone-200 p-2"))
                (div (@ (class
-                        "my-6 container flex flex-row flex-wrap justify-center"))
-                    (div (@ (class "flex flex-col gap-2"))
+                         "my-6 flex flex-row flex-wrap justify-center gap-2"))
+                    (div (@(class "flex flex-col gap-2 p-2"))
+                         (a (@(class "text-sm uppercase text-stone-600 font-bold")(href "/board/JOE")) "Board")
+                         (a (@(class "text-sm uppercase text-stone-600 font-bold")(href "/backlog/JOE")) "Backlog")
+                         )
+                    (div (@(ondrop "dropBacklogItem(event)")(ondragover "allowDrop(event)")(class "flex flex-col gap-2 container"))
                          ,(map (lambda (t)
                                  (render-ticket-listitem (cdr t)))
                                (assoc-ref backlog
-                                          'tickets))))
+                                          'tickets)))
+                    )
                (footer ,(page-footer)))))
 
 (define-public (get-backlog-html project)
