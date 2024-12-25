@@ -17,10 +17,10 @@
 
 (define-artanis-controller projects)
 
-(import (lucidplan projects))
+(import (lucidplan persistence projects)
+        (lucidplan html projects))
 
 (get "/projects"
      #:mime 'xml
      (lambda (rc)
-       (response-emit (:mime rc
-                             (get-projects-html)))))
+       (response-emit (:mime rc (html-from-projects (lucidplan-projects))))))

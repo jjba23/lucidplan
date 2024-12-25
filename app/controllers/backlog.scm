@@ -17,10 +17,11 @@
 
 (define-artanis-controller index)
 
-(import (lucidplan backlog))
+(import (lucidplan html backlog)
+        (lucidplan persistence backlog))
 
 (get "/backlog/:project"
      #:mime 'xml
      (lambda (rc)
        (response-emit (:mime rc
-                             (get-backlog-html (params rc "project"))))))
+                       (html-from-backlog (params rc "project") (lucidplan-backlog (params rc "project")))))))
