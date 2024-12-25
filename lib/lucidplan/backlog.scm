@@ -29,100 +29,15 @@
   #:use-module (ice-9 iconv)
   #:use-module (ice-9 hash-table)
   #:use-module (ice-9 threads)
-  #:use-module (lucidplan html)
+  #:use-module (lucidplan html dsl)
+  #:use-module (lucidplan html backlog)
+  #:use-module (lucidplan persistence backlog)
   #:use-module (artanis route))
 
-(define (some-backlog project)
-  `((project unquote project)
-    (tickets ("7b954ba2-dd82-46a7-9b2f-04d64bd72366"
-              (title . "Manual for SSS - info, tips, keybindings")
-              (description . "* Manual for SSS\ngenerate manual, documentation and cheatsheet for SSS easily")
-              (human-id . 1)
-              (id . "7b954ba2-dd82-46a7-9b2f-04d64bd72366"))
-             ("727dfeed-6364-4f6c-a9c6-4990621039a0"
-              (title . "Bootstrap script for SSS - easy onboarding")
-              (description . "* bootstrap script for first-setup to help adoption of sss")
-              (human-id . 2)
-              (id . "727dfeed-6364-4f6c-a9c6-4990621039a0"))
-             ("01e35983-c88d-49ab-aebd-1bb466158170"
-              (title . "User factory for SSS - profiles")
-              (description . "** user factory which is by default configured to joe's settings but is easily tweaked and with no duplication it creates new users.")
-              (human-id . 3)
-              (id . "01e35983-c88d-49ab-aebd-1bb466158170")))
-    (highest-priority-tickets unquote
-                              #("7b954ba2-dd82-46a7-9b2f-04d64bd72366" "727dfeed-6364-4f6c-a9c6-4990621039a0"))
-    (closed-tickets unquote #())
-    (in-progress-tickets unquote #("7b954ba2-dd82-46a7-9b2f-04d64bd72366"))
-    (in-review-tickets unquote #())
-    (by-priority-sorting unquote
-                         #("7b954ba2-dd82-46a7-9b2f-04d64bd72366" "727dfeed-6364-4f6c-a9c6-4990621039a0" "01e35983-c88d-49ab-aebd-1bb466158170"))
-    (user-sorting unquote
-                  #("01e35983-c88d-49ab-aebd-1bb466158170" "727dfeed-6364-4f6c-a9c6-4990621039a0" "7b954ba2-dd82-46a7-9b2f-04d64bd72366"))))
 
-(define-public (get-backlog project)
-  (some-backlog project))
-
-
-(define (render-ticket project ticket)
-  `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl"))
-         (small (@(class "font-mono text-stone-400 text-xs font-light")) "title:")
-         (h4 (@ (class "font-mono text-stone-700 text-lg"))
-             ,(assoc-ref ticket
-                         'title))
-         (small (@(class "font-mono text-stone-400 text-xs font-light")) "description:")
-         (p (@ (class "font-mono text-stone-600 text-md max-w-prose"))
-            ,(assoc-ref ticket
-                        'description))
-         (small (@(class "font-mono text-stone-400 text-xs font-light")) "meta:")
-         (small (@ (class "font-mono text-stone-500 text-xs"))
-                ,(format #f "~a-~a" project (assoc-ref ticket 'human-id)))
-         (small (@ (class "font-mono text-stone-500 text-xs"))
-                ,(assoc-ref ticket
-                            'id)))))
-
-(define ticket-listitem-reveal-details-js-template
-  "document.getElementById('details-~a').toggleAttribute('hidden')")
-
-(define (render-ticket-listitem project ticket)
-  `((div (@ (draggable "true")
-            (ondragstart "dragBacklogItem(event)")
-            (class "flex flex-col gap-2")
-            (id ,(format #f "listitem-~a"
-                         (assoc-ref ticket
-                                    'id)))
-            (onclick ,(format #f ticket-listitem-reveal-details-js-template
-                              (assoc-ref ticket
-                                         'id))))
-         (div (@ (class
-                   "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer rounded-xl"))
-              (small (@ (class "font-mono text-stone-500 text-sm"))
-                     ,(format #f "~a-~a" project (assoc-ref ticket
-                                                            'human-id)))
-              (h5 (@ (class "font-mono text-stone-700 text-lg"))
-                  ,(assoc-ref ticket
-                              'title)))
-         (div (@ (id ,(format #f "details-~a"
-                              (assoc-ref ticket
-                                         'id)))
-                 (class "ml-4")
-                 (hidden ""))
-              ,(render-ticket project ticket)))
-    
-    ))
-
-(define (html-from-backlog project backlog)
-  (html-template
-   `(div (@ (id "lucidplan-backlog-list")
-            (ondrop "dropBacklogItem(event)")
-            (ondragover "allowDrop(event)")
-            (class "flex flex-col gap-2 container"))
-         ,(map (lambda (t)
-                 (render-ticket-listitem project (cdr t)))
-               (assoc-ref backlog
-                          'tickets)))
-   
-   ))
+(define-public (get-backlog project) (lucidplan-backlog project))
 
 (define-public (get-backlog-html project)
-  (html-from-backlog project (some-backlog project)))
+  (html-from-backlog project (lucidplan-backlog project)))
+
 

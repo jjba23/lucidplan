@@ -15,7 +15,7 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with lucidplan.  If not, see <https://www.gnu.org/licenses/>.
 
-(define-module (lucidplan html)
+(define-module (lucidplan html dsl)
   #:use-module (web server)
   #:use-module (web request)
   #:use-module (web response)
@@ -31,11 +31,10 @@
   #:use-module (ice-9 threads)
   #:use-module (artanis route))
 
-
 (define-public (page-footer)
   `((div (@ (class "block text-center font-mono"))
          (div (@ (class
-                   "mt-4 flex flex-row flex-wrap gap-4 justify-center align-center"))
+                  "mt-4 flex flex-row flex-wrap gap-4 justify-center align-center"))
               (p (@ (class "text-sm text-stone-600"))
                  "find the source code here:")
               (a (@ (class "text-orange-700 font-bold cursor-pointer text-sm")
@@ -66,17 +65,16 @@
                (script (@ (src "/js/backlog.js")) ()))
          (body (@ (class "bg-stone-200 p-2"))
                (div (@ (class
-                         "my-6 flex flex-row flex-wrap justify-center gap-2"))
+                        "my-6 flex flex-row flex-wrap justify-center gap-2"))
                     (div (@ (class "flex flex-col gap-2 p-2"))
                          (a (@ (class
-                                 "text-sm uppercase text-stone-600 font-bold")
+                                "text-sm uppercase text-stone-600 font-bold")
                                (href "/projects")) "Projects")
                          (a (@ (class
-                                 "text-sm uppercase text-stone-600 font-bold")
+                                "text-sm uppercase text-stone-600 font-bold")
                                (href "/board/JOE")) "Board")
                          (a (@ (class
-                                 "text-sm uppercase text-stone-600 font-bold")
+                                "text-sm uppercase text-stone-600 font-bold")
                                (href "/backlog/JOE")) "Backlog"))
-                    ,body
-                    )               
+                    ,body)
                (footer ,(page-footer)))))

@@ -23,4 +23,4 @@
      #:mime 'xml
      (lambda (rc)
        (response-emit (:mime rc
-                       (get-projects-html)))))
+                             (get-projects-html)))))

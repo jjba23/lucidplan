@@ -29,30 +29,14 @@
   #:use-module (ice-9 iconv)
   #:use-module (ice-9 hash-table)
   #:use-module (ice-9 threads)
-  #:use-module (lucidplan html)
+  #:use-module (lucidplan html dsl)
+  #:use-module (lucidplan html projects)
+  #:use-module (lucidplan persistence projects)
   #:use-module (artanis route))
 
-(define projects
-  `((projects  ("e8351c99-22a0-4e94-bd55-f6e04fe0e46c"
-                (id . "e8351c99-22a0-4e94-bd55-f6e04fe0e46c")
-                (human-id . "JOE")
-                (title . "Joe's Projects"))
-               ("0e9f28c2-788f-49f3-811f-d463b79fbd8d"
-                (id . "0e9f28c2-788f-49f3-811f-d463b79fbd8d")
-                (human-id . "ET")
-                (title . "Engagement Team")))))
 
-(define-public (get-projects)
-  projects)
-
-(define (html-from-projects projects)
-  (html-template
-   `((div (@ (class "flex flex-col gap-2 container"))
-          ,(map (lambda (p) `(div (@ (class
-                                  "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer rounded-xl"))
-                             (p (@(class "font-mono text-stone-700 text-lg")) (a (@(href ,(format #f "/backlog/~a" (assoc-ref p 'human-id)))) ,(assoc-ref p 'title)))))
-                (assoc-ref projects 'projects))))
-   ))
+(define-public (get-projects) (lucidplan-projects))
 
 (define-public (get-projects-html)
-  (html-from-projects projects))
+  (html-from-projects (lucidplan-projects)))
+
