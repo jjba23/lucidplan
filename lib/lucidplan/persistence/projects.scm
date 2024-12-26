@@ -34,7 +34,7 @@
   #:use-module (artanis route))
 
 (define lucidplan-projects-location
-  "/home/joe/Ontwikkeling/Persoonlijk/lucidplan/db/projects.scm")
+  "/home/joe/Ontwikkeling/Persoonlijk/lucidplan/db/lucidplan/projects.scm")
 
 (define-public (read-lucidplan-projects)
   (let* ((file (open-input-file lucidplan-projects-location))

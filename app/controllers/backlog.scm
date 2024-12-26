@@ -76,7 +76,10 @@
                                             'human-id))
                                (assoc-ref backlog
                                           'tickets)))
-               (highest-human-id (apply max human-ids))
+               (highest-human-id (cond
+                                  ((null? human-ids) 1)
+                                  (else (apply max human-ids))
+                                  ))
                (new-uuid (string-replace-substring (uuidgen) "\n" ""))
                (new-ticket `((id unquote new-uuid)
                              (human-id unquote
@@ -91,10 +94,10 @@
                (new-backlog (assoc-set! backlog
                                         'tickets new-backlog-tickets)))
           
-          ;; (display "===========") (newline)          
-          ;; (write new-uuid) (newline)
-          ;; (write new-backlog) (newline)
-          ;; (display "===========") (newline)
+          (display "===========") (newline)          
+          (write new-uuid) (newline)
+          (write new-backlog) (newline)
+          (display "===========") (newline)
 
           (write-lucidplan-backlog (params rc "project") new-backlog)
 
