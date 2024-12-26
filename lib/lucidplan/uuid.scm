@@ -27,6 +27,6 @@
   #:use-module (ice-9 threads))
 
 (define-public (uuidgen)
-  (with-output-to-string
-    (lambda ()
-      (string-replace-substring (syscall "uuidgen") "\n" ""))))
+  (with-output-to-string (lambda ()
+                           (string-replace-substring (syscall "uuidgen") "\n"
+                                                     ""))))

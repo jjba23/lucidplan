@@ -24,4 +24,6 @@
      #:mime 'xml
      (lambda (rc)
        (response-emit (:mime rc
-                             (html-from-projects (read-lucidplan-projects))))))
+                             (html-from-projects (read-lucidplan-projects (params
+                                                                           rc
+                                                                           "project")))))))

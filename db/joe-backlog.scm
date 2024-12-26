@@ -1,1 +1,45 @@
-((project unquote "JOE") (tickets ("e263a0f1-77fa-45d6-bfdf-1d63c359b9bb" (title . "LucidPlan proof-of-concept development") (description . "Develop a nice and hackable project management tool that is hackable and free and open for everyone.") (human-id . 4) (ticket-status . work-in-progress) (id . "e263a0f1-77fa-45d6-bfdf-1d63c359b9bb")) ("7b954ba2-dd82-46a7-9b2f-04d64bd72366" (title . "Manual for SSS - info, tips, keybindings") (description . "* Manual for SSS\ngenerate manual, documentation and cheatsheet for SSS easily") (human-id . 1) (ticket-status . work-in-progress) (id . "7b954ba2-dd82-46a7-9b2f-04d64bd72366")) ("727dfeed-6364-4f6c-a9c6-4990621039a0" (title . "Bootstrap script for SSS - easy onboarding") (description . "* bootstrap script for first-setup to help adoption of sss") (human-id . 2) (ticket-status . todo) (id . "727dfeed-6364-4f6c-a9c6-4990621039a0")) ("01e35983-c88d-49ab-aebd-1bb466158170" (title . "User factory for SSS - profiles") (description . "** user factory which is by default configured to joe's settings but is easily tweaked and with no duplication it creates new users.") (human-id . 3) (ticket-status . todo) (id . "01e35983-c88d-49ab-aebd-1bb466158170"))) (highest-priority-tickets unquote #("e263a0f1-77fa-45d6-bfdf-1d63c359b9bb" "7b954ba2-dd82-46a7-9b2f-04d64bd72366" "727dfeed-6364-4f6c-a9c6-4990621039a0")) (closed-tickets unquote #()) (in-progress-tickets unquote #("7b954ba2-dd82-46a7-9b2f-04d64bd72366")) (in-review-tickets unquote #()) (by-priority-sorting unquote #("e263a0f1-77fa-45d6-bfdf-1d63c359b9bb" "7b954ba2-dd82-46a7-9b2f-04d64bd72366" "727dfeed-6364-4f6c-a9c6-4990621039a0" "01e35983-c88d-49ab-aebd-1bb466158170")) (user-sorting unquote #("e263a0f1-77fa-45d6-bfdf-1d63c359b9bb" "01e35983-c88d-49ab-aebd-1bb466158170" "727dfeed-6364-4f6c-a9c6-4990621039a0" "7b954ba2-dd82-46a7-9b2f-04d64bd72366")))
+((project unquote "JOE")
+ (tickets ("5650df9d-fa02-477f-92bc-a1908309c501"
+           (id . "5650df9d-fa02-477f-92bc-a1908309c501")
+           (human-id . 5)
+           (title . "WikiMusic fix reset password flow")
+           (description . "There seems to be a problem with WikiMusic's reset password functionality. It currently is broken.\r\n\r\nWe should investigate further and fix this before we invite more users to it.")
+           (ticket-status . "todo")
+           (ticket-type . "bug"))
+          ("e263a0f1-77fa-45d6-bfdf-1d63c359b9bb"
+           (title . "LucidPlan proof-of-concept development")
+           (description . "Develop a nice and hackable project management tool that is hackable and free and open for everyone.\n\nLucidPlan is a project management tool made for hackers and business-people alike.\n\nThis tool is the fruit of years of experience using bloated proprietary systems like Jira/Trello, and experiencing the insane frustrations they bring.")
+           (human-id . 4)
+           (ticket-status . "work-in-progress")
+           (ticket-type . "task")
+           (id . "e263a0f1-77fa-45d6-bfdf-1d63c359b9bb"))
+          ("7b954ba2-dd82-46a7-9b2f-04d64bd72366"
+           (title . "Manual for SSS - info, tips, keybindings")
+           (description . "* Manual for SSS\ngenerate manual, documentation and cheatsheet for SSS easily")
+           (human-id . 1)
+           (ticket-status . "work-in-progress")
+           (ticket-type . "task")
+           (id . "7b954ba2-dd82-46a7-9b2f-04d64bd72366"))
+          ("727dfeed-6364-4f6c-a9c6-4990621039a0"
+           (title . "Bootstrap script for SSS - easy onboarding")
+           (description . "* bootstrap script for first-setup to help adoption of sss")
+           (human-id . 2)
+           (ticket-status . todo)
+           (ticket-type . "task")
+           (id . "727dfeed-6364-4f6c-a9c6-4990621039a0"))
+          ("01e35983-c88d-49ab-aebd-1bb466158170"
+           (title . "User factory for SSS - profiles")
+           (description . "** user factory which is by default configured to joe's settings but is easily tweaked and with no duplication it creates new users.")
+           (human-id . 3)
+           (ticket-status . "todo")
+           (ticket-type . "task")
+           (id . "01e35983-c88d-49ab-aebd-1bb466158170")))
+ (highest-priority-tickets unquote
+                           #("e263a0f1-77fa-45d6-bfdf-1d63c359b9bb" "7b954ba2-dd82-46a7-9b2f-04d64bd72366" "727dfeed-6364-4f6c-a9c6-4990621039a0"))
+ (closed-tickets unquote #())
+ (in-progress-tickets unquote #("7b954ba2-dd82-46a7-9b2f-04d64bd72366"))
+ (in-review-tickets unquote #())
+ (by-priority-sorting unquote
+                      #("e263a0f1-77fa-45d6-bfdf-1d63c359b9bb" "7b954ba2-dd82-46a7-9b2f-04d64bd72366" "727dfeed-6364-4f6c-a9c6-4990621039a0" "01e35983-c88d-49ab-aebd-1bb466158170"))
+ (user-sorting unquote
+               #("e263a0f1-77fa-45d6-bfdf-1d63c359b9bb" "01e35983-c88d-49ab-aebd-1bb466158170" "727dfeed-6364-4f6c-a9c6-4990621039a0" "7b954ba2-dd82-46a7-9b2f-04d64bd72366")))

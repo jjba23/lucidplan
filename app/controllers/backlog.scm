@@ -37,18 +37,19 @@
      #:mime 'xml
      (lambda (rc)
        (response-emit (:mime rc
-                       (html-new-ticket-form (params rc "project"))))))
+                             (html-new-ticket-form (params rc "project"))))))
 
 (post "/backlog/:project/tickets/delete"
       #:mime 'xml
-      (lambda(rc)
+      (lambda (rc)
         (let* ((body (rc-body rc))
                (kv (read-url-encoded-body body))
                (id (uri-decode (car (assoc-ref kv "id"))))
                (backlog (read-lucidplan-backlog (params rc "project")))
-               (new-backlog-tickets (assoc-remove! (assoc-ref backlog 'tickets) id))
-               (new-backlog (assoc-set! backlog 'tickets new-backlog-tickets))
-               )
+               (new-backlog-tickets (assoc-remove! (assoc-ref backlog
+                                                              'tickets) id))
+               (new-backlog (assoc-set! backlog
+                                        'tickets new-backlog-tickets)))
           
           (newline)
           (display "===========")
@@ -57,13 +58,12 @@
           (newline)
           (display "===========")
           (newline)
-          
+
           (write-lucidplan-backlog (params rc "project") new-backlog)
 
           (redirect-to rc
                        (format #f "/backlog/~a"
-                               (params rc "project"))))
-        ))
+                               (params rc "project"))))))
 
 (post "/backlog/:project/tickets/new-submit"
       #:mime 'xml
@@ -72,6 +72,7 @@
                (kv (read-url-encoded-body body))
                (title (uri-decode (car (assoc-ref kv "title"))))
                (ticket-status (uri-decode (car (assoc-ref kv "ticket-status"))))
+               (ticket-type (uri-decode (car (assoc-ref kv "ticket-type"))))
                (description (uri-decode (car (assoc-ref kv "description"))))
                (backlog (read-lucidplan-backlog (params rc "project")))
                (human-ids (map (lambda (t)
@@ -81,15 +82,18 @@
                                           'tickets)))
                (highest-human-id (apply max human-ids))
                (new-uuid (string-replace-substring (uuidgen) "\n" ""))
-               (new-ticket `((id unquote new-uuid )
+               (new-ticket `((id unquote new-uuid)
                              (human-id unquote
                                        (+ highest-human-id 1))
                              (title unquote title)
                              (description unquote description)
-                             (ticket-status unquote ticket-status)))
-               (new-backlog-tickets (assoc-set! (assoc-ref backlog 'tickets) new-uuid new-ticket))
-               (new-backlog (assoc-set! backlog 'tickets new-backlog-tickets))
-               )
+                             (ticket-status unquote ticket-status)
+                             (ticket-type unquote ticket-type)))
+               (new-backlog-tickets (assoc-set! (assoc-ref backlog
+                                                           'tickets) new-uuid
+                                                new-ticket))
+               (new-backlog (assoc-set! backlog
+                                        'tickets new-backlog-tickets)))
           
           (newline)
           (display "===========")
@@ -100,7 +104,7 @@
           (newline)
           (display "===========")
           (newline)
-          
+
           (write-lucidplan-backlog (params rc "project") new-backlog)
 
           (redirect-to rc

@@ -38,11 +38,12 @@
 
 (define-public (read-lucidplan-backlog project)
   (let* ((file (open-input-file lucidplan-joe-backlog-location))
-         (backlog-data (eval-string (format #f "'~a" (get-string-all file)))))
+         (backlog-data (eval-string (format #f "'~a"
+                                            (get-string-all file)))))
     backlog-data))
 
 (define-public (write-lucidplan-backlog project b)
   (let* ((file (open-output-file lucidplan-joe-backlog-location)))
     (write b file)
-    ))
+    (close-output-port file)))
 
