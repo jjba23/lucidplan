@@ -40,12 +40,23 @@
              ,(assoc-ref ticket
                          'title))
          (small (@ (class "font-mono text-stone-400 text-xs font-light"))
+                "status:")
+         (p (@ (class "font-mono text-stone-700 text-md"))
+            ,(assoc-ref ticket
+                        'ticket-status))
+         (small (@ (class "font-mono text-stone-400 text-xs font-light"))
                 "description:")
          (p (@ (class "font-mono text-stone-600 text-md max-w-prose"))
             ,(assoc-ref ticket
                         'description))
          (small (@ (class "font-mono text-stone-400 text-xs font-light"))
                 "meta:")
+         (form (@(enctype "application/x-www-form-urlencoded")
+                (method "POST")
+                (action ,(format #f "/backlog/~a/tickets/delete" project)))
+               (input (@(hidden "")(name "id")(value ,(assoc-ref ticket 'id))))
+               (button (@(type "submit")) "delete")
+               )
          (small (@ (class "font-mono text-stone-500 text-xs"))
                 ,(format #f "~a-~a" project
                          (assoc-ref ticket

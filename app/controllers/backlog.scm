@@ -36,7 +36,33 @@
      #:mime 'xml
      (lambda (rc)
        (response-emit (:mime rc
-                             (html-new-ticket-form (params rc "project"))))))
+                       (html-new-ticket-form (params rc "project"))))))
+
+(post "/backlog/:project/tickets/delete"
+      #:mime 'xml
+      (lambda(rc)
+        (let* ((body (rc-body rc))
+               (kv (read-url-encoded-body body))
+               (id (uri-decode (car (assoc-ref kv "id"))))
+               (backlog (read-lucidplan-backlog (params rc "project")))
+               (new-backlog-tickets (assoc-remove! (assoc-ref backlog 'tickets) id))
+               (new-backlog (assoc-set! backlog 'tickets new-backlog-tickets))
+               )
+          
+          (newline)
+          (display "===========")
+          (newline)
+          (display new-backlog)
+          (newline)
+          (display "===========")
+          (newline)
+          
+          (write-lucidplan-backlog (params rc "project") new-backlog)
+
+          (redirect-to rc
+                       (format #f "/backlog/~a"
+                               (params rc "project"))))
+        ))
 
 (post "/backlog/:project/tickets/new-submit"
       #:mime 'xml
@@ -67,14 +93,14 @@
           (newline)
           (display "===========")
           (newline)
-          (display new-ticket)
+          (write new-uuid)
           (newline)
-          (display new-backlog)
+          (write new-backlog)
           (newline)
           (display "===========")
           (newline)
-
-          ;;(write-lucidplan-backlog (params rc "project") new-backlog)
+          
+          (write-lucidplan-backlog (params rc "project") new-backlog)
 
           (redirect-to rc
                        (format #f "/backlog/~a"

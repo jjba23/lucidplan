@@ -28,4 +28,4 @@
 
 (define-public (uuidgen)
   (with-output-to-string (lambda ()
-                           (syscall "uuidgen"))))
+                           (string-replace-substring (string-trim (syscall "uuidgen")) "\n" ""))))
