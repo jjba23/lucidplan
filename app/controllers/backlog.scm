@@ -25,3 +25,10 @@
      (lambda (rc)
        (response-emit (:mime rc
                        (html-from-backlog (params rc "project") (read-lucidplan-backlog (params rc "project")))))))
+
+(get "/backlog/:project/tickets/new"
+     #:mime 'xml
+     (lambda (rc)
+       (response-emit (:mime rc
+                       (html-new-ticket-form (params rc "project"))
+                       ))))
