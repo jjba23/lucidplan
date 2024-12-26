@@ -53,18 +53,23 @@
                                (assoc-ref backlog
                                           'tickets)))
                (highest-human-id (apply max human-ids))
-               (new-ticket `((id unquote
-                                 (uuidgen))
+               (new-uuid (uuidgen))
+               (new-ticket `((id unquote new-uuid )
                              (human-id unquote
                                        (+ highest-human-id 1))
                              (title unquote title)
                              (description unquote description)
-                             (ticket-status unquote ticket-status))))
+                             (ticket-status unquote ticket-status)))
+               (new-backlog-tickets (assoc-set! (assoc-ref backlog 'tickets) new-uuid new-ticket))
+               (new-backlog (assoc-set! backlog 'tickets new-backlog-tickets))
+               )
           
           (newline)
           (display "===========")
           (newline)
           (display new-ticket)
+          (newline)
+          (display new-backlog)
           (newline)
           (display "===========")
           (newline)
