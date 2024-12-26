@@ -18,17 +18,58 @@
 (define-artanis-controller index)
 
 (import (lucidplan html backlog)
-        (lucidplan persistence backlog))
+        (lucidplan persistence backlog)
+        (web uri)
+        (lucidplan uri)
+        (lucidplan uuid))
 
 (get "/backlog/:project"
      #:mime 'xml
      (lambda (rc)
        (response-emit (:mime rc
-                       (html-from-backlog (params rc "project") (read-lucidplan-backlog (params rc "project")))))))
+                             (html-from-backlog (params rc "project")
+                                                (read-lucidplan-backlog (params
+                                                                         rc
+                                                                         "project")))))))
 
 (get "/backlog/:project/tickets/new"
      #:mime 'xml
      (lambda (rc)
        (response-emit (:mime rc
-                       (html-new-ticket-form (params rc "project"))
-                       ))))
+                             (html-new-ticket-form (params rc "project"))))))
+
+(post "/backlog/:project/tickets/new-submit"
+      #:mime 'xml
+      (lambda (rc)
+        (let* ((body (rc-body rc))
+               (kv (read-url-encoded-body body))
+               (title (uri-decode (car (assoc-ref kv "title"))))
+               (ticket-status (uri-decode (car (assoc-ref kv "ticket-status"))))
+               (description (uri-decode (car (assoc-ref kv "description"))))
+               (backlog (read-lucidplan-backlog (params rc "project")))
+               (human-ids (map (lambda (t)
+                                 (assoc-ref (cdr t)
+                                            'human-id))
+                               (assoc-ref backlog
+                                          'tickets)))
+               (highest-human-id (apply max human-ids))
+               (new-ticket `((id unquote
+                                 (uuidgen))
+                             (human-id unquote
+                                       (+ highest-human-id 1))
+                             (title unquote title)
+                             (description unquote description)
+                             (ticket-status unquote ticket-status))))
+          
+          (newline)
+          (display "===========")
+          (newline)
+          (display new-ticket)
+          (newline)
+          (display "===========")
+          (newline)
+
+          (redirect-to rc
+                       (format #f "/backlog/~a"
+                               (params rc "project"))))))
+

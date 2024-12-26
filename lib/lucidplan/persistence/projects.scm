@@ -41,7 +41,7 @@
          (projects-data (eval-string (get-string-all file))))
     projects-data))
 
-
 (define-public (write-lucidplan-projects p)
   (with-output-to-file lucidplan-projects-location
-    (lambda() (display p))))
+    (lambda ()
+      (display p))))

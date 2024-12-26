@@ -33,7 +33,6 @@
   #:use-module (lucidplan html backlog)
   #:use-module (artanis route))
 
-
 (define lucidplan-joe-backlog-location
   "/home/joe/Ontwikkeling/Persoonlijk/lucidplan/db/joe-backlog.scm")
 
@@ -42,10 +41,8 @@
          (backlog-data (eval-string (get-string-all file))))
     backlog-data))
 
-
 (define-public (write-lucidplan-backlog project b)
   (with-output-to-file lucidplan-joe-backlog-location
-    (lambda() (display p))))
-
-
+    (lambda ()
+      (display p))))
 

@@ -26,4 +26,6 @@
   #:use-module (lucidplan process)
   #:use-module (ice-9 threads))
 
-(define-public (uuidgen) (with-output-to-string (lambda() (syscall "uuidgen"))))
+(define-public (uuidgen)
+  (with-output-to-string (lambda ()
+                           (syscall "uuidgen"))))
