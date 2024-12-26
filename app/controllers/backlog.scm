@@ -74,6 +74,8 @@
           (display "===========")
           (newline)
 
+          ;;(write-lucidplan-backlog (params rc "project") new-backlog)
+
           (redirect-to rc
                        (format #f "/backlog/~a"
                                (params rc "project"))))))

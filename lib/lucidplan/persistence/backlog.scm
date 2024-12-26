@@ -44,5 +44,5 @@
 (define-public (write-lucidplan-backlog project b)
   (with-output-to-file lucidplan-joe-backlog-location
     (lambda ()
-      (display p))))
+      (display b))))
 
