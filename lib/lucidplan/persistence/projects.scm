@@ -33,11 +33,15 @@
   #:use-module (lucidplan html projects)
   #:use-module (artanis route))
 
-(define-public (read-lucidplan-projects))
+(define lucidplan-projects-location
+  "/home/joe/Ontwikkeling/Persoonlijk/lucidplan/db/projects.scm")
+
+(define-public (read-lucidplan-projects)
+  (let* ((file (open-input-file lucidplan-projects-location))
+         (projects-data (eval-string (get-string-all file))))
+    projects-data))
+
 
 (define-public (write-lucidplan-projects p)
-  (with-output-to-file "/home/joe/Ontwikkeling/Persoonlijk/lucidplan/db/projects.scm"
-    (lambda() (display p)))
-  )
-
-(define-public (lucidplan-projects) (read-lucidplan-projects))
+  (with-output-to-file lucidplan-projects-location
+    (lambda() (display p))))

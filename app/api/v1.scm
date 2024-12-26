@@ -26,9 +26,9 @@
      #:mime 'json
      (lambda (rc)
        (:mime rc
-        (lucidplan-backlog (params rc "project")))))
+        (read-lucidplan-backlog (params rc "project")))))
 
 (get "/api/v1/projects"
      #:mime 'json
      (lambda (rc)
-       (:mime rc (lucidplan-projects))))
+       (:mime rc (read-lucidplan-projects))))

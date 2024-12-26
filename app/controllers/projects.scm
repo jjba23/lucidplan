@@ -23,4 +23,4 @@
 (get "/projects"
      #:mime 'xml
      (lambda (rc)
-       (response-emit (:mime rc (html-from-projects (lucidplan-projects))))))
+       (response-emit (:mime rc (html-from-projects (read-lucidplan-projects))))))

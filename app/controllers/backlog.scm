@@ -24,4 +24,4 @@
      #:mime 'xml
      (lambda (rc)
        (response-emit (:mime rc
-                       (html-from-backlog (params rc "project") (lucidplan-backlog (params rc "project")))))))
+                       (html-from-backlog (params rc "project") (read-lucidplan-backlog (params rc "project")))))))
