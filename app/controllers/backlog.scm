@@ -51,13 +51,9 @@
                (new-backlog (assoc-set! backlog
                                         'tickets new-backlog-tickets)))
           
-          (newline)
-          (display "===========")
-          (newline)
-          (display new-backlog)
-          (newline)
-          (display "===========")
-          (newline)
+          ;; (display "===========") (newline)
+          ;; (display new-backlog) (newline)
+          ;; (display "===========") (newline)
 
           (write-lucidplan-backlog (params rc "project") new-backlog)
 
@@ -91,19 +87,14 @@
                              (ticket-type unquote ticket-type)))
                (new-backlog-tickets (assoc-set! (assoc-ref backlog
                                                            'tickets) new-uuid
-                                                new-ticket))
+                                                           new-ticket))
                (new-backlog (assoc-set! backlog
                                         'tickets new-backlog-tickets)))
           
-          (newline)
-          (display "===========")
-          (newline)
-          (write new-uuid)
-          (newline)
-          (write new-backlog)
-          (newline)
-          (display "===========")
-          (newline)
+          ;; (display "===========") (newline)          
+          ;; (write new-uuid) (newline)
+          ;; (write new-backlog) (newline)
+          ;; (display "===========") (newline)
 
           (write-lucidplan-backlog (params rc "project") new-backlog)
 

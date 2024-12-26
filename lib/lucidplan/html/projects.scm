@@ -32,20 +32,53 @@
   #:use-module (lucidplan html dsl)
   #:use-module (artanis route))
 
+(define-public project-listitem-reveal-details-js-template
+  "document.getElementById('details-~a').toggleAttribute('hidden')")
+
 (define-public (html-from-projects projects)
-  (html-template `((div (@ (class "flex flex-col gap-2 container"))
-                        ,(map (lambda (p)
-                                `(div (@ (class
-                                          "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer rounded-xl"))
-                                      (p (@ (class
-                                             "font-mono text-stone-700 text-lg"))
-                                         (a (@ (href ,(format #f "/backlog/~a"
-                                                              (assoc-ref p
-                                                                         'human-id))))
-                                            ,(assoc-ref p
-                                                        'title)))))
-                              (assoc-ref projects
-                                         'projects))))))
+  (html-template
+   `((div (@ (class "flex flex-col gap-4"))
+          ,(map
+            (lambda (p)
+              `((div (@ (class
+                          "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer rounded-xl")
+                        (onclick ,(format #f project-listitem-reveal-details-js-template
+                                          (assoc-ref p
+                                                     'id))))
+                     (p (@ (class
+                             "font-mono text-stone-700 text-lg"))
+                        ,(format #f "~a - ~a" (assoc-ref p 'human-id)(assoc-ref p 'title))
+                        ))
+                (div (@ (id ,(format #f "details-~a"
+                                     (assoc-ref p
+                                                'id)))
+                        (hidden ""))
+                     (div (@(class "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl ml-4"))
+                          (a (@ (href ,(format #f "/backlog/~a"
+                                               (assoc-ref p
+                                                          'human-id))))
+                             ,(format #f "go to backlog: ~a" (assoc-ref p
+                                                                        'title)))
+                          (form (@(enctype "application/x-www-form-urlencoded")
+                                 (method "POST")
+                                 (action ,(format #f
+                                                  "/projects/~a/delete"
+                                                  (assoc-ref p 'id))))
+                                (input (@(name "id")(hidden "")(value ,(assoc-ref p 'id))) "")
+                                (button (@(type "submit"))
+                                        (small (@(class "text-red-600")) "delete")))
+                          (small (@ (class "font-mono text-stone-500 text-xs"))
+                                 ,(format #f "~a"
+                                          (assoc-ref p
+                                                     'human-id)))
+                          (small (@ (class "font-mono text-stone-500 text-xs"))
+                                 ,(assoc-ref p
+                                             'id))))))
+            (assoc-ref projects
+                       'projects))
+          (div (a (@ (href "/projects/new")) "+ new project"))
+          )
+     )))
 
 (define-public (get-projects-html)
   (html-from-projects projects))
