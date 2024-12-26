@@ -36,13 +36,13 @@
 (define lucidplan-projects-location
   "/home/joe/Ontwikkeling/Persoonlijk/lucidplan/db/projects.scm")
 
-(define-public (read-lucidplan-projects project)
+(define-public (read-lucidplan-projects)
   (let* ((file (open-input-file lucidplan-projects-location))
          (projects-data (eval-string (format #f "'~a"
                                              (get-string-all file)))))
     projects-data))
 
-(define-public (write-lucidplan-projects project b)
-  (let* ((file (open-output-file lucidplan-joe-projects-location)))
+(define-public (write-lucidplan-projects b)
+  (let* ((file (open-output-file lucidplan-projects-location)))
     (write b file)
     (close-output-port file)))

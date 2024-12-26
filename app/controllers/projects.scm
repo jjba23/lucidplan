@@ -18,12 +18,67 @@
 (define-artanis-controller projects)
 
 (import (lucidplan persistence projects)
-        (lucidplan html projects))
+        (lucidplan html projects)
+        (web uri)
+        (ice-9 string-fun)
+        (lucidplan uri)
+        (lucidplan uuid))
 
 (get "/projects"
      #:mime 'xml
      (lambda (rc)
        (response-emit (:mime rc
-                             (html-from-projects (read-lucidplan-projects (params
-                                                                           rc
-                                                                           "project")))))))
+                       (html-from-projects (read-lucidplan-projects))))))
+
+
+(get "/projects/new"
+     #:mime 'xml
+     (lambda (rc)
+       (response-emit (:mime rc
+                       (html-new-project-form)))))
+
+(post "/projects/delete"
+      #:mime 'xml
+      (lambda (rc)
+        (let* ((body (rc-body rc))
+               (kv (read-url-encoded-body body))
+               (id (uri-decode (car (assoc-ref kv "id"))))
+               (projects (read-lucidplan-projects))
+               (new-project-projects (assoc-remove! (assoc-ref projects
+                                                               'projects) id))
+               (new-projects (assoc-set! projects
+                                         'projects new-project-projects)))
+          
+          ;; (display "===========") (newline)
+          ;; (display new-projects) (newline)
+          ;; (display "===========") (newline)
+
+          (write-lucidplan-projects new-projects)
+
+          (redirect-to rc "/projects"))))
+
+(post "/projects/new-submit"
+      #:mime 'xml
+      (lambda (rc)
+        (let* ((body (rc-body rc))
+               (kv (read-url-encoded-body body))
+               (title (uri-decode (car (assoc-ref kv "title"))))
+               (human-id (uri-decode (car (assoc-ref kv "human-id"))))
+               (projects (read-lucidplan-projects))
+               (new-uuid (string-replace-substring (uuidgen) "\n" ""))
+               (new-project `((id unquote new-uuid)
+                              (human-id unquote human-id)
+                              (title unquote title)
+                              ))
+               (new-project-projects (assoc-set! (assoc-ref projects 'projects) new-uuid new-project))
+               (new-projects (assoc-set! projects 'projects new-project-projects)))
+          
+          ;; (display "===========") (newline)          
+          ;; (write new-uuid) (newline)
+          ;; (write new-project) (newline)
+          ;; (display "===========") (newline)
+
+          (write-lucidplan-projects new-projects)
+
+          (redirect-to rc "/projects"))))
+

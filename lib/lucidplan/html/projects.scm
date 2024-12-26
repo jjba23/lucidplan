@@ -61,9 +61,7 @@
                                                                         'title)))
                           (form (@(enctype "application/x-www-form-urlencoded")
                                  (method "POST")
-                                 (action ,(format #f
-                                                  "/projects/~a/delete"
-                                                  (assoc-ref p 'id))))
+                                 (action "/projects/delete"))
                                 (input (@(name "id")(hidden "")(value ,(assoc-ref p 'id))) "")
                                 (button (@(type "submit"))
                                         (small (@(class "text-red-600")) "delete")))
@@ -80,5 +78,18 @@
           )
      )))
 
-(define-public (get-projects-html)
-  (html-from-projects projects))
+
+(define-public (html-new-project-form)
+  (html-template `((form (@ (class "flex flex-col gap-4")
+                            (enctype "application/x-www-form-urlencoded")
+                            (method "POST")
+                            (action "/projects/new-submit"))
+                         (label "title:")
+                         (input (@ (name "title")
+                                   (required "")) "")
+
+                         (label "human id:")
+                         (input (@ (name "human-id")
+                                   (required "")) "")
+
+                         (button (@ (type "submit")) "create")))))
