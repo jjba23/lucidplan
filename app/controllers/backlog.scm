@@ -20,6 +20,7 @@
 (import (lucidplan html backlog)
         (lucidplan persistence backlog)
         (web uri)
+        (ice-9 string-fun)
         (lucidplan uri)
         (lucidplan uuid))
 
@@ -79,7 +80,7 @@
                                (assoc-ref backlog
                                           'tickets)))
                (highest-human-id (apply max human-ids))
-               (new-uuid (uuidgen))
+               (new-uuid (string-replace-substring (uuidgen) "\n" ""))
                (new-ticket `((id unquote new-uuid )
                              (human-id unquote
                                        (+ highest-human-id 1))
