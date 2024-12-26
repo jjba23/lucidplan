@@ -106,7 +106,7 @@
     ))
 
 (define-public (html-from-backlog project backlog)
-  (html-template `((div (@ (class "flex flex-col gap-4"))
+  (html-template `((div (@ (class "flex flex-col gap-4 flex-grow"))
                         (div (@ (id "lucidplan-backlog-list")
                                 (ondrop "dropBacklogItem(event)")
                                 (ondragover "allowDrop(event)")
@@ -120,7 +120,7 @@
                                                   project))) "+ new ticket"))))))
 
 (define-public (html-new-ticket-form project)
-  (html-template `((form (@ (class "flex flex-col gap-4")
+  (html-template `((form (@ (class "flex flex-col gap-4 flex-grow")
                             (enctype "application/x-www-form-urlencoded")
                             (method "POST")
                             (action ,(format #f

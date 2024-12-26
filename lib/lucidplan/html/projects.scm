@@ -37,7 +37,7 @@
 
 (define-public (html-from-projects projects)
   (html-template
-   `((div (@ (class "flex flex-col gap-4"))
+   `((div (@ (class "flex flex-col gap-4 flex-grow"))
           ,(map
             (lambda (p)
               `((div (@ (class
@@ -47,7 +47,7 @@
                                                      'id))))
                      (p (@ (class
                              "font-mono text-stone-700 text-lg"))
-                        ,(format #f "~a - ~a" (assoc-ref p 'human-id)(assoc-ref p 'title))
+                        ,(format #f "~a (~a)" (assoc-ref p 'title) (assoc-ref p 'human-id))
                         ))
                 (div (@ (id ,(format #f "details-~a"
                                      (assoc-ref p

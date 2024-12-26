@@ -94,10 +94,10 @@
                (new-backlog (assoc-set! backlog
                                         'tickets new-backlog-tickets)))
           
-          (display "===========") (newline)          
-          (write new-uuid) (newline)
-          (write new-backlog) (newline)
-          (display "===========") (newline)
+          ;; (display "===========") (newline)          
+          ;; (write new-uuid) (newline)
+          ;; (write new-backlog) (newline)
+          ;; (display "===========") (newline)
 
           (write-lucidplan-backlog (params rc "project") new-backlog)
 
