@@ -33,12 +33,11 @@
   #:use-module (lucidplan html projects)
   #:use-module (artanis route))
 
-(define-public (lucidplan-projects)
-  `((projects ("e8351c99-22a0-4e94-bd55-f6e04fe0e46c"
-               (id . "e8351c99-22a0-4e94-bd55-f6e04fe0e46c")
-               (human-id . "JOE")
-               (title . "Joe's Projects"))
-              ("0e9f28c2-788f-49f3-811f-d463b79fbd8d"
-               (id . "0e9f28c2-788f-49f3-811f-d463b79fbd8d")
-               (human-id . "ET")
-               (title . "Engagement Team")))))
+(define-public (read-lucidplan-projects))
+
+(define-public (write-lucidplan-projects p)
+  (with-output-to-file "/home/joe/Ontwikkeling/Persoonlijk/lucidplan/db/projects.scm"
+    (lambda() (display p)))
+  )
+
+(define-public (lucidplan-projects) (read-lucidplan-projects))
