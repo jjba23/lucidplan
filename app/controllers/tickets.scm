@@ -26,7 +26,12 @@
         (app models project))
 
 (define (project-id-from-human-id project)
-  (assoc-ref (car ($project 'get #:ret 'top #:condition (where #:human_id project))) "id"))
+  (let ((p ($project 'get #:ret 'top #:condition (where #:human_id project))))
+    (cond
+     ((null? p) "")
+     (else (assoc-ref (car p) "id"))
+     )
+    ))
 
 (get "/backlog/:project"
      #:mime 'xml
@@ -80,7 +85,8 @@
                    #:title title
                    #:ticket_status ticket-status
                    #:ticket_type ticket-type
-                   #:description description)
+                   #:description description
+                   #:created_at (current-time))
 
           (redirect-to rc
                        (format #f "/backlog/~a"

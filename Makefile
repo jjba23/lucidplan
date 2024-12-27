@@ -24,8 +24,8 @@ fmt:
 dev:
 	watchexec -i "dist/**" -r -e scm,css,js -- "make server"
 rebuild-db:
-	rm lucidplan.db
-	rm lucidplan.db-shm
-	rm lucidplan.db-wal
+	-rm lucidplan.db
+	-rm lucidplan.db-shm
+	-rm lucidplan.db-wal
 	touch lucidplan.db
 	sqlite3 lucidplan.db 'PRAGMA journal_mode=WAL;'

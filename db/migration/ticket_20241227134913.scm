@@ -1,11 +1,12 @@
 (create-artanis-migration ticket_20241227134913)
 
 (migrate-up (create-table 'ticket
+                          '(human_id integer (#:primary-key #:auto-increment))
                           '(id char-field
                                (#:not-null #:unique #:maxlen 36))
                           '(project_id char-field
                                        (#:not-null #:maxlen 36 #:unique))
-                          '(human_id auto)
+
                           '(title char-field
                                   (#:not-null #:maxlen 512 #:unique))
                           '(description char-field

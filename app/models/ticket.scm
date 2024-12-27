@@ -2,11 +2,11 @@
 
 (create-artanis-model ticket
                       (:deps project)
+                      (human_id integer (#:primary-key #:auto-increment))
                       (id char-field
                           (#:unique #:not-null #:maxlen 36))
                       (project_id char-field
                                   (#:not-null #:maxlen 36 #:unique))
-                      (human_id auto)
                       (title char-field
                              (#:not-null #:maxlen 512 #:unique))
                       (description char-field
