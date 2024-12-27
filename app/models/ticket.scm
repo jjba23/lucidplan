@@ -15,5 +15,8 @@
                       (ticket_status char-field
                                      (#:not-null #:maxlen 256))
                       (ticket_type char-field
-                                   (#:not-null #:maxlen 256)))
+                                   (#:not-null #:maxlen 256))
+                      (created_at date-field
+                                  (#:not-null))
+                      (updated_at date-field))
 

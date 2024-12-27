@@ -7,5 +7,8 @@
                       (human_id char-field
                                 (#:not-null #:maxlen 32))
                       (title char-field
-                             (#:not-null #:maxlen 256)))
+                             (#:not-null #:maxlen 256))
+                      (created_at date-field
+                                  (#:not-null))
+                      (updated_at date-field))
 

@@ -22,11 +22,13 @@
         (web uri)
         (ice-9 string-fun)
         (lucidplan uri)
-        (lucidplan uuid))
+        (lucidplan uuid)
+        (app models project))
 
 (get "/projects"
      #:mime 'xml
      (lambda (rc)
+       (display ($project 'table-exists?))
        (response-emit (:mime rc
                        (html-from-projects (read-lucidplan-projects))))))
 
@@ -60,6 +62,8 @@
 (post "/projects/new-submit"
       #:mime 'xml
       (lambda (rc)
+        ;;(display ($project 'table-exists?))
+        
         (let* ((body (rc-body rc))
                (kv (read-url-encoded-body body))
                (title (uri-decode (car (assoc-ref kv "title"))))
@@ -69,16 +73,15 @@
                (new-project `((id unquote new-uuid)
                               (human-id unquote human-id)
                               (title unquote title)
-                              ))
-               (new-project-projects (assoc-set! (assoc-ref projects 'projects) new-uuid new-project))
-               (new-projects (assoc-set! projects 'projects new-project-projects)))
-          
-          ;; (display "===========") (newline)          
-          ;; (write new-uuid) (newline)
-          ;; (write new-project) (newline)
-          ;; (display "===========") (newline)
+                              )))
 
-          (write-lucidplan-projects new-projects)
+          ($project 'set
+                    #:id new-uuid
+                    #:human_id human-id
+                    #:title title
+                    #:created_at (current-time))
+
+          ;;(write-lucidplan-projects new-projects)
 
           (redirect-to rc "/projects"))))
 
