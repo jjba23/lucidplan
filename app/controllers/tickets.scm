@@ -41,8 +41,6 @@
                                         #:condition
                                         (where #:project_id project-id)
                                         #:order-by "human_id ASC")))
-         (display project-id)(newline)
-         (display project-tickets)(newline)
          (response-emit (:mime rc
                          (html-from-backlog (params rc "project")
                                             project-tickets))))

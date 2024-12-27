@@ -38,23 +38,23 @@
                 "title:")
          (h4 (@ (class "font-mono text-stone-700 text-lg font-bold"))
              ,(assoc-ref ticket
-                         'title))
+                         "title"))
          (small (@ (class "font-mono text-stone-400 text-xs font-light"))
                 "status:")
          (p (@ (class "font-mono text-stone-700 text-md"))
             ,(assoc-ref ticket
-                        'ticket-status))
+                        "ticket_status"))
          (small (@ (class "font-mono text-stone-400 text-xs font-light"))
                 "type:")
          (p (@ (class "font-mono text-stone-700 text-md"))
             ,(assoc-ref ticket
-                        'ticket-type))
+                        "ticket_type"))
          (small (@ (class "font-mono text-stone-400 text-xs font-light"))
                 "description:")
          (p (@ (class
-                "font-mono text-stone-600 text-md max-w-prose whitespace-pre-wrap"))
+                 "font-mono text-stone-600 text-md max-w-prose whitespace-pre-wrap"))
             ,(assoc-ref ticket
-                        'description))
+                        "description"))
          (small (@ (class "font-mono text-stone-400 text-xs font-light"))
                 "meta:")
          (form (@ (enctype "application/x-www-form-urlencoded")
@@ -63,16 +63,16 @@
                (input (@ (hidden "")
                          (name "id")
                          (value ,(assoc-ref ticket
-                                            'id))))
+                                            "id"))))
                (button (@ (type "submit")
                           (class "text-red-600")) "delete"))
          (small (@ (class "font-mono text-stone-500 text-xs"))
-                ,(format #f "~a-~a" project
+                ,(format #f "~a-~s" project
                          (assoc-ref ticket
-                                    'human-id)))
+                                    "human_id")))
          (small (@ (class "font-mono text-stone-500 text-xs"))
                 ,(assoc-ref ticket
-                            'id)))))
+                            "id")))))
 
 (define-public ticket-listitem-reveal-details-js-template
   "document.getElementById('details-~a').toggleAttribute('hidden')")
@@ -83,22 +83,21 @@
             (class "flex flex-col gap-2")
             (id ,(format #f "listitem-~a"
                          (assoc-ref ticket
-                                    'id)))
+                                    "id")))
             (onclick ,(format #f ticket-listitem-reveal-details-js-template
                               (assoc-ref ticket
-                                         'id))))
+                                         "id"))))
          (div (@ (class
-                  "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer rounded-xl"))
+                   "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer rounded-xl"))
               (small (@ (class "font-mono text-stone-500 text-sm"))
                      ,(format #f "~a-~a" project
-                              (assoc-ref ticket
-                                         'human-id)))
+                              (assoc-ref ticket "human_id")))
               (h5 (@ (class "font-mono text-stone-700 text-lg"))
                   ,(assoc-ref ticket
-                              'title)))
+                              "title")))
          (div (@ (id ,(format #f "details-~a"
                               (assoc-ref ticket
-                                         'id)))
+                                         "id")))
                  (class "ml-4")
                  (hidden ""))
               ,(render-ticket project ticket)))
@@ -113,7 +112,7 @@
                                 (class "flex flex-col gap-2 container"))
                              ,(map (lambda (t)
                                      (render-ticket-listitem project
-                                                             (cdr t)))
+                                                             t))
                                    tickets))
                         (div (a (@ (href ,(format #f "/backlog/~a/tickets/new"
                                                   project))) "+ new ticket"))))))
