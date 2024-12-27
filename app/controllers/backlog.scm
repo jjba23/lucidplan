@@ -22,16 +22,18 @@
         (web uri)
         (ice-9 string-fun)
         (lucidplan uri)
-        (lucidplan uuid))
+        (lucidplan uuid)
+        (app models ticket))
 
 (get "/backlog/:project"
      #:mime 'xml
      (lambda (rc)
+       (display ($ticket 'table-exists?))
        (response-emit (:mime rc
-                             (html-from-backlog (params rc "project")
-                                                (read-lucidplan-backlog (params
-                                                                         rc
-                                                                         "project")))))))
+                       (html-from-backlog (params rc "project")
+                                          (read-lucidplan-backlog (params
+                                                                   rc
+                                                                   "project")))))))
 
 (get "/backlog/:project/tickets/new"
      #:mime 'xml
