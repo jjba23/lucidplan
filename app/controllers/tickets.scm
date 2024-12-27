@@ -22,15 +22,22 @@
         (ice-9 string-fun)
         (lucidplan uri)
         (lucidplan uuid)
-        (app models ticket))
+        (app models ticket)
+        (app models project))
+
+(define (project-id-from-human-id project)
+  (assoc-ref (car ($project 'get #:ret 'top #:condition (where #:human_id project))) "id"))
 
 (get "/backlog/:project"
      #:mime 'xml
      (lambda (rc)
-       (let ((project-tickets ($ticket 'get
-                                       #:condition
-                                       (where #:project_id (params rc "project"))
-                                       #:order-by "human_id ASC")))
+       (let* ((project-id (project-id-from-human-id (params rc "project")))
+              (project-tickets ($ticket 'get
+                                        #:condition
+                                        (where #:project_id project-id)
+                                        #:order-by "human_id ASC")))
+         (display project-id)(newline)
+         (display project-tickets)(newline)
          (response-emit (:mime rc
                          (html-from-backlog (params rc "project")
                                             project-tickets))))
@@ -64,15 +71,15 @@
                (ticket-status (uri-decode (car (assoc-ref kv "ticket-status"))))
                (ticket-type (uri-decode (car (assoc-ref kv "ticket-type"))))
                (description (uri-decode (car (assoc-ref kv "description"))))
-               (project-id ($project 'get #:condition (where #:human_id (params rc "project"))))
+               (project-id (project-id-from-human-id (params rc "project")))
                (new-uuid (string-replace-substring (uuidgen) "\n" "")))
 
           ($ticket 'set
                    #:id new-uuid
-                   #:project-id project-id
+                   #:project_id project-id
                    #:title title
-                   #:ticket-status ticket-status
-                   #:ticket-type ticket-type
+                   #:ticket_status ticket-status
+                   #:ticket_type ticket-type
                    #:description description)
 
           (redirect-to rc

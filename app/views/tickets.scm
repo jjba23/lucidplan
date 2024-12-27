@@ -105,7 +105,7 @@
     
     ))
 
-(define-public (html-from-backlog project backlog)
+(define-public (html-from-backlog project tickets)
   (html-template `((div (@ (class "flex flex-col gap-4 flex-grow"))
                         (div (@ (id "lucidplan-backlog-list")
                                 (ondrop "dropBacklogItem(event)")
@@ -114,8 +114,7 @@
                              ,(map (lambda (t)
                                      (render-ticket-listitem project
                                                              (cdr t)))
-                                   (assoc-ref backlog
-                                              'tickets)))
+                                   tickets))
                         (div (a (@ (href ,(format #f "/backlog/~a/tickets/new"
                                                   project))) "+ new ticket"))))))
 
