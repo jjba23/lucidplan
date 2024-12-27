@@ -17,10 +17,7 @@
 
 (define-restful-api v1)
 
-(import (lucidplan persistence projects)
-        (lucidplan html projects)
-        (lucidplan persistence backlog)
-        (lucidplan html backlog))
+(import (lucidplan persistence backlog))
 
 (get "/api/v1/backlog/:project"
      #:mime 'json

@@ -17,8 +17,7 @@
 
 (define-artanis-controller projects)
 
-(import (lucidplan persistence projects)
-        (lucidplan html projects)
+(import (app views projects)
         (web uri)
         (ice-9 string-fun)
         (lucidplan uri)
@@ -28,14 +27,15 @@
 (get "/projects"
      #:mime 'xml
      (lambda (rc)
+       (display ($project 'get #:order-by "human_id ASC" #:dump #t))
        (response-emit (:mime rc
-                       (html-from-projects ($project 'get))))))
+                       (html-from-projects ($project 'get #:order-by "human_id ASC"))))))
 
 (get "/projects/new"
      #:mime 'xml
      (lambda (rc)
        (response-emit (:mime rc
-                             (html-new-project-form)))))
+                       (html-new-project-form)))))
 
 (post "/projects/delete"
       #:mime 'xml
@@ -43,7 +43,6 @@
         (let* ((body (rc-body rc))
                (kv (read-url-encoded-body body))
                (id (uri-decode (car (assoc-ref kv "id"))))
-               (projects (read-lucidplan-projects))
                (new-project-projects (assoc-remove! (assoc-ref projects
                                                                'projects) id)))
           (DB-query (DB-open rc) (->sql delete from 'project (where #:id id)))
@@ -57,7 +56,6 @@
                (kv (read-url-encoded-body body))
                (title (uri-decode (car (assoc-ref kv "title"))))
                (human-id (uri-decode (car (assoc-ref kv "human-id"))))
-               (projects (read-lucidplan-projects))
                (new-uuid (string-replace-substring (uuidgen) "\n" ""))
                (new-project `((id unquote new-uuid)
                               (human-id unquote human-id)
