@@ -63,6 +63,7 @@
       #:mime 'xml
       (lambda (rc)
         ;;(display ($project 'table-exists?))
+        (display ($project 'table-exists?))
         
         (let* ((body (rc-body rc))
                (kv (read-url-encoded-body body))
