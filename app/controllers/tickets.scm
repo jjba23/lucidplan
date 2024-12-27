@@ -59,7 +59,7 @@
                (kv (read-url-encoded-body body))
                (id (uri-decode (car (assoc-ref kv "id")))))
 
-          (DB-query (DB-open rc) (->sql delete from 'tickets (where #:id id)))
+          (DB-query (DB-open rc) (->sql delete from 'ticket (where #:id id)))
 
           (redirect-to rc
                        (format #f "/backlog/~a"
