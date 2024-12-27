@@ -18,3 +18,6 @@ This is free software (free as in freedom), licensed under the GNU General Publi
 - *Free Software*: Contribute to its development or extend it with your own custom features.
 
 
+** Tips
+
+sqlite3 lucidplan.db 'PRAGMA journal_mode=WAL;'
