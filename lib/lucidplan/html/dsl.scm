@@ -34,7 +34,7 @@
 (define-public (page-footer)
   `((div (@ (class "block text-center font-mono"))
          (div (@ (class
-                   "mt-4 flex flex-row flex-wrap gap-4 justify-center align-center"))
+                  "mt-4 flex flex-row flex-wrap gap-4 justify-center align-center"))
               (p (@ (class "text-sm text-stone-600"))
                  "find the source code here:")
               (a (@ (class "text-orange-700 font-bold cursor-pointer text-sm")
@@ -65,16 +65,17 @@
                (script (@ (src "/js/backlog.js")) ()))
          (body (@ (class "bg-stone-200 p-2"))
                (div (@ (class
-                         "my-6 flex flex-row flex-wrap justify-left gap-4"))
+                        "my-6 flex flex-row flex-wrap justify-left gap-4"))
                     (div (@ (class "flex flex-col gap-3 p-2"))
                          (a (@ (class
-                                 "text-sm uppercase text-stone-600 font-bold")
+                                "text-sm uppercase text-stone-600 font-bold")
                                (href "/projects")) "Projects")
                          (a (@ (class
-                                 "text-sm uppercase text-stone-600 font-bold")
+                                "text-sm uppercase text-stone-600 font-bold")
                                (href "/backlog/JOE")) "Backlog")
                          (a (@ (class
-                                 "text-sm uppercase text-stone-600 font-bold")
-                               (href "/board/JOE")(hidden "")) "Board"))
+                                "text-sm uppercase text-stone-600 font-bold")
+                               (href "/board/JOE")
+                               (hidden "")) "Board"))
                     ,body)
                (footer ,(page-footer)))))

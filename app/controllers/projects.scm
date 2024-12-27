@@ -29,15 +29,15 @@
      #:mime 'xml
      (lambda (rc)
        (display ($project 'table-exists?))
+       (display ($project 'get))
        (response-emit (:mime rc
-                       (html-from-projects (read-lucidplan-projects))))))
-
+                             (html-from-projects (read-lucidplan-projects))))))
 
 (get "/projects/new"
      #:mime 'xml
      (lambda (rc)
        (response-emit (:mime rc
-                       (html-new-project-form)))))
+                             (html-new-project-form)))))
 
 (post "/projects/delete"
       #:mime 'xml
@@ -54,7 +54,7 @@
           ;; (display "===========") (newline)
           ;; (display new-projects) (newline)
           ;; (display "===========") (newline)
-
+          
           (write-lucidplan-projects new-projects)
 
           (redirect-to rc "/projects"))))
@@ -62,9 +62,9 @@
 (post "/projects/new-submit"
       #:mime 'xml
       (lambda (rc)
-        ;;(display ($project 'table-exists?))
+        ;; (display ($project 'table-exists?))
         (display ($project 'table-exists?))
-        
+
         (let* ((body (rc-body rc))
                (kv (read-url-encoded-body body))
                (title (uri-decode (car (assoc-ref kv "title"))))
@@ -73,16 +73,15 @@
                (new-uuid (string-replace-substring (uuidgen) "\n" ""))
                (new-project `((id unquote new-uuid)
                               (human-id unquote human-id)
-                              (title unquote title)
-                              )))
-
+                              (title unquote title))))
+          
           ($project 'set
                     #:id new-uuid
                     #:human_id human-id
                     #:title title
                     #:created_at (current-time))
 
-          ;;(write-lucidplan-projects new-projects)
-
+          ;; (write-lucidplan-projects new-projects)
+          
           (redirect-to rc "/projects"))))
 

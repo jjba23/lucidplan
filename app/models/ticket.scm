@@ -5,11 +5,11 @@
                       (id char-field
                           (#:primary-key #:maxlen 36))
                       (project_id char-field
-                                  (#:not-null #:maxlen 36))
+                                  (#:not-null #:maxlen 36 #:unique))
                       (human_id small-integer
-                                (#:not-null))
+                                (#:not-null #:unique))
                       (title char-field
-                             (#:not-null #:maxlen 512))
+                             (#:not-null #:maxlen 512 #:unique))
                       (description char-field
                                    (#:not-null #:maxlen 4096))
                       (ticket_status char-field

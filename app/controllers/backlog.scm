@@ -30,10 +30,10 @@
      (lambda (rc)
        (display ($ticket 'table-exists?))
        (response-emit (:mime rc
-                       (html-from-backlog (params rc "project")
-                                          (read-lucidplan-backlog (params
-                                                                   rc
-                                                                   "project")))))))
+                             (html-from-backlog (params rc "project")
+                                                (read-lucidplan-backlog (params
+                                                                         rc
+                                                                         "project")))))))
 
 (get "/backlog/:project/tickets/new"
      #:mime 'xml
@@ -56,7 +56,7 @@
           ;; (display "===========") (newline)
           ;; (display new-backlog) (newline)
           ;; (display "===========") (newline)
-
+          
           (write-lucidplan-backlog (params rc "project") new-backlog)
 
           (redirect-to rc
@@ -79,9 +79,9 @@
                                (assoc-ref backlog
                                           'tickets)))
                (highest-human-id (cond
-                                  ((null? human-ids) 1)
-                                  (else (apply max human-ids))
-                                  ))
+                                   ((null? human-ids)
+                                    1)
+                                   (else (apply max human-ids))))
                (new-uuid (string-replace-substring (uuidgen) "\n" ""))
                (new-ticket `((id unquote new-uuid)
                              (human-id unquote
@@ -92,15 +92,15 @@
                              (ticket-type unquote ticket-type)))
                (new-backlog-tickets (assoc-set! (assoc-ref backlog
                                                            'tickets) new-uuid
-                                                           new-ticket))
+                                                new-ticket))
                (new-backlog (assoc-set! backlog
                                         'tickets new-backlog-tickets)))
           
-          ;; (display "===========") (newline)          
+          ;; (display "===========") (newline)
           ;; (write new-uuid) (newline)
           ;; (write new-backlog) (newline)
           ;; (display "===========") (newline)
-
+          
           (write-lucidplan-backlog (params rc "project") new-backlog)
 
           (redirect-to rc
