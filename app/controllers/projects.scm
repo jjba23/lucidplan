@@ -27,7 +27,6 @@
 (get "/projects"
      #:mime 'xml
      (lambda (rc)
-       (display ($project 'get #:order-by "human_id ASC" #:dump #t))
        (response-emit (:mime rc
                        (html-from-projects ($project 'get #:order-by "human_id ASC"))))))
 
@@ -56,10 +55,7 @@
                (kv (read-url-encoded-body body))
                (title (uri-decode (car (assoc-ref kv "title"))))
                (human-id (uri-decode (car (assoc-ref kv "human-id"))))
-               (new-uuid (string-replace-substring (uuidgen) "\n" ""))
-               (new-project `((id unquote new-uuid)
-                              (human-id unquote human-id)
-                              (title unquote title))))
+               (new-uuid (string-replace-substring (uuidgen) "\n" "")))
           
           ($project 'set
                     #:id new-uuid

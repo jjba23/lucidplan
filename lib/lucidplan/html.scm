@@ -15,7 +15,7 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with lucidplan.  If not, see <https://www.gnu.org/licenses/>.
 
-(define-module (lucidplan html dsl)
+(define-module (lucidplan html)
   #:use-module (web server)
   #:use-module (web request)
   #:use-module (web response)

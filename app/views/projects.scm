@@ -29,7 +29,7 @@
   #:use-module (ice-9 iconv)
   #:use-module (ice-9 hash-table)
   #:use-module (ice-9 threads)
-  #:use-module (lucidplan html dsl)
+  #:use-module (lucidplan html)
   #:use-module (artanis route))
 
 (define-public project-listitem-reveal-details-js-template

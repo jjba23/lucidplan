@@ -2,11 +2,10 @@
 
 (migrate-up (create-table 'ticket
                           '(id char-field
-                               (#:primary-key #:maxlen 36))
+                               (#:not-null #:unique #:maxlen 36))
                           '(project_id char-field
                                        (#:not-null #:maxlen 36 #:unique))
-                          '(human_id small-integer
-                                     (#:not-null #:unique))
+                          '(human_id auto)
                           '(title char-field
                                   (#:not-null #:maxlen 512 #:unique))
                           '(description char-field

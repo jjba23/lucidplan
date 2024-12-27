@@ -17,16 +17,20 @@
 
 (define-restful-api v1)
 
-(import (lucidplan persistence backlog))
+(import (app models project)
+        (app models ticket))
 
 (get "/api/v1/backlog/:project"
      #:mime 'json
      (lambda (rc)
        (:mime rc
-              (read-lucidplan-backlog (params rc "project")))))
+        ($ticket 'get
+                 #:condition
+                 (where #:project_id (params rc "project"))
+                 #:order-by "human_id ASC"))))
 
 (get "/api/v1/projects"
      #:mime 'json
      (lambda (rc)
        (:mime rc
-              (read-lucidplan-projects))))
+        ($project 'get #:order-by "human_id ASC"))))

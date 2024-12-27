@@ -15,7 +15,7 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with lucidplan.  If not, see <https://www.gnu.org/licenses/>.
 
-(define-module (lucidplan html backlog)
+(define-module (app views tickets)
   #:use-module (web server)
   #:use-module (web request)
   #:use-module (web response)
@@ -29,7 +29,7 @@
   #:use-module (ice-9 iconv)
   #:use-module (ice-9 hash-table)
   #:use-module (ice-9 threads)
-  #:use-module (lucidplan html dsl)
+  #:use-module (lucidplan html)
   #:use-module (artanis route))
 
 (define-public (render-ticket project ticket)

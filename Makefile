@@ -23,3 +23,9 @@ fmt:
 	find . -maxdepth 5 -name "*.scm" -type f -exec guix style -f {} \;
 dev:
 	watchexec -i "dist/**" -r -e scm,css,js -- "make server"
+rebuild-db:
+	rm lucidplan.db
+	rm lucidplan.db-shm
+	rm lucidplan.db-wal
+	touch lucidplan.db
+	sqlite3 lucidplan.db 'PRAGMA journal_mode=WAL;'
