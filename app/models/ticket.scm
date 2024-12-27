@@ -4,16 +4,16 @@
                       (:deps project)
                       (id char-field
                           (#:primary-key #:maxlen 36))
-                      (project-id char-field
+                      (project_id char-field
                                   (#:not-null #:maxlen 36))
-                      (human-id small-integer
+                      (human_id small-integer
                                 (#:not-null))
                       (title char-field
                              (#:not-null #:maxlen 512))
                       (description char-field
                                    (#:not-null #:maxlen 4096))
-                      (ticket-status char-field
+                      (ticket_status char-field
                                      (#:not-null #:maxlen 256))
-                      (ticket-type char-field
+                      (ticket_type char-field
                                    (#:not-null #:maxlen 256)))
 
