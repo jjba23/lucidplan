@@ -28,10 +28,8 @@
 (get "/projects"
      #:mime 'xml
      (lambda (rc)
-       (display ($project 'table-exists?))
-       (display ($project 'get))
        (response-emit (:mime rc
-                             (html-from-projects (read-lucidplan-projects))))))
+                       (html-from-projects ($project 'get))))))
 
 (get "/projects/new"
      #:mime 'xml
@@ -47,24 +45,14 @@
                (id (uri-decode (car (assoc-ref kv "id"))))
                (projects (read-lucidplan-projects))
                (new-project-projects (assoc-remove! (assoc-ref projects
-                                                               'projects) id))
-               (new-projects (assoc-set! projects
-                                         'projects new-project-projects)))
-          
-          ;; (display "===========") (newline)
-          ;; (display new-projects) (newline)
-          ;; (display "===========") (newline)
-          
-          (write-lucidplan-projects new-projects)
+                                                               'projects) id)))
+          (DB-query (DB-open rc) (->sql delete from 'project (where #:id id)))
 
           (redirect-to rc "/projects"))))
 
 (post "/projects/new-submit"
       #:mime 'xml
       (lambda (rc)
-        ;; (display ($project 'table-exists?))
-        (display ($project 'table-exists?))
-
         (let* ((body (rc-body rc))
                (kv (read-url-encoded-body body))
                (title (uri-decode (car (assoc-ref kv "title"))))
@@ -80,8 +68,6 @@
                     #:human_id human-id
                     #:title title
                     #:created_at (current-time))
-
-          ;; (write-lucidplan-projects new-projects)
           
           (redirect-to rc "/projects"))))
 

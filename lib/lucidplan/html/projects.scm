@@ -39,31 +39,31 @@
   (html-template `((div (@ (class "flex flex-col gap-4 flex-grow"))
                         ,(map (lambda (p)
                                 `((div (@ (class
-                                           "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer rounded-xl")
+                                            "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer rounded-xl")
                                           (onclick ,(format #f
-                                                     project-listitem-reveal-details-js-template
-                                                     (assoc-ref p
-                                                                'id))))
+                                                            project-listitem-reveal-details-js-template
+                                                            (assoc-ref p "id"))))
+                                       
                                        (p (@ (class
-                                              "font-mono text-stone-700 text-lg"))
+                                               "font-mono text-stone-700 text-lg"))
                                           ,(format #f "~a (~a)"
                                                    (assoc-ref p
-                                                              'title)
+                                                              "title")
                                                    (assoc-ref p
-                                                              'human-id))))
+                                                              "human_id"))))
                                   (div (@ (id ,(format #f "details-~a"
                                                        (assoc-ref p
-                                                                  'id)))
+                                                                  "id")))
                                           (hidden ""))
                                        (div (@ (class
-                                                "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl ml-4"))
+                                                 "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl ml-4"))
                                             (a (@ (href ,(format #f
-                                                          "/backlog/~a"
-                                                          (assoc-ref p
-                                                                     'human-id))))
+                                                                 "/backlog/~a"
+                                                                 (assoc-ref p
+                                                                            "human_id"))))
                                                ,(format #f "go to backlog: ~a"
                                                         (assoc-ref p
-                                                                   'title)))
+                                                                   "title")))
                                             (form (@ (enctype
                                                       "application/x-www-form-urlencoded")
                                                      (method "POST")
@@ -73,22 +73,21 @@
                                                             (hidden "")
                                                             (value ,(assoc-ref
                                                                      p
-                                                                     'id))) "")
+                                                                     "id"))) "")
                                                   (button (@ (type "submit"))
                                                           (small (@ (class
-                                                                     "text-red-600"))
+                                                                      "text-red-600"))
                                                                  "delete")))
                                             (small (@ (class
-                                                       "font-mono text-stone-500 text-xs"))
+                                                        "font-mono text-stone-500 text-xs"))
                                                    ,(format #f "~a"
                                                             (assoc-ref p
-                                                                       'human-id)))
+                                                                       "human_id")))
                                             (small (@ (class
-                                                       "font-mono text-stone-500 text-xs"))
+                                                        "font-mono text-stone-500 text-xs"))
                                                    ,(assoc-ref p
-                                                               'id))))))
-                              (assoc-ref projects
-                                         'projects))
+                                                               "id"))))))
+                              projects)
                         (div (a (@ (href "/projects/new")) "+ new project"))))))
 
 (define-public (html-new-project-form)
