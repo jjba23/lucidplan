@@ -65,3 +65,28 @@
           
           (redirect-to rc "/projects"))))
 
+(get "/projects/:project-id/edit"
+     #:mime 'xml
+     (lambda (rc)
+       (let ((p (car ($project 'get #:ret 'top #:condition (where #:id (params rc "project-id"))))))
+         (response-emit (:mime rc
+                         (html-edit-project-form p)))
+         )
+       ))
+
+(post "/projects/:project-id/edit"
+      #:mime 'xml
+      (lambda (rc)
+        (let* ((body (rc-body rc))
+               (kv (read-url-encoded-body body))
+               (title (uri-decode (car (assoc-ref kv "title"))))
+               (human-id (uri-decode (car (assoc-ref kv "human-id")))))
+          
+          ($project 'set
+                    #:id (params rc "project-id")
+                    #:human_id human-id
+                    #:title title
+                    #:updated_at (current-time)
+                    #:condition (where #:id (params rc "project-id")))
+          
+          (redirect-to rc "/projects"))))

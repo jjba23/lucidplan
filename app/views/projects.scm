@@ -45,6 +45,11 @@
             ,(format #f "go to backlog: ~a"
                      (assoc-ref p
                                 "title")))
+         (a (@ (href ,(format #f
+                              "/projects/~a/edit"
+                              (assoc-ref p
+                                         "id"))))
+            "edit project")
          (form (@ (enctype
                    "application/x-www-form-urlencoded")
                   (method "POST")
@@ -98,16 +103,27 @@
                         (div (a (@ (href "/projects/new")) "+ new project"))))))
 
 (define-public (html-new-project-form)
+  (html-project-form))
+
+(define-public (html-edit-project-form p)
+  (html-project-form
+   #:title (assoc-ref p "title")
+   #:human-id (assoc-ref p "human_id")
+   #:action (format #f "/projects/~a/edit" (assoc-ref p "id"))))
+
+(define* (html-project-form #:key (title "") (human-id "") (action "/projects/new-submit"))
   (html-template `((form (@ (class "flex flex-col gap-4")
                             (enctype "application/x-www-form-urlencoded")
                             (method "POST")
-                            (action "/projects/new-submit"))
+                            (action ,action))
                          (label "title:")
                          (input (@ (name "title")
+                                   (value ,title)
                                    (required "")) "")
 
                          (label "human id:")
                          (input (@ (name "human-id")
+                                   (value ,human-id)
                                    (required "")) "")
 
                          (button (@ (type "submit")) "create")))))
