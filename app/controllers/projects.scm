@@ -22,6 +22,8 @@
         (ice-9 string-fun)
         (lucidplan uri)
         (lucidplan uuid)
+        (lucidplan base64)
+        (artanis security nss)
         (app models project))
 
 (get "/projects"
@@ -43,9 +45,7 @@
       (lambda (rc)
         (let* ((body (rc-body rc))
                (kv (read-url-encoded-body body))
-               (id (uri-decode (car (assoc-ref kv "id"))))
-               (new-project-projects (assoc-remove! (assoc-ref projects
-                                                               'projects) id)))
+               (id (uri-decode (car (assoc-ref kv "id")))))
           (DB-query (DB-open rc)
                     (->sql delete from
                            'project
@@ -53,7 +53,7 @@
 
           (redirect-to rc "/projects"))))
 
-(post "/projects/new-submit"
+(post "/projects/new"
       #:mime 'xml
       (lambda (rc)
         (let* ((body (rc-body rc))
@@ -64,8 +64,8 @@
           
           ($project 'set
                     #:id new-uuid
-                    #:human_id human-id
-                    #:title title
+                    #:human_id (safe-base64-encode human-id)
+                    #:title (safe-base64-encode title)
                     #:created_at (current-time))
 
           (redirect-to rc "/projects"))))
@@ -90,8 +90,8 @@
           (DB-query (DB-open rc)
                     (->sql update
                            'project set
-                           `((human_id ,human-id)
-                             (title ,title)
+                           `((human_id ,(safe-base64-encode human-id))
+                             (title ,(safe-base64-encode title))
                              (updated_at ,(current-time)))
                            (where #:id (params rc "project-id"))))
 

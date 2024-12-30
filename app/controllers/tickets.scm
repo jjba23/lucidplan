@@ -22,7 +22,9 @@
         (ice-9 string-fun)
         (lucidplan uri)
         (lucidplan uuid)
+        (lucidplan base64)
         (app models ticket)
+        (artanis security nss)
         (app models project))
 
 (define (project-id-from-human-id project)
@@ -30,9 +32,11 @@
                      #:ret 'top
                      #:condition (where #:human_id project))))
     (cond
-      ((null? p)
-       "")
-      (else (assoc-ref (car p) "id")))))
+     ((null? p)
+      "")
+     (else (assoc-ref (car p) "id")))))
+
+
 
 (get "/tickets/:project"
      #:mime 'xml
@@ -50,9 +54,9 @@
                                                    #:order-by "human_id ASC"))))
          (display ticket-id-to-human-id)
          (response-emit (:mime rc
-                               (html-from-tickets (params rc "project")
-                                                  project-tickets
-                                                  ticket-id-to-human-id))))))
+                         (html-from-tickets (params rc "project")
+                                            project-tickets
+                                            ticket-id-to-human-id))))))
 
 (get "/tickets/:project/new"
      #:mime 'xml
@@ -97,17 +101,17 @@
           ($ticket 'set
                    #:id new-uuid
                    #:project_id project-id
-                   #:title title
-                   #:ticket_status ticket-status
-                   #:ticket_type ticket-type
-                   #:description description
+                   #:title (safe-base64-encode title)
+                   #:ticket_status (safe-base64-encode ticket-status)
+                   #:ticket_type (safe-base64-encode ticket-type)
+                   #:description (safe-base64-encode description)
                    #:created_at (current-time)
-                   #:child_of child-of
-                   #:blocked_by blocked-by
-                   #:splits_from splits-from
-                   #:clone_of clone-of
-                   #:blocks blocks
-                   #:related_to related-to)
+                   #:child_of (safe-base64-encode child-of)
+                   #:blocked_by (safe-base64-encode blocked-by)
+                   #:splits_from (safe-base64-encode splits-from)
+                   #:clone_of (safe-base64-encode clone-of)
+                   #:blocks (safe-base64-encode blocks)
+                   #:related_to (safe-base64-encode related-to))
 
           (redirect-to rc
                        (format #f "/tickets/~a"
@@ -141,17 +145,17 @@
           (DB-query (DB-open rc)
                     (->sql update
                            'ticket set
-                           `((ticket_status ,ticket-status)
-                             (ticket_type ,ticket-type)
-                             (description ,description)
-                             (title ,title)
+                           `((ticket_status ,(safe-base64-encode ticket-status))
+                             (ticket_type ,(safe-base64-encode ticket-type))
+                             (description ,(safe-base64-encode description))
+                             (title ,(safe-base64-encode title))
                              (updated_at ,(current-time))
-                             (child_of ,child-of)
-                             (blocked_by ,blocked-by)
-                             (splits_from ,splits-from)
-                             (clone_of ,clone-of)
-                             (blocks ,blocks)
-                             (related_to ,related-to))
+                             (child_of ,(safe-base64-encode child-of))
+                             (blocked_by ,(safe-base64-encode blocked-by))
+                             (splits_from ,(safe-base64-encode splits-from))
+                             (clone_of ,(safe-base64-encode clone-of))
+                             (blocks ,(safe-base64-encode blocks))
+                             (related_to ,(safe-base64-encode related-to)))
                            (where #:id (params rc "ticket-id"))))
 
           (redirect-to rc

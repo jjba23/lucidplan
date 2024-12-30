@@ -12,6 +12,7 @@ function dropTicketsItem(ev) {
   // console.log("ev.dataTransfer");
   // console.log(ev.dataTransfer);
   var data = ev.dataTransfer.getData("text");
+  console.log(data);
   // console.log("ev.target");
   // console.log(ev.target);
   // console.log("ev.target.parentNode.parentNode");

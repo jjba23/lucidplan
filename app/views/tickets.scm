@@ -30,6 +30,8 @@
   #:use-module (ice-9 hash-table)
   #:use-module (ice-9 threads)
   #:use-module (lucidplan html)
+  #:use-module (lucidplan base64)
+  #:use-module (artanis security nss)
   #:use-module (artanis route))
 
 (define-public (render-ticket project ticket ticket-id-to-human-id)
@@ -43,7 +45,7 @@
        (else `()))))
 
   (define (mk-cond-rel r label)
-    (let ((xs (string-split (assoc-ref ticket r) #\:)))
+    (let ((xs (string-split (safe-base64-decode (assoc-ref ticket r)) #\:)))
       (cond
        ((and (not (null? xs))
              (not (equal? '("") xs)))
@@ -55,9 +57,9 @@
                     ,(map mk-rel xs)))))
        (else `()))))
 
-  `((div (@ (draggable "false")(class "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl"))
+  `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl"))
          (h4 (@ (class "font-mono text-stone-700 text-2xl font-bold"))
-             ,(assoc-ref ticket "title"))
+             ,(safe-base64-decode (assoc-ref ticket "title")))
          (a (@ (class "font-mono text-stone-400 text-xs font-light")
                (href ,(format #f "/tickets/~a/~a/edit" project
                               (assoc-ref ticket "id")))) "edit ticket")
@@ -70,20 +72,20 @@
                                "font-mono text-stone-400 text-xs font-light"))
                           "status:")
                    (p (@ (class "font-mono text-stone-700 text-sm ml-4"))
-                      ,(assoc-ref ticket "ticket_status")))
+                      ,(safe-base64-decode (assoc-ref ticket "ticket_status"))))
 
               (div (@ (class "flex flex-col gap-3"))
                    (small (@ (class
                                "font-mono text-stone-400 text-xs font-light"))
                           "type:")
                    (p (@ (class "font-mono text-stone-700 text-sm ml-4"))
-                      ,(assoc-ref ticket "ticket_type"))))
+                      ,(safe-base64-decode (assoc-ref ticket "ticket_type")))))
 
          (small (@ (class "font-mono text-stone-400 text-xs font-light"))
                 "description:")
          (p (@ (class
                  "font-mono text-stone-600 text-md max-w-prose whitespace-pre-wrap ml-4"))
-            ,(assoc-ref ticket "description"))
+            ,(safe-base64-decode (assoc-ref ticket "description")))
 
          (hr (@ (class "my-2")))
 
@@ -122,20 +124,21 @@
   "document.getElementById('details-~a').toggleAttribute('hidden')")
 
 (define-public (render-ticket-listitem project ticket ticket-id-to-human-id)
-  `((div (@ (draggable "true")
-            (ondragstart "dragTicketsItem(event)")
-            (class "flex flex-col gap-2")
-            (id ,(format #f "listitem-~a"
-                         (assoc-ref ticket "id")))
-            (onclick ,(format #f ticket-listitem-reveal-details-js-template
-                              (assoc-ref ticket "id"))))
-         (div (@ (class
-                  "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer rounded-xl"))
+  `((div (@
+          (class "flex flex-col gap-2")
+          (id ,(format #f "listitem-~a"
+                       (assoc-ref ticket "id"))))
+         (div (@ (draggable "true")
+                 (ondragstart "dragTicketsItem(event)")
+                 (onclick ,(format #f ticket-listitem-reveal-details-js-template
+                                   (assoc-ref ticket "id")))
+                 (class
+                   "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer rounded-xl"))
               (small (@ (class "font-mono text-stone-500 text-sm"))
                      ,(format #f "~a-~a" project
                               (assoc-ref ticket "human_id")))
               (h5 (@ (class "font-mono text-stone-700 text-lg"))
-                  ,(assoc-ref ticket "title")))
+                  ,(safe-base64-decode (assoc-ref ticket "title"))))
          (div (@ (id ,(format #f "details-~a"
                               (assoc-ref ticket "id")))
                  (class "ml-4")
@@ -163,16 +166,16 @@
 
 (define-public (html-edit-ticket-form project t)
   (html-ticket-form #:project project
-                    #:title (assoc-ref t "title")
-                    #:description (assoc-ref t "description")
-                    #:ticket-type (assoc-ref t "ticket_type")
-                    #:ticket-status (assoc-ref t "ticket_status")
-                    #:child-of (assoc-ref t "child_of")
-                    #:blocked-by (assoc-ref t "blocked_by")
-                    #:splits-from (assoc-ref t "splits_from")
-                    #:clone-of (assoc-ref t "clone_of")
-                    #:blocks (assoc-ref t "blocks")
-                    #:related-to (assoc-ref t "related_to")
+                    #:title (safe-base64-decode (assoc-ref t "title"))
+                    #:description (safe-base64-decode (assoc-ref t "description"))
+                    #:ticket-type (safe-base64-decode (assoc-ref t "ticket_type"))
+                    #:ticket-status (safe-base64-decode (assoc-ref t "ticket_status"))
+                    #:child-of (safe-base64-decode (assoc-ref t "child_of"))
+                    #:blocked-by (safe-base64-decode (assoc-ref t "blocked_by"))
+                    #:splits-from (safe-base64-decode (assoc-ref t "splits_from"))
+                    #:clone-of (safe-base64-decode (assoc-ref t "clone_of"))
+                    #:blocks (safe-base64-decode  (assoc-ref t "blocks"))
+                    #:related-to (safe-base64-decode (assoc-ref t "related_to"))
                     #:action (format #f "/tickets/~a/~a/edit" project
                                      (assoc-ref t "id"))))
 

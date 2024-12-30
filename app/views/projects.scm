@@ -30,6 +30,8 @@
   #:use-module (ice-9 hash-table)
   #:use-module (ice-9 threads)
   #:use-module (lucidplan html)
+  #:use-module (lucidplan base64)
+  #:use-module (artanis security nss)
   #:use-module (artanis route))
 
 (define-public project-listitem-reveal-details-js-template
@@ -38,9 +40,9 @@
 (define (render-project p)
   `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl ml-4"))
          (a (@ (href ,(format #f "/tickets/~a"
-                              (assoc-ref p "human_id"))))
+                              (safe-base64-decode (assoc-ref p "human_id")))))
             ,(format #f "go to tickets: ~a"
-                     (assoc-ref p "title")))
+                     (safe-base64-decode (assoc-ref p "title"))))
          (a (@ (href ,(format #f "/projects/~a/edit"
                               (assoc-ref p "id")))) "edit project")
          (form (@ (enctype "application/x-www-form-urlencoded")
@@ -53,20 +55,20 @@
                        (small (@ (class "text-red-600")) "delete")))
          (small (@ (class "font-mono text-stone-500 text-xs"))
                 ,(format #f "~a"
-                         (assoc-ref p "human_id")))
+                         (safe-base64-decode (assoc-ref p "human_id"))))
          (small (@ (class "font-mono text-stone-500 text-xs"))
                 ,(assoc-ref p "id")))))
 
 (define (render-project-list-item p)
   `((div (@ (class
-             "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer rounded-xl")
+              "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer rounded-xl")
             (onclick ,(format #f project-listitem-reveal-details-js-template
                               (assoc-ref p "id"))))
 
          (p (@ (class "font-mono text-stone-700 text-lg"))
             ,(format #f "~a (~a)"
-                     (assoc-ref p "title")
-                     (assoc-ref p "human_id"))))
+                     (safe-base64-decode (assoc-ref p "title"))
+                     (safe-base64-decode (assoc-ref p "human_id")))))
     (div (@ (id ,(format #f "details-~a"
                          (assoc-ref p "id")))
             (class "ml-4")
@@ -83,14 +85,14 @@
   (html-project-form))
 
 (define-public (html-edit-project-form p)
-  (html-project-form #:title (assoc-ref p "title")
-                     #:human-id (assoc-ref p "human_id")
+  (html-project-form #:title (safe-base64-decode (assoc-ref p "title"))
+                     #:human-id (safe-base64-decode (assoc-ref p "human_id"))
                      #:action (format #f "/projects/~a/edit"
                                       (assoc-ref p "id"))))
 
 (define* (html-project-form #:key (title "")
                             (human-id "")
-                            (action "/projects/new-submit"))
+                            (action "/projects/new"))
   (html-template `((form (@ (class "flex flex-col gap-4")
                             (enctype "application/x-www-form-urlencoded")
                             (method "POST")
@@ -108,5 +110,5 @@
                                    (required "")) "")
 
                          (button (@ (class
-                                     "bg-green-800 text-white p-3 w-min rounded-xl")
+                                      "bg-green-800 text-white p-3 w-min rounded-xl")
                                     (type "submit")) "done")))))
