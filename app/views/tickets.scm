@@ -131,8 +131,8 @@
    #:project project
    #:title (assoc-ref t "title")
    #:description (assoc-ref t "description")
-   #:ticket-type (assoc-ref t "ticket-type")
-   #:ticket-status (assoc-ref t "ticket-status")
+   #:ticket-type (assoc-ref t "ticket_type")
+   #:ticket-status (assoc-ref t "ticket_status")
    #:action (format #f "/tickets/~a/~a/edit" project (assoc-ref t "id"))))
 
 
@@ -147,9 +147,7 @@
   (html-template `((form (@ (class "flex flex-col gap-4 flex-grow")
                             (enctype "application/x-www-form-urlencoded")
                             (method "POST")
-                            (action ,(format #f
-                                             "/tickets/~a/new-submit"
-                                             project)))
+                            (action ,action))
                          (label "title:")
                          (input (@ (class "p-3 w-min rounded-xl")
                                    (name "title")
@@ -176,6 +174,5 @@
                          (label "description:")
                          (textarea (@ (class "p-3 w-min rounded-xl")
                                       (name "description")
-                                      (value ,description)
-                                      (required "")) "")
+                                      (required "")) ,description)
                          (button (@ (class "bg-green-800 text-white p-3 w-min rounded-xl")(type "submit")) "done")))))
