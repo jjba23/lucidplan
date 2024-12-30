@@ -28,13 +28,15 @@
      #:mime 'xml
      (lambda (rc)
        (response-emit (:mime rc
-                       (html-from-projects ($project 'get #:order-by "title ASC"))))))
+                             (html-from-projects ($project 'get
+                                                           #:order-by
+                                                           "title ASC"))))))
 
 (get "/projects/new"
      #:mime 'xml
      (lambda (rc)
        (response-emit (:mime rc
-                       (html-new-project-form)))))
+                             (html-new-project-form)))))
 
 (post "/projects/delete"
       #:mime 'xml
@@ -44,7 +46,10 @@
                (id (uri-decode (car (assoc-ref kv "id"))))
                (new-project-projects (assoc-remove! (assoc-ref projects
                                                                'projects) id)))
-          (DB-query (DB-open rc) (->sql delete from 'project (where #:id id)))
+          (DB-query (DB-open rc)
+                    (->sql delete from
+                           'project
+                           (where #:id id)))
 
           (redirect-to rc "/projects"))))
 
@@ -62,17 +67,17 @@
                     #:human_id human-id
                     #:title title
                     #:created_at (current-time))
-          
+
           (redirect-to rc "/projects"))))
 
 (get "/projects/:project-id/edit"
      #:mime 'xml
      (lambda (rc)
-       (let ((p (car ($project 'get #:ret 'top #:condition (where #:id (params rc "project-id"))))))
+       (let ((p (car ($project 'get
+                               #:ret 'top
+                               #:condition (where #:id (params rc "project-id"))))))
          (response-emit (:mime rc
-                         (html-edit-project-form p)))
-         )
-       ))
+                               (html-edit-project-form p))))))
 
 (post "/projects/:project-id/edit"
       #:mime 'xml
@@ -81,11 +86,13 @@
                (kv (read-url-encoded-body body))
                (title (uri-decode (car (assoc-ref kv "title"))))
                (human-id (uri-decode (car (assoc-ref kv "human-id")))))
-
-
-          (DB-query (DB-open rc) (->sql update 'project set `((human_id ,human-id)
-                                                              (title ,title)
-                                                              (updated_at ,(current-time)))
-                                        (where #:id (params rc "project-id"))))
           
+          (DB-query (DB-open rc)
+                    (->sql update
+                           'project set
+                           `((human_id ,human-id)
+                             (title ,title)
+                             (updated_at ,(current-time)))
+                           (where #:id (params rc "project-id"))))
+
           (redirect-to rc "/projects"))))

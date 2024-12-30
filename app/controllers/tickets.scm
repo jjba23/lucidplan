@@ -17,7 +17,7 @@
 
 (define-artanis-controller tickets)
 
-(import (app views tickets)        
+(import (app views tickets)
         (web uri)
         (ice-9 string-fun)
         (lucidplan uri)
@@ -26,38 +26,39 @@
         (app models project))
 
 (define (project-id-from-human-id project)
-  (let ((p ($project 'get #:ret 'top #:condition (where #:human_id project))))
+  (let ((p ($project 'get
+                     #:ret 'top
+                     #:condition (where #:human_id project))))
     (cond
-     ((null? p) "")
-     (else (assoc-ref (car p) "id"))
-     )
-    ))
+      ((null? p)
+       "")
+      (else (assoc-ref (car p) "id")))))
 
 (get "/tickets/:project"
      #:mime 'xml
      (lambda (rc)
        (let* ((project-id (project-id-from-human-id (params rc "project")))
               (project-tickets ($ticket 'get
-                                        #:condition
-                                        (where #:project_id project-id)
+                                        #:condition (where #:project_id
+                                                           project-id)
                                         #:order-by "human_id ASC"))
-              (ticket-id-to-human-id (map (lambda(t)
-                                            `(,(assoc-ref t "id") . ,(assoc-ref t "human_id"))
-                                            ) ($ticket 'get
-                                                       #:columns '(id human_id)
-                                                       #:order-by "human_id ASC"))))
+              (ticket-id-to-human-id (map (lambda (t)
+                                            `(,(assoc-ref t "id") unquote
+                                              (assoc-ref t "human_id")))
+                                          ($ticket 'get
+                                                   #:columns '(id human_id)
+                                                   #:order-by "human_id ASC"))))
          (display ticket-id-to-human-id)
          (response-emit (:mime rc
-                         (html-from-tickets (params rc "project")
-                                            project-tickets
-                                            ticket-id-to-human-id))))
-       ))
+                               (html-from-tickets (params rc "project")
+                                                  project-tickets
+                                                  ticket-id-to-human-id))))))
 
 (get "/tickets/:project/new"
      #:mime 'xml
      (lambda (rc)
        (response-emit (:mime rc
-                       (html-new-ticket-form (params rc "project"))))))
+                             (html-new-ticket-form (params rc "project"))))))
 
 (post "/tickets/:project/delete"
       #:mime 'xml
@@ -65,8 +66,11 @@
         (let* ((body (rc-body rc))
                (kv (read-url-encoded-body body))
                (id (uri-decode (car (assoc-ref kv "id")))))
-
-          (DB-query (DB-open rc) (->sql delete from 'ticket (where #:id id)))
+          
+          (DB-query (DB-open rc)
+                    (->sql delete from
+                           'ticket
+                           (where #:id id)))
 
           (redirect-to rc
                        (format #f "/tickets/~a"
@@ -89,7 +93,7 @@
                (related-to (uri-decode (car (assoc-ref kv "related-to"))))
                (project-id (project-id-from-human-id (params rc "project")))
                (new-uuid (string-replace-substring (uuidgen) "\n" "")))
-
+          
           ($ticket 'set
                    #:id new-uuid
                    #:project_id project-id
@@ -103,23 +107,20 @@
                    #:splits_from splits-from
                    #:clone_of clone-of
                    #:blocks blocks
-                   #:related_to related-to
-                   )
+                   #:related_to related-to)
 
           (redirect-to rc
                        (format #f "/tickets/~a"
                                (params rc "project"))))))
 
-
-
 (get "/tickets/:project/:ticket-id/edit"
      #:mime 'xml
      (lambda (rc)
-       (let ((t (car ($ticket 'get #:ret 'top #:condition (where #:id (params rc "ticket-id"))))))
+       (let ((t (car ($ticket 'get
+                              #:ret 'top
+                              #:condition (where #:id (params rc "ticket-id"))))))
          (response-emit (:mime rc
-                         (html-edit-ticket-form (params rc "project") t)))
-         )
-       ))
+                               (html-edit-ticket-form (params rc "project") t))))))
 
 (post "/tickets/:project/:ticket-id/edit"
       #:mime 'xml
@@ -136,20 +137,23 @@
                (blocks (uri-decode (car (assoc-ref kv "blocks"))))
                (related-to (uri-decode (car (assoc-ref kv "related-to"))))
                (ticket-type (uri-decode (car (assoc-ref kv "ticket-type")))))
-
-
-          (DB-query (DB-open rc) (->sql update 'ticket set `((ticket_status ,ticket-status)
-                                                             (ticket_type ,ticket-type)
-                                                             (description ,description)
-                                                             (title ,title)
-                                                             (updated_at ,(current-time))
-                                                             (child_of ,child-of)
-                                                             (blocked_by ,blocked-by)
-                                                             (splits_from ,splits-from)
-                                                             (clone_of ,clone-of)
-                                                             (blocks ,blocks)
-                                                             (related_to ,related-to)
-                                                             )
-                                        (where #:id (params rc "ticket-id"))))
           
-          (redirect-to rc (format #f "/tickets/~a" (params rc "project"))))))
+          (DB-query (DB-open rc)
+                    (->sql update
+                           'ticket set
+                           `((ticket_status ,ticket-status)
+                             (ticket_type ,ticket-type)
+                             (description ,description)
+                             (title ,title)
+                             (updated_at ,(current-time))
+                             (child_of ,child-of)
+                             (blocked_by ,blocked-by)
+                             (splits_from ,splits-from)
+                             (clone_of ,clone-of)
+                             (blocks ,blocks)
+                             (related_to ,related-to))
+                           (where #:id (params rc "ticket-id"))))
+
+          (redirect-to rc
+                       (format #f "/tickets/~a"
+                               (params rc "project"))))))

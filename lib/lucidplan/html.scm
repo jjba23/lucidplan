@@ -65,27 +65,27 @@
                (script (@ (src "/js/tickets.js")) ()))
          (body (@ (class "bg-stone-200 p-2"))
                (div (@ (class
-                         "my-6 flex flex-row flex-wrap justify-left gap-4"))
+                        "my-6 flex flex-row flex-wrap justify-left gap-4"))
                     (div (@ (class "flex flex-col gap-3 p-2"))
                          (a (@ (class
-                                 "text-sm uppercase text-stone-600 font-bold")
+                                "text-sm uppercase text-stone-600 font-bold")
                                (href "/projects")) "Projects")
                          ;; (a (@ (class
-                         ;;         "text-sm uppercase text-stone-600 font-bold")
-                         ;;       (href "/tickets/JOE")) "Tickets")
+                         ;; "text-sm uppercase text-stone-600 font-bold")
+                         ;; (href "/tickets/JOE")) "Tickets")
                          ;; (a (@ (class
-                         ;;         "text-sm uppercase text-stone-600 font-bold")
-                         ;;       (href "/board/JOE")
-                         ;;       (hidden "")) "Board")
+                         ;; "text-sm uppercase text-stone-600 font-bold")
+                         ;; (href "/board/JOE")
+                         ;; (hidden "")) "Board")
                          )
                     ,body)
                (footer ,(page-footer)))))
 
-
 (define-public (mk-option val comp)
   (cond
-   ((equal? val comp) `(option (@ (value ,val)
-                                  (selected "")) ,val))
-   (else
-    `(option (@ (value ,val)) ,val))
-   ))
+    ((equal? val comp)
+     `(option (@ (value ,val)
+                 (selected ""))
+              ,val))
+    (else `(option (@ (value ,val))
+                   ,val))))

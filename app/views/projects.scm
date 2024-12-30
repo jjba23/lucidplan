@@ -36,66 +36,42 @@
   "document.getElementById('details-~a').toggleAttribute('hidden')")
 
 (define (render-project p)
-  `((div (@ (class
-              "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl ml-4"))
-         (a (@ (href ,(format #f
-                              "/tickets/~a"
-                              (assoc-ref p
-                                         "human_id"))))
+  `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl ml-4"))
+         (a (@ (href ,(format #f "/tickets/~a"
+                              (assoc-ref p "human_id"))))
             ,(format #f "go to tickets: ~a"
-                     (assoc-ref p
-                                "title")))
-         (a (@ (href ,(format #f
-                              "/projects/~a/edit"
-                              (assoc-ref p
-                                         "id"))))
-            "edit project")
-         (form (@ (enctype
-                   "application/x-www-form-urlencoded")
+                     (assoc-ref p "title")))
+         (a (@ (href ,(format #f "/projects/~a/edit"
+                              (assoc-ref p "id")))) "edit project")
+         (form (@ (enctype "application/x-www-form-urlencoded")
                   (method "POST")
-                  (action
-                   "/projects/delete"))
+                  (action "/projects/delete"))
                (input (@ (name "id")
                          (hidden "")
-                         (value ,(assoc-ref
-                                  p
-                                  "id"))) "")
+                         (value ,(assoc-ref p "id"))) "")
                (button (@ (type "submit"))
-                       (small (@ (class
-                                   "text-red-600"))
-                              "delete")))
-         (small (@ (class
-                     "font-mono text-stone-500 text-xs"))
+                       (small (@ (class "text-red-600")) "delete")))
+         (small (@ (class "font-mono text-stone-500 text-xs"))
                 ,(format #f "~a"
-                         (assoc-ref p
-                                    "human_id")))
-         (small (@ (class
-                     "font-mono text-stone-500 text-xs"))
-                ,(assoc-ref p
-                            "id")))))
+                         (assoc-ref p "human_id")))
+         (small (@ (class "font-mono text-stone-500 text-xs"))
+                ,(assoc-ref p "id")))))
 
 (define (render-project-list-item p)
   `((div (@ (class
-              "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer rounded-xl")
-            (onclick ,(format #f
-                              project-listitem-reveal-details-js-template
+             "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer rounded-xl")
+            (onclick ,(format #f project-listitem-reveal-details-js-template
                               (assoc-ref p "id"))))
-         
-         (p (@ (class
-                 "font-mono text-stone-700 text-lg"))
+
+         (p (@ (class "font-mono text-stone-700 text-lg"))
             ,(format #f "~a (~a)"
-                     (assoc-ref p
-                                "title")
-                     (assoc-ref p
-                                "human_id"))))
+                     (assoc-ref p "title")
+                     (assoc-ref p "human_id"))))
     (div (@ (id ,(format #f "details-~a"
-                         (assoc-ref p
-                                    "id")))
+                         (assoc-ref p "id")))
             (class "ml-4")
             (hidden ""))
-         ,(render-project p)
-         ))
-  )
+         ,(render-project p))))
 
 (define-public (html-from-projects projects)
   (html-template `((div (@ (class "flex flex-col gap-4 flex-grow"))
@@ -106,12 +82,14 @@
   (html-project-form))
 
 (define-public (html-edit-project-form p)
-  (html-project-form
-   #:title (assoc-ref p "title")
-   #:human-id (assoc-ref p "human_id")
-   #:action (format #f "/projects/~a/edit" (assoc-ref p "id"))))
+  (html-project-form #:title (assoc-ref p "title")
+                     #:human-id (assoc-ref p "human_id")
+                     #:action (format #f "/projects/~a/edit"
+                                      (assoc-ref p "id"))))
 
-(define* (html-project-form #:key (title "") (human-id "") (action "/projects/new-submit"))
+(define* (html-project-form #:key (title "")
+                            (human-id "")
+                            (action "/projects/new-submit"))
   (html-template `((form (@ (class "flex flex-col gap-4")
                             (enctype "application/x-www-form-urlencoded")
                             (method "POST")
@@ -128,4 +106,6 @@
                                    (value ,human-id)
                                    (required "")) "")
 
-                         (button (@ (class "bg-green-800 text-white p-3 w-min rounded-xl")(type "submit")) "done")))))
+                         (button (@ (class
+                                     "bg-green-800 text-white p-3 w-min rounded-xl")
+                                    (type "submit")) "done")))))
