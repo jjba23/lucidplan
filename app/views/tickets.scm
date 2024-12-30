@@ -37,26 +37,23 @@
   (define (mk-rel pp)
     (let ((x (assoc-ref ticket-id-to-human-id pp)))
       (cond
-       ((not (equal? #f x))
-        `(span (@ (class "font-mono text-stone-500 text-xs"))
-               ,(format #f "~a-~a" project x))
-        )
-       (else `())
-       )
-      ))
+        ((not (equal? #f x))
+         `(span (@ (class "font-mono text-stone-500 text-xs"))
+                ,(format #f "~a-~a" project x)))
+        (else `()))))
 
   (define (mk-cond-rel r label)
     (let ((xs (string-split (assoc-ref ticket r) #\:)))
       (cond
-       ((and (not (null? xs))
-             (not (equal? '("") xs)))
-        `((div (@ (class "flex flex-col gap-2"))
-               (small (@ (class "font-mono text-stone-400 text-xs font-light"))
-                      ,label)
-               (div (@ (class
+        ((and (not (null? xs))
+              (not (equal? '("") xs)))
+         `((div (@ (class "flex flex-col gap-2"))
+                (small (@ (class "font-mono text-stone-400 text-xs font-light"))
+                       ,label)
+                (div (@ (class
                          "flex flex-row flex-wrap gap-4 items-center justify-left ml-4"))
-                    ,(map mk-rel xs)))))
-       (else `()))))
+                     ,(map mk-rel xs)))))
+        (else `()))))
 
   `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl"))
          (h4 (@ (class "font-mono text-stone-700 text-2xl font-bold"))
@@ -64,39 +61,38 @@
          (a (@ (class "font-mono text-stone-400 text-xs font-light")
                (href ,(format #f "/tickets/~a/~a/edit" project
                               (assoc-ref ticket "id")))) "edit ticket")
-         (hr (@(class "my-2")))
+         (hr (@ (class "my-2")))
 
-         
-         (div (@(class "flex flex-row flex-wrap gap-8 justify-left my-4"))
-              
-              (div (@(class "flex flex-col gap-3"))
-                   (small (@ (class "font-mono text-stone-400 text-xs font-light"))
+         (div (@ (class "flex flex-row flex-wrap gap-8 justify-left my-4"))
+
+              (div (@ (class "flex flex-col gap-3"))
+                   (small (@ (class
+                              "font-mono text-stone-400 text-xs font-light"))
                           "status:")
                    (p (@ (class "font-mono text-stone-700 text-sm ml-4"))
-                      ,(assoc-ref ticket "ticket_status"))
-                   )
-              
-              (div (@(class "flex flex-col gap-3"))
-                   (small (@ (class "font-mono text-stone-400 text-xs font-light"))
+                      ,(assoc-ref ticket "ticket_status")))
+
+              (div (@ (class "flex flex-col gap-3"))
+                   (small (@ (class
+                              "font-mono text-stone-400 text-xs font-light"))
                           "type:")
                    (p (@ (class "font-mono text-stone-700 text-sm ml-4"))
-                      ,(assoc-ref ticket "ticket_type"))
-                   )
-              )
+                      ,(assoc-ref ticket "ticket_type"))))
 
          (small (@ (class "font-mono text-stone-400 text-xs font-light"))
                 "description:")
          (p (@ (class
-                 "font-mono text-stone-600 text-md max-w-prose whitespace-pre-wrap ml-4"))
+                "font-mono text-stone-600 text-md max-w-prose whitespace-pre-wrap ml-4"))
             ,(assoc-ref ticket "description"))
 
-         (hr (@(class "my-2")))
-         
-         (small (@(class "font-mono text-stone-400 text-xs font-light")) "human id:")
+         (hr (@ (class "my-2")))
+
+         (small (@ (class "font-mono text-stone-400 text-xs font-light"))
+                "human id:")
          (small (@ (class "font-mono text-stone-500 text-xs ml-4"))
                 ,(format #f "~a-~s" project
                          (assoc-ref ticket "human_id")))
-         
+
          ,(mk-cond-rel "child_of" "child of:")
          ,(mk-cond-rel "blocked_by" "blocked by:")
          ,(mk-cond-rel "splits_from" "splits from:")
@@ -104,8 +100,6 @@
          ,(mk-cond-rel "blocks" "blocks:")
          ,(mk-cond-rel "related_to" "related to:")
 
-         
-         
          (small (@ (class "font-mono text-stone-400 text-xs font-light"))
                 "id:")
          (small (@ (class "font-mono text-stone-500 text-xs ml-4"))
@@ -121,7 +115,7 @@
                          (value ,(assoc-ref ticket "id"))))
                (button (@ (type "submit")
                           (class "text-red-600 text-sm ml-4")) "delete"))
-         
+
          )))
 
 (define-public ticket-listitem-reveal-details-js-template
