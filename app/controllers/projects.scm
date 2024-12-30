@@ -28,7 +28,7 @@
      #:mime 'xml
      (lambda (rc)
        (response-emit (:mime rc
-                       (html-from-projects ($project 'get #:order-by "human_id ASC"))))))
+                       (html-from-projects ($project 'get #:order-by "title ASC"))))))
 
 (get "/projects/new"
      #:mime 'xml
@@ -81,12 +81,11 @@
                (kv (read-url-encoded-body body))
                (title (uri-decode (car (assoc-ref kv "title"))))
                (human-id (uri-decode (car (assoc-ref kv "human-id")))))
-          
-          ($project 'set
-                    #:id (params rc "project-id")
-                    #:human_id human-id
-                    #:title title
-                    #:updated_at (current-time)
-                    #:condition (where #:id (params rc "project-id")))
+
+
+          (DB-query (DB-open rc) (->sql update 'project set `((human_id ,human-id)
+                                                              (title ,title)
+                                                              (updated_at ,(current-time)))
+                                        (where #:id (params rc "project-id"))))
           
           (redirect-to rc "/projects"))))
