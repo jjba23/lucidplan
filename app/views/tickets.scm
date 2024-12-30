@@ -36,9 +36,15 @@
   `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl"))
          (small (@ (class "font-mono text-stone-400 text-xs font-light"))
                 "title:")
-         (h4 (@ (class "font-mono text-stone-700 text-lg font-bold"))
+         (h4 (@ (class "font-mono text-stone-700 text-xl font-bold"))
              ,(assoc-ref ticket
                          "title"))
+         (a (@ (href ,(format #f
+                              "/tickets/~a/~a/edit"
+                              project
+                              (assoc-ref ticket
+                                         "id"))))
+            "edit ticket")
          (small (@ (class "font-mono text-stone-400 text-xs font-light"))
                 "status:")
          (p (@ (class "font-mono text-stone-700 text-md"))
@@ -59,7 +65,7 @@
                 "meta:")
          (form (@ (enctype "application/x-www-form-urlencoded")
                   (method "POST")
-                  (action ,(format #f "/backlog/~a/tickets/delete" project)))
+                  (action ,(format #f "/tickets/~a/delete" project)))
                (input (@ (hidden "")
                          (name "id")
                          (value ,(assoc-ref ticket
@@ -79,7 +85,7 @@
 
 (define-public (render-ticket-listitem project ticket)
   `((div (@ (draggable "true")
-            (ondragstart "dragBacklogItem(event)")
+            (ondragstart "dragTicketsItem(event)")
             (class "flex flex-col gap-2")
             (id ,(format #f "listitem-~a"
                          (assoc-ref ticket
@@ -104,49 +110,72 @@
     
     ))
 
-(define-public (html-from-backlog project tickets)
+(define-public (html-from-tickets project tickets)
   (html-template `((div (@ (class "flex flex-col gap-4 flex-grow"))
-                        (div (@ (id "lucidplan-backlog-list")
-                                (ondrop "dropBacklogItem(event)")
+                        (div (@ (id "lucidplan-tickets-list")
+                                (ondrop "dropTicketsItem(event)")
                                 (ondragover "allowDrop(event)")
                                 (class "flex flex-col gap-2 container"))
                              ,(map (lambda (t)
                                      (render-ticket-listitem project
                                                              t))
                                    tickets))
-                        (div (a (@ (href ,(format #f "/backlog/~a/tickets/new"
+                        (div (a (@ (href ,(format #f "/tickets/~a/new"
                                                   project))) "+ new ticket"))))))
 
 (define-public (html-new-ticket-form project)
+  (html-ticket-form #:project project))
+
+(define-public (html-edit-ticket-form project t)
+  (html-ticket-form
+   #:project project
+   #:title (assoc-ref t "title")
+   #:description (assoc-ref t "description")
+   #:ticket-type (assoc-ref t "ticket-type")
+   #:ticket-status (assoc-ref t "ticket-status")
+   #:action (format #f "/tickets/~a/~a/edit" project (assoc-ref t "id"))))
+
+
+(define* (html-ticket-form 
+          #:key
+          (project #f)
+          (title "")
+          (description "")
+          (ticket-status "")
+          (ticket-type "")
+          (action "/projects/new-submit"))
   (html-template `((form (@ (class "flex flex-col gap-4 flex-grow")
                             (enctype "application/x-www-form-urlencoded")
                             (method "POST")
                             (action ,(format #f
-                                             "/backlog/~a/tickets/new-submit"
+                                             "/tickets/~a/new-submit"
                                              project)))
                          (label "title:")
-                         (input (@ (name "title")
+                         (input (@ (class "p-3 w-min rounded-xl")
+                                   (name "title")
+                                   (value ,title)
                                    (required "")) "")
                          (label "status:")
-                         (select (@ (name "ticket-status")
+                         (select (@ (class "p-3 w-min rounded-xl")
+                                    (name "ticket-status")
                                     (required ""))
-                                 (option (@ (value "todo")
-                                            (selected "")) "todo")
-                                 (option (@ (value "work-in-progress"))
-                                         "work-in-progress")
-                                 (option (@ (value "in-review")) "in-review")
-                                 (option (@ (value "done")) "done")
-                                 (option (@ (value "rejected")) "rejected"))
+                                 ,(mk-option "todo" ticket-status)
+                                 ,(mk-option "work-in-progress" ticket-status)
+                                 ,(mk-option "in-review" ticket-status)
+                                 ,(mk-option "done" ticket-status)
+                                 ,(mk-option "rejected" ticket-status))
                          (label "type:")
-                         (select (@ (name "ticket-type")
-                                    (required ""))
-                                 (option (@ (value "task")
-                                            (selected "")) "task")
-                                 (option (@ (value "bug")) "bug")
-                                 (option (@ (value "story")) "story")
-                                 (option (@ (value "spike")) "spike")
-                                 (option (@ (value "time-box")) "time-box"))
+                         (select (@(class "p-3 w-min rounded-xl")
+                                  (name "ticket-type")
+                                  (required ""))
+                                 ,(mk-option "task" ticket-type)
+                                 ,(mk-option "bug" ticket-type)
+                                 ,(mk-option "story" ticket-type)
+                                 ,(mk-option "spike" ticket-type)
+                                 ,(mk-option "time-box" ticket-type))
                          (label "description:")
-                         (textarea (@ (name "description")
+                         (textarea (@ (class "p-3 w-min rounded-xl")
+                                      (name "description")
+                                      (value ,description)
                                       (required "")) "")
-                         (button (@ (type "submit")) "create")))))
+                         (button (@ (class "bg-green-800 text-white p-3 w-min rounded-xl")(type "submit")) "done")))))

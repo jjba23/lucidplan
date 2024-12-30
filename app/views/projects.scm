@@ -39,10 +39,10 @@
   `((div (@ (class
               "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl ml-4"))
          (a (@ (href ,(format #f
-                              "/backlog/~a"
+                              "/tickets/~a"
                               (assoc-ref p
                                          "human_id"))))
-            ,(format #f "go to backlog: ~a"
+            ,(format #f "go to tickets: ~a"
                      (assoc-ref p
                                 "title")))
          (a (@ (href ,(format #f
@@ -117,13 +117,15 @@
                             (method "POST")
                             (action ,action))
                          (label "title:")
-                         (input (@ (name "title")
+                         (input (@ (class "p-3 w-min rounded-xl")
+                                   (name "title")
                                    (value ,title)
                                    (required "")) "")
 
                          (label "human id:")
-                         (input (@ (name "human-id")
+                         (input (@ (class "p-3 w-min rounded-xl")
+                                   (name "human-id")
                                    (value ,human-id)
                                    (required "")) "")
 
-                         (button (@ (type "submit")) "create")))))
+                         (button (@ (class "bg-green-800 text-white p-3 w-min rounded-xl")(type "submit")) "done")))))

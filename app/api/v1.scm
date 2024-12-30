@@ -20,7 +20,7 @@
 (import (app models project)
         (app models ticket))
 
-(get "/api/v1/backlog/:project"
+(get "/api/v1/tickets/:project"
      #:mime 'json
      (lambda (rc)
        (:mime rc

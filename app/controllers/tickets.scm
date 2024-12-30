@@ -33,7 +33,7 @@
      )
     ))
 
-(get "/backlog/:project"
+(get "/tickets/:project"
      #:mime 'xml
      (lambda (rc)
        (let* ((project-id (project-id-from-human-id (params rc "project")))
@@ -42,17 +42,17 @@
                                         (where #:project_id project-id)
                                         #:order-by "human_id ASC")))
          (response-emit (:mime rc
-                         (html-from-backlog (params rc "project")
+                         (html-from-tickets (params rc "project")
                                             project-tickets))))
        ))
 
-(get "/backlog/:project/tickets/new"
+(get "/tickets/:project/new"
      #:mime 'xml
      (lambda (rc)
        (response-emit (:mime rc
                        (html-new-ticket-form (params rc "project"))))))
 
-(post "/backlog/:project/tickets/delete"
+(post "/tickets/:project/delete"
       #:mime 'xml
       (lambda (rc)
         (let* ((body (rc-body rc))
@@ -62,10 +62,10 @@
           (DB-query (DB-open rc) (->sql delete from 'ticket (where #:id id)))
 
           (redirect-to rc
-                       (format #f "/backlog/~a"
+                       (format #f "/tickets/~a"
                                (params rc "project"))))))
 
-(post "/backlog/:project/tickets/new-submit"
+(post "/tickets/:project/new-submit"
       #:mime 'xml
       (lambda (rc)
         (let* ((body (rc-body rc))
@@ -87,6 +87,36 @@
                    #:created_at (current-time))
 
           (redirect-to rc
-                       (format #f "/backlog/~a"
+                       (format #f "/tickets/~a"
                                (params rc "project"))))))
 
+
+
+(get "/tickets/:project/:ticket-id/edit"
+     #:mime 'xml
+     (lambda (rc)
+       (let ((t (car ($ticket 'get #:ret 'top #:condition (where #:id (params rc "ticket-id"))))))
+         (response-emit (:mime rc
+                         (html-edit-ticket-form (params rc "project") t)))
+         )
+       ))
+
+(post "/tickets/:project/:ticket-id/edit"
+      #:mime 'xml
+      (lambda (rc)
+        (let* ((body (rc-body rc))
+               (kv (read-url-encoded-body body))
+               (title (uri-decode (car (assoc-ref kv "title"))))
+               (description (uri-decode (car (assoc-ref kv "description"))))
+               (ticket-status (uri-decode (car (assoc-ref kv "ticket-status"))))
+               (ticket-type (uri-decode (car (assoc-ref kv "ticket-type")))))
+
+
+          (DB-query (DB-open rc) (->sql update 'ticket set `((ticket_status ,ticket-status)
+                                                             (ticket_type ,ticket-type)
+                                                             (description ,description)
+                                                             (title ,title)
+                                                             (updated_at ,(current-time)))
+                                        (where #:id (params rc "ticket-id"))))
+          
+          (redirect-to rc (format #f "/tickets/~a" (params rc "project"))))))

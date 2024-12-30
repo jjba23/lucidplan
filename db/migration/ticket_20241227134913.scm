@@ -5,7 +5,7 @@
                           '(id char-field
                                (#:not-null #:unique #:maxlen 36))
                           '(project_id char-field
-                                       (#:not-null #:maxlen 36 #:unique))
+                                       (#:not-null #:maxlen 36))
 
                           '(title char-field
                                   (#:not-null #:maxlen 512 #:unique))

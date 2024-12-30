@@ -62,20 +62,29 @@
                         (content "width=device-width, initial-scale=1.0")))
                (script (@ (src "https://cdn.tailwindcss.com")) "")
                (script (@ (src "/js/tailwind.config.js")) ())
-               (script (@ (src "/js/backlog.js")) ()))
+               (script (@ (src "/js/tickets.js")) ()))
          (body (@ (class "bg-stone-200 p-2"))
                (div (@ (class
-                        "my-6 flex flex-row flex-wrap justify-left gap-4"))
+                         "my-6 flex flex-row flex-wrap justify-left gap-4"))
                     (div (@ (class "flex flex-col gap-3 p-2"))
                          (a (@ (class
-                                "text-sm uppercase text-stone-600 font-bold")
+                                 "text-sm uppercase text-stone-600 font-bold")
                                (href "/projects")) "Projects")
-                         (a (@ (class
-                                "text-sm uppercase text-stone-600 font-bold")
-                               (href "/backlog/JOE")) "Backlog")
-                         (a (@ (class
-                                "text-sm uppercase text-stone-600 font-bold")
-                               (href "/board/JOE")
-                               (hidden "")) "Board"))
+                         ;; (a (@ (class
+                         ;;         "text-sm uppercase text-stone-600 font-bold")
+                         ;;       (href "/tickets/JOE")) "Tickets")
+                         ;; (a (@ (class
+                         ;;         "text-sm uppercase text-stone-600 font-bold")
+                         ;;       (href "/board/JOE")
+                         ;;       (hidden "")) "Board")
+                         )
                     ,body)
                (footer ,(page-footer)))))
+
+(define-public (mk-option val comp)
+  (cond
+   ((equal? val comp) `(option (@ (value ,val)
+                                  (selected "")) ,val))
+   (else
+    `(option (@ (value ,val)) ,val))
+   ))
