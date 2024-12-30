@@ -32,7 +32,25 @@
   #:use-module (lucidplan html)
   #:use-module (artanis route))
 
-(define-public (render-ticket project ticket)
+
+(define-public (render-ticket project ticket ticket-id-to-human-id)
+  
+  (define (mk-rel pp)
+    `(span (@(class "")) ,(format #f "~a-~a" project (assoc-ref ticket-id-to-human-id pp))))
+
+  (define (mk-cond-rel r label)
+    (let ((xs (string-split (assoc-ref ticket "child_of") #\:)))
+      (cond
+       ((and (not (null? xs)) (not (equal? '("") xs)))
+        `((small (@ (class "font-mono text-stone-400 text-xs font-light"))
+                 ,label)
+          (small (@ (class "font-mono text-stone-500 text-xs"))
+                 ,(map mk-rel xs)))
+        )
+       (else `())
+       )
+      ))
+  
   `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl"))
          (small (@ (class "font-mono text-stone-400 text-xs font-light"))
                 "title:")
@@ -76,6 +94,14 @@
                 ,(format #f "~a-~s" project
                          (assoc-ref ticket
                                     "human_id")))
+
+         ,(mk-cond-rel "child_of" "child of:")
+         ,(mk-cond-rel "blocked_by" "blocked by:")
+         ,(mk-cond-rel "splits_from" "splits from:")
+         ,(mk-cond-rel "clone_of" "clone of:")
+         ,(mk-cond-rel "blocks" "blocks:")
+         ,(mk-cond-rel "related_to" "related to:")
+
          (small (@ (class "font-mono text-stone-500 text-xs"))
                 ,(assoc-ref ticket
                             "id")))))
@@ -83,7 +109,7 @@
 (define-public ticket-listitem-reveal-details-js-template
   "document.getElementById('details-~a').toggleAttribute('hidden')")
 
-(define-public (render-ticket-listitem project ticket)
+(define-public (render-ticket-listitem project ticket ticket-id-to-human-id)
   `((div (@ (draggable "true")
             (ondragstart "dragTicketsItem(event)")
             (class "flex flex-col gap-2")
@@ -106,11 +132,11 @@
                                          "id")))
                  (class "ml-4")
                  (hidden ""))
-              ,(render-ticket project ticket)))
+              ,(render-ticket project ticket ticket-id-to-human-id)))
     
     ))
 
-(define-public (html-from-tickets project tickets)
+(define-public (html-from-tickets project tickets ticket-id-to-human-id)
   (html-template `((div (@ (class "flex flex-col gap-4 flex-grow"))
                         (div (@ (id "lucidplan-tickets-list")
                                 (ondrop "dropTicketsItem(event)")
@@ -118,13 +144,16 @@
                                 (class "flex flex-col gap-2 container"))
                              ,(map (lambda (t)
                                      (render-ticket-listitem project
-                                                             t))
+                                                             t
+                                                             ticket-id-to-human-id))
                                    tickets))
                         (div (a (@ (href ,(format #f "/tickets/~a/new"
                                                   project))) "+ new ticket"))))))
 
 (define-public (html-new-ticket-form project)
-  (html-ticket-form #:project project))
+  (html-ticket-form
+   #:project project
+   #:action (format #f "/tickets/~a/new" project )))
 
 (define-public (html-edit-ticket-form project t)
   (html-ticket-form
@@ -155,7 +184,7 @@
           (clone-of "")
           (blocks "")
           (related-to "")
-          (action "/projects/new-submit"))
+          (action ""))
   (html-template `((form (@ (class "flex flex-col gap-4 flex-grow")
                             (enctype "application/x-www-form-urlencoded")
                             (method "POST")

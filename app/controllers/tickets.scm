@@ -40,10 +40,17 @@
               (project-tickets ($ticket 'get
                                         #:condition
                                         (where #:project_id project-id)
-                                        #:order-by "human_id ASC")))
+                                        #:order-by "human_id ASC"))
+              (ticket-id-to-human-id (map (lambda(t)
+                                            `(,(assoc-ref t "id") . ,(assoc-ref t "human_id"))
+                                            ) ($ticket 'get
+                                                       #:columns '(id human_id)
+                                                       #:order-by "human_id ASC"))))
+         (display ticket-id-to-human-id)
          (response-emit (:mime rc
                          (html-from-tickets (params rc "project")
-                                            project-tickets))))
+                                            project-tickets
+                                            ticket-id-to-human-id))))
        ))
 
 (get "/tickets/:project/new"
@@ -65,7 +72,7 @@
                        (format #f "/tickets/~a"
                                (params rc "project"))))))
 
-(post "/tickets/:project/new-submit"
+(post "/tickets/:project/new"
       #:mime 'xml
       (lambda (rc)
         (let* ((body (rc-body rc))
