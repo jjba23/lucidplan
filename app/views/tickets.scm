@@ -35,9 +35,15 @@
 (define-public (render-ticket project ticket ticket-id-to-human-id)
   
   (define (mk-rel pp)
-    `(span (@ (class "font-mono text-stone-500 text-xs"))
-           ,(format #f "~a-~a" project
-                    (assoc-ref ticket-id-to-human-id pp))))
+    (let ((x (assoc-ref ticket-id-to-human-id pp)))
+      (cond
+       ((not (equal? #f x))
+        `(span (@ (class "font-mono text-stone-500 text-xs"))
+               ,(format #f "~a-~a" project x))
+        )
+       (else `())
+       )
+      ))
 
   (define (mk-cond-rel r label)
     (let ((xs (string-split (assoc-ref ticket r) #\:)))
