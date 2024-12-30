@@ -75,6 +75,7 @@
 
 (define-public (html-from-projects projects)
   (html-template `((div (@ (class "flex flex-col gap-4 flex-grow"))
+                        (h2 (@(class "text-xl font-mono font-bold text-stone-500")) "projects")
                         ,(map render-project-list-item projects)
                         (div (a (@ (href "/projects/new")) "+ new project"))))))
 

@@ -37,25 +37,25 @@
   (define (mk-rel pp)
     (let ((x (assoc-ref ticket-id-to-human-id pp)))
       (cond
-        ((not (equal? #f x))
-         `(span (@ (class "font-mono text-stone-500 text-xs"))
-                ,(format #f "~a-~a" project x)))
-        (else `()))))
+       ((not (equal? #f x))
+        `(span (@ (class "font-mono text-stone-500 text-xs"))
+               ,(format #f "~a-~a" project x)))
+       (else `()))))
 
   (define (mk-cond-rel r label)
     (let ((xs (string-split (assoc-ref ticket r) #\:)))
       (cond
-        ((and (not (null? xs))
-              (not (equal? '("") xs)))
-         `((div (@ (class "flex flex-col gap-2"))
-                (small (@ (class "font-mono text-stone-400 text-xs font-light"))
-                       ,label)
-                (div (@ (class
+       ((and (not (null? xs))
+             (not (equal? '("") xs)))
+        `((div (@ (class "flex flex-col gap-2"))
+               (small (@ (class "font-mono text-stone-400 text-xs font-light"))
+                      ,label)
+               (div (@ (class
                          "flex flex-row flex-wrap gap-4 items-center justify-left ml-4"))
-                     ,(map mk-rel xs)))))
-        (else `()))))
+                    ,(map mk-rel xs)))))
+       (else `()))))
 
-  `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl"))
+  `((div (@ (draggable "false")(class "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl"))
          (h4 (@ (class "font-mono text-stone-700 text-2xl font-bold"))
              ,(assoc-ref ticket "title"))
          (a (@ (class "font-mono text-stone-400 text-xs font-light")
@@ -67,14 +67,14 @@
 
               (div (@ (class "flex flex-col gap-3"))
                    (small (@ (class
-                              "font-mono text-stone-400 text-xs font-light"))
+                               "font-mono text-stone-400 text-xs font-light"))
                           "status:")
                    (p (@ (class "font-mono text-stone-700 text-sm ml-4"))
                       ,(assoc-ref ticket "ticket_status")))
 
               (div (@ (class "flex flex-col gap-3"))
                    (small (@ (class
-                              "font-mono text-stone-400 text-xs font-light"))
+                               "font-mono text-stone-400 text-xs font-light"))
                           "type:")
                    (p (@ (class "font-mono text-stone-700 text-sm ml-4"))
                       ,(assoc-ref ticket "ticket_type"))))
@@ -82,7 +82,7 @@
          (small (@ (class "font-mono text-stone-400 text-xs font-light"))
                 "description:")
          (p (@ (class
-                "font-mono text-stone-600 text-md max-w-prose whitespace-pre-wrap ml-4"))
+                 "font-mono text-stone-600 text-md max-w-prose whitespace-pre-wrap ml-4"))
             ,(assoc-ref ticket "description"))
 
          (hr (@ (class "my-2")))
@@ -146,13 +146,14 @@
 
 (define-public (html-from-tickets project tickets ticket-id-to-human-id)
   (html-template `((div (@ (class "flex flex-col gap-4 flex-grow"))
+                        (h2 (@(class "text-2xl font-mono font-bold text-stone-500")) ,(format #f "tickets for ~a" project))
                         (div (@ (id "lucidplan-tickets-list")
                                 (ondrop "dropTicketsItem(event)")
                                 (ondragover "allowDrop(event)")
                                 (class "flex flex-col gap-2 container"))
                              ,(map (lambda (t)
                                      (render-ticket-listitem project t
-                                      ticket-id-to-human-id)) tickets))
+                                                             ticket-id-to-human-id)) tickets))
                         (div (a (@ (href ,(format #f "/tickets/~a/new" project)))
                                 "+ new ticket"))))))
 
