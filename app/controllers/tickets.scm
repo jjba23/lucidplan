@@ -74,6 +74,12 @@
                (ticket-status (uri-decode (car (assoc-ref kv "ticket-status"))))
                (ticket-type (uri-decode (car (assoc-ref kv "ticket-type"))))
                (description (uri-decode (car (assoc-ref kv "description"))))
+               (child-of (uri-decode (car (assoc-ref kv "child-of"))))
+               (blocked-by (uri-decode (car (assoc-ref kv "blocked-by"))))
+               (splits-from (uri-decode (car (assoc-ref kv "splits-from"))))
+               (clone-of (uri-decode (car (assoc-ref kv "clone-of"))))
+               (blocks (uri-decode (car (assoc-ref kv "blocks"))))
+               (related-to (uri-decode (car (assoc-ref kv "related-to"))))
                (project-id (project-id-from-human-id (params rc "project")))
                (new-uuid (string-replace-substring (uuidgen) "\n" "")))
 
@@ -84,7 +90,14 @@
                    #:ticket_status ticket-status
                    #:ticket_type ticket-type
                    #:description description
-                   #:created_at (current-time))
+                   #:created_at (current-time)
+                   #:child_of child-of
+                   #:blocked_by blocked-by
+                   #:splits_from splits-from
+                   #:clone_of clone-of
+                   #:blocks blocks
+                   #:related_to related-to
+                   )
 
           (redirect-to rc
                        (format #f "/tickets/~a"
@@ -109,6 +122,12 @@
                (title (uri-decode (car (assoc-ref kv "title"))))
                (description (uri-decode (car (assoc-ref kv "description"))))
                (ticket-status (uri-decode (car (assoc-ref kv "ticket-status"))))
+               (child-of (uri-decode (car (assoc-ref kv "child-of"))))
+               (blocked-by (uri-decode (car (assoc-ref kv "blocked-by"))))
+               (splits-from (uri-decode (car (assoc-ref kv "splits-from"))))
+               (clone-of (uri-decode (car (assoc-ref kv "clone-of"))))
+               (blocks (uri-decode (car (assoc-ref kv "blocks"))))
+               (related-to (uri-decode (car (assoc-ref kv "related-to"))))
                (ticket-type (uri-decode (car (assoc-ref kv "ticket-type")))))
 
 
@@ -116,7 +135,14 @@
                                                              (ticket_type ,ticket-type)
                                                              (description ,description)
                                                              (title ,title)
-                                                             (updated_at ,(current-time)))
+                                                             (updated_at ,(current-time))
+                                                             (child_of ,child-of)
+                                                             (blocked_by ,blocked-by)
+                                                             (splits_from ,splits-from)
+                                                             (clone_of ,clone-of)
+                                                             (blocks ,blocks)
+                                                             (related_to ,related-to)
+                                                             )
                                         (where #:id (params rc "ticket-id"))))
           
           (redirect-to rc (format #f "/tickets/~a" (params rc "project"))))))

@@ -17,5 +17,11 @@
                                    (#:not-null #:maxlen 256))
                       (created_at date-field
                                   (#:not-null))
-                      (updated_at date-field))
+                      (updated_at date-field )
+                      (child_of char-field (#:maxlen 8192))
+                      (blocked_by char-field (#:maxlen 8192))
+                      (splits_from char-field (#:maxlen 8192))
+                      (clone_of char-field (#:maxlen 8192))
+                      (blocks char-field (#:maxlen 8192))
+                      (related_to char-field (#:maxlen 8192)))
 

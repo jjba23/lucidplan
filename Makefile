@@ -29,3 +29,4 @@ rebuild-db:
 	-rm lucidplan.db-wal
 	touch lucidplan.db
 	sqlite3 lucidplan.db 'PRAGMA journal_mode=WAL;'
+
