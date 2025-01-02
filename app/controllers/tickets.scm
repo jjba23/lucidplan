@@ -40,6 +40,8 @@
 
 (get "/tickets/:project"
      #:mime 'xml
+     #:auth '(table user "username" "password")
+     #:session #t
      (lambda (rc)
        (let* ((project-id (project-id-from-human-id (params rc "project")))
               (project-tickets ($ticket 'get
@@ -60,12 +62,16 @@
 
 (get "/tickets/:project/new"
      #:mime 'xml
+     #:auth '(table user "username" "password")
+     #:session #t
      (lambda (rc)
        (response-emit (:mime rc
-                             (html-new-ticket-form (params rc "project"))))))
+                       (html-new-ticket-form (params rc "project"))))))
 
 (post "/tickets/:project/delete"
       #:mime 'xml
+      #:auth '(table user "username" "password")
+      #:session #t
       (lambda (rc)
         (let* ((body (rc-body rc))
                (kv (read-url-encoded-body body))
@@ -82,6 +88,8 @@
 
 (post "/tickets/:project/new"
       #:mime 'xml
+      #:auth '(table user "username" "password")
+      #:session #t
       (lambda (rc)
         (let* ((body (rc-body rc))
                (kv (read-url-encoded-body body))
@@ -119,15 +127,19 @@
 
 (get "/tickets/:project/:ticket-id/edit"
      #:mime 'xml
+     #:auth '(table user "username" "password")
+     #:session #t
      (lambda (rc)
        (let ((t (car ($ticket 'get
                               #:ret 'top
                               #:condition (where #:id (params rc "ticket-id"))))))
          (response-emit (:mime rc
-                               (html-edit-ticket-form (params rc "project") t))))))
+                         (html-edit-ticket-form (params rc "project") t))))))
 
 (post "/tickets/:project/:ticket-id/edit"
       #:mime 'xml
+      #:auth '(table user "username" "password")
+      #:session #t
       (lambda (rc)
         (let* ((body (rc-body rc))
                (kv (read-url-encoded-body body))

@@ -26,73 +26,133 @@
         (artanis security nss)
         (app models project))
 
+(get "/" (lambda(rc) (redirect-to rc (string->uri (format #f "~a/projects" (current-myhost))) #:status 307)))
+
 (get "/projects"
+     #:auth '(table user "username" "password")
+     #:session #t
      #:mime 'xml
      (lambda (rc)
-       (response-emit (:mime rc
-                             (html-from-projects ($project 'get
-                                                           #:order-by
-                                                           "title ASC"))))))
+       (define (get-p)
+         (response-emit (:mime rc
+                         (html-from-projects ($project 'get
+                                                       #:order-by '(title asc))))))
+       (cond
+        ((:session rc 'check) (get-p))
+        ((:auth rc)
+         (:session rc 'spawn)
+         (get-p))
+        (else (redirect-to rc (string->uri (format #f "~a/login" (current-myhost))) #:status 307 )))))
 
 (get "/projects/new"
+     #:auth '(table user "username" "password")
+     #:session #t
      #:mime 'xml
      (lambda (rc)
-       (response-emit (:mime rc
-                             (html-new-project-form)))))
+       (define (get-new)
+         (response-emit (:mime rc
+                         (html-new-project-form))))
+       (cond
+        ((:session rc 'check) (get-new))
+        ((:auth rc)
+         (:session rc 'spawn)
+         (get-new))
+        (else (redirect-to rc (string->uri (format #f "~a/login" (current-myhost))) #:status 307)))))
 
 (post "/projects/delete"
+      #:auth '(table user "username" "password")
+      #:session #t
       #:mime 'xml
       (lambda (rc)
-        (let* ((body (rc-body rc))
-               (kv (read-url-encoded-body body))
-               (id (uri-decode (car (assoc-ref kv "id")))))
-          (DB-query (DB-open rc)
-                    (->sql delete from
-                           'project
-                           (where #:id id)))
+        (define (do-delete)
+          (let* ((body (rc-body rc))
+                 (kv (read-url-encoded-body body))
+                 (id (uri-decode (car (assoc-ref kv "id")))))
+            (DB-query (DB-open rc)
+                      (->sql delete from
+                             'project
+                             (where #:id id)))
 
-          (redirect-to rc "/projects"))))
+            (redirect-to rc "/projects")))
+        (cond
+         ((:session rc 'check) (do-delete))
+         ((:auth rc)
+          (:session rc 'spawn)
+          (do-delete))
+         (else (redirect-to rc (string->uri (format #f "~a/login" (current-myhost))) #:status 307)))))
 
 (post "/projects/new"
+      #:auth '(table user "username" "password")
+      #:session #t
       #:mime 'xml
       (lambda (rc)
-        (let* ((body (rc-body rc))
-               (kv (read-url-encoded-body body))
-               (title (uri-decode (car (assoc-ref kv "title"))))
-               (human-id (uri-decode (car (assoc-ref kv "human-id"))))
-               (new-uuid (string-replace-substring (uuidgen) "\n" "")))
-          
-          ($project 'set
-                    #:id new-uuid
-                    #:human_id (safe-base64-encode human-id)
-                    #:title (safe-base64-encode title)
-                    #:created_at (current-time))
+        (define (do-new)
+          (let* ((body (rc-body rc))
+                 (kv (read-url-encoded-body body))
+                 (title (uri-decode (car (assoc-ref kv "title"))))
+                 (human-id (uri-decode (car (assoc-ref kv "human-id"))))
+                 (new-uuid (string-replace-substring (uuidgen) "\n" "")))
+            
+            ($project 'set
+                      #:id new-uuid
+                      #:human_id (safe-base64-encode human-id)
+                      #:title (safe-base64-encode title)
+                      #:created_at (current-time))
 
-          (redirect-to rc "/projects"))))
+            (redirect-to rc "/projects")))
+        (cond
+         ((:session rc 'check) (do-new))
+         ((:auth rc)
+          (:session rc 'spawn)
+          (do-new))
+         (else (redirect-to rc (string->uri (format #f "~a/login" (current-myhost))) #:status 307)))
+        ))
 
 (get "/projects/:project-id/edit"
+     #:auth '(table user "username" "password")
+     #:session #t
      #:mime 'xml
      (lambda (rc)
-       (let ((p (car ($project 'get
-                               #:ret 'top
-                               #:condition (where #:id (params rc "project-id"))))))
-         (response-emit (:mime rc
-                               (html-edit-project-form p))))))
+       (define (get-edit)
+         (let ((p (car ($project 'get
+                                 #:ret 'top
+                                 #:condition (where #:id (params rc "project-id"))))))
+           (response-emit (:mime rc
+                           (html-edit-project-form p)))))
+       (write rc)
+       (cond
+        ((:session rc 'check) (get-edit))
+        ((:auth rc)
+         (:session rc 'spawn)
+         (get-edit))
+        (else (redirect-to rc (string->uri (format #f "~a/login" (current-myhost))) #:status 307)))
+       ))
 
 (post "/projects/:project-id/edit"
+      #:auth '(table user "username" "password")
+      #:session #t
       #:mime 'xml
       (lambda (rc)
-        (let* ((body (rc-body rc))
-               (kv (read-url-encoded-body body))
-               (title (uri-decode (car (assoc-ref kv "title"))))
-               (human-id (uri-decode (car (assoc-ref kv "human-id")))))
-          
-          (DB-query (DB-open rc)
-                    (->sql update
-                           'project set
-                           `((human_id ,(safe-base64-encode human-id))
-                             (title ,(safe-base64-encode title))
-                             (updated_at ,(current-time)))
-                           (where #:id (params rc "project-id"))))
+        (define (do-edit)
+          (let* ((body (rc-body rc))
+                 (kv (read-url-encoded-body body))
+                 (title (uri-decode (car (assoc-ref kv "title"))))
+                 (human-id (uri-decode (car (assoc-ref kv "human-id")))))
+            
+            (DB-query (DB-open rc)
+                      (->sql update
+                             'project set
+                             `((human_id ,(safe-base64-encode human-id))
+                               (title ,(safe-base64-encode title))
+                               (updated_at ,(current-time)))
+                             (where #:id (params rc "project-id"))))
 
-          (redirect-to rc "/projects"))))
+            (redirect-to rc "/projects")))
+        (cond
+         ((:session rc 'check) (do-edit))
+         ((:auth rc)
+          (:session rc 'spawn)
+          (do-edit))
+         (else (redirect-to rc (string->uri (format #f "~a/login" (current-myhost))) #:status 307)))
+        ))
+
