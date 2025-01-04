@@ -73,7 +73,7 @@
                              'project
                              (where #:id id)))
 
-            (redirect-to rc "/projects")))
+            (redirect-to rc "/projects" #:status 302)))
         (cond
          ((:session rc 'check) (do-delete))
          ((:auth rc)
@@ -99,7 +99,7 @@
                       #:title (safe-base64-encode title)
                       #:created_at (current-time))
 
-            (redirect-to rc "/projects")))
+            (redirect-to rc "/projects" #:status 302)))
         (cond
          ((:session rc 'check) (do-new))
          ((:auth rc)
@@ -147,7 +147,7 @@
                                (updated_at ,(current-time)))
                              (where #:id (params rc "project-id"))))
 
-            (redirect-to rc "/projects")))
+            (redirect-to rc "/projects" #:status 302)))
         (cond
          ((:session rc 'check) (do-edit))
          ((:auth rc)
