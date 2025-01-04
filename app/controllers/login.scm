@@ -38,13 +38,13 @@
          ((:session rc
            'check)
           (redirect-to rc
-                       (string->uri (format #f "~a/?login_succeeded=true"
+                       (string->uri (format #f "~a"
                                             (current-myhost))) #:status 307))
          ((:auth rc)
           (:session rc
            'spawn)
           (redirect-to rc
-                       (string->uri (format #f "~a/?login_succeeded=true"
+                       (string->uri (format #f "~a"
                                             (current-myhost))) #:status 307))
          (else (redirect-to rc
                             (string->uri (format #f
