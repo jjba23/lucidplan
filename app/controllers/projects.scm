@@ -26,7 +26,7 @@
         (artanis security nss)
         (app models project))
 
-(get "/" (lambda(rc) (redirect-to rc (string->uri (format #f "~a/projects" (current-myhost))) #:status 307)))
+(get "/" (lambda(rc) (redirect-to rc (string->uri (format #f "~a/projects" (current-myhost))) #:status 302)))
 
 (get "/projects"
      #:auth '(table user "username" "password")
@@ -42,7 +42,7 @@
         ((:auth rc)
          (:session rc 'spawn)
          (get-p))
-        (else (redirect-to rc (string->uri (format #f "~a/login" (current-myhost))) #:status 307 )))))
+        (else (redirect-to rc (string->uri (format #f "~a/login" (current-myhost))) #:status 302 )))))
 
 (get "/projects/new"
      #:auth '(table user "username" "password")
@@ -57,7 +57,7 @@
         ((:auth rc)
          (:session rc 'spawn)
          (get-new))
-        (else (redirect-to rc (string->uri (format #f "~a/login" (current-myhost))) #:status 307)))))
+        (else (redirect-to rc (string->uri (format #f "~a/login" (current-myhost))) #:status 302)))))
 
 (post "/projects/delete"
       #:auth '(table user "username" "password")
@@ -79,7 +79,7 @@
          ((:auth rc)
           (:session rc 'spawn)
           (do-delete))
-         (else (redirect-to rc (string->uri (format #f "~a/login" (current-myhost))) #:status 307)))))
+         (else (redirect-to rc (string->uri (format #f "~a/login" (current-myhost))) #:status 302)))))
 
 (post "/projects/new"
       #:auth '(table user "username" "password")
@@ -105,7 +105,7 @@
          ((:auth rc)
           (:session rc 'spawn)
           (do-new))
-         (else (redirect-to rc (string->uri (format #f "~a/login" (current-myhost))) #:status 307)))
+         (else (redirect-to rc (string->uri (format #f "~a/login" (current-myhost))) #:status 302)))
         ))
 
 (get "/projects/:project-id/edit"
@@ -125,7 +125,7 @@
         ((:auth rc)
          (:session rc 'spawn)
          (get-edit))
-        (else (redirect-to rc (string->uri (format #f "~a/login" (current-myhost))) #:status 307)))
+        (else (redirect-to rc (string->uri (format #f "~a/login" (current-myhost))) #:status 302)))
        ))
 
 (post "/projects/:project-id/edit"
@@ -153,6 +153,6 @@
          ((:auth rc)
           (:session rc 'spawn)
           (do-edit))
-         (else (redirect-to rc (string->uri (format #f "~a/login" (current-myhost))) #:status 307)))
+         (else (redirect-to rc (string->uri (format #f "~a/login" (current-myhost))) #:status 302)))
         ))
 
