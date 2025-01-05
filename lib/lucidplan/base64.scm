@@ -20,12 +20,12 @@
 
 (define-public (safe-base64-encode s)
   (cond
-   ((not (equal? "" s)) (nss:base64-encode s))
-   (else s))
-  )
+    ((not (equal? "" s))
+     (nss:base64-encode s))
+    (else s)))
 
 (define-public (safe-base64-decode s)
   (cond
-   ((not (equal? "" s)) (nss:base64-decode s))
-   (else s))
-  )
+    ((not (equal? "" s))
+     (nss:base64-decode s))
+    (else s)))

@@ -26,7 +26,12 @@
         (artanis security nss)
         (app models project))
 
-(get "/" (lambda(rc) (redirect-to rc (string->uri (format #f "~a/projects" (current-myhost))) #:status 302)))
+(get "/"
+     (lambda (rc)
+       (redirect-to rc
+                    (string->uri (format #f "~a/projects"
+                                         (current-myhost)))
+                    #:status 302)))
 
 (get "/projects"
      #:auth '(table user "username" "password")
@@ -35,14 +40,21 @@
      (lambda (rc)
        (define (get-p)
          (response-emit (:mime rc
-                         (html-from-projects ($project 'get
-                                                       #:order-by '(title asc))))))
+                               (html-from-projects ($project 'get
+                                                             #:order-by '(title
+                                                                          asc))))))
        (cond
-        ((:session rc 'check) (get-p))
-        ((:auth rc)
-         (:session rc 'spawn)
-         (get-p))
-        (else (redirect-to rc (string->uri (format #f "~a/login" (current-myhost))) #:status 302 )))))
+         ((:session rc
+                    'check)
+          (get-p))
+         ((:auth rc)
+          (:session rc
+                    'spawn)
+          (get-p))
+         (else (redirect-to rc
+                            (string->uri (format #f "~a/login"
+                                                 (current-myhost)))
+                            #:status 302)))))
 
 (get "/projects/new"
      #:auth '(table user "username" "password")
@@ -51,13 +63,19 @@
      (lambda (rc)
        (define (get-new)
          (response-emit (:mime rc
-                         (html-new-project-form))))
+                               (html-new-project-form))))
        (cond
-        ((:session rc 'check) (get-new))
-        ((:auth rc)
-         (:session rc 'spawn)
-         (get-new))
-        (else (redirect-to rc (string->uri (format #f "~a/login" (current-myhost))) #:status 302)))))
+         ((:session rc
+                    'check)
+          (get-new))
+         ((:auth rc)
+          (:session rc
+                    'spawn)
+          (get-new))
+         (else (redirect-to rc
+                            (string->uri (format #f "~a/login"
+                                                 (current-myhost)))
+                            #:status 302)))))
 
 (post "/projects/delete"
       #:auth '(table user "username" "password")
@@ -68,18 +86,22 @@
           (let* ((body (rc-body rc))
                  (kv (read-url-encoded-body body))
                  (id (uri-decode (car (assoc-ref kv "id")))))
-            (DB-query (DB-open rc)
-                      (->sql delete from
-                             'project
-                             (where #:id id)))
+            ($project 'mod 'row-delete (where #:id id))
 
-            (redirect-to rc "/projects" #:status 302)))
+            (redirect-to rc "/projects"
+                         #:status 302)))
         (cond
-         ((:session rc 'check) (do-delete))
-         ((:auth rc)
-          (:session rc 'spawn)
+         ((:session rc
+           'check)
           (do-delete))
-         (else (redirect-to rc (string->uri (format #f "~a/login" (current-myhost))) #:status 302)))))
+         ((:auth rc)
+          (:session rc
+           'spawn)
+          (do-delete))
+         (else (redirect-to rc
+                            (string->uri (format #f "~a/login"
+                                                 (current-myhost)))
+                            #:status 302)))))
 
 (post "/projects/new"
       #:auth '(table user "username" "password")
@@ -99,14 +121,20 @@
                       #:title (safe-base64-encode title)
                       #:created_at (current-time))
 
-            (redirect-to rc "/projects" #:status 302)))
+            (redirect-to rc "/projects"
+                         #:status 302)))
         (cond
-         ((:session rc 'check) (do-new))
-         ((:auth rc)
-          (:session rc 'spawn)
-          (do-new))
-         (else (redirect-to rc (string->uri (format #f "~a/login" (current-myhost))) #:status 302)))
-        ))
+          ((:session rc
+                     'check)
+           (do-new))
+          ((:auth rc)
+           (:session rc
+                     'spawn)
+           (do-new))
+          (else (redirect-to rc
+                             (string->uri (format #f "~a/login"
+                                                  (current-myhost)))
+                             #:status 302)))))
 
 (get "/projects/:project-id/edit"
      #:auth '(table user "username" "password")
@@ -116,17 +144,23 @@
        (define (get-edit)
          (let ((p (car ($project 'get
                                  #:ret 'top
-                                 #:condition (where #:id (params rc "project-id"))))))
+                                 #:condition (where #:id (params rc
+                                                                 "project-id"))))))
            (response-emit (:mime rc
-                           (html-edit-project-form p)))))
+                                 (html-edit-project-form p)))))
        (write rc)
        (cond
-        ((:session rc 'check) (get-edit))
-        ((:auth rc)
-         (:session rc 'spawn)
-         (get-edit))
-        (else (redirect-to rc (string->uri (format #f "~a/login" (current-myhost))) #:status 302)))
-       ))
+         ((:session rc
+                    'check)
+          (get-edit))
+         ((:auth rc)
+          (:session rc
+                    'spawn)
+          (get-edit))
+         (else (redirect-to rc
+                            (string->uri (format #f "~a/login"
+                                                 (current-myhost)))
+                            #:status 302)))))
 
 (post "/projects/:project-id/edit"
       #:auth '(table user "username" "password")
@@ -147,12 +181,18 @@
                                (updated_at ,(current-time)))
                              (where #:id (params rc "project-id"))))
 
-            (redirect-to rc "/projects" #:status 302)))
+            (redirect-to rc "/projects"
+                         #:status 302)))
         (cond
-         ((:session rc 'check) (do-edit))
-         ((:auth rc)
-          (:session rc 'spawn)
-          (do-edit))
-         (else (redirect-to rc (string->uri (format #f "~a/login" (current-myhost))) #:status 302)))
-        ))
+          ((:session rc
+                     'check)
+           (do-edit))
+          ((:auth rc)
+           (:session rc
+                     'spawn)
+           (do-edit))
+          (else (redirect-to rc
+                             (string->uri (format #f "~a/login"
+                                                  (current-myhost)))
+                             #:status 302)))))
 

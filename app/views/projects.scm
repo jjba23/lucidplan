@@ -61,7 +61,7 @@
 
 (define (render-project-list-item p)
   `((div (@ (class
-              "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer rounded-xl")
+             "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer rounded-xl")
             (onclick ,(format #f project-listitem-reveal-details-js-template
                               (assoc-ref p "id"))))
 
@@ -77,7 +77,9 @@
 
 (define-public (html-from-projects projects)
   (html-template `((div (@ (class "flex flex-col gap-4 flex-grow"))
-                        (h2 (@(class "text-xl font-mono font-bold text-stone-500")) "projects")
+                        (h2 (@ (class
+                                "text-xl font-mono font-bold text-stone-500"))
+                            "projects")
                         ,(map render-project-list-item projects)
                         (div (a (@ (href "/projects/new")) "+ new project"))))))
 
@@ -110,5 +112,5 @@
                                    (required "")) "")
 
                          (button (@ (class
-                                      "bg-green-800 text-white p-3 w-min rounded-xl")
+                                     "bg-green-800 text-white p-3 w-min rounded-xl")
                                     (type "submit")) "done")))))

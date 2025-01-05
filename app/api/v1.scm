@@ -26,9 +26,9 @@
      #:session #t
      (lambda (rc)
        (:mime rc
-        ($ticket 'get
-                 #:condition (where #:project_id (params rc "project"))
-                 #:order-by "human_id ASC"))))
+              ($ticket 'get
+                       #:condition (where #:project_id (params rc "project"))
+                       #:order-by "human_id ASC"))))
 
 (get "/api/v1/projects"
      #:mime 'json
@@ -36,5 +36,5 @@
      #:session #t
      (lambda (rc)
        (:mime rc
-        ($project 'get
-                  #:order-by "human_id ASC"))))
+              ($project 'get
+                        #:order-by "human_id ASC"))))
