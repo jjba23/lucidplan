@@ -55,21 +55,10 @@
                                                      #:order-by "human_id ASC"))))
            (display ticket-id-to-human-id)
            (response-emit (:mime rc
-                                 (html-from-tickets (params rc "project")
-                                                    project-tickets
-                                                    ticket-id-to-human-id)))))
-       (cond
-         ((:session rc
-                    'check)
-          (do-get))
-         ((:auth rc)
-          (:session rc
-                    'spawn)
-          (do-get))
-         (else (redirect-to rc
-                            (string->uri (format #f "~a/login"
-                                                 (current-myhost)))
-                            #:status 302)))))
+                           (html-from-tickets (params rc "project")
+                                              project-tickets
+                                              ticket-id-to-human-id)))))
+       (protected-endpoint rc do-get)))
 
 (get "/tickets/:project/new"
      #:mime 'xml
@@ -78,19 +67,8 @@
      (lambda (rc)
        (define (do-get-new)
          (response-emit (:mime rc
-                               (html-new-ticket-form (params rc "project")))))
-       (cond
-         ((:session rc
-                    'check)
-          (do-get-new))
-         ((:auth rc)
-          (:session rc
-                    'spawn)
-          (do-get-new))
-         (else (redirect-to rc
-                            (string->uri (format #f "~a/login"
-                                                 (current-myhost)))
-                            #:status 302)))))
+                         (html-new-ticket-form (params rc "project")))))
+       (protected-endpoint rc do-get-new)))
 
 (post "/tickets/:project/delete"
       #:mime 'xml
@@ -108,18 +86,7 @@
                          (format #f "/tickets/~a"
                                  (params rc "project"))
                          #:status 302)))
-        (cond
-         ((:session rc
-           'check)
-          (do-delete))
-         ((:auth rc)
-          (:session rc
-           'spawn)
-          (do-delete))
-         (else (redirect-to rc
-                            (string->uri (format #f "~a/login"
-                                                 (current-myhost)))
-                            #:status 302)))))
+        (protected-endpoint rc do-delete)))
 
 (post "/tickets/:project/new"
       #:mime 'xml
@@ -161,18 +128,7 @@
                          (string->uri (format #f "/tickets/~a"
                                               (params rc "project")))
                          #:status 302)))
-        (cond
-          ((:session rc
-                     'check)
-           (do-new))
-          ((:auth rc)
-           (:session rc
-                     'spawn)
-           (do-new))
-          (else (redirect-to rc
-                             (string->uri (format #f "~a/login"
-                                                  (current-myhost)))
-                             #:status 302)))))
+        (protected-endpoint rc do-new)))
 
 (get "/tickets/:project/:ticket-id/edit"
      #:mime 'xml
@@ -184,20 +140,9 @@
                                 #:ret 'top
                                 #:condition (where #:id (params rc "ticket-id"))))))
            (response-emit (:mime rc
-                                 (html-edit-ticket-form (params rc "project")
-                                                        t)))))
-       (cond
-         ((:session rc
-                    'check)
-          (get-edit))
-         ((:auth rc)
-          (:session rc
-                    'spawn)
-          (get-edit))
-         (else (redirect-to rc
-                            (string->uri (format #f "~a/login"
-                                                 (current-myhost)))
-                            #:status 302)))))
+                           (html-edit-ticket-form (params rc "project")
+                                                  t)))))
+       (protected-endpoint rc get-edit)))
 
 (post "/tickets/:project/:ticket-id/edit"
       #:mime 'xml
@@ -239,15 +184,4 @@
                          (string->uri (format #f "/tickets/~a"
                                               (params rc "project")))
                          #:status 302)))
-        (cond
-          ((:session rc
-                     'check)
-           (do-edit))
-          ((:auth rc)
-           (:session rc
-                     'spawn)
-           (do-edit))
-          (else (redirect-to rc
-                             (string->uri (format #f "~a/login"
-                                                  (current-myhost)))
-                             #:status 302)))))
+        (protected-endpoint rc do-edit)))

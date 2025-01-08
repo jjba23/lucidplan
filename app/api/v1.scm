@@ -25,16 +25,20 @@
      #:auth '(table user "username" "password")
      #:session #t
      (lambda (rc)
-       (:mime rc
-              ($ticket 'get
-                       #:condition (where #:project_id (params rc "project"))
-                       #:order-by "human_id ASC"))))
+       (define (do-get)
+         (:mime rc
+          ($ticket 'get
+                   #:condition (where #:project_id (params rc "project"))
+                   #:order-by "human_id ASC")))
+       (protected-api-endpoint rc do-get)))
 
 (get "/api/v1/projects"
      #:mime 'json
      #:auth '(table user "username" "password")
      #:session #t
      (lambda (rc)
-       (:mime rc
-              ($project 'get
-                        #:order-by "human_id ASC"))))
+       (define (do-get)
+         (:mime rc
+          ($project 'get
+                    #:order-by "human_id ASC")))
+       (protected-api-endpoint rc do-get)))

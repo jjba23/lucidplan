@@ -40,21 +40,10 @@
      (lambda (rc)
        (define (get-p)
          (response-emit (:mime rc
-                               (html-from-projects ($project 'get
-                                                             #:order-by '(title
-                                                                          asc))))))
-       (cond
-         ((:session rc
-                    'check)
-          (get-p))
-         ((:auth rc)
-          (:session rc
-                    'spawn)
-          (get-p))
-         (else (redirect-to rc
-                            (string->uri (format #f "~a/login"
-                                                 (current-myhost)))
-                            #:status 302)))))
+                         (html-from-projects ($project 'get
+                                                       #:order-by '(title
+                                                                    asc))))))
+       (protected-endpoint rc get-p)))
 
 (get "/projects/new"
      #:auth '(table user "username" "password")
@@ -63,19 +52,8 @@
      (lambda (rc)
        (define (get-new)
          (response-emit (:mime rc
-                               (html-new-project-form))))
-       (cond
-         ((:session rc
-                    'check)
-          (get-new))
-         ((:auth rc)
-          (:session rc
-                    'spawn)
-          (get-new))
-         (else (redirect-to rc
-                            (string->uri (format #f "~a/login"
-                                                 (current-myhost)))
-                            #:status 302)))))
+                         (html-new-project-form))))
+       (protected-endpoint rc get-new)))
 
 (post "/projects/delete"
       #:auth '(table user "username" "password")
@@ -90,18 +68,7 @@
 
             (redirect-to rc "/projects"
                          #:status 302)))
-        (cond
-         ((:session rc
-           'check)
-          (do-delete))
-         ((:auth rc)
-          (:session rc
-           'spawn)
-          (do-delete))
-         (else (redirect-to rc
-                            (string->uri (format #f "~a/login"
-                                                 (current-myhost)))
-                            #:status 302)))))
+        (protected-endpoint rc do-delete)))
 
 (post "/projects/new"
       #:auth '(table user "username" "password")
@@ -123,18 +90,7 @@
 
             (redirect-to rc "/projects"
                          #:status 302)))
-        (cond
-          ((:session rc
-                     'check)
-           (do-new))
-          ((:auth rc)
-           (:session rc
-                     'spawn)
-           (do-new))
-          (else (redirect-to rc
-                             (string->uri (format #f "~a/login"
-                                                  (current-myhost)))
-                             #:status 302)))))
+        (protected-endpoint rc do-new)))
 
 (get "/projects/:project-id/edit"
      #:auth '(table user "username" "password")
@@ -147,20 +103,9 @@
                                  #:condition (where #:id (params rc
                                                                  "project-id"))))))
            (response-emit (:mime rc
-                                 (html-edit-project-form p)))))
-       (write rc)
-       (cond
-         ((:session rc
-                    'check)
-          (get-edit))
-         ((:auth rc)
-          (:session rc
-                    'spawn)
-          (get-edit))
-         (else (redirect-to rc
-                            (string->uri (format #f "~a/login"
-                                                 (current-myhost)))
-                            #:status 302)))))
+                           (html-edit-project-form p)))))
+
+       (protected-endpoint rc get-edit)))
 
 (post "/projects/:project-id/edit"
       #:auth '(table user "username" "password")
@@ -183,16 +128,5 @@
 
             (redirect-to rc "/projects"
                          #:status 302)))
-        (cond
-          ((:session rc
-                     'check)
-           (do-edit))
-          ((:auth rc)
-           (:session rc
-                     'spawn)
-           (do-edit))
-          (else (redirect-to rc
-                             (string->uri (format #f "~a/login"
-                                                  (current-myhost)))
-                             #:status 302)))))
+        (protected-endpoint rc do-edit)))
 
