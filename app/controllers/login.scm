@@ -23,6 +23,7 @@
         (web uri)
         (ice-9 string-fun)
         (app models user)
+        (app models project)
         (app views login))
 
 (get "/login"

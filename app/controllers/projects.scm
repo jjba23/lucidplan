@@ -17,15 +17,15 @@
 
 (define-artanis-controller projects)
 
-(import (app views projects)
-        (lucidplan auth)
+(import (lucidplan auth)
         (web uri)
         (ice-9 string-fun)
         (lucidplan uri)
         (lucidplan uuid)
         (lucidplan base64)
         (artanis security nss)
-        (app models project))
+        (app models project)
+        (app views projects))
 
 (get "/"
      (lambda (rc)
@@ -40,10 +40,11 @@
      #:mime 'xml
      (lambda (rc)
        (define (get-p)
-         (response-emit (:mime rc
-                         (html-from-projects ($project 'get
-                                                       #:order-by '(title
-                                                                    asc))))))
+         (let* ((proj ($project 'get
+                                #:order-by '(title
+                                             asc))))
+           (response-emit (:mime rc
+                           (html-from-projects proj)))))
        (protected-endpoint rc get-p)))
 
 (get "/projects/new"
