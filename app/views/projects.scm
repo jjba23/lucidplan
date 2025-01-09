@@ -38,7 +38,7 @@
   "document.getElementById('details-~a').toggleAttribute('hidden')")
 
 (define (render-project p)
-  `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl ml-4"))
+  `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl"))
          (a (@ (href ,(format #f "/tickets/~a"
                               (safe-base64-decode (assoc-ref p "human_id")))))
             ,(format #f "go to tickets: ~a"
@@ -71,7 +71,7 @@
                      (safe-base64-decode (assoc-ref p "human_id")))))
     (div (@ (id ,(format #f "details-~a"
                          (assoc-ref p "id")))
-            (class "ml-4")
+            (class "")
             (hidden ""))
          ,(render-project p))))
 

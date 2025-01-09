@@ -20,6 +20,7 @@
 (import (app views tickets)
         (web uri)
         (ice-9 string-fun)
+        (lucidplan auth)
         (lucidplan uri)
         (lucidplan uuid)
         (lucidplan base64)
@@ -46,13 +47,13 @@
                 (project-tickets ($ticket 'get
                                           #:condition (where #:project_id
                                                              project-id)
-                                          #:order-by "human_id ASC"))
+                                          #:order-by '(human_id asc)))
                 (ticket-id-to-human-id (map (lambda (t)
                                               `(,(assoc-ref t "id") unquote
                                                 (assoc-ref t "human_id")))
                                             ($ticket 'get
                                                      #:columns '(id human_id)
-                                                     #:order-by "human_id ASC"))))
+                                                     #:order-by '(human_id asc)))))
            (display ticket-id-to-human-id)
            (response-emit (:mime rc
                            (html-from-tickets (params rc "project")

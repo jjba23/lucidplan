@@ -18,6 +18,7 @@
 (define-artanis-controller projects)
 
 (import (app views projects)
+        (lucidplan auth)
         (web uri)
         (ice-9 string-fun)
         (lucidplan uri)

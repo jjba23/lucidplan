@@ -19,6 +19,7 @@
 (define-artanis-controller login)
 
 (import (lucidplan html)
+        (lucidplan auth)
         (web uri)
         (ice-9 string-fun)
         (app models user)

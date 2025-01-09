@@ -23,7 +23,7 @@
 (define-public (login-page)
   (html-template `((h2 (@ (class "")) "login to lucidplan")
                    (div (@ (class
-                            "w-full rounded-xl bg-stone-100 p-4 flex flex-col gap-4 align-center my-6"))
+                            "w-full rounded-xl bg-stone-100 p-4 flex flex-col gap-4 align-center"))
                         (form (@ (action "/login")
                                  (method "POST"))
                               (label "username:")

@@ -17,7 +17,8 @@
 
 (define-restful-api v1)
 
-(import (app models project)
+(import (lucidplan auth)
+        (app models project)
         (app models ticket))
 
 (get "/api/v1/tickets/:project"
@@ -29,7 +30,7 @@
          (:mime rc
           ($ticket 'get
                    #:condition (where #:project_id (params rc "project"))
-                   #:order-by "human_id ASC")))
+                   #:order-by '(human_id asc))))
        (protected-api-endpoint rc do-get)))
 
 (get "/api/v1/projects"
@@ -40,5 +41,5 @@
        (define (do-get)
          (:mime rc
           ($project 'get
-                    #:order-by "human_id ASC")))
+                    #:order-by '(human_id asc))))
        (protected-api-endpoint rc do-get)))

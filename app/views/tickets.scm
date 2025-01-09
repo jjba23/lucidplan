@@ -53,7 +53,7 @@
                 (small (@ (class "font-mono text-stone-400 text-xs font-light"))
                        ,label)
                 (div (@ (class
-                         "flex flex-row flex-wrap gap-4 items-center justify-left ml-4"))
+                         "flex flex-row flex-wrap gap-4 items-center justify-left"))
                      ,(map mk-rel xs)))))
         (else `()))))
 
@@ -63,15 +63,15 @@
          (a (@ (class "font-mono text-stone-400 text-xs font-light")
                (href ,(format #f "/tickets/~a/~a/edit" project
                               (assoc-ref ticket "id")))) "edit ticket")
-         (hr (@ (class "my-2")))
+         (hr (@ (class "")))
 
-         (div (@ (class "flex flex-row flex-wrap gap-8 justify-left my-4"))
+         (div (@ (class "flex flex-row flex-wrap gap-8 justify-left"))
 
               (div (@ (class "flex flex-col gap-3"))
                    (small (@ (class
                               "font-mono text-stone-400 text-xs font-light"))
                           "status:")
-                   (p (@ (class "font-mono text-stone-700 text-sm ml-4"))
+                   (p (@ (class "font-mono text-stone-700 text-sm"))
                       ,(safe-base64-decode (assoc-ref ticket "ticket_status"))))
 
               (div (@ (class "flex flex-col gap-3"))
@@ -87,7 +87,7 @@
                 "font-mono text-stone-600 text-md max-w-prose whitespace-pre-wrap ml-4"))
             ,(safe-base64-decode (assoc-ref ticket "description")))
 
-         (hr (@ (class "my-2")))
+         (hr (@ (class "")))
 
          (small (@ (class "font-mono text-stone-400 text-xs font-light"))
                 "human id:")
