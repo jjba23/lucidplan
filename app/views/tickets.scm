@@ -29,10 +29,16 @@
   #:use-module (ice-9 iconv)
   #:use-module (ice-9 hash-table)
   #:use-module (ice-9 threads)
+  #:use-module (ice-9 regex)
   #:use-module (lucidplan html)
   #:use-module (lucidplan base64)
   #:use-module (artanis security nss)
   #:use-module (artanis route))
+
+(define-public (parse-org org)
+  (write (string-match "/{1}[^\n]*/{1}" org))
+  org
+  )
 
 (define-public (render-ticket project ticket ticket-id-to-human-id)
   `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl"))
@@ -63,7 +69,7 @@
                 "description:")
          (p (@ (class
                  "font-mono text-stone-600 text-md max-w-prose whitespace-pre-wrap ml-4"))
-            ,(safe-base64-decode (assoc-ref ticket "description")))
+            ,(parse-org (safe-base64-decode (assoc-ref ticket "description"))))
 
          (hr (@ (class "")))
 
