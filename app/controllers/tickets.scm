@@ -44,6 +44,9 @@
      (lambda (rc)
        (define (do-get)
          (let* ((project-id (project-id-from-human-id (params rc "project")))
+                (proj ($project 'get
+                                #:order-by '(human_id
+                                             asc)))
                 (project-tickets ($ticket 'get
                                           #:condition (where #:project_id
                                                              project-id)
@@ -54,11 +57,12 @@
                                             ($ticket 'get
                                                      #:columns '(id human_id)
                                                      #:order-by '(human_id asc)))))
-           (display ticket-id-to-human-id)
            (response-emit (:mime rc
-                           (html-from-tickets (params rc "project")
-                                              project-tickets
-                                              ticket-id-to-human-id)))))
+                           (html-from-tickets
+                            proj
+                            (params rc "project")
+                            project-tickets
+                            ticket-id-to-human-id)))))
        (protected-endpoint rc do-get)))
 
 (get "/tickets/:project/new"
@@ -68,7 +72,9 @@
      (lambda (rc)
        (define (do-get-new)
          (response-emit (:mime rc
-                         (html-new-ticket-form (params rc "project")))))
+                         (html-new-ticket-form ($project 'get
+                                                         #:order-by '(human_id
+                                                                      asc)) (params rc "project")))))
        (protected-endpoint rc do-get-new)))
 
 (post "/tickets/:project/delete"
@@ -84,8 +90,8 @@
             ($ticket 'mod 'row-delete (where #:id id))
 
             (redirect-to rc
-                         (format #f "/tickets/~a"
-                                 (params rc "project"))
+                         (string->uri (format #f "~a/tickets/~a" (current-myhost)
+                                              (params rc "project")))
                          #:status 302)))
         (protected-endpoint rc do-delete)))
 
@@ -100,13 +106,7 @@
                  (title (uri-decode (car (assoc-ref kv "title"))))
                  (ticket-status (uri-decode (car (assoc-ref kv "ticket-status"))))
                  (ticket-type (uri-decode (car (assoc-ref kv "ticket-type"))))
-                 (description (uri-decode (car (assoc-ref kv "description"))))
-                 (child-of (uri-decode (car (assoc-ref kv "child-of"))))
-                 (blocked-by (uri-decode (car (assoc-ref kv "blocked-by"))))
-                 (splits-from (uri-decode (car (assoc-ref kv "splits-from"))))
-                 (clone-of (uri-decode (car (assoc-ref kv "clone-of"))))
-                 (blocks (uri-decode (car (assoc-ref kv "blocks"))))
-                 (related-to (uri-decode (car (assoc-ref kv "related-to"))))
+                 (description (uri-decode (car (assoc-ref kv "description"))))                 
                  (project-id (project-id-from-human-id (params rc "project")))
                  (new-uuid (string-replace-substring (uuidgen) "\n" "")))
             
@@ -117,16 +117,10 @@
                      #:ticket_status (safe-base64-encode ticket-status)
                      #:ticket_type (safe-base64-encode ticket-type)
                      #:description (safe-base64-encode description)
-                     #:created_at (current-time)
-                     #:child_of (safe-base64-encode child-of)
-                     #:blocked_by (safe-base64-encode blocked-by)
-                     #:splits_from (safe-base64-encode splits-from)
-                     #:clone_of (safe-base64-encode clone-of)
-                     #:blocks (safe-base64-encode blocks)
-                     #:related_to (safe-base64-encode related-to))
+                     #:created_at (current-time))
 
             (redirect-to rc
-                         (string->uri (format #f "/tickets/~a"
+                         (string->uri (format #f "~a/tickets/~a" (current-myhost)
                                               (params rc "project")))
                          #:status 302)))
         (protected-endpoint rc do-new)))
@@ -137,11 +131,14 @@
      #:session #t
      (lambda (rc)
        (define (get-edit)
-         (let ((t (car ($ticket 'get
+         (let ((proj ($project 'get
+                               #:order-by '(human_id
+                                            asc)))
+               (t (car ($ticket 'get
                                 #:ret 'top
                                 #:condition (where #:id (params rc "ticket-id"))))))
            (response-emit (:mime rc
-                           (html-edit-ticket-form (params rc "project")
+                           (html-edit-ticket-form proj (params rc "project")
                                                   t)))))
        (protected-endpoint rc get-edit)))
 
@@ -156,12 +153,6 @@
                  (title (uri-decode (car (assoc-ref kv "title"))))
                  (description (uri-decode (car (assoc-ref kv "description"))))
                  (ticket-status (uri-decode (car (assoc-ref kv "ticket-status"))))
-                 (child-of (uri-decode (car (assoc-ref kv "child-of"))))
-                 (blocked-by (uri-decode (car (assoc-ref kv "blocked-by"))))
-                 (splits-from (uri-decode (car (assoc-ref kv "splits-from"))))
-                 (clone-of (uri-decode (car (assoc-ref kv "clone-of"))))
-                 (blocks (uri-decode (car (assoc-ref kv "blocks"))))
-                 (related-to (uri-decode (car (assoc-ref kv "related-to"))))
                  (ticket-type (uri-decode (car (assoc-ref kv "ticket-type")))))
             
             (DB-query (DB-open rc)
@@ -172,17 +163,11 @@
                                (ticket_type ,(safe-base64-encode ticket-type))
                                (description ,(safe-base64-encode description))
                                (title ,(safe-base64-encode title))
-                               (updated_at ,(current-time))
-                               (child_of ,(safe-base64-encode child-of))
-                               (blocked_by ,(safe-base64-encode blocked-by))
-                               (splits_from ,(safe-base64-encode splits-from))
-                               (clone_of ,(safe-base64-encode clone-of))
-                               (blocks ,(safe-base64-encode blocks))
-                               (related_to ,(safe-base64-encode related-to)))
+                               (updated_at ,(current-time)))
                              (where #:id (params rc "ticket-id"))))
-
+            (write (params rc "project"))
             (redirect-to rc
-                         (string->uri (format #f "/tickets/~a"
+                         (string->uri (format #f "~a/tickets/~a" (current-myhost)
                                               (params rc "project")))
                          #:status 302)))
         (protected-endpoint rc do-edit)))

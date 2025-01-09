@@ -41,7 +41,7 @@
      (lambda (rc)
        (define (get-p)
          (let* ((proj ($project 'get
-                                #:order-by '(title
+                                #:order-by '(human_id
                                              asc))))
            (response-emit (:mime rc
                            (html-from-projects proj)))))
@@ -54,7 +54,9 @@
      (lambda (rc)
        (define (get-new)
          (response-emit (:mime rc
-                         (html-new-project-form))))
+                         (html-new-project-form ($project 'get
+                                                          #:order-by '(human_id
+                                                                       asc))))))
        (protected-endpoint rc get-new)))
 
 (post "/projects/delete"
@@ -68,7 +70,7 @@
                  (id (uri-decode (car (assoc-ref kv "id")))))
             ($project 'mod 'row-delete (where #:id id))
 
-            (redirect-to rc "/projects"
+            (redirect-to rc (string->uri (format #f "~a/projects" (current-myhost)))
                          #:status 302)))
         (protected-endpoint rc do-delete)))
 
@@ -90,7 +92,7 @@
                       #:title (safe-base64-encode title)
                       #:created_at (current-time))
 
-            (redirect-to rc "/projects"
+            (redirect-to rc (string->uri (format #f "~a/projects" (current-myhost)))
                          #:status 302)))
         (protected-endpoint rc do-new)))
 
@@ -105,7 +107,9 @@
                                  #:condition (where #:id (params rc
                                                                  "project-id"))))))
            (response-emit (:mime rc
-                           (html-edit-project-form p)))))
+                           (html-edit-project-form ($project 'get
+                                                             #:order-by '(human_id
+                                                                          asc)) p)))))
 
        (protected-endpoint rc get-edit)))
 
@@ -128,7 +132,7 @@
                                (updated_at ,(current-time)))
                              (where #:id (params rc "project-id"))))
 
-            (redirect-to rc "/projects"
+            (redirect-to rc (string->uri (format #f "~a/projects" (current-myhost)))
                          #:status 302)))
         (protected-endpoint rc do-edit)))
 

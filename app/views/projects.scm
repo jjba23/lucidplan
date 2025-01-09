@@ -61,7 +61,7 @@
 
 (define (render-project-list-item p)
   `((div (@ (class
-             "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer rounded-xl")
+              "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer rounded-xl")
             (onclick ,(format #f project-listitem-reveal-details-js-template
                               (assoc-ref p "id"))))
 
@@ -76,41 +76,45 @@
          ,(render-project p))))
 
 (define-public (html-from-projects projects)
-  (html-template `((div (@ (class "flex flex-col gap-4 flex-grow"))
-                        (h2 (@ (class
-                                "text-xl font-mono font-bold text-stone-500"))
-                            "projects")
-                        ,(map render-project-list-item projects)
-                        (div (a (@ (href "/projects/new")) "+ new project"))))))
+  (html-template #:body `((div (@ (class "flex flex-col gap-4 flex-grow"))
+                               (h2 (@ (class
+                                        "text-xl font-mono font-bold text-stone-500"))
+                                   "projects")
+                               ,(map render-project-list-item projects)
+                               (div (a (@ (href "/projects/new")) "+ new project"))))
+                 ))
 
-(define-public (html-new-project-form)
-  (html-project-form))
+(define-public (html-new-project-form proj)
+  (html-project-form #:proj proj))
 
-(define-public (html-edit-project-form p)
+(define-public (html-edit-project-form proj p)
   (html-project-form #:title (safe-base64-decode (assoc-ref p "title"))
                      #:human-id (safe-base64-decode (assoc-ref p "human_id"))
                      #:action (format #f "/projects/~a/edit"
-                                      (assoc-ref p "id"))))
+                                      (assoc-ref p "id"))
+                     #:proj proj))
 
 (define* (html-project-form #:key (title "")
                             (human-id "")
-                            (action "/projects/new"))
-  (html-template `((form (@ (class "flex flex-col gap-4")
-                            (enctype "application/x-www-form-urlencoded")
-                            (method "POST")
-                            (action ,action))
-                         (label "title:")
-                         (input (@ (class "p-3 w-min rounded-xl")
-                                   (name "title")
-                                   (value ,title)
-                                   (required "")) "")
+                            (action "/projects/new")
+                            (proj '()))
+  (html-template #:body `((form (@ (class "flex flex-col gap-4")
+                                   (enctype "application/x-www-form-urlencoded")
+                                   (method "POST")
+                                   (action ,action))
+                                (label "title:")
+                                (input (@ (class "p-3 w-min rounded-xl")
+                                          (name "title")
+                                          (value ,title)
+                                          (required "")) "")
 
-                         (label "human id:")
-                         (input (@ (class "p-3 w-min rounded-xl")
-                                   (name "human-id")
-                                   (value ,human-id)
-                                   (required "")) "")
+                                (label "human id:")
+                                (input (@ (class "p-3 w-min rounded-xl")
+                                          (name "human-id")
+                                          (value ,human-id)
+                                          (required "")) "")
 
-                         (button (@ (class
-                                     "bg-green-800 text-white p-3 w-min rounded-xl")
-                                    (type "submit")) "done")))))
+                                (button (@ (class
+                                             "bg-green-800 text-white p-3 w-min rounded-xl")
+                                           (type "submit")) "done")))
+                 #:proj proj))
