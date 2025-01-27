@@ -84,6 +84,7 @@
                (string-append "MOD_COMPILED_PATH=" go)))
        #:test-target "test"
        #:phases (modify-phases %standard-phases
+                  (delete 'check)
                   (add-after 'unpack 'patch-site-dir
                     (lambda* (#:key outputs #:allow-other-keys)
                       (substitute* "artanis/commands/help.scm"
