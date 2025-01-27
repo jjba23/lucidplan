@@ -17,6 +17,9 @@
 
 (define-module (app views login)
   #:use-module (lucidplan html)
+  #:use-module (artanis i18n)
+  #:use-module (artanis i18n sxml)
+  #:use-module (artanis i18n locale)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
 
@@ -26,11 +29,11 @@
                                     "w-full rounded-xl bg-stone-100 p-4 flex flex-col gap-4 align-center"))
                                (form (@ (action "/login")
                                         (method "POST"))
-                                     (label "username:")
+                                     (label (G_ "username"))
                                      (input (@ (type "text")
                                                (class "")
                                                (name "username")) "")
-                                     (label "password:")
+                                     (label (G_ "password:"))
                                      (input (@ (type "password")
                                                (class "")
                                                (name "password")) "")
