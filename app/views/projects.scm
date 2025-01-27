@@ -70,7 +70,7 @@
             (onclick ,(format #f project-listitem-reveal-details-js-template
                               (assoc-ref p "id"))))
 
-         (p (@ (class "font-mono text-stone-700 text-lg"))
+         (p (@ (class "font-sans text-stone-700 text-lg"))
             ,(format #f "~a (~a)"
                      (safe-base64-decode (assoc-ref p "title"))
                      (safe-base64-decode (assoc-ref p "human_id")))))
@@ -83,11 +83,11 @@
 (define-public (html-from-projects G_ projects)
   (html-template G_ #:body `((div (@ (class "flex flex-col gap-4 flex-grow"))
                                   (h2 (@ (class
-                                           "text-xl font-mono font-bold text-stone-500"))
+                                           "text-xl font-sans font-bold text-stone-500"))
                                       ,(G_ "projects"))
                                   ,(map (lambda(x) (render-project-list-item G_ x)) projects)
                                   (div (a (@ (href "/projects/new")) ,(G_ "create a project")))))
-                 ))
+                 #:proj projects))
 
 (define-public (html-new-project-form G_ proj)
   (html-project-form G_ #:proj proj))

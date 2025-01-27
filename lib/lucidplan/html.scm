@@ -37,7 +37,7 @@
   #:use-module (artanis route))
 
 (define-public (page-footer G_)
-  `((div (@ (class "block text-center font-mono"))
+  `((div (@ (class "block text-center font-sans"))
          (div (@ (class
                    "mt-4 flex flex-row flex-wrap gap-4 justify-center align-center p-2"))
               (p (@ (class "text-sm text-stone-600"))
@@ -59,14 +59,14 @@
                       (a (@(class "text-md text-amber-800 font-bold")(href "/"))
                          "LucidPlan")
                       (a (@ (class
-                              "text-xs lowercase text-amber-900 font-bold")
+                              "text-sm lowercase text-amber-900 font-bold")
                             (href "/projects")) ,(G_ "Projects"))
                       (a (@ (class
-                              "text-xs lowercase text-amber-900 font-bold")
+                              "text-sm lowercase text-amber-900 font-bold")
                             (href "/login")) ,(G_ "Login"))
                       (hr)
                       ,(map (lambda(p)
-                              `(a(@(class "text-xs lowercase text-amber-900")(href ,(format #f "/tickets/~a" (safe-base64-decode (assoc-ref p "human_id")))))
+                              `(a(@(class "text-sm font-light lowercase text-amber-900")(href ,(format #f "/tickets/~a" (safe-base64-decode (assoc-ref p "human_id")))))
                                  ,(safe-base64-decode (assoc-ref p "title")))) proj)
                       ))
     `(html (head (title "LucidPlan")
@@ -76,7 +76,7 @@
                           (href "https://fonts.gstatic.com")
                           (crossorigin "")))
                  (link (@ (rel "stylesheet")
-                          (href "https://fonts.cdnfonts.com/css/liberation-sans")))
+                          (href "https://fonts.cdnfonts.com/css/work-sans")))
                  (link (@ (rel "stylesheet")
                           (href "/css/fonts.css")))
                  (meta (@ (name "viewport")
@@ -89,7 +89,7 @@
                            "flex flex-col h-screen justify-between"))
                       (div
                        ,nav
-                       ,body)
+                       (div (@(class "container mx-auto")) ,body))
                       (footer ,(page-footer G_)))
                  )))
   (export html-template))

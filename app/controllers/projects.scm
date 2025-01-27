@@ -35,7 +35,7 @@
                     #:status 302)))
 
 (get "/projects"
-     #:auth '(table user "username" "password")
+     ;; #:auth '(table user "username" "password")
      #:session #t
      #:mime 'xml
      #:i18n '(cookie "lang")
@@ -46,10 +46,10 @@
                                              asc))))
            (response-emit (:mime rc
                            (html-from-projects (:i18n rc) proj)))))
-       (protected-endpoint rc get-p)))
+       (get-p)))
 
 (get "/projects/new"
-     #:auth '(table user "username" "password")
+     ;; #:auth '(table user "username" "password")
      #:session #t
      #:mime 'xml
      #:i18n '(cookie "lang")
@@ -59,7 +59,7 @@
                          (html-new-project-form (:i18n rc) ($project 'get
                                                                      #:order-by '(human_id
                                                                                   asc))))))
-       (protected-endpoint rc get-new)))
+       (get-new)))
 
 (post "/projects/delete"
       #:auth '(table user "username" "password")
@@ -99,7 +99,7 @@
         (protected-endpoint rc do-new)))
 
 (get "/projects/:project-id/edit"
-     #:auth '(table user "username" "password")
+     ;; #:auth '(table user "username" "password")
      #:session #t
      #:mime 'xml
      #:i18n '(cookie "lang")
@@ -114,7 +114,7 @@
                                                                         #:order-by '(human_id
                                                                                      asc)) p)))))
 
-       (protected-endpoint rc get-edit)))
+       (get-edit)))
 
 (post "/projects/:project-id/edit"
       #:auth '(table user "username" "password")
