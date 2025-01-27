@@ -66,7 +66,7 @@
 
 (define (render-project-list-item G_ p)
   `((div (@ (class
-              "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer rounded-xl")
+              "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/50 border-stone-200 py-1 px-3 cursor-pointer rounded-xl")
             (onclick ,(format #f project-listitem-reveal-details-js-template
                               (assoc-ref p "id"))))
 
@@ -120,6 +120,6 @@
                                              (required "")) "")
 
                                    (button (@ (class
-                                                "bg-green-800 text-white p-3 w-min rounded-xl")
+                                                "bg-green-800/75 text-white p-3 w-min rounded-xl")
                                               (type "submit")) ,(G_ "done"))))
                  #:proj proj))

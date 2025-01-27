@@ -116,7 +116,7 @@
                                    ticket-listitem-reveal-details-js-template
                                    (assoc-ref ticket "id")))
                  (class
-                   "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300 border-stone-200 py-1 px-3 cursor-pointer rounded-xl"))
+                   "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/50 border-stone-200 py-1 px-3 cursor-pointer rounded-xl"))
               (small (@ (class "font-sans text-stone-500 text-sm"))
                      ,(format #f "~a-~a" project
                               (assoc-ref ticket "human_id")))

@@ -56,14 +56,15 @@
 (begin
   (define* (html-template G_ #:key body (proj '()))
     (define nav `(div (@ (class "flex flex-row flex-wrap gap-3 p-2 bg-stone-200/50 items-center justify-left w-full"))
-                      (a (@(class "text-md text-amber-800 font-bold")(href "/"))
+                      (a (@(class "text-md text-amber-800 font-bold mr-4")(href "/"))
                          "LucidPlan")
                       (a (@ (class
                               "text-sm lowercase text-amber-900 font-bold")
-                            (href "/projects")) ,(G_ "Projects"))
+                            (href "/login")) ,(G_ "Login"))
                       (a (@ (class
                               "text-sm lowercase text-amber-900 font-bold")
-                            (href "/login")) ,(G_ "Login"))
+                            (href "/projects")) ,(G_ "Projects"))
+                      
                       (hr)
                       ,(map (lambda(p)
                               `(a(@(class "text-sm font-light lowercase text-amber-900")(href ,(format #f "/tickets/~a" (safe-base64-decode (assoc-ref p "human_id")))))
