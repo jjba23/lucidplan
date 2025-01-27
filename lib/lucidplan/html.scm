@@ -59,7 +59,7 @@
     (define nav
       `(div (@ (class
                 "flex flex-row flex-wrap gap-3 p-2 bg-stone-200/50 items-center justify-left w-full"))
-            (a (@ (class "text-md text-amber-800 font-bold mr-4")
+            (a (@ (class "text-md text-amber-900 font-bold mr-4")
                   (href "/")) "LucidPlan")
             (a (@ (class "text-sm lowercase text-amber-900 font-bold")
                   (href "/login"))
@@ -94,8 +94,7 @@
            (body (@ (class "bg-amber-100/35"))
                  (div (@ (class "flex flex-col h-screen justify-between"))
                       (div ,nav
-                           (div (@ (class "container mx-auto"))
-                                ,body))
+                           (div ,body))
                       (footer ,(page-footer G_))))))
   (export html-template))
 

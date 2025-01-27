@@ -84,15 +84,16 @@
 
 (define-public (html-from-projects G_ projects)
   (html-template G_
-                 #:body `((div (@ (class "flex flex-col gap-4 flex-grow"))
-                               (h2 (@ (class
-                                       "text-xl font-sans font-bold text-stone-500"))
-                                   ,(G_ "projects"))
-                               ,(map (lambda (x)
-                                       (render-project-list-item G_ x))
-                                     projects)
-                               (div (a (@ (href "/projects/new"))
-                                       ,(G_ "create a project")))))
+                 #:body `(div (@ (class "container mx-auto"))
+                              ((div (@ (class "flex flex-col gap-4 flex-grow"))
+                                    (h2 (@ (class
+                                            "text-xl font-sans font-bold text-stone-500"))
+                                        ,(G_ "projects"))
+                                    ,(map (lambda (x)
+                                            (render-project-list-item G_ x))
+                                          projects)
+                                    (div (a (@ (href "/projects/new"))
+                                            ,(G_ "create a project"))))))
                  #:proj projects))
 
 (define-public (html-new-project-form G_ proj)
@@ -113,25 +114,26 @@
                             (action "/projects/new")
                             (proj '()))
   (html-template G_
-                 #:body `((form (@ (class "flex flex-col gap-4")
-                                   (enctype
-                                    "application/x-www-form-urlencoded")
-                                   (method "POST")
-                                   (action ,action))
-                                (label ,(G_ "title"))
-                                (input (@ (class "p-3 w-min rounded-xl")
-                                          (name "title")
-                                          (value ,title)
-                                          (required "")) "")
+                 #:body `(div (@ (class "container mx-auto"))
+                              ((form (@ (class "flex flex-col gap-4")
+                                        (enctype
+                                         "application/x-www-form-urlencoded")
+                                        (method "POST")
+                                        (action ,action))
+                                     (label ,(G_ "title"))
+                                     (input (@ (class "p-3 w-min rounded-xl")
+                                               (name "title")
+                                               (value ,title)
+                                               (required "")) "")
 
-                                (label ,(G_ "human id"))
-                                (input (@ (class "p-3 w-min rounded-xl")
-                                          (name "human-id")
-                                          (value ,human-id)
-                                          (required "")) "")
+                                     (label ,(G_ "human id"))
+                                     (input (@ (class "p-3 w-min rounded-xl")
+                                               (name "human-id")
+                                               (value ,human-id)
+                                               (required "")) "")
 
-                                (button (@ (class
-                                            "bg-green-800/75 text-white p-3 w-min rounded-xl")
-                                           (type "submit"))
-                                        ,(G_ "done"))))
+                                     (button (@ (class
+                                                 "bg-green-800/75 text-white p-3 w-min rounded-xl")
+                                                (type "submit"))
+                                             ,(G_ "done")))))
                  #:proj proj))

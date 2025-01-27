@@ -132,20 +132,32 @@
 (define-public (html-from-tickets G_ projects project tickets
                                   ticket-id-to-human-id)
   (html-template G_
-                 #:body `((div (@ (class "flex flex-col gap-4 flex-grow"))
-                               (h2 (@ (class
-                                       "text-2xl font-sans font-bold text-stone-500"))
-                                   ,(format #f "tickets for ~a" project))
-                               (div (@ (id "lucidplan-tickets-list")
-                                       (ondrop "dropTicketsItem(event)")
-                                       (ondragover "allowDrop(event)")
-                                       (class "flex flex-col gap-2 container"))
-                                    ,(map (lambda (t)
-                                            (render-ticket-listitem G_ project
-                                             t ticket-id-to-human-id)) tickets))
-                               (div (a (@ (href ,(format #f "/tickets/~a/new"
-                                                         project)))
-                                       "+ new ticket"))))
+                 #:body `(div (@ (class "container mx-auto"))
+                              ((div (@ (class "flex flex-col gap-4 flex-grow"))
+                                    (div (@ (class
+                                             "flex flex-wrap flex-row gap-6 items-center"))
+                                         (h2 (@ (class
+                                                 "text-2xl font-sans font-bold text-stone-500"))
+                                             ,(format #f "tickets for ~a"
+                                                      project))
+                                         (a (@ (class "text-stone-500 text-md")
+                                               (href ,(format #f "/kanban/~a"
+                                                              project)))
+                                            (span "kanban board")))
+                                    (div (@ (id "lucidplan-tickets-list")
+                                            (ondrop "dropTicketsItem(event)")
+                                            (ondragover "allowDrop(event)")
+                                            (class
+                                             "flex flex-col gap-2 container"))
+                                         ,(map (lambda (t)
+                                                 (render-ticket-listitem G_
+                                                  project t
+                                                  ticket-id-to-human-id))
+                                               tickets))
+                                    (div (a (@ (href ,(format #f
+                                                       "/tickets/~a/new"
+                                                       project)))
+                                            "+ new ticket")))))
                  #:proj projects))
 
 (define-public (html-new-ticket-form G_ proj project)
@@ -218,6 +230,49 @@
                     ,(G_ "done")))))
 
   (html-template G_
-                 #:body `((div (@ (class))
+                 #:body `((div (@ (class "container mx-auto"))
                                ,form_))
                  #:proj proj))
+
+(define-public (kanban-from-tickets G_ projects project tickets
+                                    ticket-id-to-human-id)
+  (html-template G_
+                 #:body `((div (@ (class "container mx-auto"))
+                               ((div (@ (class "flex flex-col gap-4 flex-grow"))
+                                     (div (@ (class
+                                              "flex flex-wrap flex-row gap-6 items-center"))
+                                          (h2 (@ (class
+                                                  "text-2xl font-sans font-bold text-stone-500"))
+                                              ,(format #f "kanban for ~a"
+                                                       project))
+                                          (a (@ (class
+                                                 "text-stone-500 text-md")
+                                                (href ,(format #f
+                                                               "/tickets/~a"
+                                                               project)))
+                                             (span "backlog")))
+                                     (div (a (@ (href ,(format #f
+                                                        "/tickets/~a/new"
+                                                        project)))
+                                             "+ new ticket"))
+
+                                     )))
+                          (div (@ (class "flex flex-wrap gap-1 justify-center"))
+                               (div (@ (class
+                                        "w-1/5 flex flex-col gap-2 bg-stone-200"))
+                                    (h4 (@ (class "text-sm")) "todo"))
+                               (div (@ (class
+                                        "w-1/5 flex flex-col gap-2 bg-stone-200"))
+                                    (h4 (@ (class "text-sm"))
+                                        "work-in-progress"))
+                               (div (@ (class
+                                        "w-1/5 flex flex-col gap-2 bg-stone-200"))
+                                    (h4 (@ (class "text-sm")) "in-review"))
+                               (div (@ (class
+                                        "w-1/5 flex flex-col gap-2 bg-stone-200"))
+                                    (h4 (@ (class "text-sm")) "done"))
+                               ;; ,(map (lambda (t)
+                               ;; (render-ticket-kanban-item G_ project
+                               ;; t ticket-id-to-human-id)) tickets)
+                               ))
+                 #:proj projects))
