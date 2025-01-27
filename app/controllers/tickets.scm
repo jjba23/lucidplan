@@ -41,6 +41,7 @@
      #:mime 'xml
      #:auth '(table user "username" "password")
      #:session #t
+     #:i18n '(cookie "lang")
      (lambda (rc)
        (define (do-get)
          (let* ((project-id (project-id-from-human-id (params rc "project")))
@@ -58,23 +59,24 @@
                                                      #:columns '(id human_id)
                                                      #:order-by '(human_id asc)))))
            (response-emit (:mime rc
-                           (html-from-tickets
-                            proj
-                            (params rc "project")
-                            project-tickets
-                            ticket-id-to-human-id)))))
+                           (html-from-tickets (:i18n rc)
+                                              proj
+                                              (params rc "project")
+                                              project-tickets
+                                              ticket-id-to-human-id)))))
        (protected-endpoint rc do-get)))
 
 (get "/tickets/:project/new"
      #:mime 'xml
      #:auth '(table user "username" "password")
      #:session #t
+     #:i18n '(cookie "lang")
      (lambda (rc)
        (define (do-get-new)
          (response-emit (:mime rc
-                         (html-new-ticket-form ($project 'get
-                                                         #:order-by '(human_id
-                                                                      asc)) (params rc "project")))))
+                         (html-new-ticket-form (:i18n rc) ($project 'get
+                                                                    #:order-by '(human_id
+                                                                                 asc)) (params rc "project")))))
        (protected-endpoint rc do-get-new)))
 
 (post "/tickets/:project/delete"
@@ -129,6 +131,7 @@
      #:mime 'xml
      #:auth '(table user "username" "password")
      #:session #t
+     #:i18n '(cookie "lang")
      (lambda (rc)
        (define (get-edit)
          (let ((proj ($project 'get
@@ -138,7 +141,7 @@
                                 #:ret 'top
                                 #:condition (where #:id (params rc "ticket-id"))))))
            (response-emit (:mime rc
-                           (html-edit-ticket-form proj (params rc "project")
+                           (html-edit-ticket-form (:i18n rc) proj (params rc "project")
                                                   t)))))
        (protected-endpoint rc get-edit)))
 

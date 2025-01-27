@@ -38,25 +38,27 @@
      #:auth '(table user "username" "password")
      #:session #t
      #:mime 'xml
+     #:i18n '(cookie "lang")
      (lambda (rc)
        (define (get-p)
          (let* ((proj ($project 'get
                                 #:order-by '(human_id
                                              asc))))
            (response-emit (:mime rc
-                           (html-from-projects proj)))))
+                           (html-from-projects (:i18n rc) proj)))))
        (protected-endpoint rc get-p)))
 
 (get "/projects/new"
      #:auth '(table user "username" "password")
      #:session #t
      #:mime 'xml
+     #:i18n '(cookie "lang")
      (lambda (rc)
        (define (get-new)
          (response-emit (:mime rc
-                         (html-new-project-form ($project 'get
-                                                          #:order-by '(human_id
-                                                                       asc))))))
+                         (html-new-project-form (:i18n rc) ($project 'get
+                                                                     #:order-by '(human_id
+                                                                                  asc))))))
        (protected-endpoint rc get-new)))
 
 (post "/projects/delete"
@@ -100,6 +102,7 @@
      #:auth '(table user "username" "password")
      #:session #t
      #:mime 'xml
+     #:i18n '(cookie "lang")
      (lambda (rc)
        (define (get-edit)
          (let ((p (car ($project 'get
@@ -107,9 +110,9 @@
                                  #:condition (where #:id (params rc
                                                                  "project-id"))))))
            (response-emit (:mime rc
-                           (html-edit-project-form ($project 'get
-                                                             #:order-by '(human_id
-                                                                          asc)) p)))))
+                           (html-edit-project-form (:i18n rc) ($project 'get
+                                                                        #:order-by '(human_id
+                                                                                     asc)) p)))))
 
        (protected-endpoint rc get-edit)))
 
