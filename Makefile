@@ -108,9 +108,17 @@ dir-uninstall:
 watchexec:
 	watchexec -i "dist/**" -r -e scm,css,js -- "make server"
 
+
+# Target to format source code files according to the style guide
+# Find all .scm files and format them using 'guix style'
+fmt:
+	$(call lucidplan-log-info,"formatting all Scheme files")
+	find . -maxdepth 8 -name "*.scm" -type f -exec guix style -f {} \;
+
 # Target to start a development server for lucidplan
 # Use watchexec to watch for file changes and restart the server on changes
 dev:
+	@-make fmt
 	$(call lucidplan-log-info,"starting development server for lucidplan")
 ifdef GUIX_VERSION
 	guix shell -m manifest.scm -- make watchexec
@@ -129,12 +137,6 @@ server:
 production-server:
 	$(call lucidplan-log-info,"starting production lucidplan server")
 	guix shell -m manifest.scm -- art work -c conf/production.conf
-
-# Target to format source code files according to the style guide
-# Find all .scm files and format them using 'guix style'
-fmt:
-	$(call lucidplan-log-info,"formatting all Scheme files")
-	find . -maxdepth 8 -name "*.scm" -type f -exec guix style -f {} \;
 
 
 # Initialize a new database and enable WAL mode for higher concurrent writes to SQLite 3

@@ -31,7 +31,7 @@
      #:i18n '(cookie "lang")
      (lambda (rc)
        (response-emit (:mime rc
-                       (login-page (:i18n rc))))))
+                             (login-page (:i18n rc))))))
 
 (post "/login"
       #:auth '(table user "username" "password")

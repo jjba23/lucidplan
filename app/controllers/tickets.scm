@@ -38,7 +38,7 @@
       (else (assoc-ref (car p) "id")))))
 
 (get "/tickets/:project"
-     #:mime 'xml     
+     #:mime 'xml
      ;; #:auth '(table user "username" "password")
      #:session #t
      #:i18n '(cookie "lang")
@@ -46,8 +46,7 @@
        (define (get)
          (let* ((project-id (project-id-from-human-id (params rc "project")))
                 (proj ($project 'get
-                                #:order-by '(human_id
-                                             asc)))
+                                #:order-by '(human_id asc)))
                 (project-tickets ($ticket 'get
                                           #:condition (where #:project_id
                                                              project-id)
@@ -59,11 +58,10 @@
                                                      #:columns '(id human_id)
                                                      #:order-by '(human_id asc)))))
            (response-emit (:mime rc
-                           (html-from-tickets (:i18n rc)
-                                              proj
-                                              (params rc "project")
-                                              project-tickets
-                                              ticket-id-to-human-id)))))
+                                 (html-from-tickets (:i18n rc) proj
+                                                    (params rc "project")
+                                                    project-tickets
+                                                    ticket-id-to-human-id)))))
        (get)))
 
 (get "/tickets/:project/new"
@@ -74,9 +72,11 @@
      (lambda (rc)
        (define (get-new)
          (response-emit (:mime rc
-                         (html-new-ticket-form (:i18n rc) ($project 'get
-                                                                    #:order-by '(human_id
-                                                                                 asc)) (params rc "project")))))
+                               (html-new-ticket-form (:i18n rc)
+                                                     ($project 'get
+                                                               #:order-by '(human_id
+                                                                            asc))
+                                                     (params rc "project")))))
        (get-new)))
 
 (post "/tickets/:project/delete"
@@ -88,11 +88,14 @@
           (let* ((body (rc-body rc))
                  (kv (read-url-encoded-body body))
                  (id (uri-decode (car (assoc-ref kv "id")))))
-
-            ($ticket 'mod 'row-delete (where #:id id))
+            
+            ($ticket 'mod
+                     'row-delete
+                     (where #:id id))
 
             (redirect-to rc
-                         (string->uri (format #f "~a/tickets/~a" (current-myhost)
+                         (string->uri (format #f "~a/tickets/~a"
+                                              (current-myhost)
                                               (params rc "project")))
                          #:status 302)))
         (protected-endpoint rc do-delete)))
@@ -108,7 +111,7 @@
                  (title (uri-decode (car (assoc-ref kv "title"))))
                  (ticket-status (uri-decode (car (assoc-ref kv "ticket-status"))))
                  (ticket-type (uri-decode (car (assoc-ref kv "ticket-type"))))
-                 (description (uri-decode (car (assoc-ref kv "description"))))                 
+                 (description (uri-decode (car (assoc-ref kv "description"))))
                  (project-id (project-id-from-human-id (params rc "project")))
                  (new-uuid (string-replace-substring (uuidgen) "\n" "")))
             
@@ -122,7 +125,8 @@
                      #:created_at (current-time))
 
             (redirect-to rc
-                         (string->uri (format #f "~a/tickets/~a" (current-myhost)
+                         (string->uri (format #f "~a/tickets/~a"
+                                              (current-myhost)
                                               (params rc "project")))
                          #:status 302)))
         (protected-endpoint rc do-new)))
@@ -135,14 +139,15 @@
      (lambda (rc)
        (define (get-edit)
          (let* ((proj ($project 'get
-                                #:order-by '(human_id
-                                             asc)))
+                                #:order-by '(human_id asc)))
                 (t (car ($ticket 'get
                                  #:ret 'top
-                                 #:condition (where #:id (params rc "ticket-id"))))))
+                                 #:condition (where #:id (params rc
+                                                                 "ticket-id"))))))
            (response-emit (:mime rc
-                           (html-edit-ticket-form (:i18n rc) proj (params rc "project")
-                                                  t)))))
+                                 (html-edit-ticket-form (:i18n rc) proj
+                                                        (params rc "project")
+                                                        t)))))
        (get-edit)))
 
 (post "/tickets/:project/:ticket-id/edit"
@@ -170,7 +175,8 @@
                              (where #:id (params rc "ticket-id"))))
             (write (params rc "project"))
             (redirect-to rc
-                         (string->uri (format #f "~a/tickets/~a" (current-myhost)
+                         (string->uri (format #f "~a/tickets/~a"
+                                              (current-myhost)
                                               (params rc "project")))
                          #:status 302)))
         (protected-endpoint rc do-edit)))

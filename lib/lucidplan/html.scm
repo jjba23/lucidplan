@@ -39,7 +39,7 @@
 (define-public (page-footer G_)
   `((div (@ (class "block text-center font-sans"))
          (div (@ (class
-                   "mt-4 flex flex-row flex-wrap gap-4 justify-center align-center p-2"))
+                  "mt-4 flex flex-row flex-wrap gap-4 justify-center align-center p-2"))
               (p (@ (class "text-sm text-stone-600"))
                  ,(G_ "find the source code here"))
               (a (@ (class "text-amber-800 font-bold cursor-pointer text-sm")
@@ -52,24 +52,30 @@
             (span (@ (class "text-sm text-stone-600"))
                   ,(G_ "free project management for everyone"))))))
 
-
 (begin
-  (define* (html-template G_ #:key body (proj '()))
-    (define nav `(div (@ (class "flex flex-row flex-wrap gap-3 p-2 bg-stone-200/50 items-center justify-left w-full"))
-                      (a (@(class "text-md text-amber-800 font-bold mr-4")(href "/"))
-                         "LucidPlan")
-                      (a (@ (class
-                              "text-sm lowercase text-amber-900 font-bold")
-                            (href "/login")) ,(G_ "Login"))
-                      (a (@ (class
-                              "text-sm lowercase text-amber-900 font-bold")
-                            (href "/projects")) ,(G_ "Projects"))
-                      
-                      (hr)
-                      ,(map (lambda(p)
-                              `(a(@(class "text-sm font-light lowercase text-amber-900")(href ,(format #f "/tickets/~a" (safe-base64-decode (assoc-ref p "human_id")))))
-                                 ,(safe-base64-decode (assoc-ref p "title")))) proj)
-                      ))
+  (define* (html-template G_
+                          #:key body
+                          (proj '()))
+    (define nav
+      `(div (@ (class
+                "flex flex-row flex-wrap gap-3 p-2 bg-stone-200/50 items-center justify-left w-full"))
+            (a (@ (class "text-md text-amber-800 font-bold mr-4")
+                  (href "/")) "LucidPlan")
+            (a (@ (class "text-sm lowercase text-amber-900 font-bold")
+                  (href "/login"))
+               ,(G_ "Login"))
+            (a (@ (class "text-sm lowercase text-amber-900 font-bold")
+                  (href "/projects"))
+               ,(G_ "Projects"))
+
+            (hr)
+            ,(map (lambda (p)
+                    `(a (@ (class
+                            "text-sm font-light lowercase text-amber-900")
+                           (href ,(format #f "/tickets/~a"
+                                          (safe-base64-decode (assoc-ref p
+                                                               "human_id")))))
+                        ,(safe-base64-decode (assoc-ref p "title")))) proj)))
     `(html (head (title "LucidPlan")
                  (link (@ (rel "preconnect")
                           (href "https://fonts.googleapis.com")))
@@ -86,20 +92,18 @@
                  (script (@ (src "/js/tailwind.config.js")) ())
                  (script (@ (src "/js/tickets.js")) ()))
            (body (@ (class "bg-amber-100/35"))
-                 (div (@ (class
-                           "flex flex-col h-screen justify-between"))
-                      (div
-                       ,nav
-                       (div (@(class "container mx-auto")) ,body))
-                      (footer ,(page-footer G_)))
-                 )))
+                 (div (@ (class "flex flex-col h-screen justify-between"))
+                      (div ,nav
+                           (div (@ (class "container mx-auto"))
+                                ,body))
+                      (footer ,(page-footer G_))))))
   (export html-template))
 
 (define-public (mk-option val comp)
   (cond
-   ((equal? val comp)
-    `(option (@ (value ,val)
-                (selected ""))
-             ,val))
-   (else `(option (@ (value ,val))
-                  ,val))))
+    ((equal? val comp)
+     `(option (@ (value ,val)
+                 (selected ""))
+              ,val))
+    (else `(option (@ (value ,val))
+                   ,val))))

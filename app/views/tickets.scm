@@ -41,9 +41,7 @@
   #:use-module (artanis route))
 
 (define-public (parse-org org)
-  (write (string-match "/{1}[^\n]*/{1}" org))
-  org
-  )
+  (write (string-match "/{1}[^\n]*/{1}" org)) org)
 
 (define-public (render-ticket G_ project ticket ticket-id-to-human-id)
   `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl"))
@@ -51,21 +49,22 @@
              ,(safe-base64-decode (assoc-ref ticket "title")))
          (a (@ (class "font-sans text-stone-400 text-xs font-light")
                (href ,(format #f "/tickets/~a/~a/edit" project
-                              (assoc-ref ticket "id")))) ,(G_ "edit ticket"))
+                              (assoc-ref ticket "id"))))
+            ,(G_ "edit ticket"))
          (hr (@ (class "")))
 
          (div (@ (class "flex flex-row flex-wrap gap-8 justify-left"))
 
               (div (@ (class "flex flex-col gap-3"))
                    (small (@ (class
-                               "font-sans text-stone-400 text-xs font-light"))
+                              "font-sans text-stone-400 text-xs font-light"))
                           ,(G_ "status"))
                    (p (@ (class "font-sans text-stone-700 text-sm"))
                       ,(safe-base64-decode (assoc-ref ticket "ticket_status"))))
 
               (div (@ (class "flex flex-col gap-3"))
                    (small (@ (class
-                               "font-sans text-stone-400 text-xs font-light"))
+                              "font-sans text-stone-400 text-xs font-light"))
                           ,(G_ "type"))
                    (p (@ (class "font-sans text-stone-700 text-sm ml-4"))
                       ,(safe-base64-decode (assoc-ref ticket "ticket_type")))))
@@ -73,7 +72,7 @@
          (small (@ (class "font-sans text-stone-400 text-xs font-light"))
                 ,(G_ "description"))
          (p (@ (class
-                 "font-sans text-stone-600 text-md max-w-prose whitespace-pre-wrap ml-4"))
+                "font-sans text-stone-600 text-md max-w-prose whitespace-pre-wrap ml-4"))
             ,(parse-org (safe-base64-decode (assoc-ref ticket "description"))))
 
          (hr (@ (class "")))
@@ -83,7 +82,6 @@
          (small (@ (class "font-sans text-stone-500 text-xs ml-4"))
                 ,(format #f "~a-~s" project
                          (assoc-ref ticket "human_id")))
-
 
          (small (@ (class "font-sans text-stone-400 text-xs font-light"))
                 ,(G_ "id"))
@@ -99,7 +97,8 @@
                          (name "id")
                          (value ,(assoc-ref ticket "id"))))
                (button (@ (type "submit")
-                          (class "text-red-600 text-sm ml-4")) ,(G_ "delete")))
+                          (class "text-red-600 text-sm ml-4"))
+                       ,(G_ "delete")))
 
          )))
 
@@ -116,7 +115,7 @@
                                    ticket-listitem-reveal-details-js-template
                                    (assoc-ref ticket "id")))
                  (class
-                   "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/50 border-stone-200 py-1 px-3 cursor-pointer rounded-xl"))
+                  "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/50 border-stone-200 py-1 px-3 cursor-pointer rounded-xl"))
               (small (@ (class "font-sans text-stone-500 text-sm"))
                      ,(format #f "~a-~a" project
                               (assoc-ref ticket "human_id")))
@@ -130,42 +129,48 @@
     
     ))
 
-(define-public (html-from-tickets G_ projects project tickets ticket-id-to-human-id)
-  (html-template G_ #:body `((div (@ (class "flex flex-col gap-4 flex-grow"))
-                                  (h2 (@ (class
-                                           "text-2xl font-sans font-bold text-stone-500"))
-                                      ,(format #f "tickets for ~a" project))
-                                  (div (@ (id "lucidplan-tickets-list")
-                                          (ondrop "dropTicketsItem(event)")
-                                          (ondragover "allowDrop(event)")
-                                          (class "flex flex-col gap-2 container"))
-                                       ,(map (lambda (t)
-                                               (render-ticket-listitem G_ project t
-                                                                       ticket-id-to-human-id)) tickets))
-                                  (div (a (@ (href ,(format #f "/tickets/~a/new" project)))
-                                          "+ new ticket"))))
+(define-public (html-from-tickets G_ projects project tickets
+                                  ticket-id-to-human-id)
+  (html-template G_
+                 #:body `((div (@ (class "flex flex-col gap-4 flex-grow"))
+                               (h2 (@ (class
+                                       "text-2xl font-sans font-bold text-stone-500"))
+                                   ,(format #f "tickets for ~a" project))
+                               (div (@ (id "lucidplan-tickets-list")
+                                       (ondrop "dropTicketsItem(event)")
+                                       (ondragover "allowDrop(event)")
+                                       (class "flex flex-col gap-2 container"))
+                                    ,(map (lambda (t)
+                                            (render-ticket-listitem G_ project
+                                             t ticket-id-to-human-id)) tickets))
+                               (div (a (@ (href ,(format #f "/tickets/~a/new"
+                                                         project)))
+                                       "+ new ticket"))))
                  #:proj projects))
 
 (define-public (html-new-ticket-form G_ proj project)
-  (html-ticket-form G_ #:project project
+  (html-ticket-form G_
+                    #:project project
                     #:proj proj
                     #:action (format #f "/tickets/~a/new" project)))
 
 (define-public (html-edit-ticket-form G_ proj project t)
-  (html-ticket-form G_ #:project project
+  (html-ticket-form G_
+                    #:project project
                     #:is-edit #t
                     #:title (safe-base64-decode (assoc-ref t "title"))
                     #:description (safe-base64-decode (assoc-ref t
-                                                                 "description"))
+                                                       "description"))
                     #:ticket-type (safe-base64-decode (assoc-ref t
-                                                                 "ticket_type"))
+                                                       "ticket_type"))
                     #:ticket-status (safe-base64-decode (assoc-ref t
-                                                                   "ticket_status"))
+                                                         "ticket_status"))
                     #:action (format #f "/tickets/~a/~a/edit" project
                                      (assoc-ref t "id"))
                     #:proj proj))
 
-(define* (html-ticket-form G_ #:key (project #f)
+(define* (html-ticket-form G_
+                           #:key (project #f)
                            (title "")
                            (description "")
                            (ticket-status "")
@@ -173,43 +178,46 @@
                            (action "")
                            (is-edit #f)
                            (proj '()))
-  (define form_ `((form (@ (class "flex flex-col gap-4 flex-grow")
-                           (enctype "application/x-www-form-urlencoded")
-                           (method "POST")
-                           (action ,action))
-                        (label ,(G_ "title"))
-                        (input (@ (class "p-3 w-min rounded-xl")
-                                  (name "title")
-                                  (value ,title)
-                                  (required "")) "")
-                        (label ,(G_ "status"))
-                        (select (@ (class "p-3 rounded-xl")
-                                   (name "ticket-status")
-                                   (required ""))
-                                ,(mk-option "todo" ticket-status)
-                                ,(mk-option "work-in-progress" ticket-status)
-                                ,(mk-option "in-review" ticket-status)
-                                ,(mk-option "done" ticket-status)
-                                ,(mk-option "rejected" ticket-status))
-                        (label ,(G_ "type"))
-                        (select (@ (class "p-3 rounded-xl")
-                                   (name "ticket-type")
-                                   (required ""))
-                                ,(mk-option "task" ticket-type)
-                                ,(mk-option "bug" ticket-type)
-                                ,(mk-option "story" ticket-type)
-                                ,(mk-option "spike" ticket-type)
-                                ,(mk-option "time-box" ticket-type))
-                        (label ,(G_  "description"))
-                        (textarea (@ (class "p-3 w-full min-h-48 rounded-xl")
-                                     (name "description")
-                                     (required ""))
-                                  ,description)
+  (define form_
+    `((form (@ (class "flex flex-col gap-4 flex-grow")
+               (enctype "application/x-www-form-urlencoded")
+               (method "POST")
+               (action ,action))
+            (label ,(G_ "title"))
+            (input (@ (class "p-3 w-min rounded-xl")
+                      (name "title")
+                      (value ,title)
+                      (required "")) "")
+            (label ,(G_ "status"))
+            (select (@ (class "p-3 rounded-xl")
+                       (name "ticket-status")
+                       (required ""))
+                    ,(mk-option "todo" ticket-status)
+                    ,(mk-option "work-in-progress" ticket-status)
+                    ,(mk-option "in-review" ticket-status)
+                    ,(mk-option "done" ticket-status)
+                    ,(mk-option "rejected" ticket-status))
+            (label ,(G_ "type"))
+            (select (@ (class "p-3 rounded-xl")
+                       (name "ticket-type")
+                       (required ""))
+                    ,(mk-option "task" ticket-type)
+                    ,(mk-option "bug" ticket-type)
+                    ,(mk-option "story" ticket-type)
+                    ,(mk-option "spike" ticket-type)
+                    ,(mk-option "time-box" ticket-type))
+            (label ,(G_ "description"))
+            (textarea (@ (class "p-3 w-full min-h-48 rounded-xl")
+                         (name "description")
+                         (required ""))
+                      ,description)
 
-                        (button (@ (class
-                                     "bg-green-700/75 text-white p-2 w-min rounded-xl")
-                                   (type "submit")) ,(G_ "done")))))
-  
-  (html-template G_ #:body `((div (@(class ))
-                                  ,form_)) 
+            (button (@ (class
+                        "bg-green-700/75 text-white p-2 w-min rounded-xl")
+                       (type "submit"))
+                    ,(G_ "done")))))
+
+  (html-template G_
+                 #:body `((div (@ (class))
+                               ,form_))
                  #:proj proj))

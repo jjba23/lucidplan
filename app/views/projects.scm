@@ -49,7 +49,8 @@
             ,(format #f "go to tickets: ~a"
                      (safe-base64-decode (assoc-ref p "title"))))
          (a (@ (href ,(format #f "/projects/~a/edit"
-                              (assoc-ref p "id")))) ,(G_ "edit project"))
+                              (assoc-ref p "id"))))
+            ,(G_ "edit project"))
          (form (@ (enctype "application/x-www-form-urlencoded")
                   (method "POST")
                   (action "/projects/delete"))
@@ -57,7 +58,8 @@
                          (hidden "")
                          (value ,(assoc-ref p "id"))) "")
                (button (@ (type "submit"))
-                       (small (@ (class "text-red-600")) ,(G_ "delete"))))
+                       (small (@ (class "text-red-600"))
+                              ,(G_ "delete"))))
          (small (@ (class "font-mono text-stone-500 text-xs"))
                 ,(format #f "~a"
                          (safe-base64-decode (assoc-ref p "human_id"))))
@@ -66,7 +68,7 @@
 
 (define (render-project-list-item G_ p)
   `((div (@ (class
-              "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/50 border-stone-200 py-1 px-3 cursor-pointer rounded-xl")
+             "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/50 border-stone-200 py-1 px-3 cursor-pointer rounded-xl")
             (onclick ,(format #f project-listitem-reveal-details-js-template
                               (assoc-ref p "id"))))
 
@@ -81,45 +83,55 @@
          ,(render-project G_ p))))
 
 (define-public (html-from-projects G_ projects)
-  (html-template G_ #:body `((div (@ (class "flex flex-col gap-4 flex-grow"))
-                                  (h2 (@ (class
-                                           "text-xl font-sans font-bold text-stone-500"))
-                                      ,(G_ "projects"))
-                                  ,(map (lambda(x) (render-project-list-item G_ x)) projects)
-                                  (div (a (@ (href "/projects/new")) ,(G_ "create a project")))))
+  (html-template G_
+                 #:body `((div (@ (class "flex flex-col gap-4 flex-grow"))
+                               (h2 (@ (class
+                                       "text-xl font-sans font-bold text-stone-500"))
+                                   ,(G_ "projects"))
+                               ,(map (lambda (x)
+                                       (render-project-list-item G_ x))
+                                     projects)
+                               (div (a (@ (href "/projects/new"))
+                                       ,(G_ "create a project")))))
                  #:proj projects))
 
 (define-public (html-new-project-form G_ proj)
-  (html-project-form G_ #:proj proj))
+  (html-project-form G_
+                     #:proj proj))
 
 (define-public (html-edit-project-form G_ proj p)
-  (html-project-form G_ #:title (safe-base64-decode (assoc-ref p "title"))
+  (html-project-form G_
+                     #:title (safe-base64-decode (assoc-ref p "title"))
                      #:human-id (safe-base64-decode (assoc-ref p "human_id"))
                      #:action (format #f "/projects/~a/edit"
                                       (assoc-ref p "id"))
                      #:proj proj))
 
-(define* (html-project-form G_ #:key (title "")
+(define* (html-project-form G_
+                            #:key (title "")
                             (human-id "")
                             (action "/projects/new")
                             (proj '()))
-  (html-template G_ #:body `((form (@ (class "flex flex-col gap-4")
-                                      (enctype "application/x-www-form-urlencoded")
-                                      (method "POST")
-                                      (action ,action))
-                                   (label ,(G_ "title"))
-                                   (input (@ (class "p-3 w-min rounded-xl")
-                                             (name "title")
-                                             (value ,title)
-                                             (required "")) "")
+  (html-template G_
+                 #:body `((form (@ (class "flex flex-col gap-4")
+                                   (enctype
+                                    "application/x-www-form-urlencoded")
+                                   (method "POST")
+                                   (action ,action))
+                                (label ,(G_ "title"))
+                                (input (@ (class "p-3 w-min rounded-xl")
+                                          (name "title")
+                                          (value ,title)
+                                          (required "")) "")
 
-                                   (label ,(G_ "human id"))
-                                   (input (@ (class "p-3 w-min rounded-xl")
-                                             (name "human-id")
-                                             (value ,human-id)
-                                             (required "")) "")
+                                (label ,(G_ "human id"))
+                                (input (@ (class "p-3 w-min rounded-xl")
+                                          (name "human-id")
+                                          (value ,human-id)
+                                          (required "")) "")
 
-                                   (button (@ (class
-                                                "bg-green-800/75 text-white p-3 w-min rounded-xl")
-                                              (type "submit")) ,(G_ "done"))))
+                                (button (@ (class
+                                            "bg-green-800/75 text-white p-3 w-min rounded-xl")
+                                           (type "submit"))
+                                        ,(G_ "done"))))
                  #:proj proj))

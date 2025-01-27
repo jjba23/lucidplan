@@ -28,9 +28,9 @@
      (lambda (rc)
        (define (do-get)
          (:mime rc
-          ($ticket 'get
-                   #:condition (where #:project_id (params rc "project"))
-                   #:order-by '(human_id asc))))
+                ($ticket 'get
+                         #:condition (where #:project_id (params rc "project"))
+                         #:order-by '(human_id asc))))
        (protected-api-endpoint rc do-get)))
 
 (get "/api/v1/projects"
@@ -40,6 +40,6 @@
      (lambda (rc)
        (define (do-get)
          (:mime rc
-          ($project 'get
-                    #:order-by '(human_id asc))))
+                ($project 'get
+                          #:order-by '(human_id asc))))
        (protected-api-endpoint rc do-get)))

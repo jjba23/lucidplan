@@ -26,19 +26,23 @@
   #:use-module (ice-9 string-fun))
 
 (define-public (login-page G_)
-  (html-template G_ #:body `((h2 (@ (class "font-bold text-stone-800/75 text-md")) ,(G_ "login to lucidplan"))
-                             (div 
-                              (form (@ (action "/login")
-                                       (class "w-full rounded-xl bg-stone-200/50 p-4 flex flex-row flex-wrap items-center gap-4 align-center")
-                                       (method "POST"))
-                                    (label ,(G_ "username"))
-                                    (input (@ (type "text")
-                                              (class "p-3 rounded-xl")
-                                              (name "username")) "")
-                                    (label ,(G_ "password"))
-                                    (input (@ (type "password")
-                                              (class "p-3 rounded-xl")
-                                              (name "password")) "")
-                                    (button (@ (type "submit")
-                                               (class "p-2 rounded-xl w-min bg-green-700/75 text-white")) "login"))))))
+  (html-template G_
+                 #:body `((h2 (@ (class "font-bold text-stone-800/75 text-md"))
+                              ,(G_ "login to lucidplan"))
+                          (div (form (@ (action "/login")
+                                        (class
+                                         "w-full rounded-xl bg-stone-200/50 p-4 flex flex-row flex-wrap items-center gap-4 align-center")
+                                        (method "POST"))
+                                     (label ,(G_ "username"))
+                                     (input (@ (type "text")
+                                               (class "p-3 rounded-xl")
+                                               (name "username")) "")
+                                     (label ,(G_ "password"))
+                                     (input (@ (type "password")
+                                               (class "p-3 rounded-xl")
+                                               (name "password")) "")
+                                     (button (@ (type "submit")
+                                                (class
+                                                 "p-2 rounded-xl w-min bg-green-700/75 text-white"))
+                                             "login"))))))
 
