@@ -75,7 +75,7 @@
                            (href ,(format #f "/tickets/~a"
                                           (safe-base64-decode (assoc-ref p
                                                                "human_id")))))
-                        ,(safe-base64-decode (assoc-ref p "title")))) proj)))
+                        ,(safe-base64-decode (assoc-ref p "human_id")))) proj)))
     `(html (head (title "LucidPlan")
                  (link (@ (rel "preconnect")
                           (href "https://fonts.googleapis.com")))
