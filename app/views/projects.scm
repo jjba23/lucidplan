@@ -44,26 +44,34 @@
 
 (define (render-project G_ p)
   `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl"))
-         (a (@ (href ,(format #f "/tickets/~a"
+         (a (@ (class "text-amber-900")
+               (href ,(format #f "/tickets/~a"
                               (safe-base64-decode (assoc-ref p "human_id")))))
-            ,(format #f "go to tickets: ~a"
+            ,(format #f "📚 go to backlog: ~a"
                      (safe-base64-decode (assoc-ref p "title"))))
-         (a (@ (href ,(format #f "/projects/~a/edit"
-                              (assoc-ref p "id"))))
-            ,(G_ "edit project"))
-         (form (@ (enctype "application/x-www-form-urlencoded")
-                  (method "POST")
-                  (action "/projects/delete"))
-               (input (@ (name "id")
-                         (hidden "")
-                         (value ,(assoc-ref p "id"))) "")
-               (button (@ (type "submit"))
-                       (small (@ (class "text-red-600"))
-                              ,(G_ "delete"))))
-         (small (@ (class "font-mono text-stone-500 text-xs"))
+         (a (@ (class "text-amber-900")
+               (href ,(format #f "/kanban/~a"
+                              (safe-base64-decode (assoc-ref p "human_id")))))
+            ,(format #f "💡 go to kanban: ~a"
+                     (safe-base64-decode (assoc-ref p "title"))))
+         (hr)
+         (div (@ (class "flex flex-wrap flex-row gap-4"))
+              (a (@ (href ,(format #f "/projects/~a/edit"
+                                   (assoc-ref p "id"))))
+                 ,(G_ "edit project"))
+              (form (@ (enctype "application/x-www-form-urlencoded")
+                       (method "POST")
+                       (action "/projects/delete"))
+                    (input (@ (name "id")
+                              (hidden "")
+                              (value ,(assoc-ref p "id"))) "")
+                    (button (@ (type "submit"))
+                            (p (@ (class "text-red-600"))
+                               ,(G_ "delete")))))
+         (small (@ (class "font-mono text-stone-600"))
                 ,(format #f "~a"
                          (safe-base64-decode (assoc-ref p "human_id"))))
-         (small (@ (class "font-mono text-stone-500 text-xs"))
+         (small (@ (class "font-mono text-stone-600 text-xs"))
                 ,(assoc-ref p "id")))))
 
 (define (render-project-list-item G_ p)
@@ -87,7 +95,7 @@
                  #:body `(div (@ (class "container mx-auto"))
                               ((div (@ (class "flex flex-col gap-4 flex-grow"))
                                     (h2 (@ (class
-                                            "text-xl font-sans font-bold text-stone-500"))
+                                            "text-xl font-sans font-bold text-stone-600"))
                                         ,(G_ "projects"))
                                     ,(map (lambda (x)
                                             (render-project-list-item G_ x))
