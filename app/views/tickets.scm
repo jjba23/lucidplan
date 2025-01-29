@@ -36,6 +36,7 @@
   #:use-module (artanis i18n locale)
   #:use-module (ice-9 i18n)
   #:use-module (lucidplan html)
+  #:use-module (lucidplan prelude)
   #:use-module (lucidplan base64)
   #:use-module (artanis security nss)
   #:use-module (artanis route))
@@ -150,6 +151,14 @@
                                                                 project-details
                                                                 "human_id")))))
                                             (span "💡 kanban")))
+                                    ,(render-if-nestring (lambda (x)
+                                                           `(p (@ (class
+                                                                   "text-sm text-stone-500"))
+                                                               ,(safe-base64-decode
+                                                                 x)))
+                                                         (assoc-ref
+                                                          project-details
+                                                          "description"))
                                     (div (@ (id "lucidplan-tickets-list")
                                             (ondrop "dropTicketsItem(event)")
                                             (ondragover "allowDrop(event)")

@@ -43,12 +43,21 @@
 (define-public project-listitem-reveal-details-js-template
   "document.getElementById('details-~a').toggleAttribute('hidden')")
 
-
 (define (render-project G_ p)
   `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl"))
-         ,(render-if-nestring (lambda(x) `(p ,(safe-base64-decode x))) (assoc-ref p "description"))
-         ,(render-if-nestring (lambda(x) `(a (@ (class "text-amber-900")(href ,(safe-base64-decode x))) "🔗 view project")) (assoc-ref p "url"))
-         ,(render-if-nestring (lambda(x) `(a (@ (class "text-amber-900")(href ,(safe-base64-decode x))) "🔗 project code")) (assoc-ref p "vcs_url"))
+         ,(render-if-nestring (lambda (x)
+                                `(p ,(safe-base64-decode x)))
+                              (assoc-ref p "description"))
+         ,(render-if-nestring (lambda (x)
+                                `(a (@ (class "text-amber-900")
+                                       (href ,(safe-base64-decode x)))
+                                    "🔗 view project"))
+                              (assoc-ref p "url"))
+         ,(render-if-nestring (lambda (x)
+                                `(a (@ (class "text-amber-900")
+                                       (href ,(safe-base64-decode x)))
+                                    "🔗 project code"))
+                              (assoc-ref p "vcs_url"))
          (hr)
          (a (@ (class "text-amber-900")
                (href ,(format #f "/tickets/~a"
@@ -118,9 +127,14 @@
   (html-project-form G_
                      #:title (safe-base64-decode (assoc-ref p "title"))
                      #:human-id (safe-base64-decode (assoc-ref p "human_id"))
-                     #:url (if (assoc-ref p "url") (safe-base64-decode (assoc-ref p "url")) "")
-                     #:vcs-url (if (assoc-ref p "vcs_url") (safe-base64-decode (assoc-ref p "vcs_url")) "")
-                     #:description (if (assoc-ref p "description") (safe-base64-decode (assoc-ref p "description")) "")
+                     #:url (if (assoc-ref p "url")
+                               (safe-base64-decode (assoc-ref p "url")) "")
+                     #:vcs-url (if (assoc-ref p "vcs_url")
+                                   (safe-base64-decode (assoc-ref p "vcs_url"))
+                                   "")
+                     #:description (if (assoc-ref p "description")
+                                       (safe-base64-decode (assoc-ref p
+                                                            "description")) "")
                      #:action (format #f "/projects/~a/edit"
                                       (assoc-ref p "id"))
                      #:proj proj))

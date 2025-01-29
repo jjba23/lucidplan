@@ -22,7 +22,10 @@
   #:use-module (ice-9 iconv))
 
 (define-public (nestring? x)
-  (and x (not (equal? "" x))))
+  (and x
+       (not (equal? "" x))))
 
 (define-public (render-if-nestring expr x)
-  (if (nestring? x) (expr x) '()))
+  (if (nestring? x)
+      (expr x)
+      '()))
