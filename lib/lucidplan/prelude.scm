@@ -29,3 +29,11 @@
   (if (nestring? x)
       (expr x)
       '()))
+
+(define-public (log-exprs xs)
+  (newline)
+  (display "========")
+  (for-each (lambda (x)
+              (newline)
+              (write (format #f "~a" x))
+              (newline)) xs))

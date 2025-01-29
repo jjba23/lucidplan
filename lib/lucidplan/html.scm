@@ -94,7 +94,8 @@
            (body (@ (class "bg-amber-100/35"))
                  (div (@ (class "flex flex-col h-screen justify-between"))
                       (div ,nav
-                           (div ,body))
+                           (div (@ (class "my-6"))
+                                ,body))
                       (footer ,(page-footer G_))))))
   (export html-template))
 

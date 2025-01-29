@@ -16,11 +16,12 @@
 
 (define-artanis-controller kanban)
 
-(import (app views tickets)
+(import (app views kanban)
         (web uri)
         (ice-9 string-fun)
         (lucidplan auth)
         (lucidplan uri)
+        (lucidplan prelude)
         (lucidplan uuid)
         (lucidplan base64)
         (app models ticket)
@@ -31,6 +32,7 @@
   (let ((p ($project 'get
                      #:ret 'top
                      #:condition (where #:human_id (safe-base64-encode project)))))
+    (log-exprs (list p))
     (cond
       ((null? p)
        "")
@@ -50,15 +52,14 @@
                                           #:condition (where #:project_id
                                                              project-id)
                                           #:order-by '(human_id asc)))
+                (ts ($ticket 'get
+                             #:columns '(id human_id)
+                             #:condition (where #:project_id project-id)
+                             #:order-by '(human_id asc)))
+                (_ (log-exprs (list ts)))
                 (ticket-id-to-human-id (map (lambda (t)
                                               `(,(assoc-ref t "id") unquote
-                                                (assoc-ref t "human_id")))
-                                            ($ticket 'get
-                                                     #:columns '(id human_id)
-                                                     #:condition (where
-                                                                  #:project_id
-                                                                  project-id)
-                                                     #:order-by '(human_id asc)))))
+                                                (assoc-ref t "human_id"))) ts)))
            (response-emit (:mime rc
                                  (kanban-from-tickets (:i18n rc) proj
                                                       (params rc "project")
