@@ -1,7 +1,6 @@
 # lucidplan - the CI/CD orchestrator written in Guile Scheme
 
 # Copyright © 2024 "Josep Bigorra" known as "jjba23" <jjbigorra@gmail.com>
-# Copyright © 2024 "Mu Lei" known as "NalaGinrut" <NalaGinrut@gmail.com>
 
 # lucidplan is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,7 +21,7 @@
 
 LUCIDPLAN_LOCATION="/etc/lucidplan"
 LUCIDPLAN_DB="lucidplan.db"
-COPYRIGHT_HOLDERS="Josep Bigorra & Mu Lei"
+COPYRIGHT_HOLDERS="Josep Bigorra"
 I18N_LOCATION="sys/i18n/locale"
 
 # System details
