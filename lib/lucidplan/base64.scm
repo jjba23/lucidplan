@@ -26,6 +26,6 @@
 
 (define-public (safe-base64-decode s)
   (cond
-    ((not (equal? "" s))
-     (nss:base64-decode s))
-    (else s)))
+   ((not (equal? "" s))
+    (nss:base64-decode s))
+   (else s)))

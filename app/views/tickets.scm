@@ -45,31 +45,26 @@
 
 (define-public (render-ticket G_ project ticket ticket-id-to-human-id)
   `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl"))
-         (h4 (@ (class "font-sans text-stone-700 text-2xl font-bold"))
+         (h4 (@ (class "font-sans text-stone-700 text-2xl font-bold my-3"))
              ,(safe-base64-decode (assoc-ref ticket "title")))
-         (a (@ (class "font-sans text-stone-400 text-xs font-light")
-               (href ,(format #f "/tickets/~a/~a/edit" project
-                              (assoc-ref ticket "id"))))
-            ,(G_ "edit ticket"))
-         (hr (@ (class "")))
 
          (div (@ (class "flex flex-row flex-wrap gap-8 justify-left"))
 
               (div (@ (class "flex flex-col gap-3"))
                    (small (@ (class
-                              "font-sans text-stone-400 text-xs font-light"))
+                              "font-sans text-stone-500 text-md font-light"))
                           ,(G_ "status"))
                    (p (@ (class "font-sans text-stone-700 text-sm"))
                       ,(safe-base64-decode (assoc-ref ticket "ticket_status"))))
 
               (div (@ (class "flex flex-col gap-3"))
                    (small (@ (class
-                              "font-sans text-stone-400 text-xs font-light"))
+                              "font-sans text-stone-500 text-md font-light"))
                           ,(G_ "type"))
                    (p (@ (class "font-sans text-stone-700 text-sm ml-4"))
                       ,(safe-base64-decode (assoc-ref ticket "ticket_type")))))
 
-         (small (@ (class "font-sans text-stone-400 text-xs font-light"))
+         (small (@ (class "font-sans text-stone-500 text-md font-light"))
                 ,(G_ "description"))
          (p (@ (class
                 "font-sans text-stone-600 text-md max-w-prose whitespace-pre-wrap ml-4"))
@@ -77,28 +72,32 @@
 
          (hr (@ (class "")))
 
-         (small (@ (class "font-sans text-stone-400 text-xs font-light"))
+         (small (@ (class "font-sans text-stone-500 text-md font-light"))
                 ,(G_ "human id"))
-         (small (@ (class "font-sans text-stone-500 text-xs ml-4"))
+         (small (@ (class "font-sans text-stone-600 text-md ml-4"))
                 ,(format #f "~a-~s" project
                          (assoc-ref ticket "human_id")))
 
-         (small (@ (class "font-sans text-stone-400 text-xs font-light"))
+         (small (@ (class "font-sans text-stone-500 text-md font-light"))
                 ,(G_ "id"))
-         (small (@ (class "font-sans text-stone-500 text-xs ml-4"))
+         (small (@ (class "font-sans text-stone-600 text-md ml-4"))
                 ,(assoc-ref ticket "id"))
 
-         (small (@ (class "font-sans text-stone-400 text-xs font-light"))
-                ,(G_ "user actions"))
-         (form (@ (enctype "application/x-www-form-urlencoded")
-                  (method "POST")
-                  (action ,(format #f "/tickets/~a/delete" project)))
-               (input (@ (hidden "")
-                         (name "id")
-                         (value ,(assoc-ref ticket "id"))))
-               (button (@ (type "submit")
-                          (class "text-red-600 text-sm ml-4"))
-                       ,(G_ "delete")))
+         (hr)
+         (div (@ (class "flex flex-row flex-wrap gap-4"))
+              (a (@ (class "font-sans text-amber-900 font-light")
+                    (href ,(format #f "/tickets/~a/~a/edit" project
+                                   (assoc-ref ticket "id"))))
+                 ,(G_ "edit ticket"))
+              (form (@ (enctype "application/x-www-form-urlencoded")
+                       (method "POST")
+                       (action ,(format #f "/tickets/~a/delete" project)))
+                    (input (@ (hidden "")
+                              (name "id")
+                              (value ,(assoc-ref ticket "id"))))
+                    (button (@ (type "submit")
+                               (class "text-red-600 text-md ml-4"))
+                            ,(G_ "delete"))))
 
          )))
 
@@ -116,7 +115,7 @@
                                    (assoc-ref ticket "id")))
                  (class
                   "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/50 border-stone-200 py-1 px-3 cursor-pointer rounded-xl"))
-              (small (@ (class "font-sans text-stone-500 text-sm"))
+              (small (@ (class "font-sans text-stone-600 text-sm"))
                      ,(format #f "~a-~a" project
                               (assoc-ref ticket "human_id")))
               (h5 (@ (class "font-sans text-stone-700 text-lg"))
@@ -129,21 +128,28 @@
     
     ))
 
-(define-public (html-from-tickets G_ projects project tickets
+(define-public (html-from-tickets G_ projects project-details tickets
                                   ticket-id-to-human-id)
+  (display (format #f "~a" project-details))
+  (display (safe-base64-decode (assoc-ref project-details "title")))
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((div (@ (class "flex flex-col gap-4 flex-grow"))
                                     (div (@ (class
                                              "flex flex-wrap flex-row gap-6 items-center"))
                                          (h2 (@ (class
-                                                 "text-2xl font-sans font-bold text-stone-500"))
-                                             ,(format #f "tickets for ~a"
-                                                      project))
-                                         (a (@ (class "text-stone-500 text-md")
+                                                 "text-2xl font-sans font-bold text-stone-600"))
+                                             ,(format #f "backlog of ~a"
+                                                      (safe-base64-decode (assoc-ref
+                                                                           project-details
+                                                                           "title"))))
+                                         (a (@ (class "text-stone-600 text-md")
                                                (href ,(format #f "/kanban/~a"
-                                                              project)))
-                                            (span "kanban board")))
+                                                              (safe-base64-decode
+                                                               (assoc-ref
+                                                                project-details
+                                                                "human_id")))))
+                                            (span "💡 kanban")))
                                     (div (@ (id "lucidplan-tickets-list")
                                             (ondrop "dropTicketsItem(event)")
                                             (ondragover "allowDrop(event)")
@@ -151,12 +157,16 @@
                                              "flex flex-col gap-2 container"))
                                          ,(map (lambda (t)
                                                  (render-ticket-listitem G_
-                                                  project t
-                                                  ticket-id-to-human-id))
+                                                  (safe-base64-decode (assoc-ref
+                                                                       project-details
+                                                                       "human_id"))
+                                                  t ticket-id-to-human-id))
                                                tickets))
                                     (div (a (@ (href ,(format #f
                                                        "/tickets/~a/new"
-                                                       project)))
+                                                       (safe-base64-decode (assoc-ref
+                                                                            project-details
+                                                                            "human_id")))))
                                             "+ new ticket")))))
                  #:proj projects))
 
@@ -242,11 +252,11 @@
                                      (div (@ (class
                                               "flex flex-wrap flex-row gap-6 items-center"))
                                           (h2 (@ (class
-                                                  "text-2xl font-sans font-bold text-stone-500"))
+                                                  "text-2xl font-sans font-bold text-stone-600"))
                                               ,(format #f "kanban for ~a"
                                                        project))
                                           (a (@ (class
-                                                 "text-stone-500 text-md")
+                                                 "text-stone-600 text-md")
                                                 (href ,(format #f
                                                                "/tickets/~a"
                                                                project)))

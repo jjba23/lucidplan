@@ -30,6 +30,7 @@
   #:use-module (ice-9 hash-table)
   #:use-module (ice-9 threads)
   #:use-module (lucidplan html)
+  #:use-module (lucidplan prelude)
   #:use-module (artanis artanis)
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
@@ -42,32 +43,41 @@
 (define-public project-listitem-reveal-details-js-template
   "document.getElementById('details-~a').toggleAttribute('hidden')")
 
+
 (define (render-project G_ p)
   `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl"))
-         (p ,(assoc-ref p "description"))
-         ,(if (assoc-ref p "url") `(a (@ (href ,(assoc-ref p "url"))) "view project") '())         
-         (a (@ (href ,(assoc-ref p "vcs_url"))) "code of project")
+         ,(render-if-nestring (lambda(x) `(p ,(safe-base64-decode x))) (assoc-ref p "description"))
+         ,(render-if-nestring (lambda(x) `(a (@ (class "text-amber-900")(href ,(safe-base64-decode x))) "🔗 view project")) (assoc-ref p "url"))
+         ,(render-if-nestring (lambda(x) `(a (@ (class "text-amber-900")(href ,(safe-base64-decode x))) "🔗 project code")) (assoc-ref p "vcs_url"))
          (hr)
-         (a (@ (href ,(format #f "/tickets/~a"
+         (a (@ (class "text-amber-900")
+               (href ,(format #f "/tickets/~a"
                               (safe-base64-decode (assoc-ref p "human_id")))))
-            ,(format #f "go to tickets: ~a"
+            ,(format #f "📚 go to backlog: ~a"
                      (safe-base64-decode (assoc-ref p "title"))))
-         (a (@ (href ,(format #f "/projects/~a/edit"
-                              (assoc-ref p "id"))))
-            ,(G_ "edit project"))
-         (form (@ (enctype "application/x-www-form-urlencoded")
-                  (method "POST")
-                  (action "/projects/delete"))
-               (input (@ (name "id")
-                         (hidden "")
-                         (value ,(assoc-ref p "id"))) "")
-               (button (@ (type "submit"))
-                       (small (@ (class "text-red-600"))
-                              ,(G_ "delete"))))
-         (small (@ (class "font-mono text-stone-500 text-xs"))
+         (a (@ (class "text-amber-900")
+               (href ,(format #f "/kanban/~a"
+                              (safe-base64-decode (assoc-ref p "human_id")))))
+            ,(format #f "💡 go to kanban: ~a"
+                     (safe-base64-decode (assoc-ref p "title"))))
+         (hr)
+         (div (@ (class "flex flex-wrap flex-row gap-4"))
+              (a (@ (href ,(format #f "/projects/~a/edit"
+                                   (assoc-ref p "id"))))
+                 ,(G_ "edit project"))
+              (form (@ (enctype "application/x-www-form-urlencoded")
+                       (method "POST")
+                       (action "/projects/delete"))
+                    (input (@ (name "id")
+                              (hidden "")
+                              (value ,(assoc-ref p "id"))) "")
+                    (button (@ (type "submit"))
+                            (p (@ (class "text-red-600"))
+                               ,(G_ "delete")))))
+         (small (@ (class "font-mono text-stone-600"))
                 ,(format #f "~a"
                          (safe-base64-decode (assoc-ref p "human_id"))))
-         (small (@ (class "font-mono text-stone-500 text-xs"))
+         (small (@ (class "font-mono text-stone-600 text-xs"))
                 ,(assoc-ref p "id")))))
 
 (define (render-project-list-item G_ p)
@@ -91,7 +101,7 @@
                  #:body `(div (@ (class "container mx-auto"))
                               ((div (@ (class "flex flex-col gap-4 flex-grow"))
                                     (h2 (@ (class
-                                            "text-xl font-sans font-bold text-stone-500"))
+                                            "text-xl font-sans font-bold text-stone-600"))
                                         ,(G_ "projects"))
                                     ,(map (lambda (x)
                                             (render-project-list-item G_ x))
@@ -108,9 +118,9 @@
   (html-project-form G_
                      #:title (safe-base64-decode (assoc-ref p "title"))
                      #:human-id (safe-base64-decode (assoc-ref p "human_id"))
-                     #:url (safe-base64-decode (assoc-ref p "url"))
-                     #:vcs-url (safe-base64-decode (assoc-ref p "vcs_url"))
-                     #:description (safe-base64-decode (assoc-ref p "description"))
+                     #:url (if (assoc-ref p "url") (safe-base64-decode (assoc-ref p "url")) "")
+                     #:vcs-url (if (assoc-ref p "vcs_url") (safe-base64-decode (assoc-ref p "vcs_url")) "")
+                     #:description (if (assoc-ref p "description") (safe-base64-decode (assoc-ref p "description")) "")
                      #:action (format #f "/projects/~a/edit"
                                       (assoc-ref p "id"))
                      #:proj proj))
@@ -144,19 +154,16 @@
                                      (label ,(G_ "url"))
                                      (input (@ (class "p-3 w-min rounded-xl")
                                                (name "url")
-                                               (value ,url)
-                                               (required "")) "")
+                                               (value ,url)) "")
                                      (label ,(G_ "code url"))
                                      (input (@ (class "p-3 w-min rounded-xl")
                                                (name "vcs-url")
-                                               (value ,vcs-url)
-                                               (required "")) "")
+                                               (value ,vcs-url)) "")
 
                                      (label ,(G_ "description"))
                                      (input (@ (class "p-3 w-min rounded-xl")
                                                (name "description")
-                                               (value ,description)
-                                               (required "")) "")
+                                               (value ,description)) "")
 
                                      (button (@ (class
                                                  "bg-green-800/75 text-white p-3 w-min rounded-xl")

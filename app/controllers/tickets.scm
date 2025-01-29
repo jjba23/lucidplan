@@ -47,6 +47,12 @@
          (let* ((project-id (project-id-from-human-id (params rc "project")))
                 (proj ($project 'get
                                 #:order-by '(human_id asc)))
+                (project-details (car ($project 'get
+                                                #:ret 'top
+                                                #:condition (where #:human_id (safe-base64-encode
+                                                                               (params
+                                                                                rc
+                                                                                "project"))))))
                 (project-tickets ($ticket 'get
                                           #:condition (where #:project_id
                                                              project-id)
@@ -60,9 +66,10 @@
                                                                   #:project_id
                                                                   project-id)
                                                      #:order-by '(human_id asc)))))
+           
            (response-emit (:mime rc
                                  (html-from-tickets (:i18n rc) proj
-                                                    (params rc "project")
+                                                    project-details
                                                     project-tickets
                                                     ticket-id-to-human-id)))))
        (get)))

@@ -89,6 +89,9 @@
           (let* ((body (rc-body rc))
                  (kv (read-url-encoded-body body))
                  (title (uri-decode (car (assoc-ref kv "title"))))
+                 (description (uri-decode (car (assoc-ref kv "description"))))
+                 (url (uri-decode (car (assoc-ref kv "url"))))
+                 (vcs-url (uri-decode (car (assoc-ref kv "vcs-url"))))
                  (human-id (uri-decode (car (assoc-ref kv "human-id"))))
                  (new-uuid (string-replace-substring (uuidgen) "\n" "")))
             
@@ -96,6 +99,9 @@
                       #:id new-uuid
                       #:human_id (safe-base64-encode human-id)
                       #:title (safe-base64-encode title)
+                      #:description (safe-base64-encode description)
+                      #:url (safe-base64-encode url)
+                      #:vcs_url (safe-base64-encode vcs-url)
                       #:created_at (current-time))
 
             (redirect-to rc
@@ -133,12 +139,18 @@
           (let* ((body (rc-body rc))
                  (kv (read-url-encoded-body body))
                  (title (uri-decode (car (assoc-ref kv "title"))))
+                 (description (uri-decode (car (assoc-ref kv "description"))))
+                 (url (uri-decode (car (assoc-ref kv "url"))))
+                 (vcs-url (uri-decode (car (assoc-ref kv "vcs-url"))))
                  (human-id (uri-decode (car (assoc-ref kv "human-id")))))
             
             (DB-query (DB-open rc)
                       (->sql update
                              'project set
                              `((human_id ,(safe-base64-encode human-id))
+                               (url ,(safe-base64-encode url))
+                               (vcs_url ,(safe-base64-encode vcs-url))
+                               (description ,(safe-base64-encode description))
                                (title ,(safe-base64-encode title))
                                (updated_at ,(current-time)))
                              (where #:id (params rc "project-id"))))
