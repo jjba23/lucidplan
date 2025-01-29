@@ -1,0 +1,6 @@
+
+#+begin_src
+ALTER TABLE project ADD COLUMN url AFTER title;
+ALTER TABLE project ADD COLUMN vcs_url AFTER url;
+ALTER TABLE project ADD COLUMN description AFTER url;
+#+end_src

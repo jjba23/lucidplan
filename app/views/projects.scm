@@ -44,6 +44,10 @@
 
 (define (render-project G_ p)
   `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl"))
+         (p ,(assoc-ref p "description"))
+         ,(if (assoc-ref p "url") `(a (@ (href ,(assoc-ref p "url"))) "view project") '())         
+         (a (@ (href ,(assoc-ref p "vcs_url"))) "code of project")
+         (hr)
          (a (@ (href ,(format #f "/tickets/~a"
                               (safe-base64-decode (assoc-ref p "human_id")))))
             ,(format #f "go to tickets: ~a"
@@ -104,6 +108,9 @@
   (html-project-form G_
                      #:title (safe-base64-decode (assoc-ref p "title"))
                      #:human-id (safe-base64-decode (assoc-ref p "human_id"))
+                     #:url (safe-base64-decode (assoc-ref p "url"))
+                     #:vcs-url (safe-base64-decode (assoc-ref p "vcs_url"))
+                     #:description (safe-base64-decode (assoc-ref p "description"))
                      #:action (format #f "/projects/~a/edit"
                                       (assoc-ref p "id"))
                      #:proj proj))
@@ -111,6 +118,9 @@
 (define* (html-project-form G_
                             #:key (title "")
                             (human-id "")
+                            (description "")
+                            (url "")
+                            (vcs-url "")
                             (action "/projects/new")
                             (proj '()))
   (html-template G_
@@ -130,6 +140,22 @@
                                      (input (@ (class "p-3 w-min rounded-xl")
                                                (name "human-id")
                                                (value ,human-id)
+                                               (required "")) "")
+                                     (label ,(G_ "url"))
+                                     (input (@ (class "p-3 w-min rounded-xl")
+                                               (name "url")
+                                               (value ,url)
+                                               (required "")) "")
+                                     (label ,(G_ "code url"))
+                                     (input (@ (class "p-3 w-min rounded-xl")
+                                               (name "vcs-url")
+                                               (value ,vcs-url)
+                                               (required "")) "")
+
+                                     (label ,(G_ "description"))
+                                     (input (@ (class "p-3 w-min rounded-xl")
+                                               (name "description")
+                                               (value ,description)
                                                (required "")) "")
 
                                      (button (@ (class
