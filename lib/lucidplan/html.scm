@@ -39,10 +39,10 @@
 (define-public (page-footer G_)
   `((div (@ (class "block text-center font-sans"))
          (div (@ (class
-                  "mt-4 flex flex-row flex-wrap gap-4 justify-center align-center p-2"))
+                   "mt-4 flex flex-row flex-wrap gap-4 justify-center align-center p-2"))
               (p (@ (class "text-sm text-stone-600"))
                  ,(G_ "find the source code here"))
-              (a (@ (class "text-teal-800 font-bold cursor-pointer text-sm")
+              (a (@ (class "text-stone-800 font-bold cursor-pointer text-sm")
                     (href "https://codeberg.org/jjba23/lucidplan"))
                  "https://codeberg.org/jjba23/lucidplan"))
          (p (@ (class "mt-4 p-2"))
@@ -58,26 +58,28 @@
                           (proj '()))
     (define nav
       `(div (@ (class
-                "flex flex-row flex-wrap gap-3 p-2 bg-stone-200/50 items-center justify-left w-full"))
-            (a (@ (class "text-md text-teal-800 font-bold mr-4")
+                 "flex flex-row flex-wrap gap-3 p-3 bg-stone-800 items-center justify-left w-full"))
+            (a (@ (class "text-md text-white font-black mr-4")
                   (href "/")) "LucidPlan")
-            (a (@ (class "text-sm lowercase text-teal-800 font-bold")
+            (a (@ (class "text-sm lowercase text-white font-extrabold")
                   (href "/login"))
                ,(G_ "Login"))
-            (a (@ (class "text-sm lowercase text-teal-800 font-bold")
+            (a (@ (class "text-sm lowercase text-white font-extrabold")
                   (href "/projects"))
                ,(G_ "Projects"))
 
             (hr)
 
-            (select (@ (onchange "window.location.href=this.value;"))
+            (select (@ (onchange "window.location.href=this.value;")
+                       (class "text-sm text-white bg-transparent font-extrabold"))
+                    (option "goto")
                     ,(map (lambda (p)
                             `(option (@ (value ,(format #f "/tickets/~a"
                                                         (safe-base64-decode (assoc-ref
                                                                              p
                                                                              "human_id"))))
                                         (class
-                                         "text-sm font-light lowercase text-teal-800"))
+                                          "text-sm font-light lowercase text-stone-800"))
                                      ,(safe-base64-decode (assoc-ref p "title"))))
                           proj))))
     `(html (head (title "LucidPlan")
@@ -93,10 +95,10 @@
                  (script (@ (src "https://cdn.tailwindcss.com")) "")
                  (script (@ (src "/js/tailwind.config.js")) ())
                  (script (@ (src "/js/tickets.js")) ()))
-           (body (@ (class "bg-teal-100/20"))
+           (body (@ (class "bg-stone-200/50"))
                  (div (@ (class "flex flex-col h-screen justify-between"))
                       (div ,nav
-                           (div (@ (class "my-6"))
+                           (div (@ (class "py-6"))
                                 ,body))
                       (footer ,(page-footer G_))))))
   (export html-template))

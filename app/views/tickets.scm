@@ -86,7 +86,7 @@
 
          (hr)
          (div (@ (class "flex flex-row flex-wrap gap-4"))
-              (a (@ (class "font-sans text-teal-800 font-light")
+              (a (@ (class "font-sans text-stone-800 font-light")
                     (href ,(format #f "/tickets/~a/~a/edit" project
                                    (assoc-ref ticket "id"))))
                  ,(G_ "edit ticket"))
@@ -139,7 +139,7 @@
                                     (div (@ (class
                                              "flex flex-wrap flex-row gap-6 items-center"))
                                          (h2 (@ (class
-                                                 "text-2xl font-sans font-bold text-stone-600"))
+                                                 "text-2xl font-sans font-black text-stone-600"))
                                              ,(format #f "backlog of ~a"
                                                       (safe-base64-decode (assoc-ref
                                                                            project-details

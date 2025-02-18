@@ -49,22 +49,22 @@
                                 `(p ,(safe-base64-decode x)))
                               (assoc-ref p "description"))
          ,(render-if-nestring (lambda (x)
-                                `(a (@ (class "text-teal-800")
+                                `(a (@ (class "text-stone-800")
                                        (href ,(safe-base64-decode x)))
                                     "🔗 view project"))
                               (assoc-ref p "url"))
          ,(render-if-nestring (lambda (x)
-                                `(a (@ (class "text-teal-800")
+                                `(a (@ (class "text-stone-800")
                                        (href ,(safe-base64-decode x)))
                                     "🔗 project code"))
                               (assoc-ref p "vcs_url"))
          (hr)
-         (a (@ (class "text-teal-800")
+         (a (@ (class "text-stone-800")
                (href ,(format #f "/tickets/~a"
                               (safe-base64-decode (assoc-ref p "human_id")))))
             ,(format #f "📚 go to backlog: ~a"
                      (safe-base64-decode (assoc-ref p "title"))))
-         (a (@ (class "text-teal-800")
+         (a (@ (class "text-stone-800")
                (href ,(format #f "/kanban/~a"
                               (safe-base64-decode (assoc-ref p "human_id")))))
             ,(format #f "💡 go to kanban: ~a"
@@ -82,7 +82,7 @@
                               (value ,(assoc-ref p "id"))) "")
                     (button (@ (type "submit"))
                             (p (@ (class "text-red-600"))
-                               ,(G_ "delete")))))
+                               ,(format #f "~a  ❌" (G_ "delete"))))))
          (small (@ (class "font-mono text-stone-600"))
                 ,(format #f "~a"
                          (safe-base64-decode (assoc-ref p "human_id"))))
