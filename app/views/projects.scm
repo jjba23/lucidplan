@@ -44,7 +44,7 @@
   "document.getElementById('details-~a').toggleAttribute('hidden')")
 
 (define (render-project G_ p)
-  `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl"))
+  `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-2xl  border-stone-400/75 border-2"))
          ,(render-if-nestring (lambda (x)
                                 `(p ,(safe-base64-decode x)))
                               (assoc-ref p "description"))
@@ -91,11 +91,11 @@
 
 (define (render-project-list-item G_ p)
   `((div (@ (class
-             "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/50 border-stone-200 py-1 px-3 cursor-pointer rounded-xl")
+             "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/75 border-stone-400/75 border-2 py-2 px-4 cursor-pointer rounded-xl")
             (onclick ,(format #f project-listitem-reveal-details-js-template
                               (assoc-ref p "id"))))
 
-         (p (@ (class "font-sans text-stone-700 text-lg"))
+         (p (@ (class "font-sans text-stone-800 text-lg"))
             ,(format #f "~a (~a)"
                      (safe-base64-decode (assoc-ref p "title"))
                      (safe-base64-decode (assoc-ref p "human_id")))))
@@ -155,27 +155,27 @@
                                         (method "POST")
                                         (action ,action))
                                      (label ,(G_ "title"))
-                                     (input (@ (class "p-3 w-min rounded-xl")
+                                     (input (@ (class "p-3 w-min rounded-xl border-stone-400/75 border-2")
                                                (name "title")
                                                (value ,title)
                                                (required "")) "")
 
                                      (label ,(G_ "human id"))
-                                     (input (@ (class "p-3 w-min rounded-xl")
+                                     (input (@ (class "p-3 w-min rounded-xl border-stone-400/75 border-2")
                                                (name "human-id")
                                                (value ,human-id)
                                                (required "")) "")
                                      (label ,(G_ "url"))
-                                     (input (@ (class "p-3 w-min rounded-xl")
+                                     (input (@ (class "p-3 w-min rounded-xl border-stone-400/75 border-2")
                                                (name "url")
                                                (value ,url)) "")
                                      (label ,(G_ "code url"))
-                                     (input (@ (class "p-3 w-min rounded-xl")
+                                     (input (@ (class "p-3 w-min rounded-xl border-stone-400/75 border-2")
                                                (name "vcs-url")
                                                (value ,vcs-url)) "")
 
                                      (label ,(G_ "description"))
-                                     (input (@ (class "p-3 w-min rounded-xl")
+                                     (input (@ (class "p-3 w-min rounded-xl border-stone-400/75 border-2")
                                                (name "description")
                                                (value ,description)) "")
 

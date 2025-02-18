@@ -58,21 +58,21 @@
                           (proj '()))
     (define nav
       `(div (@ (class
-                 "flex flex-row flex-wrap gap-3 p-3 bg-stone-800 items-center justify-left w-full"))
-            (a (@ (class "text-md text-white font-black mr-4")
+                 "flex flex-row flex-wrap gap-3 p-3 bg-stone-900/90 items-center justify-left w-full shadow-lg"))
+            (a (@ (class "text-md text-white font-sans font-black mr-4")
                   (href "/")) "LucidPlan")
-            (a (@ (class "text-sm lowercase text-white font-extrabold")
+            (a (@ (class "text-sm lowercase text-white font-sans font-medium")
                   (href "/login"))
                ,(G_ "Login"))
-            (a (@ (class "text-sm lowercase text-white font-extrabold")
+            (a (@ (class "text-sm lowercase text-white font-sans font-medium")
                   (href "/projects"))
                ,(G_ "Projects"))
 
             (hr)
 
             (select (@ (onchange "window.location.href=this.value;")
-                       (class "text-sm text-white bg-transparent font-extrabold"))
-                    (option "goto")
+                       (class "text-sm text-white bg-transparent font-medium font-sans"))
+                    (option "🔗 go to")
                     ,(map (lambda (p)
                             `(option (@ (value ,(format #f "/tickets/~a"
                                                         (safe-base64-decode (assoc-ref
