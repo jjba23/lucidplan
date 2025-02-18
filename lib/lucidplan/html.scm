@@ -96,7 +96,7 @@
                  (script (@ (src "https://cdn.tailwindcss.com")) "")
                  (script (@ (src "/js/tailwind.config.js")) ())
                  (script (@ (src "/js/tickets.js")) ()))
-           (body (@ (class "bg-teal-100/35"))
+           (body (@ (class "bg-teal-100/20"))
                  (div (@ (class "flex flex-col h-screen justify-between"))
                       (div ,nav
                            (div (@ (class "my-6"))
