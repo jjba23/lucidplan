@@ -42,7 +42,7 @@
                   "mt-4 flex flex-row flex-wrap gap-4 justify-center align-center p-2"))
               (p (@ (class "text-sm text-stone-600"))
                  ,(G_ "find the source code here"))
-              (a (@ (class "text-amber-800 font-bold cursor-pointer text-sm")
+              (a (@ (class "text-teal-800 font-bold cursor-pointer text-sm")
                     (href "https://codeberg.org/jjba23/lucidplan"))
                  "https://codeberg.org/jjba23/lucidplan"))
          (p (@ (class "mt-4 p-2"))
@@ -58,7 +58,7 @@
                           (proj '()))
     (define nav
       `(div (@ (class
-                 "flex flex-row flex-wrap gap-3 p-2 bg-stone-200/50 items-center justify-left w-full"))
+                "flex flex-row flex-wrap gap-3 p-2 bg-stone-200/50 items-center justify-left w-full"))
             (a (@ (class "text-md text-teal-800 font-bold mr-4")
                   (href "/")) "LucidPlan")
             (a (@ (class "text-sm lowercase text-teal-800 font-bold")
@@ -69,26 +69,23 @@
                ,(G_ "Projects"))
 
             (hr)
-            
-            (select
-             (@
-              (onchange "window.location.href=this.value;"))
-             ,(map (lambda (p)
-                     `(option (@ (value ,(format #f "/tickets/~a"
-                                                 (safe-base64-decode (assoc-ref p
-                                                                                "human_id"))) )
-                                 (class
-                                   "text-sm font-light lowercase text-teal-800"))
-                              ,(safe-base64-decode (assoc-ref p "title")))) proj))
-            ))
+
+            (select (@ (onchange "window.location.href=this.value;"))
+                    ,(map (lambda (p)
+                            `(option (@ (value ,(format #f "/tickets/~a"
+                                                        (safe-base64-decode (assoc-ref
+                                                                             p
+                                                                             "human_id"))))
+                                        (class
+                                         "text-sm font-light lowercase text-teal-800"))
+                                     ,(safe-base64-decode (assoc-ref p "title"))))
+                          proj))))
     `(html (head (title "LucidPlan")
                  (link (@ (rel "preconnect")
                           (href "https://fonts.googleapis.com")))
                  (link (@ (rel "preconnect")
                           (href "https://fonts.gstatic.com")
                           (crossorigin "")))
-                 (link (@ (rel "stylesheet")
-                          (href "https://fonts.cdnfonts.com/css/work-sans")))
                  (link (@ (rel "stylesheet")
                           (href "/css/fonts.css")))
                  (meta (@ (name "viewport")
