@@ -86,7 +86,7 @@
 
          (hr)
          (div (@ (class "flex flex-row flex-wrap gap-4"))
-              (a (@ (class "font-sans text-amber-900 font-light")
+              (a (@ (class "font-sans text-teal-800 font-light")
                     (href ,(format #f "/tickets/~a/~a/edit" project
                                    (assoc-ref ticket "id"))))
                  ,(G_ "edit ticket"))

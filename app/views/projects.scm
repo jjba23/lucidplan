@@ -49,22 +49,22 @@
                                 `(p ,(safe-base64-decode x)))
                               (assoc-ref p "description"))
          ,(render-if-nestring (lambda (x)
-                                `(a (@ (class "text-amber-900")
+                                `(a (@ (class "text-teal-800")
                                        (href ,(safe-base64-decode x)))
                                     "🔗 view project"))
                               (assoc-ref p "url"))
          ,(render-if-nestring (lambda (x)
-                                `(a (@ (class "text-amber-900")
+                                `(a (@ (class "text-teal-800")
                                        (href ,(safe-base64-decode x)))
                                     "🔗 project code"))
                               (assoc-ref p "vcs_url"))
          (hr)
-         (a (@ (class "text-amber-900")
+         (a (@ (class "text-teal-800")
                (href ,(format #f "/tickets/~a"
                               (safe-base64-decode (assoc-ref p "human_id")))))
             ,(format #f "📚 go to backlog: ~a"
                      (safe-base64-decode (assoc-ref p "title"))))
-         (a (@ (class "text-amber-900")
+         (a (@ (class "text-teal-800")
                (href ,(format #f "/kanban/~a"
                               (safe-base64-decode (assoc-ref p "human_id")))))
             ,(format #f "💡 go to kanban: ~a"

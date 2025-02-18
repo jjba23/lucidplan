@@ -58,24 +58,29 @@
                           (proj '()))
     (define nav
       `(div (@ (class
-                "flex flex-row flex-wrap gap-3 p-2 bg-stone-200/50 items-center justify-left w-full"))
-            (a (@ (class "text-md text-amber-900 font-bold mr-4")
+                 "flex flex-row flex-wrap gap-3 p-2 bg-stone-200/50 items-center justify-left w-full"))
+            (a (@ (class "text-md text-teal-800 font-bold mr-4")
                   (href "/")) "LucidPlan")
-            (a (@ (class "text-sm lowercase text-amber-900 font-bold")
+            (a (@ (class "text-sm lowercase text-teal-800 font-bold")
                   (href "/login"))
                ,(G_ "Login"))
-            (a (@ (class "text-sm lowercase text-amber-900 font-bold")
+            (a (@ (class "text-sm lowercase text-teal-800 font-bold")
                   (href "/projects"))
                ,(G_ "Projects"))
 
             (hr)
-            ,(map (lambda (p)
-                    `(a (@ (class
-                            "text-sm font-light lowercase text-amber-900")
-                           (href ,(format #f "/tickets/~a"
-                                          (safe-base64-decode (assoc-ref p
-                                                               "human_id")))))
-                        ,(safe-base64-decode (assoc-ref p "title")))) proj)))
+            
+            (select
+             (@
+              (onchange "window.location.href=this.value;"))
+             ,(map (lambda (p)
+                     `(option (@ (value ,(format #f "/tickets/~a"
+                                                 (safe-base64-decode (assoc-ref p
+                                                                                "human_id"))) )
+                                 (class
+                                   "text-sm font-light lowercase text-teal-800"))
+                              ,(safe-base64-decode (assoc-ref p "title")))) proj))
+            ))
     `(html (head (title "LucidPlan")
                  (link (@ (rel "preconnect")
                           (href "https://fonts.googleapis.com")))
@@ -91,7 +96,7 @@
                  (script (@ (src "https://cdn.tailwindcss.com")) "")
                  (script (@ (src "/js/tailwind.config.js")) ())
                  (script (@ (src "/js/tickets.js")) ()))
-           (body (@ (class "bg-amber-100/35"))
+           (body (@ (class "bg-teal-100/35"))
                  (div (@ (class "flex flex-col h-screen justify-between"))
                       (div ,nav
                            (div (@ (class "my-6"))

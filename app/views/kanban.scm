@@ -98,7 +98,7 @@
                                                              project)))
                                            (span "backlog")))
                                    (div (a (@ (class
-                                               "text-sm text-amber-900 my-3")
+                                               "text-sm text-teal-800 my-3")
                                               (href ,(format #f
                                                       "/tickets/~a/new"
                                                       project))) "new ticket"))
