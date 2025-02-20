@@ -98,7 +98,7 @@
            (body (@ (class "bg-stone-200/50"))
                  (div (@ (class "flex flex-col h-screen justify-between"))
                       (div ,nav
-                           (div (@ (class "py-6"))
+                           (div (@ (class "py-8"))
                                 ,body))
                       (footer ,(page-footer G_))))))
   (export html-template))
