@@ -1,3 +1,5 @@
+;; -*- mode: Scheme;-*-
+
 ;; This an Artanis ENTRY file, don't remove it!
 
 (use-modules (artanis artanis)
