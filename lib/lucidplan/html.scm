@@ -59,12 +59,12 @@
     (define nav
       `(div (@ (class
                  "flex flex-row flex-wrap gap-3 p-3 bg-stone-900/90 items-center justify-left w-full shadow-lg"))
-            (a (@ (class "text-md text-white font-sans font-black mr-4")
+            (a (@ (class "text-md text-white font-sans font-black px-4")
                   (href "/")) "LucidPlan")
-            (a (@ (class "text-sm lowercase text-white font-sans font-medium")
+            (a (@ (class "text-sm lowercase text-white font-sans font-medium px-2")
                   (href "/login"))
                ,(G_ "Login"))
-            (a (@ (class "text-sm lowercase text-white font-sans font-medium")
+            (a (@ (class "text-sm lowercase text-white font-sans font-medium px-2")
                   (href "/projects"))
                ,(G_ "Projects"))
 
