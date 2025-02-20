@@ -1,6 +1,6 @@
 ;;; lucidplan - free and open project management for everyone
 
-;; Copyright © 2024 "Josep Bigorra" known as "jjba23" <jjbigorra@gmail.com>
+;; Copyright © 2025 "Josep Bigorra" known as "jjba23" <jjbigorra@gmail.com>
 
 ;; lucidplan is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
   #:use-module (ice-9 hash-table)
   #:use-module (ice-9 threads)
   #:use-module (lucidplan html)
+  #:use-module (lucidplan prelude)
   #:use-module (artanis artanis)
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
@@ -43,13 +44,27 @@
   "document.getElementById('details-~a').toggleAttribute('hidden')")
 
 (define (render-project G_ p)
-  `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl"))
-         (a (@ (class "text-amber-900")
+  `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-2xl  border-stone-400/75 border-2"))
+         ,(render-if-nestring (lambda (x)
+                                `(p ,(safe-base64-decode x)))
+                              (assoc-ref p "description"))
+         ,(render-if-nestring (lambda (x)
+                                `(a (@ (class "text-stone-800")
+                                       (href ,(safe-base64-decode x)))
+                                    "🔗 view project"))
+                              (assoc-ref p "url"))
+         ,(render-if-nestring (lambda (x)
+                                `(a (@ (class "text-stone-800")
+                                       (href ,(safe-base64-decode x)))
+                                    "🔗 project code"))
+                              (assoc-ref p "vcs_url"))
+         (hr)
+         (a (@ (class "text-stone-800")
                (href ,(format #f "/tickets/~a"
                               (safe-base64-decode (assoc-ref p "human_id")))))
             ,(format #f "📚 go to backlog: ~a"
                      (safe-base64-decode (assoc-ref p "title"))))
-         (a (@ (class "text-amber-900")
+         (a (@ (class "text-stone-800")
                (href ,(format #f "/kanban/~a"
                               (safe-base64-decode (assoc-ref p "human_id")))))
             ,(format #f "💡 go to kanban: ~a"
@@ -67,7 +82,7 @@
                               (value ,(assoc-ref p "id"))) "")
                     (button (@ (type "submit"))
                             (p (@ (class "text-red-600"))
-                               ,(G_ "delete")))))
+                               ,(format #f "~a  ❌" (G_ "delete"))))))
          (small (@ (class "font-mono text-stone-600"))
                 ,(format #f "~a"
                          (safe-base64-decode (assoc-ref p "human_id"))))
@@ -76,11 +91,11 @@
 
 (define (render-project-list-item G_ p)
   `((div (@ (class
-             "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/50 border-stone-200 py-1 px-3 cursor-pointer rounded-xl")
+             "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/75 border-stone-400/75 border-2 py-2 px-4 cursor-pointer rounded-xl")
             (onclick ,(format #f project-listitem-reveal-details-js-template
                               (assoc-ref p "id"))))
 
-         (p (@ (class "font-sans text-stone-700 text-lg"))
+         (p (@ (class "font-sans text-stone-800 text-lg"))
             ,(format #f "~a (~a)"
                      (safe-base64-decode (assoc-ref p "title"))
                      (safe-base64-decode (assoc-ref p "human_id")))))
@@ -112,6 +127,14 @@
   (html-project-form G_
                      #:title (safe-base64-decode (assoc-ref p "title"))
                      #:human-id (safe-base64-decode (assoc-ref p "human_id"))
+                     #:url (if (assoc-ref p "url")
+                               (safe-base64-decode (assoc-ref p "url")) "")
+                     #:vcs-url (if (assoc-ref p "vcs_url")
+                                   (safe-base64-decode (assoc-ref p "vcs_url"))
+                                   "")
+                     #:description (if (assoc-ref p "description")
+                                       (safe-base64-decode (assoc-ref p
+                                                            "description")) "")
                      #:action (format #f "/projects/~a/edit"
                                       (assoc-ref p "id"))
                      #:proj proj))
@@ -119,6 +142,9 @@
 (define* (html-project-form G_
                             #:key (title "")
                             (human-id "")
+                            (description "")
+                            (url "")
+                            (vcs-url "")
                             (action "/projects/new")
                             (proj '()))
   (html-template G_
@@ -129,16 +155,29 @@
                                         (method "POST")
                                         (action ,action))
                                      (label ,(G_ "title"))
-                                     (input (@ (class "p-3 w-min rounded-xl")
+                                     (input (@ (class "p-3 w-min rounded-xl border-stone-400/75 border-2")
                                                (name "title")
                                                (value ,title)
                                                (required "")) "")
 
                                      (label ,(G_ "human id"))
-                                     (input (@ (class "p-3 w-min rounded-xl")
+                                     (input (@ (class "p-3 w-min rounded-xl border-stone-400/75 border-2")
                                                (name "human-id")
                                                (value ,human-id)
                                                (required "")) "")
+                                     (label ,(G_ "url"))
+                                     (input (@ (class "p-3 w-min rounded-xl border-stone-400/75 border-2")
+                                               (name "url")
+                                               (value ,url)) "")
+                                     (label ,(G_ "code url"))
+                                     (input (@ (class "p-3 w-min rounded-xl border-stone-400/75 border-2")
+                                               (name "vcs-url")
+                                               (value ,vcs-url)) "")
+
+                                     (label ,(G_ "description"))
+                                     (input (@ (class "p-3 w-min rounded-xl border-stone-400/75 border-2")
+                                               (name "description")
+                                               (value ,description)) "")
 
                                      (button (@ (class
                                                  "bg-green-800/75 text-white p-3 w-min rounded-xl")

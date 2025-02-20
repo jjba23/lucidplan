@@ -1,6 +1,6 @@
 ;;; lucidplan - free and open project management for everyone
 
-;; Copyright © 2024 "Josep Bigorra" known as "jjba23" <jjbigorra@gmail.com>
+;; Copyright © 2025 "Josep Bigorra" known as "jjba23" <jjbigorra@gmail.com>
 
 ;; lucidplan is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@
   #:use-module (artanis i18n locale)
   #:use-module (ice-9 i18n)
   #:use-module (lucidplan html)
+  #:use-module (lucidplan prelude)
   #:use-module (lucidplan base64)
   #:use-module (artanis security nss)
   #:use-module (artanis route))
@@ -44,7 +45,7 @@
   (write (string-match "/{1}[^\n]*/{1}" org)) org)
 
 (define-public (render-ticket G_ project ticket ticket-id-to-human-id)
-  `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-xl"))
+  `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-2xl border-stone-400/75 border-2"))
          (h4 (@ (class "font-sans text-stone-700 text-2xl font-bold my-3"))
              ,(safe-base64-decode (assoc-ref ticket "title")))
 
@@ -85,7 +86,7 @@
 
          (hr)
          (div (@ (class "flex flex-row flex-wrap gap-4"))
-              (a (@ (class "font-sans text-amber-900 font-light")
+              (a (@ (class "font-sans text-stone-800 font-light")
                     (href ,(format #f "/tickets/~a/~a/edit" project
                                    (assoc-ref ticket "id"))))
                  ,(G_ "edit ticket"))
@@ -114,11 +115,11 @@
                                    ticket-listitem-reveal-details-js-template
                                    (assoc-ref ticket "id")))
                  (class
-                  "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/50 border-stone-200 py-1 px-3 cursor-pointer rounded-xl"))
-              (small (@ (class "font-sans text-stone-600 text-sm"))
+                  "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/75 border-stone-400/75 border-2 py-2 px-4 cursor-pointer rounded-xl"))
+              (small (@ (class "font-sans text-stone-800 text-sm"))
                      ,(format #f "~a-~a" project
                               (assoc-ref ticket "human_id")))
-              (h5 (@ (class "font-sans text-stone-700 text-lg"))
+              (h5 (@ (class "font-sans text-stone-900 text-lg"))
                   ,(safe-base64-decode (assoc-ref ticket "title"))))
          (div (@ (id ,(format #f "details-~a"
                               (assoc-ref ticket "id")))
@@ -138,7 +139,7 @@
                                     (div (@ (class
                                              "flex flex-wrap flex-row gap-6 items-center"))
                                          (h2 (@ (class
-                                                 "text-2xl font-sans font-bold text-stone-600"))
+                                                 "text-2xl font-sans font-black text-stone-600"))
                                              ,(format #f "backlog of ~a"
                                                       (safe-base64-decode (assoc-ref
                                                                            project-details
@@ -150,6 +151,14 @@
                                                                 project-details
                                                                 "human_id")))))
                                             (span "💡 kanban")))
+                                    ,(render-if-nestring (lambda (x)
+                                                           `(p (@ (class
+                                                                   "text-sm text-stone-500"))
+                                                               ,(safe-base64-decode
+                                                                 x)))
+                                                         (assoc-ref
+                                                          project-details
+                                                          "description"))
                                     (div (@ (id "lucidplan-tickets-list")
                                             (ondrop "dropTicketsItem(event)")
                                             (ondragover "allowDrop(event)")
@@ -206,12 +215,12 @@
                (method "POST")
                (action ,action))
             (label ,(G_ "title"))
-            (input (@ (class "p-3 w-min rounded-xl")
+            (input (@ (class "p-3 w-min rounded-xl border-stone-400/75 border-2")
                       (name "title")
                       (value ,title)
                       (required "")) "")
             (label ,(G_ "status"))
-            (select (@ (class "p-3 rounded-xl")
+            (select (@ (class "p-3 rounded-xl border-stone-400/75 border-2")
                        (name "ticket-status")
                        (required ""))
                     ,(mk-option "todo" ticket-status)
@@ -220,7 +229,7 @@
                     ,(mk-option "done" ticket-status)
                     ,(mk-option "rejected" ticket-status))
             (label ,(G_ "type"))
-            (select (@ (class "p-3 rounded-xl")
+            (select (@ (class "p-3 rounded-xl border-stone-400/75 border-2")
                        (name "ticket-type")
                        (required ""))
                     ,(mk-option "task" ticket-type)
@@ -229,7 +238,7 @@
                     ,(mk-option "spike" ticket-type)
                     ,(mk-option "time-box" ticket-type))
             (label ,(G_ "description"))
-            (textarea (@ (class "p-3 w-full min-h-48 rounded-xl")
+            (textarea (@ (class "p-3 w-full min-h-64 rounded-xl border-stone-400/75 border-2")
                          (name "description")
                          (required ""))
                       ,description)
@@ -244,45 +253,3 @@
                                ,form_))
                  #:proj proj))
 
-(define-public (kanban-from-tickets G_ projects project tickets
-                                    ticket-id-to-human-id)
-  (html-template G_
-                 #:body `((div (@ (class "container mx-auto"))
-                               ((div (@ (class "flex flex-col gap-4 flex-grow"))
-                                     (div (@ (class
-                                              "flex flex-wrap flex-row gap-6 items-center"))
-                                          (h2 (@ (class
-                                                  "text-2xl font-sans font-bold text-stone-600"))
-                                              ,(format #f "kanban for ~a"
-                                                       project))
-                                          (a (@ (class
-                                                 "text-stone-600 text-md")
-                                                (href ,(format #f
-                                                               "/tickets/~a"
-                                                               project)))
-                                             (span "backlog")))
-                                     (div (a (@ (href ,(format #f
-                                                        "/tickets/~a/new"
-                                                        project)))
-                                             "+ new ticket"))
-
-                                     )))
-                          (div (@ (class "flex flex-wrap gap-1 justify-center"))
-                               (div (@ (class
-                                        "w-1/5 flex flex-col gap-2 bg-stone-200"))
-                                    (h4 (@ (class "text-sm")) "todo"))
-                               (div (@ (class
-                                        "w-1/5 flex flex-col gap-2 bg-stone-200"))
-                                    (h4 (@ (class "text-sm"))
-                                        "work-in-progress"))
-                               (div (@ (class
-                                        "w-1/5 flex flex-col gap-2 bg-stone-200"))
-                                    (h4 (@ (class "text-sm")) "in-review"))
-                               (div (@ (class
-                                        "w-1/5 flex flex-col gap-2 bg-stone-200"))
-                                    (h4 (@ (class "text-sm")) "done"))
-                               ;; ,(map (lambda (t)
-                               ;; (render-ticket-kanban-item G_ project
-                               ;; t ticket-id-to-human-id)) tickets)
-                               ))
-                 #:proj projects))

@@ -1,6 +1,6 @@
 ;;; lucidplan - free and open project management for everyone
 
-;; Copyright © 2024 "Josep Bigorra" known as "jjba23" <jjbigorra@gmail.com>
+;; Copyright © 2025 "Josep Bigorra" known as "jjba23" <jjbigorra@gmail.com>
 
 ;; lucidplan is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -39,10 +39,10 @@
 (define-public (page-footer G_)
   `((div (@ (class "block text-center font-sans"))
          (div (@ (class
-                  "mt-4 flex flex-row flex-wrap gap-4 justify-center align-center p-2"))
+                   "mt-4 flex flex-row flex-wrap gap-4 justify-center align-center p-2"))
               (p (@ (class "text-sm text-stone-600"))
                  ,(G_ "find the source code here"))
-              (a (@ (class "text-amber-800 font-bold cursor-pointer text-sm")
+              (a (@ (class "text-stone-800 font-bold cursor-pointer text-sm")
                     (href "https://codeberg.org/jjba23/lucidplan"))
                  "https://codeberg.org/jjba23/lucidplan"))
          (p (@ (class "mt-4 p-2"))
@@ -58,24 +58,30 @@
                           (proj '()))
     (define nav
       `(div (@ (class
-                "flex flex-row flex-wrap gap-3 p-2 bg-stone-200/50 items-center justify-left w-full"))
-            (a (@ (class "text-md text-amber-900 font-bold mr-4")
+                 "flex flex-row flex-wrap gap-3 p-3 bg-stone-900/90 items-center justify-left w-full shadow-lg"))
+            (a (@ (class "text-md text-white font-sans font-black mr-4")
                   (href "/")) "LucidPlan")
-            (a (@ (class "text-sm lowercase text-amber-900 font-bold")
+            (a (@ (class "text-sm lowercase text-white font-sans font-medium")
                   (href "/login"))
                ,(G_ "Login"))
-            (a (@ (class "text-sm lowercase text-amber-900 font-bold")
+            (a (@ (class "text-sm lowercase text-white font-sans font-medium")
                   (href "/projects"))
                ,(G_ "Projects"))
 
             (hr)
-            ,(map (lambda (p)
-                    `(a (@ (class
-                            "text-sm font-light lowercase text-amber-900")
-                           (href ,(format #f "/tickets/~a"
-                                          (safe-base64-decode (assoc-ref p
-                                                               "human_id")))))
-                        ,(safe-base64-decode (assoc-ref p "title")))) proj)))
+
+            (select (@ (onchange "window.location.href=this.value;")
+                       (class "text-sm text-white bg-transparent font-medium font-sans"))
+                    (option "🔗 go to")
+                    ,(map (lambda (p)
+                            `(option (@ (value ,(format #f "/tickets/~a"
+                                                        (safe-base64-decode (assoc-ref
+                                                                             p
+                                                                             "human_id"))))
+                                        (class
+                                          "text-sm font-light lowercase text-stone-800"))
+                                     ,(safe-base64-decode (assoc-ref p "title"))))
+                          proj))))
     `(html (head (title "LucidPlan")
                  (link (@ (rel "preconnect")
                           (href "https://fonts.googleapis.com")))
@@ -83,18 +89,17 @@
                           (href "https://fonts.gstatic.com")
                           (crossorigin "")))
                  (link (@ (rel "stylesheet")
-                          (href "https://fonts.cdnfonts.com/css/work-sans")))
-                 (link (@ (rel "stylesheet")
                           (href "/css/fonts.css")))
                  (meta (@ (name "viewport")
                           (content "width=device-width, initial-scale=1.0")))
                  (script (@ (src "https://cdn.tailwindcss.com")) "")
                  (script (@ (src "/js/tailwind.config.js")) ())
                  (script (@ (src "/js/tickets.js")) ()))
-           (body (@ (class "bg-amber-100/35"))
+           (body (@ (class "bg-stone-200/50"))
                  (div (@ (class "flex flex-col h-screen justify-between"))
                       (div ,nav
-                           (div ,body))
+                           (div (@ (class "py-6"))
+                                ,body))
                       (footer ,(page-footer G_))))))
   (export html-template))
 

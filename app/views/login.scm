@@ -1,6 +1,6 @@
 ;;; lucidplan - free and open project management for everyone
 
-;; Copyright © 2024 "Josep Bigorra" known as "jjba23" <jjbigorra@gmail.com>
+;; Copyright © 2025 "Josep Bigorra" known as "jjba23" <jjbigorra@gmail.com>
 
 ;; lucidplan is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -37,11 +37,11 @@
                                              (method "POST"))
                                           (label ,(G_ "username"))
                                           (input (@ (type "text")
-                                                    (class "p-3 rounded-xl")
+                                                    (class "p-3 rounded-xl border-stone-400/75 border-2")
                                                     (name "username")) "")
                                           (label ,(G_ "password"))
                                           (input (@ (type "password")
-                                                    (class "p-3 rounded-xl")
+                                                    (class "p-3 rounded-xl border-stone-400/75 border-2")
                                                     (name "password")) "")
                                           (button (@ (type "submit")
                                                      (class

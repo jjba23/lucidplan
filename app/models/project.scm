@@ -10,6 +10,12 @@
                       (title char-field
                              (#:not-null #:maxlen 256
                               #:unique))
+                      (url char-field
+                           (#:maxlen 2048))
+                      (vcs_url char-field
+                               (#:maxlen 2048))
+                      (description char-field
+                                   (#:maxlen 2048))
                       (created_at date-field
                                   (#:not-null))
                       (updated_at date-field))
