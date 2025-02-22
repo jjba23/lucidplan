@@ -42,7 +42,7 @@
 
 (define render-k-ticket
   (lambda (t)
-    `((div (@ (class "w-full flex flex-wrap flex-row gap-4"))
+    `((div (@ (class "w-max flex flex-wrap flex-row gap-4"))
            (div (@ (class
                     "rounded-xl bg-stone-200/50 p-3 border-stone-400/75 border-2"))
                 (p (@ (class "text-xs text-stone-700"))
@@ -80,7 +80,7 @@
          (show-done #f)
          (_ (log-exprs (list (list? tickets-todo) tickets-todo)))
          (kanban-html `((div (@ (class "container mx-auto"))
-                             ((div (@ (class "flex flex-col gap-4 flex-grow"))
+                             ((div (@ (class "flex flex-col gap-3 flex-grow"))
                                    (div (@ (class
                                             "flex flex-wrap flex-row gap-6 items-center"))
                                         (h2 (@ (class
