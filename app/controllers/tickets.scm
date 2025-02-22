@@ -23,6 +23,7 @@
         (lucidplan auth)
         (lucidplan uri)
         (lucidplan uuid)
+        (lucidplan query-escape)
         (app models ticket)
         (artanis security nss)
         (app models project))
@@ -38,7 +39,6 @@
 
 (get "/tickets/:project"
      #:mime 'xml
-     ;; #:auth '(table user "username" "password")
      #:session #t
      #:i18n '(cookie "lang")
      (lambda (rc)
@@ -66,25 +66,24 @@
                                                      #:order-by '(human_id asc)))))
            
            (response-emit (:mime rc
-                                 (html-from-tickets (:i18n rc) proj
-                                                    project-details
-                                                    project-tickets
-                                                    ticket-id-to-human-id)))))
+                           (html-from-tickets (:i18n rc) proj
+                                              project-details
+                                              project-tickets
+                                              ticket-id-to-human-id)))))
        (get)))
 
 (get "/tickets/:project/new"
      #:mime 'xml
-     ;; #:auth '(table user "username" "password")
      #:session #t
      #:i18n '(cookie "lang")
      (lambda (rc)
        (define (get-new)
          (response-emit (:mime rc
-                               (html-new-ticket-form (:i18n rc)
-                                                     ($project 'get
-                                                               #:order-by '(human_id
-                                                                            asc))
-                                                     (params rc "project")))))
+                         (html-new-ticket-form (:i18n rc)
+                                               ($project 'get
+                                                         #:order-by '(human_id
+                                                                      asc))
+                                               (params rc "project")))))
        (get-new)))
 
 (post "/tickets/:project/delete"
@@ -126,10 +125,10 @@
             ($ticket 'set
                      #:id new-uuid
                      #:project_id project-id
-                     #:title title
+                     #:title (escape-str title)
                      #:ticket_status ticket-status
                      #:ticket_type ticket-type
-                     #:description description
+                     #:description (escape-str description)
                      #:created_at (current-time))
 
             (redirect-to rc
@@ -175,8 +174,8 @@
                              'ticket set
                              `((ticket_status ,ticket-status)
                                (ticket_type ,ticket-type)
-                               (description ,description)
-                               (title ,title)
+                               (description ,(escape-str description))
+                               (title ,(escape-str title))
                                (updated_at ,(current-time)))
                              (where #:id (params rc "ticket-id"))))
             (write (params rc "project"))

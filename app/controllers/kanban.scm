@@ -23,6 +23,7 @@
         (lucidplan uri)
         (lucidplan prelude)
         (lucidplan uuid)
+        (lucidplan query-escape)
         (app models ticket)
         (artanis security nss)
         (app models project))

@@ -36,6 +36,7 @@
   #:use-module (artanis i18n locale)
   #:use-module (ice-9 i18n)
   #:use-module (lucidplan html)
+  #:use-module (lucidplan query-escape)
   #:use-module (lucidplan prelude)
   #:use-module (lucidplan base64)
   #:use-module (artanis security nss)
@@ -208,9 +209,9 @@
                (action ,action))
             (label ,(G_ "title"))
             (input (@ (class
-                       "p-3 w-min rounded-xl border-stone-400/75 border-2")
+                        "p-3 w-min rounded-xl border-stone-400/75 border-2")
                       (name "title")
-                      (value ,title)
+                      (value ,(unescape-str title))
                       (required "")) "")
             (label ,(G_ "status"))
             (select (@ (class "p-3 rounded-xl border-stone-400/75 border-2")
@@ -232,13 +233,13 @@
                     ,(mk-option "time-box" ticket-type))
             (label ,(G_ "description"))
             (textarea (@ (class
-                          "p-3 w-full min-h-64 rounded-xl border-stone-400/75 border-2")
+                           "p-3 w-full min-h-64 rounded-xl border-stone-400/75 border-2")
                          (name "description")
                          (required ""))
-                      ,description)
+                      ,(unescape-str description))
 
             (button (@ (class
-                        "bg-green-700/75 text-white p-2 w-min rounded-xl")
+                         "bg-green-700/75 text-white p-2 w-min rounded-xl")
                        (type "submit"))
                     ,(G_ "done")))))
 
