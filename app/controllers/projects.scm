@@ -97,11 +97,11 @@
             
             ($project 'set
                       #:id new-uuid
-                      #:human_id (safe-base64-encode human-id)
-                      #:title (safe-base64-encode title)
-                      #:description (safe-base64-encode description)
-                      #:url (safe-base64-encode url)
-                      #:vcs_url (safe-base64-encode vcs-url)
+                      #:human_id human-id
+                      #:title title
+                      #:description description
+                      #:url url
+                      #:vcs_url vcs-url
                       #:created_at (current-time))
 
             (redirect-to rc
@@ -147,11 +147,11 @@
             (DB-query (DB-open rc)
                       (->sql update
                              'project set
-                             `((human_id ,(safe-base64-encode human-id))
-                               (url ,(safe-base64-encode url))
-                               (vcs_url ,(safe-base64-encode vcs-url))
-                               (description ,(safe-base64-encode description))
-                               (title ,(safe-base64-encode title))
+                             `((human_id ,human-id)
+                               (url ,url)
+                               (vcs_url ,vcs-url)
+                               (description ,description)
+                               (title ,title)
                                (updated_at ,(current-time)))
                              (where #:id (params rc "project-id"))))
 

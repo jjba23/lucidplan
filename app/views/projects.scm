@@ -45,31 +45,31 @@
 
 (define (render-project G_ p)
   `((div (@ (class
-             "flex flex-col gap-2 p-3 bg-stone-100 rounded-2xl  border-stone-400/75 border-2"))
+              "flex flex-col gap-2 p-3 bg-stone-100 rounded-2xl  border-stone-400/75 border-2"))
          ,(render-if-nestring (lambda (x)
-                                `(p ,(safe-base64-decode x)))
+                                `(p , x))
                               (assoc-ref p "description"))
          ,(render-if-nestring (lambda (x)
                                 `(a (@ (class "text-stone-800")
-                                       (href ,(safe-base64-decode x)))
+                                       (href , x))
                                     "🔗 view project"))
                               (assoc-ref p "url"))
          ,(render-if-nestring (lambda (x)
                                 `(a (@ (class "text-stone-800")
-                                       (href ,(safe-base64-decode x)))
+                                       (href , x))
                                     "🔗 project code"))
                               (assoc-ref p "vcs_url"))
          (hr)
          (a (@ (class "text-stone-800")
                (href ,(format #f "/tickets/~a"
-                              (safe-base64-decode (assoc-ref p "human_id")))))
+                              (assoc-ref p "human_id"))))
             ,(format #f "📚 go to backlog: ~a"
-                     (safe-base64-decode (assoc-ref p "title"))))
+                     (assoc-ref p "title")))
          (a (@ (class "text-stone-800")
                (href ,(format #f "/kanban/~a"
-                              (safe-base64-decode (assoc-ref p "human_id")))))
+                              (assoc-ref p "human_id"))))
             ,(format #f "💡 go to kanban: ~a"
-                     (safe-base64-decode (assoc-ref p "title"))))
+                     (assoc-ref p "title")))
          (hr)
          (div (@ (class "flex flex-wrap flex-row gap-4"))
               (a (@ (href ,(format #f "/projects/~a/edit"
@@ -87,20 +87,20 @@
                                         (G_ "delete"))))))
          (small (@ (class "font-mono text-stone-600"))
                 ,(format #f "~a"
-                         (safe-base64-decode (assoc-ref p "human_id"))))
+                         (assoc-ref p "human_id")))
          (small (@ (class "font-mono text-stone-600 text-xs"))
                 ,(assoc-ref p "id")))))
 
 (define (render-project-list-item G_ p)
   `((div (@ (class
-             "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/75 border-stone-400/75 border-2 py-2 px-4 cursor-pointer rounded-xl")
+              "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/75 border-stone-400/75 border-2 py-2 px-4 cursor-pointer rounded-xl")
             (onclick ,(format #f project-listitem-reveal-details-js-template
                               (assoc-ref p "id"))))
 
          (p (@ (class "font-sans text-stone-800 text-lg"))
             ,(format #f "~a (~a)"
-                     (safe-base64-decode (assoc-ref p "title"))
-                     (safe-base64-decode (assoc-ref p "human_id")))))
+                     (assoc-ref p "title")
+                     (assoc-ref p "human_id"))))
     (div (@ (id ,(format #f "details-~a"
                          (assoc-ref p "id")))
             (class "")
@@ -127,16 +127,16 @@
 
 (define-public (html-edit-project-form G_ proj p)
   (html-project-form G_
-                     #:title (safe-base64-decode (assoc-ref p "title"))
-                     #:human-id (safe-base64-decode (assoc-ref p "human_id"))
+                     #:title  (assoc-ref p "title")
+                     #:human-id  (assoc-ref p "human_id")
                      #:url (if (assoc-ref p "url")
-                               (safe-base64-decode (assoc-ref p "url")) "")
+                               (assoc-ref p "url") "")
                      #:vcs-url (if (assoc-ref p "vcs_url")
-                                   (safe-base64-decode (assoc-ref p "vcs_url"))
+                                   (assoc-ref p "vcs_url")
                                    "")
                      #:description (if (assoc-ref p "description")
-                                       (safe-base64-decode (assoc-ref p
-                                                            "description")) "")
+                                       (assoc-ref p
+                                                  "description") "")
                      #:action (format #f "/projects/~a/edit"
                                       (assoc-ref p "id"))
                      #:proj proj))

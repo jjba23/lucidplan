@@ -25,7 +25,11 @@
     (else s)))
 
 (define-public (safe-base64-decode s)
-  (cond
-    ((not (equal? "" s))
-     (nss:base64-decode s))
-    (else s)))
+  (catch #t
+    (lambda ()
+      (cond
+       ((not (equal? "" s))
+        (nss:base64-decode s))
+       (else s)))
+    (lambda (key . args)
+      s)))
