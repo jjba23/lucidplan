@@ -32,7 +32,7 @@ GUIX_VERSION := $(shell guix --version)
 # Logging helpers
 
 define lucidplan-log-info
-	@printf "\n\033[1m[info] $(shell date +%s) - %s\033[0m\n" $(1)
+	@printf "\n\033[1m[info] $(shell date --rfc-3339=seconds) - %s\033[0m\n" $(1)
 endef
 
 # i18n helpers

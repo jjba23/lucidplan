@@ -44,7 +44,8 @@
 (define render-k-ticket
   (lambda (t)
     `((div (@ (class "flex flex-wrap flex-row gap-4"))
-           (div (@ (class "rounded-xl bg-stone-200/50 p-3 border-stone-400/75 border-2"))
+           (div (@ (class
+                    "rounded-xl bg-stone-200/50 p-3 border-stone-400/75 border-2"))
                 (p (@ (class "text-xs text-stone-700"))
                    ,(safe-base64-decode (assoc-ref t "title"))))))))
 

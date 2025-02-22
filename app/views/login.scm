@@ -37,11 +37,13 @@
                                              (method "POST"))
                                           (label ,(G_ "username"))
                                           (input (@ (type "text")
-                                                    (class "p-3 rounded-xl border-stone-400/75 border-2")
+                                                    (class
+                                                     "p-3 rounded-xl border-stone-400/75 border-2")
                                                     (name "username")) "")
                                           (label ,(G_ "password"))
                                           (input (@ (type "password")
-                                                    (class "p-3 rounded-xl border-stone-400/75 border-2")
+                                                    (class
+                                                     "p-3 rounded-xl border-stone-400/75 border-2")
                                                     (name "password")) "")
                                           (button (@ (type "submit")
                                                      (class

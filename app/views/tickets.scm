@@ -45,7 +45,8 @@
   (write (string-match "/{1}[^\n]*/{1}" org)) org)
 
 (define-public (render-ticket G_ project ticket ticket-id-to-human-id)
-  `((div (@ (class "flex flex-col gap-2 p-3 bg-stone-100 rounded-2xl border-stone-400/75 border-2"))
+  `((div (@ (class
+             "flex flex-col gap-2 p-3 bg-stone-100 rounded-2xl border-stone-400/75 border-2"))
          (h4 (@ (class "font-sans text-stone-700 text-2xl font-bold my-3"))
              ,(safe-base64-decode (assoc-ref ticket "title")))
 
@@ -215,7 +216,8 @@
                (method "POST")
                (action ,action))
             (label ,(G_ "title"))
-            (input (@ (class "p-3 w-min rounded-xl border-stone-400/75 border-2")
+            (input (@ (class
+                       "p-3 w-min rounded-xl border-stone-400/75 border-2")
                       (name "title")
                       (value ,title)
                       (required "")) "")
@@ -238,7 +240,8 @@
                     ,(mk-option "spike" ticket-type)
                     ,(mk-option "time-box" ticket-type))
             (label ,(G_ "description"))
-            (textarea (@ (class "p-3 w-full min-h-64 rounded-xl border-stone-400/75 border-2")
+            (textarea (@ (class
+                          "p-3 w-full min-h-64 rounded-xl border-stone-400/75 border-2")
                          (name "description")
                          (required ""))
                       ,description)

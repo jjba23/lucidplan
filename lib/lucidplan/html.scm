@@ -39,7 +39,7 @@
 (define-public (page-footer G_)
   `((div (@ (class "block text-center font-sans"))
          (div (@ (class
-                   "flex flex-row flex-wrap gap-2 justify-center align-center py-3"))
+                  "flex flex-row flex-wrap gap-2 justify-center align-center py-3"))
               (p (@ (class "text-sm text-stone-600"))
                  ,(G_ "find the source code here"))
               (a (@ (class "text-stone-800 font-bold cursor-pointer text-sm")
@@ -58,20 +58,23 @@
                           (proj '()))
     (define nav
       `(div (@ (class
-                 "flex flex-row flex-wrap gap-3 p-3 bg-stone-900/90 items-center justify-left w-full shadow-lg"))
+                "flex flex-row flex-wrap gap-3 p-3 bg-stone-900/90 items-center justify-left w-full shadow-lg"))
             (a (@ (class "text-md text-white font-sans font-black px-4")
                   (href "/")) "LucidPlan")
-            (a (@ (class "text-sm lowercase text-white font-sans font-medium px-2")
+            (a (@ (class
+                   "text-sm lowercase text-white font-sans font-medium px-2")
                   (href "/login"))
                ,(G_ "Login"))
-            (a (@ (class "text-sm lowercase text-white font-sans font-medium px-2")
+            (a (@ (class
+                   "text-sm lowercase text-white font-sans font-medium px-2")
                   (href "/projects"))
                ,(G_ "Projects"))
 
             (hr)
 
             (select (@ (onchange "window.location.href=this.value;")
-                       (class "text-sm text-white bg-transparent font-medium font-sans"))
+                       (class
+                        "text-sm text-white bg-transparent font-medium font-sans"))
                     (option "🔗 go to")
                     ,(map (lambda (p)
                             `(option (@ (value ,(format #f "/tickets/~a"
@@ -79,7 +82,7 @@
                                                                              p
                                                                              "human_id"))))
                                         (class
-                                          "text-sm font-light lowercase text-stone-800"))
+                                         "text-sm font-light lowercase text-stone-800"))
                                      ,(safe-base64-decode (assoc-ref p "title"))))
                           proj))))
     `(html (head (title "LucidPlan")
