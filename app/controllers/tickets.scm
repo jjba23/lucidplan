@@ -30,11 +30,11 @@
 (define (project-id-from-human-id project)
   (let ((p ($project 'get
                      #:ret 'top
-                     #:condition (where #:human_id  project))))
+                     #:condition (where #:human_id project))))
     (cond
-     ((null? p)
-      "")
-     (else (assoc-ref (car p) "id")))))
+      ((null? p)
+       "")
+      (else (assoc-ref (car p) "id")))))
 
 (get "/tickets/:project"
      #:mime 'xml
@@ -48,10 +48,9 @@
                                 #:order-by '(human_id asc)))
                 (project-details (car ($project 'get
                                                 #:ret 'top
-                                                #:condition (where #:human_id 
-                                                                   (params
-                                                                    rc
-                                                                    "project")))))
+                                                #:condition (where #:human_id (params
+                                                                               rc
+                                                                               "project")))))
                 (project-tickets ($ticket 'get
                                           #:condition (where #:project_id
                                                              project-id)
@@ -67,10 +66,10 @@
                                                      #:order-by '(human_id asc)))))
            
            (response-emit (:mime rc
-                           (html-from-tickets (:i18n rc) proj
-                                              project-details
-                                              project-tickets
-                                              ticket-id-to-human-id)))))
+                                 (html-from-tickets (:i18n rc) proj
+                                                    project-details
+                                                    project-tickets
+                                                    ticket-id-to-human-id)))))
        (get)))
 
 (get "/tickets/:project/new"
@@ -127,10 +126,10 @@
             ($ticket 'set
                      #:id new-uuid
                      #:project_id project-id
-                     #:title  title
-                     #:ticket_status  ticket-status
-                     #:ticket_type  ticket-type
-                     #:description  description
+                     #:title title
+                     #:ticket_status ticket-status
+                     #:ticket_type ticket-type
+                     #:description description
                      #:created_at (current-time))
 
             (redirect-to rc
@@ -153,9 +152,9 @@
                                  #:condition (where #:id (params rc
                                                                  "ticket-id"))))))
            (response-emit (:mime rc
-                           (html-edit-ticket-form (:i18n rc) proj
-                                                  (params rc "project")
-                                                  t)))))
+                                 (html-edit-ticket-form (:i18n rc) proj
+                                                        (params rc "project")
+                                                        t)))))
        (get-edit)))
 
 (post "/tickets/:project/:ticket-id/edit"
@@ -174,10 +173,10 @@
             (DB-query (DB-open rc)
                       (->sql update
                              'ticket set
-                             `((ticket_status , ticket-status)
-                               (ticket_type , ticket-type)
-                               (description , description)
-                               (title , title)
+                             `((ticket_status ,ticket-status)
+                               (ticket_type ,ticket-type)
+                               (description ,description)
+                               (title ,title)
                                (updated_at ,(current-time)))
                              (where #:id (params rc "ticket-id"))))
             (write (params rc "project"))

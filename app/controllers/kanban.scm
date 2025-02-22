@@ -23,7 +23,6 @@
         (lucidplan uri)
         (lucidplan prelude)
         (lucidplan uuid)
-        (lucidplan base64)
         (app models ticket)
         (artanis security nss)
         (app models project))
@@ -31,7 +30,7 @@
 (define (project-id-from-human-id project)
   (let ((p ($project 'get
                      #:ret 'top
-                     #:condition (where #:human_id (safe-base64-encode project)))))
+                     #:condition (where #:human_id project))))
     (log-exprs (list p))
     (cond
       ((null? p)

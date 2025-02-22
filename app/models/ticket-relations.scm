@@ -11,6 +11,6 @@
                       ;; - child
                       ;; - clone
                       ;; - related
-                      (relation_type char-field (#:not-null #:maxlen 1024)))
-
+                      (relation_type char-field
+                                     (#:not-null #:maxlen 1024)))
 

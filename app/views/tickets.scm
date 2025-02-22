@@ -48,7 +48,7 @@
   `((div (@ (class
              "flex flex-col gap-2 p-3 bg-stone-100 rounded-2xl border-stone-400/75 border-2"))
          (h4 (@ (class "font-sans text-stone-700 text-2xl font-bold my-3"))
-             ,(safe-base64-decode (assoc-ref ticket "title")))
+             ,(assoc-ref ticket "title"))
 
          (div (@ (class "flex flex-row flex-wrap gap-8 justify-left"))
 
@@ -57,20 +57,20 @@
                               "font-sans text-stone-500 text-md font-light"))
                           ,(G_ "status"))
                    (p (@ (class "font-sans text-stone-700 text-sm"))
-                      ,(safe-base64-decode (assoc-ref ticket "ticket_status"))))
+                      ,(assoc-ref ticket "ticket_status")))
 
               (div (@ (class "flex flex-col gap-3"))
                    (small (@ (class
                               "font-sans text-stone-500 text-md font-light"))
                           ,(G_ "type"))
                    (p (@ (class "font-sans text-stone-700 text-sm ml-4"))
-                      ,(safe-base64-decode (assoc-ref ticket "ticket_type")))))
+                      ,(assoc-ref ticket "ticket_type"))))
 
          (small (@ (class "font-sans text-stone-500 text-md font-light"))
                 ,(G_ "description"))
          (p (@ (class
                 "font-sans text-stone-600 text-md max-w-prose whitespace-pre-wrap ml-4"))
-            ,(parse-org (safe-base64-decode (assoc-ref ticket "description"))))
+            ,(parse-org (assoc-ref ticket "description")))
 
          (hr (@ (class "")))
 
@@ -121,7 +121,7 @@
                      ,(format #f "~a-~a" project
                               (assoc-ref ticket "human_id")))
               (h5 (@ (class "font-sans text-stone-900 text-lg"))
-                  ,(safe-base64-decode (assoc-ref ticket "title"))))
+                  ,(assoc-ref ticket "title")))
          (div (@ (id ,(format #f "details-~a"
                               (assoc-ref ticket "id")))
                  (class "ml-4")
@@ -132,29 +132,25 @@
 
 (define-public (html-from-tickets G_ projects project-details tickets
                                   ticket-id-to-human-id)
-  (display (format #f "~a" project-details))
-  (display (safe-base64-decode (assoc-ref project-details "title")))
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
                               ((div (@ (class "flex flex-col gap-4 flex-grow"))
                                     (div (@ (class
-                                              "flex flex-wrap flex-row gap-6 items-center"))
+                                             "flex flex-wrap flex-row gap-6 items-center"))
                                          (h2 (@ (class
-                                                  "text-2xl font-sans font-black text-stone-600"))
+                                                 "text-2xl font-sans font-black text-stone-600"))
                                              ,(format #f "backlog of ~a"
                                                       (assoc-ref
-                                                       project-details
-                                                       "title")))
+                                                       project-details "title")))
                                          (a (@ (class "text-stone-600 text-md")
                                                (href ,(format #f "/kanban/~a"
-                                                              (safe-base64-decode
-                                                               (assoc-ref
-                                                                project-details
-                                                                "human_id")))))
+                                                              (assoc-ref
+                                                               project-details
+                                                               "human_id"))))
                                             (span "💡 kanban")))
                                     ,(render-if-nestring (lambda (x)
                                                            `(p (@ (class
-                                                                    "text-sm text-stone-500"))
+                                                                   "text-sm text-stone-500"))
                                                                ,x))
                                                          (assoc-ref
                                                           project-details
@@ -163,19 +159,18 @@
                                             (ondrop "dropTicketsItem(event)")
                                             (ondragover "allowDrop(event)")
                                             (class
-                                              "flex flex-col gap-2 container"))
+                                             "flex flex-col gap-2 container"))
                                          ,(map (lambda (t)
                                                  (render-ticket-listitem G_
-                                                                         (assoc-ref
-                                                                          project-details
-                                                                          "human_id")
-                                                                         t ticket-id-to-human-id))
+                                                  (assoc-ref project-details
+                                                             "human_id") t
+                                                  ticket-id-to-human-id))
                                                tickets))
                                     (div (a (@ (href ,(format #f
-                                                              "/tickets/~a/new"
-                                                              (safe-base64-decode (assoc-ref
-                                                                                   project-details
-                                                                                   "human_id")))))
+                                                       "/tickets/~a/new"
+                                                       (assoc-ref
+                                                        project-details
+                                                        "human_id"))))
                                             "+ new ticket")))))
                  #:proj projects))
 
@@ -189,13 +184,10 @@
   (html-ticket-form G_
                     #:project project
                     #:is-edit #t
-                    #:title (safe-base64-decode (assoc-ref t "title"))
-                    #:description (safe-base64-decode (assoc-ref t
-                                                       "description"))
-                    #:ticket-type (safe-base64-decode (assoc-ref t
-                                                       "ticket_type"))
-                    #:ticket-status (safe-base64-decode (assoc-ref t
-                                                         "ticket_status"))
+                    #:title (assoc-ref t "title")
+                    #:description (assoc-ref t "description")
+                    #:ticket-type (assoc-ref t "ticket_type")
+                    #:ticket-status (assoc-ref t "ticket_status")
                     #:action (format #f "/tickets/~a/~a/edit" project
                                      (assoc-ref t "id"))
                     #:proj proj))

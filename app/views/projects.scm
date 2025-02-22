@@ -36,7 +36,6 @@
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
   #:use-module (ice-9 i18n)
-  #:use-module (lucidplan base64)
   #:use-module (artanis security nss)
   #:use-module (artanis route))
 
@@ -45,9 +44,9 @@
 
 (define (render-project G_ p)
   `((div (@ (class
-              "flex flex-col gap-2 p-3 bg-stone-100 rounded-2xl  border-stone-400/75 border-2"))
+             "flex flex-col gap-2 p-3 bg-stone-100 rounded-2xl  border-stone-400/75 border-2"))
          ,(render-if-nestring (lambda (x)
-                                `(p , x))
+                                `(p ,x))
                               (assoc-ref p "description"))
          (hr)
          (a (@ (class "text-stone-800")
@@ -63,13 +62,11 @@
          (hr)
          ,(render-if-nestring (lambda (x)
                                 `(a (@ (class "text-stone-800")
-                                       (href , x))
-                                    "🔗 view project"))
+                                       (href ,x)) "🔗 view project"))
                               (assoc-ref p "url"))
          ,(render-if-nestring (lambda (x)
                                 `(a (@ (class "text-stone-800")
-                                       (href , x))
-                                    "🔗 project code"))
+                                       (href ,x)) "🔗 project code"))
                               (assoc-ref p "vcs_url"))
          (hr)
          (div (@ (class "flex flex-wrap flex-row gap-4"))
@@ -94,7 +91,7 @@
 
 (define (render-project-list-item G_ p)
   `((div (@ (class
-              "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/75 border-stone-400/75 border-2 py-2 px-4 cursor-pointer rounded-xl")
+             "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/75 border-stone-400/75 border-2 py-2 px-4 cursor-pointer rounded-xl")
             (onclick ,(format #f project-listitem-reveal-details-js-template
                               (assoc-ref p "id"))))
 
@@ -128,16 +125,14 @@
 
 (define-public (html-edit-project-form G_ proj p)
   (html-project-form G_
-                     #:title  (assoc-ref p "title")
-                     #:human-id  (assoc-ref p "human_id")
+                     #:title (assoc-ref p "title")
+                     #:human-id (assoc-ref p "human_id")
                      #:url (if (assoc-ref p "url")
                                (assoc-ref p "url") "")
                      #:vcs-url (if (assoc-ref p "vcs_url")
-                                   (assoc-ref p "vcs_url")
-                                   "")
+                                   (assoc-ref p "vcs_url") "")
                      #:description (if (assoc-ref p "description")
-                                       (assoc-ref p
-                                                  "description") "")
+                                       (assoc-ref p "description") "")
                      #:action (format #f "/projects/~a/edit"
                                       (assoc-ref p "id"))
                      #:proj proj))

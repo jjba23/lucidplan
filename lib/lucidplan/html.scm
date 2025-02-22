@@ -29,7 +29,6 @@
   #:use-module (ice-9 iconv)
   #:use-module (ice-9 hash-table)
   #:use-module (ice-9 threads)
-  #:use-module (lucidplan base64)
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
@@ -58,15 +57,15 @@
                           (proj '()))
     (define nav
       `(div (@ (class
-                 "flex flex-row flex-wrap gap-3 p-3 bg-stone-900/90 items-center justify-left w-full shadow-lg"))
+                "flex flex-row flex-wrap gap-3 p-3 bg-stone-900/90 items-center justify-left w-full shadow-lg"))
             (a (@ (class "text-md text-white font-sans font-black px-4")
                   (href "/")) "LucidPlan")
             (a (@ (class
-                    "text-sm lowercase text-white font-sans font-medium px-2")
+                   "text-sm lowercase text-white font-sans font-medium px-2")
                   (href "/login"))
                ,(G_ "Login"))
             (a (@ (class
-                    "text-sm lowercase text-white font-sans font-medium px-2")
+                   "text-sm lowercase text-white font-sans font-medium px-2")
                   (href "/projects"))
                ,(G_ "Projects"))
 
@@ -74,17 +73,15 @@
 
             (select (@ (onchange "window.location.href=this.value;")
                        (class
-                         "text-sm text-white bg-transparent font-medium font-sans"))
+                        "text-sm text-white bg-transparent font-medium font-sans"))
                     (option "🔗 go to")
                     ,(map (lambda (p)
                             `(option (@ (value ,(format #f "/tickets/~a"
-                                                        (assoc-ref
-                                                         p
-                                                         "human_id")))
+                                                        (assoc-ref p
+                                                                   "human_id")))
                                         (class
-                                          "text-sm font-light lowercase text-stone-800"))
-                                     ,(assoc-ref p "title")))
-                          proj))))
+                                         "text-sm font-light lowercase text-stone-800"))
+                                     ,(assoc-ref p "title"))) proj))))
     `(html (head (title "LucidPlan")
                  (link (@ (rel "preconnect")
                           (href "https://fonts.googleapis.com")))

@@ -37,7 +37,6 @@
   #:use-module (ice-9 i18n)
   #:use-module (lucidplan html)
   #:use-module (lucidplan prelude)
-  #:use-module (lucidplan base64)
   #:use-module (artanis security nss)
   #:use-module (artanis route))
 
@@ -47,41 +46,35 @@
            (div (@ (class
                     "rounded-xl bg-stone-200/50 p-3 border-stone-400/75 border-2"))
                 (p (@ (class "text-xs text-stone-700"))
-                   ,(safe-base64-decode (assoc-ref t "title"))))))))
+                   ,(assoc-ref t "title")))))))
 
 (define-public (kanban-from-tickets G_ projects project tickets
                                     ticket-id-to-human-id)
   
   (let* ((tickets-todo (filter (lambda (x)
                                  (eq? 'todo
-                                      (string->symbol (safe-base64-decode (assoc-ref
-                                                                           x
-                                                                           "ticket_status")))))
+                                      (string->symbol (assoc-ref x
+                                                       "ticket_status"))))
                                tickets))
          (tickets-work-in-progress (filter (lambda (x)
                                              (eq? 'work-in-progress
-                                                  (string->symbol (safe-base64-decode
-                                                                   (assoc-ref
-                                                                    x
-                                                                    "ticket_status")))))
+                                                  (string->symbol (assoc-ref x
+                                                                   "ticket_status"))))
                                            tickets))
          (tickets-in-review (filter (lambda (x)
                                       (eq? 'in-review
-                                           (string->symbol (safe-base64-decode
-                                                            (assoc-ref x
-                                                             "ticket_status")))))
+                                           (string->symbol (assoc-ref x
+                                                            "ticket_status"))))
                                     tickets))
          (tickets-rejected (filter (lambda (x)
                                      (eq? 'rejected
-                                          (string->symbol (safe-base64-decode (assoc-ref
-                                                                               x
-                                                                               "ticket_status")))))
+                                          (string->symbol (assoc-ref x
+                                                           "ticket_status"))))
                                    tickets))
          (tickets-done (filter (lambda (x)
                                  (eq? 'done
-                                      (string->symbol (safe-base64-decode (assoc-ref
-                                                                           x
-                                                                           "ticket_status")))))
+                                      (string->symbol (assoc-ref x
+                                                       "ticket_status"))))
                                tickets))
          (show-rejected #f)
          (show-done #f)
