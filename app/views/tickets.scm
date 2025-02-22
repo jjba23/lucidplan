@@ -138,13 +138,13 @@
                  #:body `(div (@ (class "container mx-auto"))
                               ((div (@ (class "flex flex-col gap-4 flex-grow"))
                                     (div (@ (class
-                                             "flex flex-wrap flex-row gap-6 items-center"))
+                                              "flex flex-wrap flex-row gap-6 items-center"))
                                          (h2 (@ (class
-                                                 "text-2xl font-sans font-black text-stone-600"))
+                                                  "text-2xl font-sans font-black text-stone-600"))
                                              ,(format #f "backlog of ~a"
-                                                      (safe-base64-decode (assoc-ref
-                                                                           project-details
-                                                                           "title"))))
+                                                      (assoc-ref
+                                                       project-details
+                                                       "title")))
                                          (a (@ (class "text-stone-600 text-md")
                                                (href ,(format #f "/kanban/~a"
                                                               (safe-base64-decode
@@ -154,9 +154,8 @@
                                             (span "💡 kanban")))
                                     ,(render-if-nestring (lambda (x)
                                                            `(p (@ (class
-                                                                   "text-sm text-stone-500"))
-                                                               ,(safe-base64-decode
-                                                                 x)))
+                                                                    "text-sm text-stone-500"))
+                                                               ,x))
                                                          (assoc-ref
                                                           project-details
                                                           "description"))
@@ -164,19 +163,19 @@
                                             (ondrop "dropTicketsItem(event)")
                                             (ondragover "allowDrop(event)")
                                             (class
-                                             "flex flex-col gap-2 container"))
+                                              "flex flex-col gap-2 container"))
                                          ,(map (lambda (t)
                                                  (render-ticket-listitem G_
-                                                  (safe-base64-decode (assoc-ref
-                                                                       project-details
-                                                                       "human_id"))
-                                                  t ticket-id-to-human-id))
+                                                                         (assoc-ref
+                                                                          project-details
+                                                                          "human_id")
+                                                                         t ticket-id-to-human-id))
                                                tickets))
                                     (div (a (@ (href ,(format #f
-                                                       "/tickets/~a/new"
-                                                       (safe-base64-decode (assoc-ref
-                                                                            project-details
-                                                                            "human_id")))))
+                                                              "/tickets/~a/new"
+                                                              (safe-base64-decode (assoc-ref
+                                                                                   project-details
+                                                                                   "human_id")))))
                                             "+ new ticket")))))
                  #:proj projects))
 

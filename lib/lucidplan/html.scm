@@ -58,15 +58,15 @@
                           (proj '()))
     (define nav
       `(div (@ (class
-                "flex flex-row flex-wrap gap-3 p-3 bg-stone-900/90 items-center justify-left w-full shadow-lg"))
+                 "flex flex-row flex-wrap gap-3 p-3 bg-stone-900/90 items-center justify-left w-full shadow-lg"))
             (a (@ (class "text-md text-white font-sans font-black px-4")
                   (href "/")) "LucidPlan")
             (a (@ (class
-                   "text-sm lowercase text-white font-sans font-medium px-2")
+                    "text-sm lowercase text-white font-sans font-medium px-2")
                   (href "/login"))
                ,(G_ "Login"))
             (a (@ (class
-                   "text-sm lowercase text-white font-sans font-medium px-2")
+                    "text-sm lowercase text-white font-sans font-medium px-2")
                   (href "/projects"))
                ,(G_ "Projects"))
 
@@ -74,16 +74,16 @@
 
             (select (@ (onchange "window.location.href=this.value;")
                        (class
-                        "text-sm text-white bg-transparent font-medium font-sans"))
+                         "text-sm text-white bg-transparent font-medium font-sans"))
                     (option "🔗 go to")
                     ,(map (lambda (p)
                             `(option (@ (value ,(format #f "/tickets/~a"
-                                                        (safe-base64-decode (assoc-ref
-                                                                             p
-                                                                             "human_id"))))
+                                                        (assoc-ref
+                                                         p
+                                                         "human_id")))
                                         (class
-                                         "text-sm font-light lowercase text-stone-800"))
-                                     ,(safe-base64-decode (assoc-ref p "title"))))
+                                          "text-sm font-light lowercase text-stone-800"))
+                                     ,(assoc-ref p "title")))
                           proj))))
     `(html (head (title "LucidPlan")
                  (link (@ (rel "preconnect")

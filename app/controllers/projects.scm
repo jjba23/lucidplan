@@ -22,7 +22,6 @@
         (ice-9 string-fun)
         (lucidplan uri)
         (lucidplan uuid)
-        (lucidplan base64)
         (artanis security nss)
         (app models project)
         (app views projects))
