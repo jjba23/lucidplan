@@ -155,36 +155,37 @@
                                         (action ,action))
                                      (label ,(G_ "title"))
                                      (input (@ (class
-                                                 "p-3 w-min rounded-xl border-stone-400/75 border-2")
+                                                "p-3 w-min rounded-xl border-stone-400/75 border-2")
                                                (name "title")
                                                (value ,(unescape-str title))
                                                (required "")) "")
 
                                      (label ,(G_ "human id"))
                                      (input (@ (class
-                                                 "p-3 w-min rounded-xl border-stone-400/75 border-2")
+                                                "p-3 w-min rounded-xl border-stone-400/75 border-2")
                                                (name "human-id")
                                                (value ,human-id)
                                                (required "")) "")
                                      (label ,(G_ "url"))
                                      (input (@ (class
-                                                 "p-3 w-min rounded-xl border-stone-400/75 border-2")
+                                                "p-3 w-min rounded-xl border-stone-400/75 border-2")
                                                (name "url")
                                                (value ,url)) "")
                                      (label ,(G_ "code url"))
                                      (input (@ (class
-                                                 "p-3 w-min rounded-xl border-stone-400/75 border-2")
+                                                "p-3 w-min rounded-xl border-stone-400/75 border-2")
                                                (name "vcs-url")
                                                (value ,vcs-url)) "")
 
                                      (label ,(G_ "description"))
                                      (input (@ (class
-                                                 "p-3 w-min rounded-xl border-stone-400/75 border-2")
+                                                "p-3 w-min rounded-xl border-stone-400/75 border-2")
                                                (name "description")
-                                               (value ,(unescape-str description))) "")
+                                               (value ,(unescape-str
+                                                        description))) "")
 
                                      (button (@ (class
-                                                  "bg-green-800/75 text-white p-3 w-min rounded-xl")
+                                                 "bg-green-800/75 text-white p-3 w-min rounded-xl")
                                                 (type "submit"))
                                              ,(G_ "done")))))
                  #:proj proj))

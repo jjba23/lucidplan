@@ -40,7 +40,6 @@
 
 (get "/kanban/:project"
      #:mime 'xml
-     ;; #:auth '(table user "username" "password")
      #:session #t
      #:i18n '(cookie "lang")
      (lambda (rc)
@@ -50,16 +49,17 @@
                                 #:order-by '(human_id asc)))
                 (project-tickets ($ticket 'get
                                           #:condition (where #:project_id
-                                                             project-id)
-                                          #:order-by '(human_id asc)))
-                (ts ($ticket 'get
-                             #:columns '(id human_id)
-                             #:condition (where #:project_id project-id)
-                             #:order-by '(human_id asc)))
-                (_ (log-exprs (list ts)))
+                                                             project-id
+                                                             #:ticket_status '
+                                                             (todo
+                                                              work-in-progress
+                                                              in-review done))
+
+                                          #:order-by '(updated_at desc)))
                 (ticket-id-to-human-id (map (lambda (t)
                                               `(,(assoc-ref t "id") unquote
-                                                (assoc-ref t "human_id"))) ts)))
+                                                (assoc-ref t "human_id")))
+                                            project-tickets)))
            (response-emit (:mime rc
                                  (kanban-from-tickets (:i18n rc) proj
                                                       (params rc "project")

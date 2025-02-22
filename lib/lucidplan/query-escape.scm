@@ -42,7 +42,5 @@
               (set! result
                     (string-replace-substring result
                                               (car (cdr p))
-                                              (car p)))) escape-alist)
-  result)
-
+                                              (car p)))) escape-alist) result)
 

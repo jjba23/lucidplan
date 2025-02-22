@@ -53,8 +53,12 @@
                                                                                "project")))))
                 (project-tickets ($ticket 'get
                                           #:condition (where #:project_id
-                                                             project-id)
-                                          #:order-by '(human_id asc)))
+                                                             project-id
+                                                             #:ticket_status '
+                                                             (todo
+                                                              work-in-progress
+                                                              in-review))
+                                          #:order-by '(updated_at desc)))
                 (ticket-id-to-human-id (map (lambda (t)
                                               `(,(assoc-ref t "id") unquote
                                                 (assoc-ref t "human_id")))
@@ -66,10 +70,10 @@
                                                      #:order-by '(human_id asc)))))
            
            (response-emit (:mime rc
-                           (html-from-tickets (:i18n rc) proj
-                                              project-details
-                                              project-tickets
-                                              ticket-id-to-human-id)))))
+                                 (html-from-tickets (:i18n rc) proj
+                                                    project-details
+                                                    project-tickets
+                                                    ticket-id-to-human-id)))))
        (get)))
 
 (get "/tickets/:project/new"
@@ -79,11 +83,11 @@
      (lambda (rc)
        (define (get-new)
          (response-emit (:mime rc
-                         (html-new-ticket-form (:i18n rc)
-                                               ($project 'get
-                                                         #:order-by '(human_id
-                                                                      asc))
-                                               (params rc "project")))))
+                               (html-new-ticket-form (:i18n rc)
+                                                     ($project 'get
+                                                               #:order-by '(human_id
+                                                                            asc))
+                                                     (params rc "project")))))
        (get-new)))
 
 (post "/tickets/:project/delete"

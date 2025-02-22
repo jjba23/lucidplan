@@ -43,7 +43,7 @@
          (let* ((proj ($project 'get
                                 #:order-by '(human_id asc))))
            (response-emit (:mime rc
-                           (html-from-projects (:i18n rc) proj)))))
+                                 (html-from-projects (:i18n rc) proj)))))
        (get-p)))
 
 (get "/projects/new"
@@ -53,10 +53,10 @@
      (lambda (rc)
        (define (get-new)
          (response-emit (:mime rc
-                         (html-new-project-form (:i18n rc)
-                                                ($project 'get
-                                                          #:order-by '(human_id
-                                                                       asc))))))
+                               (html-new-project-form (:i18n rc)
+                                                      ($project 'get
+                                                                #:order-by '(human_id
+                                                                             asc))))))
        (get-new)))
 
 (post "/projects/delete"
@@ -119,11 +119,11 @@
                                  #:condition (where #:id (params rc
                                                                  "project-id"))))))
            (response-emit (:mime rc
-                           (html-edit-project-form (:i18n rc)
-                                                   ($project 'get
-                                                             #:order-by '
-                                                             (human_id
-                                                              asc)) p)))))
+                                 (html-edit-project-form (:i18n rc)
+                                                         ($project 'get
+                                                                   #:order-by '
+                                                                   (human_id
+                                                                    asc)) p)))))
 
        (get-edit)))
 

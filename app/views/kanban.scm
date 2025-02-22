@@ -42,7 +42,7 @@
 
 (define render-k-ticket
   (lambda (t)
-    `((div (@ (class "flex flex-wrap flex-row gap-4"))
+    `((div (@ (class "w-full flex flex-wrap flex-row gap-4"))
            (div (@ (class
                     "rounded-xl bg-stone-200/50 p-3 border-stone-400/75 border-2"))
                 (p (@ (class "text-xs text-stone-700"))
@@ -101,20 +101,24 @@
                         (div (@ (class
                                  "flex flex-wrap gap-3 justify-center my-8"))
                              (div (@ (class "w-1/5 flex flex-col gap-2"))
-                                  (h4 (@ (class "text-sm font-bold")) "todo")
+                                  (h4 (@ (class "text-sm font-bold flex gap-2"))
+                                      ,(G_ "todo"))
                                   ,(map render-k-ticket tickets-todo))
-
                              (div (@ (class "w-1/5 flex flex-col gap-2"))
-                                  (h4 (@ (class "text-sm font-bold"))
-                                      "work-in-progress")
+                                  (h4 (@ (class "text-sm font-bold flex gap-2"))
+                                      (span "⚙️")
+                                      (span ,(G_ "work-in-progress")))
                                   ,(map render-k-ticket
                                         tickets-work-in-progress))
                              (div (@ (class "w-1/5 flex flex-col gap-2"))
-                                  (h4 (@ (class "text-sm font-bold"))
-                                      "in-review")
+                                  (h4 (@ (class "text-sm font-bold flex gap-2"))
+                                      (span "🔍")
+                                      (span ,(G_ "in-review")))
                                   ,(map render-k-ticket tickets-in-review))
                              (div (@ (class "w-1/5 flex flex-col gap-2"))
-                                  (h4 (@ (class "text-sm font-bold")) "done")
+                                  (h4 (@ (class "text-sm font-bold flex gap-2"))
+                                      (span "✅")
+                                      (span ,(G_ "done")))
                                   ,(map render-k-ticket tickets-done))))))
     (html-template G_
                    #:body kanban-html
