@@ -23,6 +23,7 @@
         (lucidplan auth)
         (lucidplan uri)
         (lucidplan uuid)
+        (lucidplan abstraction)
         (lucidplan query-escape)
         (app models ticket)
         (artanis security nss)
@@ -33,9 +34,11 @@
                      #:ret 'top
                      #:condition (where #:human_id project))))
     (cond
-      ((null? p)
-       "")
-      (else (assoc-ref (car p) "id")))))
+     ((null? p)
+      "")
+     (else (assoc-ref (car p) "id")))))
+
+
 
 (get "/tickets/:project"
      #:mime 'xml
@@ -44,6 +47,7 @@
      (lambda (rc)
        (define (get)
          (let* ((project-id (project-id-from-human-id (params rc "project")))
+                (_ (display (format #f "project-id ~a" project-id)))
                 (proj ($project 'get
                                 #:order-by '(human_id asc)))
                 (project-details (car ($project 'get
@@ -51,14 +55,11 @@
                                                 #:condition (where #:human_id (params
                                                                                rc
                                                                                "project")))))
-                (project-tickets ($ticket 'get
-                                          #:condition (where #:project_id
-                                                             project-id
-                                                             #:ticket_status '
-                                                             (todo
-                                                              work-in-progress
-                                                              in-review))
-                                          #:order-by '(updated_at desc)))
+                (project-tickets (filter only-active-tickets-filter
+                                         ($ticket 'get
+                                                  #:condition (where #:project_id
+                                                                     project-id)
+                                                  #:order-by '(updated_at desc))))
                 (ticket-id-to-human-id (map (lambda (t)
                                               `(,(assoc-ref t "id") unquote
                                                 (assoc-ref t "human_id")))
@@ -70,10 +71,10 @@
                                                      #:order-by '(human_id asc)))))
            
            (response-emit (:mime rc
-                                 (html-from-tickets (:i18n rc) proj
-                                                    project-details
-                                                    project-tickets
-                                                    ticket-id-to-human-id)))))
+                           (html-from-tickets (:i18n rc) proj
+                                              project-details
+                                              project-tickets
+                                              ticket-id-to-human-id)))))
        (get)))
 
 (get "/tickets/:project/new"
