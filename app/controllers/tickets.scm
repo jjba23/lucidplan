@@ -34,11 +34,9 @@
                      #:ret 'top
                      #:condition (where #:human_id project))))
     (cond
-     ((null? p)
-      "")
-     (else (assoc-ref (car p) "id")))))
-
-
+      ((null? p)
+       "")
+      (else (assoc-ref (car p) "id")))))
 
 (get "/tickets/:project"
      #:mime 'xml
@@ -57,8 +55,9 @@
                                                                                "project")))))
                 (project-tickets (filter only-active-tickets-filter
                                          ($ticket 'get
-                                                  #:condition (where #:project_id
-                                                                     project-id)
+                                                  #:condition (where
+                                                               #:project_id
+                                                               project-id)
                                                   #:order-by '(updated_at desc))))
                 (ticket-id-to-human-id (map (lambda (t)
                                               `(,(assoc-ref t "id") unquote
@@ -71,10 +70,10 @@
                                                      #:order-by '(human_id asc)))))
            
            (response-emit (:mime rc
-                           (html-from-tickets (:i18n rc) proj
-                                              project-details
-                                              project-tickets
-                                              ticket-id-to-human-id)))))
+                                 (html-from-tickets (:i18n rc) proj
+                                                    project-details
+                                                    project-tickets
+                                                    ticket-id-to-human-id)))))
        (get)))
 
 (get "/tickets/:project/new"

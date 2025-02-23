@@ -42,7 +42,7 @@
 
 (define render-k-ticket
   (lambda (t)
-    `((div (@ (class "w-max flex flex-wrap flex-row gap-4"))
+    `((div (@ (class "flex flex-wrap flex-row gap-4"))
            (div (@ (class
                     "rounded-xl bg-stone-200/50 p-3 border-stone-400/75 border-2"))
                 (p (@ (class "text-xs text-stone-700"))
@@ -87,10 +87,12 @@
                                                 "text-2xl font-sans font-bold text-stone-600"))
                                             ,(format #f "kanban for ~a"
                                                      project))
-                                        (a (@ (class "text-stone-600 text-md")
+                                        (a (@ (class
+                                               "text-stone-600 text-md flex gap-1")
                                               (href ,(format #f "/tickets/~a"
                                                              project)))
-                                           (span "backlog")))
+                                           (span "📚")
+                                           (span ,(G_ "backlog"))))
                                    (div (a (@ (class
                                                "text-sm text-stone-800 my-3")
                                               (href ,(format #f
@@ -99,27 +101,29 @@
 
                                    )))
                         (div (@ (class
-                                 "flex flex-wrap gap-3 justify-center my-8"))
-                             (div (@ (class "w-1/5 flex flex-col gap-2"))
+                                 "flex flex-wrap my-8 justify-between p-4"))
+                             (div (@ (class "sm:w-1/3 flex flex-col gap-2 p-2"))
                                   (h4 (@ (class "text-sm font-bold flex gap-2"))
                                       ,(G_ "todo"))
                                   ,(map render-k-ticket tickets-todo))
-                             (div (@ (class "w-1/5 flex flex-col gap-2"))
+                             (div (@ (class "sm:w-1/3 flex flex-col gap-2 p-2"))
                                   (h4 (@ (class "text-sm font-bold flex gap-2"))
                                       (span "⚙️")
                                       (span ,(G_ "work-in-progress")))
                                   ,(map render-k-ticket
                                         tickets-work-in-progress))
-                             (div (@ (class "w-1/5 flex flex-col gap-2"))
+                             (div (@ (class "sm:w-1/3 flex flex-col gap-2 p-2"))
                                   (h4 (@ (class "text-sm font-bold flex gap-2"))
                                       (span "🔍")
                                       (span ,(G_ "in-review")))
-                                  ,(map render-k-ticket tickets-in-review))
-                             (div (@ (class "w-1/5 flex flex-col gap-2"))
-                                  (h4 (@ (class "text-sm font-bold flex gap-2"))
-                                      (span "✅")
-                                      (span ,(G_ "done")))
-                                  ,(map render-k-ticket tickets-done))))))
+                                  ,(map render-k-ticket tickets-in-review)))
+                        (hr)
+                        (div (@ (class
+                                 "sm:w-1/3 my-6 p-4 flex flex-col gap-2 p-2"))
+                             (h4 (@ (class "text-sm font-bold flex gap-2"))
+                                 (span "✅")
+                                 (span ,(G_ "done")))
+                             ,(map render-k-ticket tickets-done)))))
     (html-template G_
                    #:body kanban-html
                    #:proj projects)))

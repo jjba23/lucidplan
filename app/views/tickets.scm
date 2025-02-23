@@ -57,8 +57,10 @@
                    (small (@ (class
                               "font-sans text-stone-500 text-md font-light"))
                           ,(G_ "status"))
-                   (p (@ (class "font-sans text-stone-700 text-sm"))
-                      ,(assoc-ref ticket "ticket_status")))
+                   (p (@ (class "font-sans text-stone-700 text-sm flex gap-1"))
+                      ,(emoji-for-ticket-status (assoc-ref ticket
+                                                           "ticket_status"))
+                      (span ,(assoc-ref ticket "ticket_status"))))
 
               (div (@ (class "flex flex-col gap-3"))
                    (small (@ (class
@@ -218,10 +220,10 @@
                        (name "ticket-status")
                        (required ""))
                     ,(mk-option "todo" ticket-status)
-                    ,(mk-option "work-in-progress" ticket-status)
-                    ,(mk-option "in-review" ticket-status)
-                    ,(mk-option "done" ticket-status)
-                    ,(mk-option "rejected" ticket-status))
+                    ,(mk-emoji-option "work-in-progress" "⚙️" ticket-status)
+                    ,(mk-emoji-option "in-review" "🔍" ticket-status)
+                    ,(mk-emoji-option "done" "✅" ticket-status)
+                    ,(mk-emoji-option "rejected" "❌" ticket-status))
             (label ,(G_ "type"))
             (select (@ (class "p-3 rounded-xl border-stone-400/75 border-2")
                        (name "ticket-type")

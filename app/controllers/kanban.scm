@@ -35,9 +35,9 @@
                      #:condition (where #:human_id project))))
     (log-exprs (list p))
     (cond
-     ((null? p)
-      "")
-     (else (assoc-ref (car p) "id")))))
+      ((null? p)
+       "")
+      (else (assoc-ref (car p) "id")))))
 
 (get "/kanban/:project"
      #:mime 'xml
@@ -48,17 +48,19 @@
          (let* ((project-id (project-id-from-human-id (params rc "project")))
                 (proj ($project 'get
                                 #:order-by '(human_id asc)))
-                (project-tickets (filter also-done-tickets-filter ($ticket 'get
-                                                                           #:condition (where #:project_id
-                                                                                              project-id)
-                                                                           #:order-by '(updated_at desc))))
+                (project-tickets (filter also-done-tickets-filter
+                                         ($ticket 'get
+                                                  #:condition (where
+                                                               #:project_id
+                                                               project-id)
+                                                  #:order-by '(updated_at desc))))
                 (ticket-id-to-human-id (map (lambda (t)
                                               `(,(assoc-ref t "id") unquote
                                                 (assoc-ref t "human_id")))
                                             project-tickets)))
            (response-emit (:mime rc
-                           (kanban-from-tickets (:i18n rc) proj
-                                                (params rc "project")
-                                                project-tickets
-                                                ticket-id-to-human-id)))))
+                                 (kanban-from-tickets (:i18n rc) proj
+                                                      (params rc "project")
+                                                      project-tickets
+                                                      ticket-id-to-human-id)))))
        (get)))
