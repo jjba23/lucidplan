@@ -260,7 +260,9 @@ SQL databases.  This package implements the interface for SQLite.")))
       (license license:gpl3+))))
 
 (define-public guile-hygguile
-  (let ((commit "5bd29b72ab86e07c7b2bbb2850eecdff20ee3cb9")
+  (let ((commit "5a1634e105a44fdb114753b6841a4a5c84a090da")
+        (base32-sha-signature
+         "19sradcjww8iamv8z9f7j00qnbh89w59sb9rnqgymqb9a0dmbbic")
         (revision "0"))
     (package
       (name "guile-hygguile")
@@ -273,7 +275,7 @@ SQL databases.  This package implements the interface for SQLite.")))
                (commit commit)))
          (file-name (git-file-name name version))
          (sha256
-          (base32 "1rwjkqnm1xn8qz158p8yyicw9pq37r9s6g3pz4d01blgi7i77xpq"))))
+          (base32 base32-sha-signature))))
       (build-system guile-build-system)
       (native-inputs (list guile-3.0))
       (arguments

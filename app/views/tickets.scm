@@ -41,6 +41,7 @@
   #:use-module (lucidplan base64)
   #:use-module (hygguile components button)
   #:use-module (hygguile components select)
+  #:use-module (hygguile abstraction)
   #:use-module (artanis security nss)
   #:use-module (artanis route))
 
@@ -118,11 +119,11 @@
                                    ticket-listitem-reveal-details-js-template
                                    (assoc-ref ticket "id")))
                  (class
-                  "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/75 border-stone-400/75 border-2 py-2 px-4 cursor-pointer rounded-xl"))
+                   "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/75 border-stone-400/75 border-2 py-2 px-4 cursor-pointer rounded-xl"))
               (small (@ (class "font-sans text-stone-800 text-sm"))
                      ,(format #f "~a-~a" project
                               (assoc-ref ticket "human_id")))
-              (h5 (@ (class "font-sans text-stone-900 text-lg"))
+              (h5 (@ (class ,(symbols->css '(font-sans text-stone-700 text-lg font-black break-words))))
                   ,(assoc-ref ticket "title")))
          (div (@ (id ,(format #f "details-~a"
                               (assoc-ref ticket "id")))

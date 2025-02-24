@@ -39,6 +39,7 @@
   #:use-module (lucidplan query-escape)
   #:use-module (hygguile components button)
   #:use-module (hygguile components input)
+  #:use-module (hygguile abstraction)
   #:use-module (artanis security nss)
   #:use-module (artanis route))
 
@@ -47,21 +48,23 @@
 
 (define (render-project G_ p)
   `((div (@ (class
-             "flex flex-col gap-2 p-3 bg-stone-100 rounded-2xl  border-stone-400/75 border-2"))
+             "flex flex-col gap-2 px-3 py-6 bg-stone-100 rounded-2xl  border-stone-400/75 border-2"))
          ,(render-if-nestring (lambda (x)
-                                `(p ,x))
+                                `(p (@ (class ,(symbols->css '(text-md
+                                                               font-medium))))
+                                    ,x))
                               (assoc-ref p "description"))
          (hr)
          (div (@ (class "flex flex-wrap flex-row gap-3"))
               (a (@ (class "text-stone-800")
                     (href ,(format #f "/tickets/~a"
                                    (assoc-ref p "human_id"))))
-                 ,(action-button #:content (format #f "📚 go to backlog: ~a"
+                 ,(action-button #:content (format #f "📚 backlog: ~a"
                                                    (assoc-ref p "title"))))
               (a (@ (class "text-stone-800")
                     (href ,(format #f "/kanban/~a"
                                    (assoc-ref p "human_id"))))
-                 ,(action-button #:content (format #f "💡 go to kanban: ~a"
+                 ,(action-button #:content (format #f "💡 kanban: ~a"
                                                    (assoc-ref p "title")))))
          (hr)
          (div (@ (class "flex flex-wrap flex-row gap-3"))
@@ -97,11 +100,12 @@
 
 (define (render-project-list-item G_ p)
   `((div (@ (class
-             "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/75 border-stone-400/75 border-2 py-2 px-4 cursor-pointer rounded-xl")
+              "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/75 border-stone-400/75 border-2 py-2 px-4 cursor-pointer rounded-xl")
             (onclick ,(format #f project-listitem-reveal-details-js-template
                               (assoc-ref p "id"))))
 
-         (p (@ (class "font-sans text-stone-800 text-lg"))
+         (p (@ (class ,(symbols->css '(font-sans text-stone-700 text-lg
+                                                 font-black break-words))))
             ,(format #f "~a"
                      (assoc-ref p "title"))))
     (div (@ (id ,(format #f "details-~a"

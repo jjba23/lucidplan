@@ -1,0 +1,31 @@
+%%%% Starting test symbols->css
+Group begin: symbols->css
+Test begin:
+  test-name: "empty list returns empty class string"
+  source-file: "hygguile/abstraction.scm"
+  source-line: 44
+  source-form: (test-equal "empty list returns empty class string" (symbols->css (quote ())) "")
+Test end:
+  result-kind: pass
+  actual-value: ""
+  expected-value: ""
+Test begin:
+  test-name: "list of symbols is converted to space-separated string"
+  source-file: "hygguile/abstraction.scm"
+  source-line: 47
+  source-form: (test-equal "list of symbols is converted to space-separated string" (symbols->css (quote (p-2 bg-stone-900/75))) "p-2 bg-stone-900/75")
+Test end:
+  result-kind: pass
+  actual-value: "p-2 bg-stone-900/75"
+  expected-value: "p-2 bg-stone-900/75"
+Test begin:
+  test-name: "false value returns empty class string"
+  source-file: "hygguile/abstraction.scm"
+  source-line: 50
+  source-form: (test-equal "false value returns empty class string" (symbols->css #f) "")
+Test end:
+  result-kind: pass
+  actual-value: ""
+  expected-value: ""
+Group end: symbols->css
+# of expected passes      3
