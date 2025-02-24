@@ -48,7 +48,7 @@
 
 (define-public (render-ticket G_ project ticket ticket-id-to-human-id)
   `((div (@ (class
-              "flex flex-col gap-2 p-3 bg-stone-100 rounded-2xl border-stone-400/75 border-2"))
+             "flex flex-col gap-2 p-3 bg-stone-100 rounded-2xl border-stone-400/75 border-2"))
          (h4 (@ (class "font-sans text-stone-700 text-2xl font-bold my-3"))
              ,(assoc-ref ticket "title"))
 
@@ -56,7 +56,7 @@
 
               (div (@ (class "flex flex-col gap-3"))
                    (small (@ (class
-                               "font-sans text-stone-500 text-md font-light"))
+                              "font-sans text-stone-500 text-md font-light"))
                           ,(G_ "status"))
                    (p (@ (class "font-sans text-stone-700 text-sm flex gap-1"))
                       ,(emoji-for-ticket-status (assoc-ref ticket
@@ -65,7 +65,7 @@
 
               (div (@ (class "flex flex-col gap-3"))
                    (small (@ (class
-                               "font-sans text-stone-500 text-md font-light"))
+                              "font-sans text-stone-500 text-md font-light"))
                           ,(G_ "type"))
                    (p (@ (class "font-sans text-stone-700 text-sm ml-4"))
                       ,(assoc-ref ticket "ticket_type"))))
@@ -73,7 +73,7 @@
          (small (@ (class "font-sans text-stone-500 text-md font-light"))
                 ,(G_ "description"))
          (p (@ (class
-                 "font-sans text-stone-600 text-md max-w-prose whitespace-pre-wrap ml-4"))
+                "font-sans text-stone-600 text-md max-w-prose whitespace-pre-wrap ml-4"))
             ,(parse-org (assoc-ref ticket "description")))
 
          (hr (@ (class "")))
@@ -91,10 +91,9 @@
 
          (hr)
          (div (@ (class "flex flex-row flex-wrap gap-4"))
-              (a (@ (class "font-sans text-stone-800 font-light")
-                    (href ,(format #f "/tickets/~a/~a/edit" project
+              (a (@ (href ,(format #f "/tickets/~a/~a/edit" project
                                    (assoc-ref ticket "id"))))
-                 ,(G_ "edit ticket"))
+                 ,(action-button #:content (G_ "edit ticket")))
               (form (@ (enctype "application/x-www-form-urlencoded")
                        (method "POST")
                        (action ,(format #f "/tickets/~a/delete" project)))

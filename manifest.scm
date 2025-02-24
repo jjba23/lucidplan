@@ -260,7 +260,7 @@ SQL databases.  This package implements the interface for SQLite.")))
       (license license:gpl3+))))
 
 (define-public guile-hygguile
-  (let ((commit "fe806eef3c00fc9288e47cbb834c2bd076fffb60")
+  (let ((commit "0093ce7651dd823d62a38ea2f25cdf2e2a7555a2")
         (revision "0"))
     (package
       (name "guile-hygguile")
@@ -273,7 +273,7 @@ SQL databases.  This package implements the interface for SQLite.")))
                (commit commit)))
          (file-name (git-file-name name version))
          (sha256
-          (base32 "07hgy0gyz7d3m6ajakn6d9skpl4zlg2r1f88gv1ncpq8a64nms3b"))))
+          (base32 "12xjazk9yp4g9r75mb93aghq3r728fsi9w52zizcp2cncqpy73a0"))))
       (build-system guile-build-system)
       (native-inputs (list guile-3.0))
       (arguments
@@ -283,7 +283,9 @@ SQL databases.  This package implements the interface for SQLite.")))
       (synopsis
        "SXML and TailwindCSS UI component library for Lisp (Guile Scheme) software projects")
       (description
-       "Cozy and professional user-interfaces for everyone. SXML and TailwindCSS UI component library for Lisp (Guile Scheme) software projects. hygge + guile = hygguile")
+       "Cozy and professional user-interfaces for everyone.
+        SXML and TailwindCSS UI component library for Lisp (Guile Scheme) software projects.
+        hygge + guile = hygguile")
       (license license:lgpl3+))))
 
 (packages->manifest (list (specification->package "make")
