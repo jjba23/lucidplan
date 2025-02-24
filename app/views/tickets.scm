@@ -39,6 +39,7 @@
   #:use-module (lucidplan query-escape)
   #:use-module (lucidplan prelude)
   #:use-module (lucidplan base64)
+  #:use-module (hygguile components button)
   #:use-module (artanis security nss)
   #:use-module (artanis route))
 
