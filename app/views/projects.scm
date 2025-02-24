@@ -50,7 +50,8 @@
   `((div (@ (class
              "flex flex-col gap-2 px-3 py-6 bg-stone-100 rounded-2xl  border-stone-400/75 border-2"))
          ,(render-if-nestring (lambda (x)
-                                `(p (@ (class ,(symbols->css '(text-md
+                                `(p (@ (class ,(symbols->css '(text-md py-3
+                                                               text-stone-800
                                                                font-medium))))
                                     ,x))
                               (assoc-ref p "description"))
@@ -100,7 +101,7 @@
 
 (define (render-project-list-item G_ p)
   `((div (@ (class
-              "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/75 border-stone-400/75 border-2 py-2 px-4 cursor-pointer rounded-xl")
+             "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/75 border-stone-400/75 border-2 py-2 px-4 cursor-pointer rounded-xl")
             (onclick ,(format #f project-listitem-reveal-details-js-template
                               (assoc-ref p "id"))))
 

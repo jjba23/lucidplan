@@ -74,8 +74,13 @@
 
          (small (@ (class "font-sans text-stone-500 text-md font-light"))
                 ,(G_ "description"))
-         (p (@ (class
-                "font-sans text-stone-600 text-md max-w-prose whitespace-pre-wrap ml-4"))
+         (p (@ (class ,(symbols->css '(text-md py-3
+                                               text-stone-800
+                                               font-medium
+                                               font-sans
+                                               max-w-prose
+                                               whitespace-pre-wrap
+                                               ml-4))))
             ,(parse-org (assoc-ref ticket "description")))
 
          (hr (@ (class "")))
@@ -119,11 +124,12 @@
                                    ticket-listitem-reveal-details-js-template
                                    (assoc-ref ticket "id")))
                  (class
-                   "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/75 border-stone-400/75 border-2 py-2 px-4 cursor-pointer rounded-xl"))
+                  "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/75 border-stone-400/75 border-2 py-2 px-4 cursor-pointer rounded-xl"))
               (small (@ (class "font-sans text-stone-800 text-sm"))
                      ,(format #f "~a-~a" project
                               (assoc-ref ticket "human_id")))
-              (h5 (@ (class ,(symbols->css '(font-sans text-stone-700 text-lg font-black break-words))))
+              (h5 (@ (class ,(symbols->css '(font-sans text-stone-700 text-lg
+                                                       font-black break-words))))
                   ,(assoc-ref ticket "title")))
          (div (@ (id ,(format #f "details-~a"
                               (assoc-ref ticket "id")))
@@ -213,7 +219,7 @@
                        #:name "title"
                        #:value (unescape-str title)
                        #:required #t)
-            
+
             (label ,(G_ "status"))
             (select (@ (class "p-3 rounded-xl border-stone-400/75 border-2")
                        (name "ticket-status")
@@ -264,7 +270,7 @@
                                       #:selected-value ticket-type))
             (label ,(G_ "description"))
             (textarea (@ (class
-                           "p-3 w-full min-h-64 rounded-xl border-stone-400/75 border-2")
+                          "p-3 w-full min-h-64 rounded-xl border-stone-400/75 border-2")
                          (name "description")
                          (required ""))
                       ,(unescape-str description))
