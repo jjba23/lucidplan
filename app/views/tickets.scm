@@ -40,6 +40,7 @@
   #:use-module (lucidplan prelude)
   #:use-module (lucidplan base64)
   #:use-module (hygguile components button)
+  #:use-module (hygguile components select)
   #:use-module (artanis security nss)
   #:use-module (artanis route))
 
@@ -209,7 +210,7 @@
                (action ,action))
             (label ,(G_ "title"))
             (input (@ (class
-                       "p-3 w-min rounded-xl border-stone-400/75 border-2")
+                        "p-3 w-min rounded-xl border-stone-400/75 border-2")
                       (name "title")
                       (value ,(unescape-str title))
                       (required "")) "")
@@ -217,23 +218,53 @@
             (select (@ (class "p-3 rounded-xl border-stone-400/75 border-2")
                        (name "ticket-status")
                        (required ""))
-                    ,(mk-option "todo" ticket-status)
-                    ,(mk-emoji-option "work-in-progress" "⚙️" ticket-status)
-                    ,(mk-emoji-option "in-review" "🔍" ticket-status)
-                    ,(mk-emoji-option "done" "✅" ticket-status)
-                    ,(mk-emoji-option "rejected" "❌" ticket-status))
+                    ,(mk-glyph-option #:value "todo"
+                                      #:glyph "☑️"
+                                      #:content (G_ "To-do")
+                                      #:selected-value ticket-status)
+                    ,(mk-glyph-option #:value "work-in-progress"
+                                      #:glyph "⚙️"
+                                      #:content (G_ "Work in Progress")
+                                      #:selected-value ticket-status)
+                    ,(mk-glyph-option #:value "in-review"
+                                      #:glyph "🔍"
+                                      #:content (G_ "In Review")
+                                      #:selected-value ticket-status)
+                    ,(mk-glyph-option #:value "done"
+                                      #:glyph "✅"
+                                      #:content (G_ "Done")
+                                      #:selected-value ticket-status)
+                    ,(mk-glyph-option #:value "rejected"
+                                      #:glyph "❌"
+                                      #:content (G_ "Rejected")
+                                      #:selected-value ticket-status))
             (label ,(G_ "type"))
             (select (@ (class "p-3 rounded-xl border-stone-400/75 border-2")
                        (name "ticket-type")
                        (required ""))
-                    ,(mk-option "task" ticket-type)
-                    ,(mk-option "bug" ticket-type)
-                    ,(mk-option "story" ticket-type)
-                    ,(mk-option "spike" ticket-type)
-                    ,(mk-option "time-box" ticket-type))
+                    ,(mk-glyph-option #:value "task"
+                                      #:glyph "🔷"
+                                      #:content (G_ "Task")
+                                      #:selected-value ticket-type)
+                    ,(mk-glyph-option #:value "bug"
+                                      #:glyph "🐛"
+                                      #:content (G_ "Bug")
+                                      #:selected-value ticket-type)
+                    ,(mk-glyph-option #:value "story"
+                                      #:glyph "🟩"
+                                      #:content (G_ "Story")
+                                      #:selected-value ticket-type)
+                    ,(mk-glyph-option #:value "spike"
+                                      #:glyph "🪨"
+                                      #:content (G_ "Spike")
+                                      #:selected-value ticket-type)
+                    ,(mk-glyph-option #:value "time-box"
+                                      #:glyph "🕙"
+                                      #:content (G_ "Time Box")
+                                      #:selected-value ticket-type))
             (label ,(G_ "description"))
             (textarea (@ (class
-                          "p-3 w-full min-h-64 rounded-xl border-stone-400/75 border-2")
+                           "p-3 w-full min-h-64 rounded-xl border-stone-400/75 border-2")
                          (name "description")
                          (required ""))
                       ,(unescape-str description))

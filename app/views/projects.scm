@@ -151,14 +151,14 @@
                             (proj '()))
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
-                              ((form (@ (class "flex flex-col gap-4")
+                              ((form (@ (class "flex flex-col gap-4 p-2")
                                         (enctype
                                          "application/x-www-form-urlencoded")
                                         (method "POST")
                                         (action ,action))
                                      (label ,(G_ "title"))
                                      (input (@ (class
-                                                "p-3 w-min rounded-xl border-stone-400/75 border-2")
+                                                "p-3 max-w-prose rounded-xl border-stone-400/75 border-2")
                                                (name "title")
                                                (value ,(unescape-str title))
                                                (required "")) "")
