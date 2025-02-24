@@ -57,15 +57,15 @@
                           (proj '()))
     (define nav
       `(div (@ (class
-                 "flex flex-row flex-wrap gap-3 p-3 bg-stone-900/90 items-center justify-left w-full shadow-lg"))
+                "flex flex-row flex-wrap gap-3 p-3 bg-stone-900/90 items-center justify-left w-full shadow-lg"))
             (a (@ (class "text-md text-white font-sans font-black px-4")
                   (href "/")) "LucidPlan")
             (a (@ (class
-                    "text-sm lowercase text-white font-sans font-medium px-2")
+                   "text-sm lowercase text-white font-sans font-medium px-2")
                   (href "/login"))
                ,(G_ "Login"))
             (a (@ (class
-                    "text-sm lowercase text-white font-sans font-medium px-2")
+                   "text-sm lowercase text-white font-sans font-medium px-2")
                   (href "/projects"))
                ,(G_ "Projects"))
 
@@ -73,14 +73,14 @@
 
             (select (@ (onchange "window.location.href=this.value;")
                        (class
-                         "text-sm text-white bg-transparent font-medium font-sans"))
+                        "text-sm text-white bg-transparent font-medium font-sans"))
                     (option "🔗 go to")
                     ,(map (lambda (p)
                             `(option (@ (value ,(format #f "/tickets/~a"
                                                         (assoc-ref p
                                                                    "human_id")))
                                         (class
-                                          "text-sm font-light lowercase text-stone-800"))
+                                         "text-sm font-light lowercase text-stone-800"))
                                      ,(assoc-ref p "title"))) proj))))
     `(html (head (title "LucidPlan")
                  (link (@ (rel "preconnect")
@@ -103,17 +103,16 @@
                       (footer ,(page-footer G_))))))
   (export html-template))
 
-
 (define-public (emoji-for-ticket-status ticket-status)
   (cond
-   ((equal? "todo" ticket-status)
-    "")
-   ((equal? "work-in-progress" ticket-status)
-    "⚙️")
-   ((equal? "in-review" ticket-status)
-    "🔍")
-   ((equal? "done" ticket-status)
-    "✅")
-   ((equal? "rejected" ticket-status)
-    "❌")
-   (else "")))
+    ((equal? "todo" ticket-status)
+     "")
+    ((equal? "work-in-progress" ticket-status)
+     "⚙️")
+    ((equal? "in-review" ticket-status)
+     "🔍")
+    ((equal? "done" ticket-status)
+     "✅")
+    ((equal? "rejected" ticket-status)
+     "❌")
+    (else "")))

@@ -38,6 +38,7 @@
   #:use-module (ice-9 i18n)
   #:use-module (lucidplan query-escape)
   #:use-module (hygguile components button)
+  #:use-module (hygguile components input)
   #:use-module (artanis security nss)
   #:use-module (artanis route))
 
@@ -156,36 +157,28 @@
                                          "application/x-www-form-urlencoded")
                                         (method "POST")
                                         (action ,action))
-                                     (label ,(G_ "title"))
-                                     (input (@ (class
-                                                "p-3 max-w-prose rounded-xl border-stone-400/75 border-2")
-                                               (name "title")
-                                               (value ,(unescape-str title))
-                                               (required "")) "")
-
-                                     (label ,(G_ "human id"))
-                                     (input (@ (class
-                                                "p-3 w-min rounded-xl border-stone-400/75 border-2")
-                                               (name "human-id")
-                                               (value ,human-id)
-                                               (required "")) "")
-                                     (label ,(G_ "url"))
-                                     (input (@ (class
-                                                "p-3 w-min rounded-xl border-stone-400/75 border-2")
-                                               (name "url")
-                                               (value ,url)) "")
-                                     (label ,(G_ "code url"))
-                                     (input (@ (class
-                                                "p-3 w-min rounded-xl border-stone-400/75 border-2")
-                                               (name "vcs-url")
-                                               (value ,vcs-url)) "")
-
-                                     (label ,(G_ "description"))
-                                     (input (@ (class
-                                                "p-3 w-min rounded-xl border-stone-400/75 border-2")
-                                               (name "description")
-                                               (value ,(unescape-str
-                                                        description))) "")
+                                     ,(mk-input #:label (G_ "title")
+                                                #:name "title"
+                                                #:value (unescape-str title)
+                                                #:required #t)
+                                     ,(mk-input #:label (G_ "human id")
+                                                #:name "human-id"
+                                                #:value human-id
+                                                #:required #t)
+                                     ,(mk-input #:label (G_ "homepage url")
+                                                #:name "url"
+                                                #:value url
+                                                #:required #f)
+                                     ,(mk-input #:label (G_
+                                                         "version control url")
+                                                #:name "vcs-url"
+                                                #:value vcs-url
+                                                #:required #f)
+                                     ,(mk-input #:label (G_ "description")
+                                                #:name "description"
+                                                #:value (unescape-str
+                                                         description)
+                                                #:required #f)
 
                                      (div ,(success-submit-button #:content (G_
                                                                              "submit"))))))
