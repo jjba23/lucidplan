@@ -236,55 +236,55 @@ SQL databases.  This package implements the interface for SQLite.")))
   (let ((commit "64002d74025f577e1eeea7bc51218a2c7929631f")
         (revision "0"))
     (package
-     (name "guile-uuid")
-     (version (git-version "0.0.0" revision commit))
-     (source
-      (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://codeberg.org/elb/guile-uuid.git")
-             (commit commit)))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "1q6dqm2hzq75aa5mrrwgqdml864pdrxc98j7pyj1y0827phnzjfj"))))
-     (build-system guile-build-system)
-     (native-inputs (list guile-3.0 guile-gcrypt))
-     (home-page "https://codeberg.org/elb/guile-uuid")
-     (synopsis
-      "Guile-UUID is a UUID generation and manipulation module for GNU Guile.")
-     (description
-      "This package implements RFC 9562 UUIDs, and can generate versions 1 and 3–8 from that specification.
+      (name "guile-uuid")
+      (version (git-version "0.0.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://codeberg.org/elb/guile-uuid.git")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "1q6dqm2hzq75aa5mrrwgqdml864pdrxc98j7pyj1y0827phnzjfj"))))
+      (build-system guile-build-system)
+      (native-inputs (list guile-3.0 guile-gcrypt))
+      (home-page "https://codeberg.org/elb/guile-uuid")
+      (synopsis
+       "Guile-UUID is a UUID generation and manipulation module for GNU Guile.")
+      (description
+       "This package implements RFC 9562 UUIDs, and can generate versions 1 and 3–8 from that specification.
         It provides parsing for UUIDs in standard hex-and-dash format of any variant and version.
         It can also query the variant and version of UUIDs from the RFC.
         Simple routines for converting between binary and hex-and-dash string UUIDs are included.")
-     (license license:gpl3+))))
+      (license license:gpl3+))))
 
 (define-public guile-hygguile
-  (let ((commit "f0d79aa01ed32d9f39885353ba3f767560e6449a")
+  (let ((commit "fe806eef3c00fc9288e47cbb834c2bd076fffb60")
         (revision "0"))
     (package
-     (name "guile-hygguile")
-     (version (git-version "0.0.0" revision commit))
-     (source
-      (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://codeberg.org/jjba23/hygguile.git")
-             (commit commit)))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "0vivh0n85zgxkzky87qizygc9cn2a00r8rwvp92bgx27wxg3z8fb"))))
-     (build-system guile-build-system)
-     (native-inputs (list guile-3.0))
-     (arguments
-      (list
-       #:source-directory "src"))
-     (home-page "https://codeberg.org/jjba23/hygguile")
-     (synopsis
-      "SXML and TailwindCSS UI component library for Lisp (Guile Scheme) software projects")
-     (description
-      "Cozy and professional user-interfaces for everyone. SXML and TailwindCSS UI component library for Lisp (Guile Scheme) software projects. hygge + guile = hygguile")
-     (license license:lgpl3+))))
+      (name "guile-hygguile")
+      (version (git-version "0.0.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://codeberg.org/jjba23/hygguile.git")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "07hgy0gyz7d3m6ajakn6d9skpl4zlg2r1f88gv1ncpq8a64nms3b"))))
+      (build-system guile-build-system)
+      (native-inputs (list guile-3.0))
+      (arguments
+       (list
+        #:source-directory "src"))
+      (home-page "https://codeberg.org/jjba23/hygguile")
+      (synopsis
+       "SXML and TailwindCSS UI component library for Lisp (Guile Scheme) software projects")
+      (description
+       "Cozy and professional user-interfaces for everyone. SXML and TailwindCSS UI component library for Lisp (Guile Scheme) software projects. hygge + guile = hygguile")
+      (license license:lgpl3+))))
 
 (packages->manifest (list (specification->package "make")
                           (specification->package "gettext")

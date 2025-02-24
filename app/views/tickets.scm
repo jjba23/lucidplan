@@ -47,7 +47,7 @@
 
 (define-public (render-ticket G_ project ticket ticket-id-to-human-id)
   `((div (@ (class
-             "flex flex-col gap-2 p-3 bg-stone-100 rounded-2xl border-stone-400/75 border-2"))
+              "flex flex-col gap-2 p-3 bg-stone-100 rounded-2xl border-stone-400/75 border-2"))
          (h4 (@ (class "font-sans text-stone-700 text-2xl font-bold my-3"))
              ,(assoc-ref ticket "title"))
 
@@ -55,7 +55,7 @@
 
               (div (@ (class "flex flex-col gap-3"))
                    (small (@ (class
-                              "font-sans text-stone-500 text-md font-light"))
+                               "font-sans text-stone-500 text-md font-light"))
                           ,(G_ "status"))
                    (p (@ (class "font-sans text-stone-700 text-sm flex gap-1"))
                       ,(emoji-for-ticket-status (assoc-ref ticket
@@ -64,7 +64,7 @@
 
               (div (@ (class "flex flex-col gap-3"))
                    (small (@ (class
-                              "font-sans text-stone-500 text-md font-light"))
+                               "font-sans text-stone-500 text-md font-light"))
                           ,(G_ "type"))
                    (p (@ (class "font-sans text-stone-700 text-sm ml-4"))
                       ,(assoc-ref ticket "ticket_type"))))
@@ -72,7 +72,7 @@
          (small (@ (class "font-sans text-stone-500 text-md font-light"))
                 ,(G_ "description"))
          (p (@ (class
-                "font-sans text-stone-600 text-md max-w-prose whitespace-pre-wrap ml-4"))
+                 "font-sans text-stone-600 text-md max-w-prose whitespace-pre-wrap ml-4"))
             ,(parse-org (assoc-ref ticket "description")))
 
          (hr (@ (class "")))
@@ -100,9 +100,7 @@
                     (input (@ (hidden "")
                               (name "id")
                               (value ,(assoc-ref ticket "id"))))
-                    (button (@ (type "submit")
-                               (class "text-red-600 text-md ml-4"))
-                            ,(G_ "delete"))))
+                    ,(danger-submit-button #:content (G_ "delete"))))
 
          )))
 

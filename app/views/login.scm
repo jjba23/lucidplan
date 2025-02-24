@@ -21,6 +21,7 @@
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
+  #:use-module (hygguile components button)
   #:use-module (ice-9 i18n)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
@@ -45,8 +46,6 @@
                                                     (class
                                                      "p-3 rounded-xl border-stone-400/75 border-2")
                                                     (name "password")) "")
-                                          (button (@ (type "submit")
-                                                     (class
-                                                      "p-2 rounded-xl w-min bg-green-700/75 text-white"))
-                                                  "login")))))))
+                                          ,(success-submit-button #:content (G_
+                                                                             "login"))))))))
 
