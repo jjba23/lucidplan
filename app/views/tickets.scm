@@ -209,12 +209,11 @@
                (enctype "application/x-www-form-urlencoded")
                (method "POST")
                (action ,action))
-            (label ,(G_ "title"))
-            (input (@ (class
-                       "p-3 w-min rounded-xl border-stone-400/75 border-2")
-                      (name "title")
-                      (value ,(unescape-str title))
-                      (required "")) "")
+            ,(mk-input #:label (G_ "title")
+                       #:name "title"
+                       #:value (unescape-str title)
+                       #:required #t)
+            
             (label ,(G_ "status"))
             (select (@ (class "p-3 rounded-xl border-stone-400/75 border-2")
                        (name "ticket-status")
@@ -265,7 +264,7 @@
                                       #:selected-value ticket-type))
             (label ,(G_ "description"))
             (textarea (@ (class
-                          "p-3 w-full min-h-64 rounded-xl border-stone-400/75 border-2")
+                           "p-3 w-full min-h-64 rounded-xl border-stone-400/75 border-2")
                          (name "description")
                          (required ""))
                       ,(unescape-str description))
