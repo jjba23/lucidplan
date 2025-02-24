@@ -203,7 +203,7 @@
                            (is-edit #f)
                            (proj '()))
   (define form_
-    `((form (@ (class "flex flex-col gap-4 flex-grow")
+    `((form (@ (class "flex flex-col gap-4")
                (enctype "application/x-www-form-urlencoded")
                (method "POST")
                (action ,action))
@@ -238,10 +238,7 @@
                          (required ""))
                       ,(unescape-str description))
 
-            (button (@ (class
-                        "bg-green-700/75 text-white p-2 w-min rounded-xl")
-                       (type "submit"))
-                    ,(G_ "done")))))
+            (div ,(success-submit-button #:content (G_ "submit"))))))
 
   (html-template G_
                  #:body `((div (@ (class "container mx-auto"))

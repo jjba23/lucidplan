@@ -37,6 +37,7 @@
   #:use-module (artanis i18n locale)
   #:use-module (ice-9 i18n)
   #:use-module (lucidplan query-escape)
+  #:use-module (hygguile components button)
   #:use-module (artanis security nss)
   #:use-module (artanis route))
 
@@ -50,40 +51,43 @@
                                 `(p ,x))
                               (assoc-ref p "description"))
          (hr)
-         (a (@ (class "text-stone-800")
-               (href ,(format #f "/tickets/~a"
-                              (assoc-ref p "human_id"))))
-            ,(format #f "📚 go to backlog: ~a"
-                     (assoc-ref p "title")))
-         (a (@ (class "text-stone-800")
-               (href ,(format #f "/kanban/~a"
-                              (assoc-ref p "human_id"))))
-            ,(format #f "💡 go to kanban: ~a"
-                     (assoc-ref p "title")))
+         (div (@ (class "flex flex-wrap flex-row gap-3"))
+              (a (@ (class "text-stone-800")
+                    (href ,(format #f "/tickets/~a"
+                                   (assoc-ref p "human_id"))))
+                 ,(action-button #:content (format #f "📚 go to backlog: ~a"
+                                                   (assoc-ref p "title"))))
+              (a (@ (class "text-stone-800")
+                    (href ,(format #f "/kanban/~a"
+                                   (assoc-ref p "human_id"))))
+                 ,(action-button #:content (format #f "💡 go to kanban: ~a"
+                                                   (assoc-ref p "title")))))
          (hr)
-         ,(render-if-nestring (lambda (x)
-                                `(a (@ (class "text-stone-800")
-                                       (href ,x)) "🔗 view project"))
-                              (assoc-ref p "url"))
-         ,(render-if-nestring (lambda (x)
-                                `(a (@ (class "text-stone-800")
-                                       (href ,x)) "🔗 project code"))
-                              (assoc-ref p "vcs_url"))
+         (div (@ (class "flex flex-wrap flex-row gap-3"))
+              ,(render-if-nestring (lambda (x)
+                                     `(a (@ (class "text-stone-800")
+                                            (href ,x))
+                                         ,(action-button #:content
+                                                         "🔗 view project")))
+                                   (assoc-ref p "url"))
+              ,(render-if-nestring (lambda (x)
+                                     `(a (@ (class "text-stone-800")
+                                            (href ,x))
+                                         ,(action-button #:content
+                                                         "🔗 project code")))
+                                   (assoc-ref p "vcs_url")))
          (hr)
          (div (@ (class "flex flex-wrap flex-row gap-4"))
               (a (@ (href ,(format #f "/projects/~a/edit"
                                    (assoc-ref p "id"))))
-                 ,(G_ "edit project"))
+                 ,(action-button #:content (G_ "edit project")))
               (form (@ (enctype "application/x-www-form-urlencoded")
                        (method "POST")
                        (action "/projects/delete"))
                     (input (@ (name "id")
                               (hidden "")
                               (value ,(assoc-ref p "id"))) "")
-                    (button (@ (type "submit"))
-                            (p (@ (class "text-red-600"))
-                               ,(format #f "~a  ❌"
-                                        (G_ "delete"))))))
+                    ,(danger-submit-button #:content (G_ "delete"))))
          (small (@ (class "font-mono text-stone-600"))
                 ,(format #f "~a"
                          (assoc-ref p "human_id")))
@@ -183,8 +187,6 @@
                                                (value ,(unescape-str
                                                         description))) "")
 
-                                     (button (@ (class
-                                                 "bg-green-800/75 text-white p-3 w-min rounded-xl")
-                                                (type "submit"))
-                                             ,(G_ "done")))))
+                                     (div ,(success-submit-button #:content (G_
+                                                                             "submit"))))))
                  #:proj proj))
