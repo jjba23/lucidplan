@@ -46,7 +46,6 @@
   (string-take (string-drop s 1)
                (- (string-length s) 2)))
 
-
 (define (drop-first-last-line s)
   (let* ((lines (string-split s #\newline))
          (middle (if (> (length lines) 2) 
