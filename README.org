@@ -21,6 +21,9 @@ Visit my instance of LucidPlan here: https://lucidplan.jointhefreeworld.org/
 
 This is free software (free as in freedom), licensed under the GNU General Public License v3 or newer.
 
+[[https://jointhefreeworld.org/static-assets/lucidplan/img/2025-02-25-1.png]]
+
+
 Built with Guile Scheme and GNU Artanis, SQLite, Tailwind CSS
 
 - *Fully Customizable:* Hack the behavior and content of each UI element with Scheme code.
