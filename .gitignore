@@ -1,3 +1,4 @@
 tmp/cache/route.cache
 lucidplan.db*
 tmp/*
+*.log

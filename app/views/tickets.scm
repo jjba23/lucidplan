@@ -50,7 +50,7 @@
 
 (define-public (render-ticket G_ project ticket ticket-id-to-human-id)
   `((div (@ (class
-              "flex flex-col gap-2 p-3 bg-stone-100 rounded-2xl border-stone-400/75 border-2"))
+             "flex flex-col gap-2 p-3 bg-stone-100 rounded-2xl border-stone-400/75 border-2"))
          (h4 (@ (class "font-sans text-stone-700 text-2xl font-bold my-3"))
              ,(assoc-ref ticket "title"))
 
@@ -58,7 +58,7 @@
 
               (div (@ (class "flex flex-col gap-3"))
                    (small (@ (class
-                               "font-sans text-stone-500 text-md font-light"))
+                              "font-sans text-stone-500 text-md font-light"))
                           ,(G_ "status"))
                    (p (@ (class "font-sans text-stone-700 text-sm flex gap-1"))
                       ,(emoji-for-ticket-status (assoc-ref ticket
@@ -67,7 +67,7 @@
 
               (div (@ (class "flex flex-col gap-3"))
                    (small (@ (class
-                               "font-sans text-stone-500 text-md font-light"))
+                              "font-sans text-stone-500 text-md font-light"))
                           ,(G_ "type"))
                    (p (@ (class "font-sans text-stone-700 text-sm ml-4"))
                       ,(assoc-ref ticket "ticket_type"))))
@@ -124,7 +124,7 @@
                                    ticket-listitem-reveal-details-js-template
                                    (assoc-ref ticket "id")))
                  (class
-                   "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/75 border-stone-400/75 border-2 py-2 px-4 cursor-pointer rounded-xl"))
+                  "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/75 border-stone-400/75 border-2 py-2 px-4 cursor-pointer rounded-xl"))
               (small (@ (class "font-sans text-stone-800 text-sm"))
                      ,(format #f "~a-~a" project
                               (assoc-ref ticket "human_id")))
