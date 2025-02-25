@@ -21,6 +21,7 @@
   #:use-module (ice-9 rdelim)
   #:use-module (ice-9 regex)
   #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-64)
   #:use-module (ice-9 string-fun)
   #:use-module (hygguile abstraction)
   #:use-module (ice-9 iconv))
@@ -43,46 +44,101 @@
               (newline)) xs))
 
 (define (drop-first-last s)
-  (string-take (string-drop s 1)
-               (- (string-length s) 2)))
+  (if (> (string-length s) 2)
+
+      (string-take (string-drop s 1)
+                   (- (string-length s) 2)) s))
 
 (define (drop-first-last-line s)
   (let* ((lines (string-split s #\newline))
-         (middle (if (> (length lines) 2) 
-                     (drop-right (cdr lines) 1) 
-                     '())))  
+         (middle (if (> (length lines) 2)
+                     (drop-right (cdr lines) 1)
+                     '())))
     (string-join middle "\n")))
 
-(define-public org-code-pattern
-  "~([^~]+)~")
+(begin
+  (define org-code-pattern
+    "~([^~]+)~")
 
-(define-public org-code-block-pattern
-  "#\\+begin_src.*\n.*#\\+end_src")
+  (define org-code-replacement
+    "<code class=\"~a\">~a</code>")
 
-(define-public (parse-org org)
-  (let* ((with-parsed-code (regexp-substitute/global #f
-                                                     org-code-pattern
-                                                     org
-                                                     'pre
-                                                     (lambda (m)
-                                                       (format #f
-                                                               "<code class=\"~a\">~a</code>"
-                                                               (->css '(bg-stone-200/75
-                                                                        rounded-lg
-                                                                        py-1 px-2))
-                                                               (drop-first-last (match:substring
-                                                                                 m))))
-                                                     'post))
-         (with-parsed-code-block (regexp-substitute/global #f
-                                                           org-code-block-pattern
-                                                           with-parsed-code
-                                                           'pre
-                                                           (lambda (m)
-                                                             (format #f "<pre class=\"~a\">~a</pre>"
-                                                                     (->css '(bg-stone-200/75
-                                                                              rounded-lg py-2 px-3
-                                                                              whitespace-pre))
-                                                                     (drop-first-last-line (match:substring m))))
-                                                           'post)))
-    with-parsed-code-block))
+  (define org-code-block-pattern
+    "#\\+begin_src.*\n.*#\\+end_src")
 
+  (define org-code-block-replacement
+    "<pre class=\"~a\">~a</pre>")
+
+  (define* (parse-org org)
+    (let* ((with-parsed-code (regexp-substitute/global #f
+                                                       org-code-pattern
+                                                       org
+                                                       'pre
+                                                       (lambda (m)
+                                                         (format #f
+                                                          org-code-replacement
+                                                          (->css '(bg-stone-200/75
+                                                                   rounded-lg
+                                                                   py-1 px-2))
+                                                          (drop-first-last (match:substring
+                                                                            m))))
+                                                       'post))
+           (with-parsed-code-block (regexp-substitute/global #f
+                                    org-code-block-pattern
+                                    with-parsed-code
+                                    'pre
+                                    (lambda (m)
+                                      (format #f org-code-block-replacement
+                                              (->css '(bg-stone-200/75
+                                                       rounded-lg py-2 px-3
+                                                       whitespace-pre))
+                                              (drop-first-last-line (match:substring
+                                                                     m))))
+                                    'post)))
+      with-parsed-code-block))
+  (export parse-org))
+
+;; module tests
+(test-begin "prelude")
+
+(test-equal "nestring? with non-empty string" #t
+            (nestring? "hello"))
+(test-equal "nestring? with empty string" #f
+            (nestring? ""))
+(test-equal "nestring? with #f" #f
+            (nestring? #f))
+(test-equal "nestring? with #t" #t
+            (nestring? #t))
+
+(test-equal "render-if-nestring with valid string" "HELLO"
+            (render-if-nestring string-upcase "hello"))
+(test-equal "render-if-nestring with empty string"
+            '()
+            (render-if-nestring string-upcase ""))
+(test-equal "render-if-nestring with #f"
+            '()
+            (render-if-nestring string-upcase #f))
+
+(test-assert "log-exprs runs without error"
+             (begin
+               (log-exprs '("test" 123)) #t))
+
+(test-equal "drop-first-last normal case" "ell"
+            (drop-first-last "hello"))
+(test-equal "drop-first-last single char" "a"
+            (drop-first-last "a"))
+(test-equal "drop-first-last two chars" "ab"
+            (drop-first-last "ab"))
+(test-equal "drop-first-last empty string" ""
+            (drop-first-last ""))
+
+(test-equal "drop-first-last-line normal case" "middle line"
+            (drop-first-last-line "first line\nmiddle line\nlast line"))
+(test-equal "drop-first-last-line single line" ""
+            (drop-first-last-line "single line"))
+(test-equal "drop-first-last-line two lines" ""
+            (drop-first-last-line "first line\nlast line"))
+(test-equal "drop-first-last-line empty input" ""
+            (drop-first-last-line ""))
+
+(test-end)

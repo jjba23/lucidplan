@@ -17,6 +17,8 @@
 
 # Code:
 
+.PHONY: test dir-install dir-uninstall dev server production-server fmt init-db compile-i18n new-i18n join-i18n init-i18n-nl init-i18n-en merge-i18n-nl merge-i18n-en
+
 # Constants
 
 LUCIDPLAN_LOCATION="/etc/lucidplan"
@@ -26,8 +28,6 @@ I18N_LOCATION="sys/i18n/locale"
 
 # System details
 GUIX_VERSION := $(shell guix --version)
-
-.PHONY: dir-install dir-uninstall dev server production-server fmt init-db compile-i18n new-i18n join-i18n init-i18n-nl init-i18n-en merge-i18n-nl merge-i18n-en
 
 # Logging helpers
 
@@ -182,3 +182,8 @@ merge-i18n-es:
 # Development REPL
 repl:
 	guix shell -m manifest.scm -- guile --fresh-auto-compile -c '((@ (ares server) run-nrepl-server))'
+
+
+# Unit tests
+test:
+	guix shell -m manifest.scm -- guile --fresh-auto-compile run-tests.scm
