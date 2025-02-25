@@ -260,9 +260,9 @@ SQL databases.  This package implements the interface for SQLite.")))
       (license license:gpl3+))))
 
 (define-public guile-hygguile
-  (let ((commit "6030b3fac733c30b5b4cb7ee42c90c62e524e09f")
+  (let ((commit "23f78d4b9695f417842c4b66bbfb7bc26cc06835")
         (base32-sha-signature
-         "1yb9fq344rl4hs14frng31v7lgl43h9mbrd1dz87n068vasi6952")
+         "0ba1jfcf8ffrp9kgwk7cnc5hc95q2hxvgvzrrch9bqan3q23dhxx")
         (revision "0"))
     (package
       (name "guile-hygguile")
