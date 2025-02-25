@@ -131,4 +131,26 @@
 (test-equal "drop-first-last-line empty input" ""
             (drop-first-last-line ""))
 
+(test-equal "parse-org inline code parsing"
+  "This is <code class=\"bg-stone-200/75 rounded-lg py-1 px-2\">test</code> code."
+  (parse-org "This is ~test~ code."))
+
+(test-equal "parse-org code block parsing"
+  "<pre class=\"bg-stone-200/75 rounded-lg my-3 py-2 px-3 whitespace-pre overflow-x-scroll\">some code\ninside block</pre>"
+  (parse-org "#+begin_src
+some code
+inside block
+#+end_src"))
+
+(test-equal "parse-org mixed inline and block parsing"
+  "Here is <code class=\"bg-stone-200/75 rounded-lg py-1 px-2\">inline</code> code and a block: <pre class=\"bg-stone-200/75 rounded-lg my-3 py-2 px-3 whitespace-pre overflow-x-scroll\">code block</pre>"
+  (parse-org "Here is ~inline~ code and a block: #+begin_src
+code block
+#+end_src"))
+
+(test-equal "parse-org no matches"
+  "Just some text with no code."
+  (parse-org "Just some text with no code."))
+
+
 (test-end)
