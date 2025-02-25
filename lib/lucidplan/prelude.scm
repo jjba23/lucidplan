@@ -76,25 +76,26 @@
                                                        'pre
                                                        (lambda (m)
                                                          (format #f
-                                                          org-code-replacement
-                                                          (->css '(bg-stone-200/75
-                                                                   rounded-lg
-                                                                   py-1 px-2))
-                                                          (drop-first-last (match:substring
-                                                                            m))))
+                                                                 org-code-replacement
+                                                                 (->css '(bg-stone-200/75
+                                                                          rounded-lg
+                                                                          py-1 px-2))
+                                                                 (drop-first-last (match:substring
+                                                                                   m))))
                                                        'post))
            (with-parsed-code-block (regexp-substitute/global #f
-                                    org-code-block-pattern
-                                    with-parsed-code
-                                    'pre
-                                    (lambda (m)
-                                      (format #f org-code-block-replacement
-                                              (->css '(bg-stone-200/75
-                                                       rounded-lg py-2 px-3
-                                                       whitespace-pre))
-                                              (drop-first-last-line (match:substring
-                                                                     m))))
-                                    'post)))
+                                                             org-code-block-pattern
+                                                             with-parsed-code
+                                                             'pre
+                                                             (lambda (m)
+                                                               (format #f org-code-block-replacement
+                                                                       (->css '(bg-stone-200/75
+                                                                                rounded-lg my-3 py-2 px-3
+                                                                                whitespace-pre
+                                                                                overflow-x-scroll))
+                                                                       (drop-first-last-line (match:substring
+                                                                                              m))))
+                                                             'post)))
       with-parsed-code-block))
   (export parse-org))
 
