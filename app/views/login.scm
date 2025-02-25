@@ -31,7 +31,7 @@
 (define-public (login-page G_)
   (let ((login-form `(form (@ (action "/login")
                               (class
-                                "w-full rounded-xl bg-stone-200/50 p-4 flex flex-row flex-wrap items-center gap-4")
+                               "w-full rounded-xl bg-stone-200/50 p-4 flex flex-row flex-wrap items-center gap-4")
                               (method "POST"))
                            ,(mk-input #:label (G_ "username")
                                       #:name "username"
@@ -46,7 +46,7 @@
     (html-template G_
                    #:body `(div (@ (class "container mx-auto"))
                                 ((h2 (@ (class
-                                          "font-bold text-stone-800/75 text-md"))
+                                         "font-bold text-stone-800/75 text-md"))
                                      ,(G_ "login to lucidplan"))
                                  (div ,login-form))))))
 

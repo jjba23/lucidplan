@@ -97,7 +97,8 @@
                                                "text-sm text-stone-800 my-3")
                                               (href ,(format #f
                                                       "/tickets/~a/new"
-                                                      project))) "➕ new ticket"))
+                                                      project)))
+                                           "➕ new ticket"))
 
                                    )))
                         (div (@ (class
