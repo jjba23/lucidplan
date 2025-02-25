@@ -41,6 +41,7 @@
   #:use-module (lucidplan base64)
   #:use-module (hygguile components button)
   #:use-module (hygguile components select)
+  #:use-module (hygguile components input)
   #:use-module (hygguile abstraction)
   #:use-module (artanis security nss)
   #:use-module (artanis route))
