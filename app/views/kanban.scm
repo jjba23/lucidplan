@@ -42,7 +42,7 @@
 
 (define render-k-ticket
   (lambda (t)
-    `((div (@ (class "flex flex-wrap flex-row gap-4"))
+    `((div (@ (class "w-auto"))
            (div (@ (class
                     "rounded-xl bg-stone-200/50 p-3 border-stone-400/75 border-2"))
                 (p (@ (class "text-xs text-stone-700"))
@@ -97,7 +97,7 @@
                                                "text-sm text-stone-800 my-3")
                                               (href ,(format #f
                                                       "/tickets/~a/new"
-                                                      project))) "new ticket"))
+                                                      project))) "➕ new ticket"))
 
                                    )))
                         (div (@ (class
