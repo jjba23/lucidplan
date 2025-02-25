@@ -46,14 +46,11 @@
   #:use-module (artanis security nss)
   #:use-module (artanis route))
 
-(define-public (parse-org org)
-  (write (string-match "/{1}[^\n]*/{1}" org)) org)
-
 (define-public (render-ticket G_ project ticket ticket-id-to-human-id)
   `((div (@ (class
              "flex flex-col gap-2 p-3 bg-stone-100 rounded-2xl border-stone-400/75 border-2"))
          (h4 (@ (class "font-sans text-stone-700 text-2xl font-bold my-3"))
-             ,(assoc-ref ticket "title"))
+             ,(parse-org (assoc-ref ticket "title")))
 
          (div (@ (class "flex flex-row flex-wrap gap-8 justify-left"))
 
@@ -131,7 +128,7 @@
                               (assoc-ref ticket "human_id")))
               (h5 (@ (class ,(->css '(font-sans text-stone-700 text-lg
                                                 font-black break-words))))
-                  ,(assoc-ref ticket "title")))
+                  ,(parse-org (assoc-ref ticket "title"))))
          (div (@ (id ,(format #f "details-~a"
                               (assoc-ref ticket "id")))
                  (class "ml-4")

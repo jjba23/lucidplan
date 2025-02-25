@@ -18,7 +18,9 @@
 (define-module (lucidplan prelude)
   #:use-module (ice-9 time)
   #:use-module (ice-9 format)
+  #:use-module (ice-9 regex)
   #:use-module (ice-9 string-fun)
+  #:use-module (hygguile abstraction)
   #:use-module (ice-9 iconv))
 
 (define-public (nestring? x)
@@ -37,3 +39,26 @@
               (newline)
               (write (format #f "~a" x))
               (newline)) xs))
+
+(define (drop-first-last s)
+  (string-take (string-drop s 1)
+               (- (string-length s) 2)))
+
+(define-public org-code-pattern
+  "~([^~]+)~")
+
+(define-public (parse-org org)
+  (let* ((with-parsed-code (regexp-substitute/global #f
+                                                     org-code-pattern
+                                                     org
+                                                     'pre
+                                                     (lambda (m)
+                                                       (format #f
+                                                        "<code class=\"~a\">~a</code>"
+                                                        (->css '(bg-stone-200/75
+                                                                 rounded-lg
+                                                                 py-1 px-2))
+                                                        (drop-first-last (match:substring
+                                                                          m))))
+                                                     'post)))
+    with-parsed-code))
