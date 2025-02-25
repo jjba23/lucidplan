@@ -30,11 +30,6 @@
   (and x
        (not (equal? "" x))))
 
-(define-public (render-if-nestring expr x)
-  (if (nestring? x)
-      (expr x)
-      '()))
-
 (define-public (log-exprs xs)
   (newline)
   (display "========")
@@ -76,26 +71,29 @@
                                                        'pre
                                                        (lambda (m)
                                                          (format #f
-                                                                 org-code-replacement
-                                                                 (->css '(bg-stone-200/75
-                                                                          rounded-lg
-                                                                          py-1 px-2))
-                                                                 (drop-first-last (match:substring
-                                                                                   m))))
+                                                          org-code-replacement
+                                                          (->css '(bg-stone-200/75
+                                                                   rounded-lg
+                                                                   py-1 px-2))
+                                                          (drop-first-last (match:substring
+                                                                            m))))
                                                        'post))
            (with-parsed-code-block (regexp-substitute/global #f
-                                                             org-code-block-pattern
-                                                             with-parsed-code
-                                                             'pre
-                                                             (lambda (m)
-                                                               (format #f org-code-block-replacement
-                                                                       (->css '(bg-stone-200/75
-                                                                                rounded-lg my-3 py-2 px-3
-                                                                                whitespace-pre
-                                                                                overflow-x-scroll))
-                                                                       (drop-first-last-line (match:substring
-                                                                                              m))))
-                                                             'post)))
+                                    org-code-block-pattern
+                                    with-parsed-code
+                                    'pre
+                                    (lambda (m)
+                                      (format #f org-code-block-replacement
+                                              (->css '(bg-stone-200/75
+                                                       rounded-lg
+                                                       my-3
+                                                       py-2
+                                                       px-3
+                                                       whitespace-pre
+                                                       overflow-x-scroll))
+                                              (drop-first-last-line (match:substring
+                                                                     m))))
+                                    'post)))
       with-parsed-code-block))
   (export parse-org))
 
@@ -110,15 +108,6 @@
             (nestring? #f))
 (test-equal "nestring? with #t" #t
             (nestring? #t))
-
-(test-equal "render-if-nestring with valid string" "HELLO"
-            (render-if-nestring string-upcase "hello"))
-(test-equal "render-if-nestring with empty string"
-            '()
-            (render-if-nestring string-upcase ""))
-(test-equal "render-if-nestring with #f"
-            '()
-            (render-if-nestring string-upcase #f))
 
 (test-assert "log-exprs runs without error"
              (begin
