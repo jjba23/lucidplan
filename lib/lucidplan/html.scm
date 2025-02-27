@@ -116,3 +116,17 @@
     ((equal? "rejected" ticket-status)
      "❌")
     (else "")))
+
+(define-public (emoji-for-ticket-type ticket-type)
+  (cond
+    ((equal? "task" ticket-type)
+     "🌿")
+    ((equal? "bug" ticket-type)
+     "🐜")
+    ((equal? "story" ticket-type)
+     "🌳")
+    ((equal? "spike" ticket-type)
+     "🧪")
+    ((equal? "time-box" ticket-type)
+     "🕙")
+    (else "")))

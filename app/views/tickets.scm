@@ -246,19 +246,19 @@
                        (name "ticket-type")
                        (required ""))
                     ,(mk-glyph-option #:value "task"
-                                      #:glyph "🔷"
+                                      #:glyph "🌿"
                                       #:content (G_ "Task")
                                       #:selected-value ticket-type)
                     ,(mk-glyph-option #:value "bug"
-                                      #:glyph "🐛"
+                                      #:glyph "🐜"
                                       #:content (G_ "Bug")
                                       #:selected-value ticket-type)
                     ,(mk-glyph-option #:value "story"
-                                      #:glyph "🟩"
+                                      #:glyph "🌳"
                                       #:content (G_ "Story")
                                       #:selected-value ticket-type)
                     ,(mk-glyph-option #:value "spike"
-                                      #:glyph "🪨"
+                                      #:glyph "🧪"
                                       #:content (G_ "Spike")
                                       #:selected-value ticket-type)
                     ,(mk-glyph-option #:value "time-box"
