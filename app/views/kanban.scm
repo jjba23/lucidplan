@@ -145,7 +145,7 @@
                                                      (span "✅")
                                                      (span ,(G_ "Done"))
                                                      (span (@(class "text-xs text-stone-700 font-light")) ,(format #f " ( ~a ) " (length tickets-done)))))
-                                        (div (@(class "my-8"))
+                                        (div (@(class "my-8 flex gap-2"))
                                              ,(map render-k-ticket tickets-done))))
 
                           (hr)
@@ -159,7 +159,7 @@
                                                      (span "❌")
                                                      (span ,(G_ "Rejected"))
                                                      (span (@(class "text-xs text-stone-700 font-light")) ,(format #f " ( ~a ) " (length tickets-rejected)))))
-                                        (div (@(class "my-8"))
+                                        (div (@(class "my-8 flex gap-2"))
                                              ,(map render-k-ticket tickets-rejected)))))))
       (html-template G_
                      #:body kanban-html
