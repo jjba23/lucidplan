@@ -136,8 +136,8 @@
                                                                            "]["
                                                                            "|")
                                                                           #\|))
-                                                                (_ (write
-                                                                    split-l))
+                                                                ;; (_ (write
+                                                                ;; split-l))
                                                                 (link (string-drop
                                                                        (car
                                                                         split-l)
