@@ -89,12 +89,12 @@
                                                        'pre
                                                        (lambda (m)
                                                          (format #f
-                                                                 org-code-replacement
-                                                                 (->css '(bg-stone-200/75
-                                                                          rounded-lg
-                                                                          py-1 px-2))
-                                                                 (drop-first-last (match:substring
-                                                                                   m))))
+                                                          org-code-replacement
+                                                          (->css '(bg-stone-200/75
+                                                                   rounded-lg
+                                                                   py-1 px-2))
+                                                          (drop-first-last (match:substring
+                                                                            m))))
                                                        'post))
            ;; (_ (display "\nwith-parsed-code\n"))
            ;; (_ (write with-parsed-code))
@@ -104,9 +104,9 @@
                                                          'pre
                                                          (lambda (m)
                                                            (format #f
-                                                                   org-em-replacement
-                                                                   (drop-first-last (match:substring
-                                                                                     m))))
+                                                            org-em-replacement
+                                                            (drop-first-last (match:substring
+                                                                              m))))
                                                          'post))
            ;; (_ (display "\nwith-parsed-italic\n"))
            ;; (_ (write with-parsed-italic))
@@ -116,9 +116,9 @@
                                                          'pre
                                                          (lambda (m)
                                                            (format #f
-                                                                   org-strong-replacement
-                                                                   (drop-first-last (match:substring
-                                                                                     m))))
+                                                            org-strong-replacement
+                                                            (drop-first-last (match:substring
+                                                                              m))))
                                                          'post))
            ;; (_ (display "\nwith-parsed-strong\n"))
            ;; (_ (write with-parsed-strong))
@@ -130,34 +130,46 @@
                                                          (let* ((l (drop-first-last
                                                                     (match:substring
                                                                      m)))
-                                                                (split-l (string-split (string-replace-substring l "][" "|") #\|))
-                                                                (_ (write split-l))
-                                                                (link (string-drop (car split-l) 1))
-                                                                (desc (string-drop-right (car (cdr split-l)) 1)))
+                                                                (split-l (string-split
+                                                                          (string-replace-substring
+                                                                           l
+                                                                           "]["
+                                                                           "|")
+                                                                          #\|))
+                                                                (_ (write
+                                                                    split-l))
+                                                                (link (string-drop
+                                                                       (car
+                                                                        split-l)
+                                                                       1))
+                                                                (desc (string-drop-right
+                                                                       (car (cdr
+                                                                             split-l))
+                                                                       1)))
                                                            (format #f
-                                                                   org-link-replacement
-                                                                   (->css '(text-blue-800
-                                                                            font-bold))
-                                                                   link desc)))
+                                                            org-link-replacement
+                                                            (->css '(text-blue-800
+                                                                     font-bold))
+                                                            link desc)))
                                                        'post))
            ;; (_ (display "\nwith-parsed-link\n"))
            ;; (_ (write with-parsed-link))
            (with-parsed-code-block (regexp-substitute/global #f
-                                                             org-code-block-pattern
-                                                             with-parsed-link
-                                                             'pre
-                                                             (lambda (m)
-                                                               (format #f org-code-block-replacement
-                                                                       (->css '(bg-stone-200/75
-                                                                                rounded-lg
-                                                                                my-3
-                                                                                py-2
-                                                                                px-3
-                                                                                whitespace-pre
-                                                                                overflow-x-scroll))
-                                                                       (drop-first-last-line (match:substring
-                                                                                              m))))
-                                                             'post))
+                                    org-code-block-pattern
+                                    with-parsed-link
+                                    'pre
+                                    (lambda (m)
+                                      (format #f org-code-block-replacement
+                                              (->css '(bg-stone-200/75
+                                                       rounded-lg
+                                                       my-3
+                                                       py-2
+                                                       px-3
+                                                       whitespace-pre
+                                                       overflow-x-scroll))
+                                              (drop-first-last-line (match:substring
+                                                                     m))))
+                                    'post))
            ;; (_ (display "\nwith-parsed-code-block\n"))
            ;; (_ (write with-parsed-code-block))
            )
@@ -245,11 +257,11 @@ block code
             (parse-org "This is /multi\nline/ italic text."))
 
 (test-equal "parse-org inline link parsing"
-  "This is <a class=\"text-blue-800 font-bold\" href=\"https://www.google.com\">some link</a> code."
-  (parse-org "This is [[https://www.google.com][some link]] code."))
+ "This is <a class=\"text-blue-800 font-bold\" href=\"https://www.google.com\">some link</a> code."
+ (parse-org "This is [[https://www.google.com][some link]] code."))
 
 (test-equal "parse-org inline link parsing of same desc"
-  "This is <a class=\"text-blue-800 font-bold\" href=\"https://www.google.com\">https://www.google.com</a> code."
-  (parse-org "This is [[https://www.google.com][https://www.google.com]] code."))
+ "This is <a class=\"text-blue-800 font-bold\" href=\"https://www.google.com\">https://www.google.com</a> code."
+ (parse-org "This is [[https://www.google.com][https://www.google.com]] code."))
 
 (test-end)
