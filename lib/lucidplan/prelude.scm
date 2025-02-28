@@ -64,6 +64,18 @@
   (define org-code-block-replacement
     "<pre class=\"~a\">~a</pre>")
 
+  (define org-em-pattern
+    "/([^/<>]+)/")
+
+  (define org-em-replacement
+    "<em>~a</em>")
+
+  (define org-strong-pattern
+    "\\*([^*]+)\\*")
+
+  (define org-strong-replacement
+    "<strong>~a</strong>")
+
   (define* (parse-org org)
     (let* ((with-parsed-code (regexp-substitute/global #f
                                                        org-code-pattern
@@ -71,29 +83,58 @@
                                                        'pre
                                                        (lambda (m)
                                                          (format #f
-                                                          org-code-replacement
-                                                          (->css '(bg-stone-200/75
-                                                                   rounded-lg
-                                                                   py-1 px-2))
-                                                          (drop-first-last (match:substring
-                                                                            m))))
+                                                                 org-code-replacement
+                                                                 (->css '(bg-stone-200/75
+                                                                          rounded-lg
+                                                                          py-1 px-2))
+                                                                 (drop-first-last (match:substring
+                                                                                   m))))
                                                        'post))
+           ;; (_ (display "\nwith-parsed-code\n"))
+           ;; (_ (write with-parsed-code))
+           (with-parsed-italic (regexp-substitute/global #f
+                                                         org-em-pattern
+                                                         with-parsed-code
+                                                         'pre
+                                                         (lambda (m)
+                                                           (format #f
+                                                                   org-em-replacement
+                                                                   (drop-first-last (match:substring
+                                                                                     m))))
+                                                         'post))
+           ;; (_ (display "\nwith-parsed-italic\n"))
+           ;; (_ (write with-parsed-italic))
+           (with-parsed-strong (regexp-substitute/global #f
+                                                         org-strong-pattern
+                                                         with-parsed-italic
+                                                         'pre
+                                                         (lambda (m)
+                                                           (format #f
+                                                                   org-strong-replacement
+                                                                   (drop-first-last (match:substring
+                                                                                     m))))
+                                                         'post))
+           ;; (_ (display "\nwith-parsed-strong\n"))
+           ;; (_ (write with-parsed-strong))
            (with-parsed-code-block (regexp-substitute/global #f
-                                    org-code-block-pattern
-                                    with-parsed-code
-                                    'pre
-                                    (lambda (m)
-                                      (format #f org-code-block-replacement
-                                              (->css '(bg-stone-200/75
-                                                       rounded-lg
-                                                       my-3
-                                                       py-2
-                                                       px-3
-                                                       whitespace-pre
-                                                       overflow-x-scroll))
-                                              (drop-first-last-line (match:substring
-                                                                     m))))
-                                    'post)))
+                                                             org-code-block-pattern
+                                                             with-parsed-strong
+                                                             'pre
+                                                             (lambda (m)
+                                                               (format #f org-code-block-replacement
+                                                                       (->css '(bg-stone-200/75
+                                                                                rounded-lg
+                                                                                my-3
+                                                                                py-2
+                                                                                px-3
+                                                                                whitespace-pre
+                                                                                overflow-x-scroll))
+                                                                       (drop-first-last-line (match:substring
+                                                                                              m))))
+                                                             'post))
+           ;; (_ (display "\nwith-parsed-code-block\n"))
+           ;; (_ (write with-parsed-code-block))
+           )
       with-parsed-code-block))
   (export parse-org))
 
@@ -151,5 +192,13 @@ code block
 
 (test-equal "parse-org no matches" "Just some text with no code."
             (parse-org "Just some text with no code."))
+
+(test-equal "parse-org inline italic parsing"
+  "This is <em>test</em> code."
+  (parse-org "This is /test/ code."))
+
+(test-equal "parse-org inline strong parsing"
+  "This is <strong>test</strong> code."
+  (parse-org "This is *test* code."))
 
 (test-end)
