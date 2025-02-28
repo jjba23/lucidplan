@@ -44,6 +44,13 @@
       (string-take (string-drop s 1)
                    (- (string-length s) 2)) s))
 
+(define (drop-first-last-n s n)
+  (if (> (string-length s) 2)
+
+      (string-take (string-drop s n)
+                   (- (string-length s)
+                      (+ 1 n))) s))
+
 (define (drop-first-last-line s)
   (let* ((lines (string-split s #\newline))
          (middle (if (> (length lines) 2)
@@ -65,10 +72,12 @@
     "<pre class=\"~a\">~a</pre>")
 
   (define org-em-pattern
-    "/([^/<>:]+)/")
+    "[[:space:]]/([^/<>:]+)/[[:space:]]")
 
+  ;; space is important for italic replacement
+  ;; due to links
   (define org-em-replacement
-    "<em>~a</em>")
+    " <em>~a</em> ")
 
   (define org-strong-pattern
     "\\*([^*]+)\\*")
@@ -83,48 +92,9 @@
     "<a class=\"~a\" href=\"~a\">~a</a>")
 
   (define* (parse-org org)
-    (let* ((with-parsed-code (regexp-substitute/global #f
-                                                       org-code-pattern
-                                                       org
-                                                       'pre
-                                                       (lambda (m)
-                                                         (format #f
-                                                          org-code-replacement
-                                                          (->css '(bg-stone-200/75
-                                                                   rounded-lg
-                                                                   py-1 px-2))
-                                                          (drop-first-last (match:substring
-                                                                            m))))
-                                                       'post))
-           ;; (_ (display "\nwith-parsed-code\n"))
-           ;; (_ (write with-parsed-code))
-           (with-parsed-italic (regexp-substitute/global #f
-                                                         org-em-pattern
-                                                         with-parsed-code
-                                                         'pre
-                                                         (lambda (m)
-                                                           (format #f
-                                                            org-em-replacement
-                                                            (drop-first-last (match:substring
-                                                                              m))))
-                                                         'post))
-           ;; (_ (display "\nwith-parsed-italic\n"))
-           ;; (_ (write with-parsed-italic))
-           (with-parsed-strong (regexp-substitute/global #f
-                                                         org-strong-pattern
-                                                         with-parsed-italic
-                                                         'pre
-                                                         (lambda (m)
-                                                           (format #f
-                                                            org-strong-replacement
-                                                            (drop-first-last (match:substring
-                                                                              m))))
-                                                         'post))
-           ;; (_ (display "\nwith-parsed-strong\n"))
-           ;; (_ (write with-parsed-strong))
-           (with-parsed-link (regexp-substitute/global #f
+    (let* ((with-parsed-link (regexp-substitute/global #f
                                                        org-link-pattern
-                                                       with-parsed-strong
+                                                       org
                                                        'pre
                                                        (lambda (m)
                                                          (let* ((l (drop-first-last
@@ -154,9 +124,60 @@
                                                        'post))
            ;; (_ (display "\nwith-parsed-link\n"))
            ;; (_ (write with-parsed-link))
+           (with-parsed-code (regexp-substitute/global #f
+                                                       org-code-pattern
+                                                       with-parsed-link
+                                                       'pre
+                                                       (lambda (m)
+                                                         (format #f
+                                                          org-code-replacement
+                                                          (->css '(bg-stone-200/75
+                                                                   rounded-lg
+                                                                   py-1 px-2))
+                                                          (drop-first-last (match:substring
+                                                                            m))))
+                                                       'post))
+           ;; (_ (display "\nwith-parsed-code\n"))
+           ;; (_ (write with-parsed-code))
+           (with-parsed-italic (regexp-substitute/global #f
+                                                         org-em-pattern
+                                                         with-parsed-code
+                                                         'pre
+                                                         (lambda (m)
+                                                           ;; (display "(match:substring m)\n")
+                                                           ;; (write (match:substring m))
+                                                           (cond
+                                                             ((string-contains
+                                                               (match:substring
+                                                                m) "://")
+                                                              (drop-first-last
+                                                               (string-trim-both
+                                                                (match:substring
+                                                                 m))))
+                                                             (else (format #f
+                                                                    org-em-replacement
+                                                                    (drop-first-last
+                                                                     (string-trim-both
+                                                                      (match:substring
+                                                                       m)))))))
+                                                         'post))
+           ;; (_ (display "\nwith-parsed-italic\n"))
+           ;; (_ (write with-parsed-italic))
+           (with-parsed-strong (regexp-substitute/global #f
+                                                         org-strong-pattern
+                                                         with-parsed-italic
+                                                         'pre
+                                                         (lambda (m)
+                                                           (format #f
+                                                            org-strong-replacement
+                                                            (drop-first-last (match:substring
+                                                                              m))))
+                                                         'post))
+           ;; (_ (display "\nwith-parsed-strong\n"))
+           ;; (_ (write with-parsed-strong))
            (with-parsed-code-block (regexp-substitute/global #f
                                     org-code-block-pattern
-                                    with-parsed-link
+                                    with-parsed-strong
                                     'pre
                                     (lambda (m)
                                       (format #f org-code-block-replacement
@@ -239,8 +260,8 @@ code block
             (parse-org "This is *test* code."))
 
 (test-equal "parse-org inline combined formatting"
-            "This is <strong><em>test</em></strong> code."
-            (parse-org "This is */test/* code."))
+            "This is <em><strong>test</strong></em> code."
+            (parse-org "This is /*test*/ code."))
 
 (test-equal "parse-org consecutive inline formatting"
  "<strong>bold</strong> <em>italic</em> <code class=\"bg-stone-200/75 rounded-lg py-1 px-2\">code</code>"
@@ -263,5 +284,10 @@ block code
 (test-equal "parse-org inline link parsing of same desc"
  "This is <a class=\"text-blue-800 font-bold\" href=\"https://www.google.com\">https://www.google.com</a> code."
  (parse-org "This is [[https://www.google.com][https://www.google.com]] code."))
+
+(test-equal "parse-org inline link parsing of same desc"
+ "Created GitHub ticket here: <a class=\"text-blue-800 font-bold\" href=\"https://github.com/flatpak/flatpak/issues/6135\">https://github.com/flatpak/flatpak/issues/6135</a>"
+ (parse-org
+  "Created GitHub ticket here: [[https://github.com/flatpak/flatpak/issues/6135][https://github.com/flatpak/flatpak/issues/6135]]"))
 
 (test-end)
