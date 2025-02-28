@@ -201,4 +201,20 @@ code block
   "This is <strong>test</strong> code."
   (parse-org "This is *test* code."))
 
+(test-equal "parse-org inline combined formatting"
+  "This is <strong><em>test</em></strong> code."
+  (parse-org "This is */test/* code."))
+
+(test-equal "parse-org consecutive inline formatting"
+  "<strong>bold</strong> <em>italic</em> <code class=\"bg-stone-200/75 rounded-lg py-1 px-2\">code</code>"
+  (parse-org "*bold* /italic/ ~code~"))
+
+(test-equal "parse-org mixed block and inline formatting"
+  "Inline <code class=\"bg-stone-200/75 rounded-lg py-1 px-2\">code</code> before block: <pre class=\"bg-stone-200/75 rounded-lg my-3 py-2 px-3 whitespace-pre overflow-x-scroll\">block code</pre> after block."
+  (parse-org "Inline ~code~ before block: #+begin_src\nblock code\n#+end_src after block."))
+
+(test-equal "parse-org multiline inline formatting"
+  "This is <em>multi\nline</em> italic text."
+  (parse-org "This is /multi\nline/ italic text."))
+
 (test-end)
