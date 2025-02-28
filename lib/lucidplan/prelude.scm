@@ -65,7 +65,7 @@
     "<pre class=\"~a\">~a</pre>")
 
   (define org-em-pattern
-    "/([^/<>]+)/")
+    "/([^/<>:]+)/")
 
   (define org-em-replacement
     "<em>~a</em>")
@@ -75,6 +75,12 @@
 
   (define org-strong-replacement
     "<strong>~a</strong>")
+
+  (define org-link-pattern
+    "\\[\\[.*\\]\\]")
+
+  (define org-link-replacement
+    "<a class=\"~a\" href=\"~a\">~a</a>")
 
   (define* (parse-org org)
     (let* ((with-parsed-code (regexp-substitute/global #f
@@ -116,9 +122,29 @@
                                                          'post))
            ;; (_ (display "\nwith-parsed-strong\n"))
            ;; (_ (write with-parsed-strong))
+           (with-parsed-link (regexp-substitute/global #f
+                                                       org-link-pattern
+                                                       with-parsed-strong
+                                                       'pre
+                                                       (lambda (m)
+                                                         (let* ((l (drop-first-last
+                                                                    (match:substring
+                                                                     m)))
+                                                                (split-l (string-split (string-replace-substring l "][" "|") #\|))
+                                                                (_ (write split-l))
+                                                                (link (string-drop (car split-l) 1))
+                                                                (desc (string-drop-right (car (cdr split-l)) 1)))
+                                                           (format #f
+                                                                   org-link-replacement
+                                                                   (->css '(text-blue-800
+                                                                            font-bold))
+                                                                   link desc)))
+                                                       'post))
+           ;; (_ (display "\nwith-parsed-link\n"))
+           ;; (_ (write with-parsed-link))
            (with-parsed-code-block (regexp-substitute/global #f
                                                              org-code-block-pattern
-                                                             with-parsed-strong
+                                                             with-parsed-link
                                                              'pre
                                                              (lambda (m)
                                                                (format #f org-code-block-replacement
@@ -193,28 +219,37 @@ code block
 (test-equal "parse-org no matches" "Just some text with no code."
             (parse-org "Just some text with no code."))
 
-(test-equal "parse-org inline italic parsing"
-  "This is <em>test</em> code."
-  (parse-org "This is /test/ code."))
+(test-equal "parse-org inline italic parsing" "This is <em>test</em> code."
+            (parse-org "This is /test/ code."))
 
 (test-equal "parse-org inline strong parsing"
-  "This is <strong>test</strong> code."
-  (parse-org "This is *test* code."))
+            "This is <strong>test</strong> code."
+            (parse-org "This is *test* code."))
 
 (test-equal "parse-org inline combined formatting"
-  "This is <strong><em>test</em></strong> code."
-  (parse-org "This is */test/* code."))
+            "This is <strong><em>test</em></strong> code."
+            (parse-org "This is */test/* code."))
 
 (test-equal "parse-org consecutive inline formatting"
-  "<strong>bold</strong> <em>italic</em> <code class=\"bg-stone-200/75 rounded-lg py-1 px-2\">code</code>"
-  (parse-org "*bold* /italic/ ~code~"))
+ "<strong>bold</strong> <em>italic</em> <code class=\"bg-stone-200/75 rounded-lg py-1 px-2\">code</code>"
+ (parse-org "*bold* /italic/ ~code~"))
 
 (test-equal "parse-org mixed block and inline formatting"
-  "Inline <code class=\"bg-stone-200/75 rounded-lg py-1 px-2\">code</code> before block: <pre class=\"bg-stone-200/75 rounded-lg my-3 py-2 px-3 whitespace-pre overflow-x-scroll\">block code</pre> after block."
-  (parse-org "Inline ~code~ before block: #+begin_src\nblock code\n#+end_src after block."))
+ "Inline <code class=\"bg-stone-200/75 rounded-lg py-1 px-2\">code</code> before block: <pre class=\"bg-stone-200/75 rounded-lg my-3 py-2 px-3 whitespace-pre overflow-x-scroll\">block code</pre> after block."
+ (parse-org "Inline ~code~ before block: #+begin_src
+block code
+#+end_src after block."))
 
 (test-equal "parse-org multiline inline formatting"
-  "This is <em>multi\nline</em> italic text."
-  (parse-org "This is /multi\nline/ italic text."))
+            "This is <em>multi\nline</em> italic text."
+            (parse-org "This is /multi\nline/ italic text."))
+
+(test-equal "parse-org inline link parsing"
+  "This is <a class=\"text-blue-800 font-bold\" href=\"https://www.google.com\">some link</a> code."
+  (parse-org "This is [[https://www.google.com][some link]] code."))
+
+(test-equal "parse-org inline link parsing of same desc"
+  "This is <a class=\"text-blue-800 font-bold\" href=\"https://www.google.com\">https://www.google.com</a> code."
+  (parse-org "This is [[https://www.google.com][https://www.google.com]] code."))
 
 (test-end)
