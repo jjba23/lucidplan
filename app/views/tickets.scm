@@ -116,19 +116,17 @@
   `((div (@ (class "flex flex-col gap-2")
             (id ,(format #f "listitem-~a"
                          (assoc-ref ticket "id"))))
-         (div (@
-               (onclick ,(format #f
-                                 ticket-listitem-reveal-details-js-template
-                                 (assoc-ref ticket "id")))
-               (class
-                 "flex flex-row flex-wrap gap-4 items-center justify-between bg-stone-300/75 border-stone-400/75 border-2 py-2 px-4 cursor-pointer rounded-xl"))
-              (div 
-               (small (@ (class "font-sans text-stone-800 text-sm"))
-                      ,(format #f "~a-~a" project
-                               (assoc-ref ticket "human_id")))
-               (h5 (@ (class ,(->css '(font-sans text-stone-700 text-lg
-                                                 font-black break-words))))
-                   ,(parse-org (assoc-ref ticket "title"))))
+         (div (@ (onclick ,(format #f
+                                   ticket-listitem-reveal-details-js-template
+                                   (assoc-ref ticket "id")))
+                 (class
+                  "flex flex-row flex-wrap gap-4 items-center justify-between bg-stone-300/75 border-stone-400/75 border-2 py-2 px-4 cursor-pointer rounded-xl"))
+              (div (small (@ (class "font-sans text-stone-800 text-sm"))
+                          ,(format #f "~a-~a" project
+                                   (assoc-ref ticket "human_id")))
+                   (h5 (@ (class ,(->css '(font-sans text-stone-700 text-lg
+                                                     font-black break-words))))
+                       ,(parse-org (assoc-ref ticket "title"))))
               (div (a (@ (href ,(format #f "/tickets/~a/~a" project
                                         (assoc-ref ticket "human_id"))))
                       (span "🔗"))))
@@ -151,45 +149,46 @@
     (html-template G_
                    #:body `(div (@ (class "container mx-auto"))
                                 ((div (@ (class
-                                           "flex flex-col gap-4 flex-grow"))
+                                          "flex flex-col gap-4 flex-grow"))
                                       (div (@ (class
-                                                "flex flex-wrap flex-row gap-4 items-center justify-between"))
+                                               "flex flex-wrap flex-row gap-4 items-center justify-between"))
                                            (h2 (@ (class
-                                                    "text-3xl font-sans font-black text-stone-700"))
+                                                   "text-3xl font-sans font-black text-stone-700"))
                                                ,(format #f "backlog of ~a"
                                                         (assoc-ref
                                                          project-details
                                                          "title")))
-                                           (div (@(class "flex flex-row flex-wrap gap-1 items-center"))
-                                                (div
-                                                 (a (@ (class
-                                                         "text-stone-600 text-md")
-                                                       (href ,(format #f
-                                                                      "/kanban/~a"
-                                                                      (assoc-ref
-                                                                       project-details
-                                                                       "human_id"))))
-                                                    ,(action-button #:content
-                                                                    "💡 kanban")))
+                                           (div (@ (class
+                                                    "flex flex-row flex-wrap gap-1 items-center"))
+                                                (div (a (@ (class
+                                                            "text-stone-600 text-md")
+                                                           (href ,(format #f
+                                                                   "/kanban/~a"
+                                                                   (assoc-ref
+                                                                    project-details
+                                                                    "human_id"))))
+                                                        ,(action-button
+                                                          #:content "💡 kanban")))
                                                 (a (@ (href ,(format #f
-                                                                     "/tickets/~a/new"
-                                                                     (assoc-ref
-                                                                      project-details
-                                                                      "human_id"))))
-                                                   ,(action-button #:content "➕ new ticket"))))
+                                                              "/tickets/~a/new"
+                                                              (assoc-ref
+                                                               project-details
+                                                               "human_id"))))
+                                                   ,(action-button #:content
+                                                     "➕ new ticket"))))
                                       ,(render-if-nestring (lambda (x)
                                                              `(p (@ (class
-                                                                      "text-sm text-stone-500"))
+                                                                     "text-sm text-stone-500"))
                                                                  ,x))
                                                            (assoc-ref
                                                             project-details
                                                             "description"))
 
                                       (details (summary (@ (class
-                                                             "text-stone-600 text-sm cursor-pointer"))
+                                                            "text-stone-600 text-sm cursor-pointer"))
                                                         ,(G_ "backlog options"))
                                                (div (@ (class
-                                                         "flex flex-wrap flex-row gap-4 my-3"))
+                                                        "flex flex-wrap flex-row gap-4 my-3"))
                                                     (input (@ (id
                                                                "should-show-done")
                                                               (type checkbox)
@@ -208,7 +207,7 @@
                                                                            project-details
                                                                            "human_id"))))
                                                            (span (@ (class
-                                                                      "text-stone-600 text-sm"))
+                                                                     "text-stone-600 text-sm"))
                                                                  ,(G_
                                                                    "show done?")))
                                                     (input (@ (id
@@ -229,19 +228,19 @@
                                                                            project-details
                                                                            "human_id"))))
                                                            (span (@ (class
-                                                                      "text-stone-600 text-sm"))
+                                                                     "text-stone-600 text-sm"))
                                                                  ,(G_
                                                                    "show rejected?")))))
                                       (div (@ (id "lucidplan-tickets-list")
                                               (ondrop "dropTicketsItem(event)")
                                               (ondragover "allowDrop(event)")
                                               (class
-                                                "flex flex-col gap-2 container"))
+                                               "flex flex-col gap-2 container"))
                                            ,(map (lambda (t)
                                                    (render-ticket-listitem G_
-                                                                           (assoc-ref project-details
-                                                                                      "human_id") t
-                                                                                      ticket-id-to-human-id))
+                                                    (assoc-ref project-details
+                                                     "human_id") t
+                                                    ticket-id-to-human-id))
                                                  (filter
                                                   only-active-tickets-filter
                                                   tickets)))
@@ -252,18 +251,18 @@
                                                     (class "my-4"))
                                                  (hr)
                                                  (h2 (@ (class
-                                                          "text-lg font-sans font-black text-stone-600 flex flex-row gap-2 my-4"))
+                                                         "text-lg font-sans font-black text-stone-600 flex flex-row gap-2 my-4"))
                                                      (span "✅")
                                                      (span ,(G_ "done")))
                                                  (div (@ (class
-                                                           "flex flex-col gap-2 container"))
+                                                          "flex flex-col gap-2 container"))
                                                       ,(map (lambda (t)
                                                               (render-ticket-listitem
                                                                G_
                                                                (assoc-ref
                                                                 project-details
                                                                 "human_id") t
-                                                                ticket-id-to-human-id))
+                                                               ticket-id-to-human-id))
                                                             (filter
                                                              only-done-tickets-filter
                                                              tickets))))
@@ -274,23 +273,22 @@
                                                     (class "my-4"))
                                                  (hr)
                                                  (h2 (@ (class
-                                                          "text-lg font-sans font-black text-stone-600 flex flex-row gap-2 my-4"))
+                                                         "text-lg font-sans font-black text-stone-600 flex flex-row gap-2 my-4"))
                                                      (span "❌")
                                                      (span ,(G_ "rejected")))
                                                  (div (@ (class
-                                                           "flex flex-col gap-2 container"))
+                                                          "flex flex-col gap-2 container"))
                                                       ,(map (lambda (t)
                                                               (render-ticket-listitem
                                                                G_
                                                                (assoc-ref
                                                                 project-details
                                                                 "human_id") t
-                                                                ticket-id-to-human-id))
+                                                               ticket-id-to-human-id))
                                                             (filter
                                                              only-rejected-tickets-filter
                                                              tickets))))
-                                           '())
-                                      )))
+                                           '()))))
                    #:proj projects))
   (export html-from-tickets))
 
