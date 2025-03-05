@@ -23,6 +23,7 @@
         (lucidplan auth)
         (lucidplan uri)
         (lucidplan uuid)
+        (lucidplan html)
         (lucidplan abstraction)
         (lucidplan query-escape)
         (app models ticket)
@@ -47,33 +48,46 @@
        (define (get)
          (let* ((project-id (project-id-from-human-id (params rc "project")))
                 (with-done (cond
-                            ((not (equal? #f (get-from-qstr rc "with-done")))
-                             (:cookies-set! rc
-                              'lucidplan-show-done
-                              "lucidplan-show-done" (get-from-qstr rc "with-done"))
-                             (:cookies-setattr! rc
-                              'lucidplan-show-done
-                              #:expires 12000000
-                              #:path "/"
-                              #:http-only #t)
-                             (equal? (get-from-qstr rc "with-done") "true"))
-                            ((not (equal? #f (:cookies-value rc "lucidplan-show-done")))
-                             (equal? (:cookies-value rc "lucidplan-show-done") "true"))
-                            (else #f)))
+                             ((not (equal? #f
+                                           (get-from-qstr rc "with-done")))
+                              (:cookies-set! rc
+                                             'lucidplan-show-done
+                                             "lucidplan-show-done"
+                                             (get-from-qstr rc "with-done"))
+                              (:cookies-setattr! rc
+                                                 'lucidplan-show-done
+                                                 #:expires 12000000
+                                                 #:path "/"
+                                                 #:http-only #t)
+                              (equal? (get-from-qstr rc "with-done") "true"))
+                             ((not (equal? #f
+                                           (:cookies-value rc
+                                            "lucidplan-show-done")))
+                              (equal? (:cookies-value rc "lucidplan-show-done")
+                                      "true"))
+                             (else #f)))
                 (with-rejected (cond
-                                ((not (equal? #f (get-from-qstr rc "with-rejected")))
-                                 (:cookies-set! rc
-                                  'lucidplan-show-rejected
-                                  "lucidplan-show-rejected" (get-from-qstr rc "with-rejected"))
-                                 (:cookies-setattr! rc
-                                  'lucidplan-show-rejected
-                                  #:expires 12000000
-                                  #:path "/"
-                                  #:http-only #t)
-                                 (equal? (get-from-qstr rc "with-rejected") "true"))
-                                ((not (equal? #f (:cookies-value rc "lucidplan-show-rejected")))
-                                 (equal? (:cookies-value rc "lucidplan-show-rejected") "true"))
-                                (else #f)))
+                                 ((not (equal? #f
+                                               (get-from-qstr rc
+                                                              "with-rejected")))
+                                  (:cookies-set! rc
+                                                 'lucidplan-show-rejected
+                                                 "lucidplan-show-rejected"
+                                                 (get-from-qstr rc
+                                                  "with-rejected"))
+                                  (:cookies-setattr! rc
+                                                     'lucidplan-show-rejected
+                                                     #:expires 12000000
+                                                     #:path "/"
+                                                     #:http-only #t)
+                                  (equal? (get-from-qstr rc "with-rejected")
+                                          "true"))
+                                 ((not (equal? #f
+                                               (:cookies-value rc
+                                                "lucidplan-show-rejected")))
+                                  (equal? (:cookies-value rc
+                                           "lucidplan-show-rejected") "true"))
+                                 (else #f)))
                 (proj ($project 'get
                                 #:order-by '(human_id asc)))
                 (write (params rc "project"))
@@ -83,9 +97,8 @@
                                                                                rc
                                                                                "project")))))
                 (project-tickets ($ticket 'get
-                                          #:condition (where
-                                                       #:project_id
-                                                       project-id)
+                                          #:condition (where #:project_id
+                                                             project-id)
                                           #:order-by '(updated_at desc)))
                 (ticket-id-to-human-id (map (lambda (t)
                                               `(,(assoc-ref t "id") unquote
@@ -98,16 +111,19 @@
                                                      #:order-by '(human_id asc)))))
            
            (response-emit (:mime rc
-                           (html-from-tickets (:i18n rc)
-                                              #:projects proj
-                                              #:project-details project-details
-                                              #:tickets project-tickets
-                                              #:ticket-id-to-human-id ticket-id-to-human-id
-                                              #:with-done with-done
-                                              #:with-rejected with-rejected)))))
+                                 (html-from-tickets (:i18n rc)
+                                                    #:projects proj
+                                                    #:project-details
+                                                    project-details
+                                                    #:tickets project-tickets
+                                                    #:ticket-id-to-human-id
+                                                    ticket-id-to-human-id
+                                                    #:with-done with-done
+                                                    #:with-rejected
+                                                    with-rejected)))))
        (get)))
 
-(get "/tickets/:project/:ticket-id"
+(get "/tickets/:project/:human-id"
      #:mime 'xml
      #:session #t
      #:i18n '(cookie "lang")
@@ -117,12 +133,15 @@
                                 #:order-by '(human_id asc)))
                 (t (car ($ticket 'get
                                  #:ret 'top
-                                 #:condition (where #:id (params rc
-                                                                 "ticket-id"))))))
+                                 #:condition (where #:human_id (params rc
+                                                                "human-id"))))))
            (response-emit (:mime rc
-                           (html-edit-ticket-form (:i18n rc) proj
-                                                  (params rc "project")
-                                                  t)))))
+                                 (html-template (:i18n rc)
+                                                #:body `(div (@ (class "p-2"))
+                                                             ,(render-ticket (:i18n
+                                                                              rc)
+                                                               (params rc
+                                                                "project") t)))))))
        (get-single)))
 
 (get "/tickets/:project/new"

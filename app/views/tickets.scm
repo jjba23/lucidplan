@@ -47,7 +47,7 @@
   #:use-module (artanis security nss)
   #:use-module (artanis route))
 
-(define-public (render-ticket G_ project ticket ticket-id-to-human-id)
+(define-public (render-ticket G_ project ticket)
   `((div (@ (class
              "flex flex-col gap-2 p-3 bg-stone-100 rounded-2xl border-stone-400/75 border-2"))
          (h4 (@ (class "font-sans text-stone-700 text-2xl font-bold my-3"))
@@ -118,22 +118,26 @@
                          (assoc-ref ticket "id"))))
          (div (@ (draggable "true")
                  (ondragstart "dragTicketsItem(event)")
-                 (onclick ,(format #f
-                                   ticket-listitem-reveal-details-js-template
-                                   (assoc-ref ticket "id")))
                  (class
-                  "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/75 border-stone-400/75 border-2 py-2 px-4 cursor-pointer rounded-xl"))
-              (small (@ (class "font-sans text-stone-800 text-sm"))
-                     ,(format #f "~a-~a" project
-                              (assoc-ref ticket "human_id")))
-              (h5 (@ (class ,(->css '(font-sans text-stone-700 text-lg
-                                                font-black break-words))))
-                  ,(parse-org (assoc-ref ticket "title"))))
+                  "flex flex-row flex-wrap gap-4 items-center justify-between bg-stone-300/75 border-stone-400/75 border-2 py-2 px-4 cursor-pointer rounded-xl"))
+              (div (@ (onclick ,(format #f
+                                 ticket-listitem-reveal-details-js-template
+                                 (assoc-ref ticket "id"))))
+
+                   (small (@ (class "font-sans text-stone-800 text-sm"))
+                          ,(format #f "~a-~a" project
+                                   (assoc-ref ticket "human_id")))
+                   (h5 (@ (class ,(->css '(font-sans text-stone-700 text-lg
+                                                     font-black break-words))))
+                       ,(parse-org (assoc-ref ticket "title"))))
+              (div (a (@ (href ,(format #f "/tickets/~a/~a" project
+                                        (assoc-ref ticket "human_id"))))
+                      (span "🔗"))))
          (div (@ (id ,(format #f "details-~a"
                               (assoc-ref ticket "id")))
                  (class "ml-4")
                  (hidden ""))
-              ,(render-ticket G_ project ticket ticket-id-to-human-id)))
+              ,(render-ticket G_ project ticket)))
     
     ))
 
@@ -148,17 +152,17 @@
     (html-template G_
                    #:body `(div (@ (class "container mx-auto"))
                                 ((div (@ (class
-                                           "flex flex-col gap-4 flex-grow"))
+                                          "flex flex-col gap-4 flex-grow"))
                                       (div (@ (class
-                                                "flex flex-wrap flex-row gap-6 items-center"))
+                                               "flex flex-wrap flex-row gap-6 items-center"))
                                            (h2 (@ (class
-                                                    "text-2xl font-sans font-black text-stone-600"))
+                                                   "text-2xl font-sans font-black text-stone-600"))
                                                ,(format #f "backlog of ~a"
                                                         (assoc-ref
                                                          project-details
                                                          "title")))
                                            (a (@ (class
-                                                   "text-stone-600 text-md")
+                                                  "text-stone-600 text-md")
                                                  (href ,(format #f
                                                                 "/kanban/~a"
                                                                 (assoc-ref
@@ -168,56 +172,68 @@
                                                               "💡 kanban")))
                                       ,(render-if-nestring (lambda (x)
                                                              `(p (@ (class
-                                                                      "text-sm text-stone-500"))
+                                                                     "text-sm text-stone-500"))
                                                                  ,x))
                                                            (assoc-ref
                                                             project-details
                                                             "description"))
                                       (details (summary (@ (class
-                                                             "text-stone-600 text-sm cursor-pointer"))
+                                                            "text-stone-600 text-sm cursor-pointer"))
                                                         ,(G_ "backlog options"))
                                                (div (@ (class
-                                                         "flex flex-wrap flex-row gap-4 my-3"))
+                                                        "flex flex-wrap flex-row gap-4 my-3"))
                                                     (input (@ (id
                                                                "should-show-done")
                                                               (type checkbox)
-                                                              ,(if with-done '(checked true) '(not-checked true))
+                                                              ,(if with-done
+                                                                   '(checked
+                                                                     true)
+                                                                   '(not-checked
+                                                                     true))
                                                               (onchange ,(format
                                                                           #f
                                                                           (string-append
                                                                            "window.location.href ="
                                                                            " `/tickets/~a?with-done="
                                                                            "${document.getElementById('should-show-done').checked}`;")
-                                                                          (assoc-ref project-details "human_id"))))
+                                                                          (assoc-ref
+                                                                           project-details
+                                                                           "human_id"))))
                                                            (span (@ (class
-                                                                      "text-stone-600 text-sm"))
+                                                                     "text-stone-600 text-sm"))
                                                                  ,(G_
                                                                    "show done?")))
                                                     (input (@ (id
                                                                "should-show-rejected")
                                                               (type checkbox)
-                                                              ,(if with-rejected '(checked true) '(not-checked true))
+                                                              ,(if
+                                                                with-rejected
+                                                                '(checked true)
+                                                                '(not-checked
+                                                                  true))
                                                               (onchange ,(format
                                                                           #f
                                                                           (string-append
                                                                            "window.location.href ="
                                                                            " `/tickets/~a?with-rejected="
                                                                            "${document.getElementById('should-show-rejected').checked}`;")
-                                                                          (assoc-ref project-details "human_id"))))
+                                                                          (assoc-ref
+                                                                           project-details
+                                                                           "human_id"))))
                                                            (span (@ (class
-                                                                      "text-stone-600 text-sm"))
+                                                                     "text-stone-600 text-sm"))
                                                                  ,(G_
                                                                    "show rejected?")))))
                                       (div (@ (id "lucidplan-tickets-list")
                                               (ondrop "dropTicketsItem(event)")
                                               (ondragover "allowDrop(event)")
                                               (class
-                                                "flex flex-col gap-2 container"))
+                                               "flex flex-col gap-2 container"))
                                            ,(map (lambda (t)
                                                    (render-ticket-listitem G_
-                                                                           (assoc-ref project-details
-                                                                                      "human_id") t
-                                                                                      ticket-id-to-human-id))
+                                                    (assoc-ref project-details
+                                                     "human_id") t
+                                                    ticket-id-to-human-id))
                                                  (filter
                                                   only-active-tickets-filter
                                                   tickets)))
@@ -228,18 +244,18 @@
                                                     (class "my-4"))
                                                  (hr)
                                                  (h2 (@ (class
-                                                          "text-lg font-sans font-black text-stone-600 flex flex-row gap-2 my-4"))
+                                                         "text-lg font-sans font-black text-stone-600 flex flex-row gap-2 my-4"))
                                                      (span "✅")
                                                      (span ,(G_ "done")))
                                                  (div (@ (class
-                                                           "flex flex-col gap-2 container"))
+                                                          "flex flex-col gap-2 container"))
                                                       ,(map (lambda (t)
                                                               (render-ticket-listitem
                                                                G_
                                                                (assoc-ref
                                                                 project-details
                                                                 "human_id") t
-                                                                ticket-id-to-human-id))
+                                                               ticket-id-to-human-id))
                                                             (filter
                                                              only-done-tickets-filter
                                                              tickets))))
@@ -250,27 +266,27 @@
                                                     (class "my-4"))
                                                  (hr)
                                                  (h2 (@ (class
-                                                          "text-lg font-sans font-black text-stone-600 flex flex-row gap-2 my-4"))
+                                                         "text-lg font-sans font-black text-stone-600 flex flex-row gap-2 my-4"))
                                                      (span "❌")
                                                      (span ,(G_ "rejected")))
                                                  (div (@ (class
-                                                           "flex flex-col gap-2 container"))
+                                                          "flex flex-col gap-2 container"))
                                                       ,(map (lambda (t)
                                                               (render-ticket-listitem
                                                                G_
                                                                (assoc-ref
                                                                 project-details
                                                                 "human_id") t
-                                                                ticket-id-to-human-id))
+                                                               ticket-id-to-human-id))
                                                             (filter
                                                              only-rejected-tickets-filter
                                                              tickets))))
                                            '())
                                       (div (a (@ (href ,(format #f
-                                                                "/tickets/~a/new"
-                                                                (assoc-ref
-                                                                 project-details
-                                                                 "human_id"))))
+                                                         "/tickets/~a/new"
+                                                         (assoc-ref
+                                                          project-details
+                                                          "human_id"))))
                                               "+ new ticket")))))
                    #:proj projects))
   (export html-from-tickets))
