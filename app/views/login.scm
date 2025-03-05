@@ -35,7 +35,7 @@
                               (method "POST"))
                            ,(mk-input #:label (G_ "username")
                                       #:name "username"
-                                      #:value ""
+                                      #:value "Joe"
                                       #:required #t)
                            ,(mk-input #:label (G_ "password")
                                       #:name "password"

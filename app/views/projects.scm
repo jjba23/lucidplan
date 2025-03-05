@@ -84,7 +84,7 @@
          (hr)
          (div (@ (class "flex flex-wrap flex-row gap-4"))
               (a (@ (href ,(format #f "/projects/~a/edit"
-                                   (assoc-ref p "id"))))
+                                   (assoc-ref p "human_id"))))
                  ,(action-button #:content (G_ "edit project")))
               (form (@ (enctype "application/x-www-form-urlencoded")
                        (method "POST")
@@ -147,7 +147,7 @@
                      #:description (if (assoc-ref p "description")
                                        (assoc-ref p "description") "")
                      #:action (format #f "/projects/~a/edit"
-                                      (assoc-ref p "id"))
+                                      (assoc-ref p "human_id"))
                      #:proj proj))
 
 (define* (html-project-form G_

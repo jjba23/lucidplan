@@ -96,7 +96,7 @@
          (hr)
          (div (@ (class "flex flex-row flex-wrap gap-4"))
               (a (@ (href ,(format #f "/tickets/~a/~a/edit" project
-                                   (assoc-ref ticket "id"))))
+                                   (assoc-ref ticket "human_id"))))
                  ,(action-button #:content (G_ "edit ticket")))
               (form (@ (enctype "application/x-www-form-urlencoded")
                        (method "POST")
@@ -195,7 +195,7 @@
                     #:ticket-type (assoc-ref t "ticket_type")
                     #:ticket-status (assoc-ref t "ticket_status")
                     #:action (format #f "/tickets/~a/~a/edit" project
-                                     (assoc-ref t "id"))
+                                     (assoc-ref t "human_id"))
                     #:proj proj))
 
 (define* (html-ticket-form G_

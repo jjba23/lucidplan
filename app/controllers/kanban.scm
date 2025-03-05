@@ -48,12 +48,10 @@
          (let* ((project-id (project-id-from-human-id (params rc "project")))
                 (proj ($project 'get
                                 #:order-by '(human_id asc)))
-                (project-tickets (filter also-done-tickets-filter
-                                         ($ticket 'get
-                                                  #:condition (where
-                                                               #:project_id
-                                                               project-id)
-                                                  #:order-by '(updated_at desc))))
+                (project-tickets ($ticket 'get
+                                          #:condition (where #:project_id
+                                                             project-id)
+                                          #:order-by '(updated_at desc)))
                 (ticket-id-to-human-id (map (lambda (t)
                                               `(,(assoc-ref t "id") unquote
                                                 (assoc-ref t "human_id")))

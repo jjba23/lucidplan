@@ -76,6 +76,24 @@
                                                     ticket-id-to-human-id)))))
        (get)))
 
+(get "/tickets/:project/:ticket-id"
+     #:mime 'xml
+     #:session #t
+     #:i18n '(cookie "lang")
+     (lambda (rc)
+       (define (get-single)
+         (let* ((proj ($project 'get
+                                #:order-by '(human_id asc)))
+                (t (car ($ticket 'get
+                                 #:ret 'top
+                                 #:condition (where #:id (params rc
+                                                                 "ticket-id"))))))
+           (response-emit (:mime rc
+                                 (html-edit-ticket-form (:i18n rc) proj
+                                                        (params rc "project")
+                                                        t)))))
+       (get-single)))
+
 (get "/tickets/:project/new"
      #:mime 'xml
      #:session #t
@@ -142,25 +160,25 @@
                          #:status 302)))
         (protected-endpoint rc do-new)))
 
-(get "/tickets/:project/:ticket-id/edit"
+(get "/tickets/:project/:human-id/edit"
      #:mime 'xml
      #:session #t
      #:i18n '(cookie "lang")
      (lambda (rc)
        (define (get-edit)
          (let* ((proj ($project 'get
-                                #:order-by '(human_id asc)))
+                                #:order-by '(title asc)))
                 (t (car ($ticket 'get
                                  #:ret 'top
-                                 #:condition (where #:id (params rc
-                                                                 "ticket-id"))))))
+                                 #:condition (where #:human_id (params rc
+                                                                "human-id"))))))
            (response-emit (:mime rc
                                  (html-edit-ticket-form (:i18n rc) proj
                                                         (params rc "project")
                                                         t)))))
        (get-edit)))
 
-(post "/tickets/:project/:ticket-id/edit"
+(post "/tickets/:project/:human-id/edit"
       #:mime 'xml
       #:auth '(table user "username" "password")
       #:session #t
@@ -181,8 +199,8 @@
                                (description ,(escape-str description))
                                (title ,(escape-str title))
                                (updated_at ,(current-time)))
-                             (where #:id (params rc "ticket-id"))))
-            (write (params rc "project"))
+                             (where #:human_id (params rc "human-id"))))
+
             (redirect-to rc
                          (string->uri (format #f "~a/tickets/~a"
                                               (current-myhost)

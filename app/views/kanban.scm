@@ -42,14 +42,17 @@
   #:use-module (artanis security nss)
   #:use-module (artanis route))
 
-(define render-k-ticket
-  (lambda (t)
-    `((div (@ (class "w-auto"))
-           (div (@ (class
-                    "rounded-xl bg-stone-200/50 p-3 border-stone-400/75 border-2"))
-                (p (@ (class "text-xs text-stone-700 flex flex-row gap-2"))
-                   (span ,(emoji-for-ticket-type (assoc-ref t "ticket_type")))
-                   (span ,(assoc-ref t "title"))))))))
+(define (render-k-ticket project t)
+  `((div (@ (class "w-auto"))
+         (div (@ (class
+                  "rounded-xl bg-stone-200/25 p-3 border-stone-400/75 border-2"))
+              (div (@ (class
+                       "flex flex-row justify-between items-center gap-2"))
+                   (p (@ (class "text-xs text-stone-700 flex flex-row gap-2"))
+                      (span ,(parse-org (assoc-ref t "title"))))
+                   (a (@ (class "text-xs")
+                         (href ,(format #f "/tickets/~a/~a" project
+                                        (assoc-ref t "human_id")))) "🔗"))))))
 
 (begin
   (define* (kanban-from-tickets G_ projects project tickets
@@ -81,9 +84,7 @@
                                         (string->symbol (assoc-ref x
                                                          "ticket_status"))))
                                  tickets))
-           (show-rejected #f)
-           (show-done #f)
-           (_ (log-exprs (list (list? tickets-todo) tickets-todo)))
+
            (kanban-html `((div (@ (class "container mx-auto"))
                                ((div (@ (class "flex flex-col gap-3 flex-grow"))
                                      (div (@ (class
@@ -119,7 +120,9 @@
                                                   "text-xs text-stone-700 font-light"))
                                               ,(format #f " ( ~a ) "
                                                        (length tickets-todo))))
-                                    ,(map render-k-ticket tickets-todo))
+                                    ,(map (lambda (t)
+                                            (render-k-ticket project t))
+                                          tickets-todo))
                                (div (@ (class
                                         "sm:w-1/3 flex flex-col gap-2 p-2"))
                                     (h4 (@ (class
@@ -131,7 +134,8 @@
                                               ,(format #f " ( ~a ) "
                                                        (length
                                                         tickets-work-in-progress))))
-                                    ,(map render-k-ticket
+                                    ,(map (lambda (t)
+                                            (render-k-ticket project t))
                                           tickets-work-in-progress))
                                (div (@ (class
                                         "sm:w-1/3 flex flex-col gap-2 p-2"))
@@ -144,7 +148,9 @@
                                               ,(format #f " ( ~a ) "
                                                        (length
                                                         tickets-in-review))))
-                                    ,(map render-k-ticket tickets-in-review)))
+                                    ,(map (lambda (t)
+                                            (render-k-ticket project t))
+                                          tickets-in-review)))
                           (hr)
                           (div (@ (class
                                    "sm:w-1/3 my-6 p-4 flex flex-col gap-2 p-2"))
@@ -163,7 +169,9 @@
                                                               tickets-done)))))
                                         (div (@ (class
                                                  "my-8 flex flex-col gap-2"))
-                                             ,(map render-k-ticket
+                                             ,(map (lambda (t)
+                                                     (render-k-ticket project
+                                                                      t))
                                                    tickets-done))))
 
                           (hr)
@@ -184,7 +192,9 @@
                                                               tickets-rejected)))))
                                         (div (@ (class
                                                  "my-8 flex flex-col gap-2"))
-                                             ,(map render-k-ticket
+                                             ,(map (lambda (t)
+                                                     (render-k-ticket project
+                                                                      t))
                                                    tickets-rejected)))))))
       (html-template G_
                      #:body kanban-html

@@ -108,7 +108,7 @@
                          #:status 302)))
         (protected-endpoint rc do-new)))
 
-(get "/projects/:project-id/edit"
+(get "/projects/:human-id/edit"
      #:session #t
      #:mime 'xml
      #:i18n '(cookie "lang")
@@ -116,8 +116,8 @@
        (define (get-edit)
          (let ((p (car ($project 'get
                                  #:ret 'top
-                                 #:condition (where #:id (params rc
-                                                                 "project-id"))))))
+                                 #:condition (where #:human_id (params rc
+                                                                "human-id"))))))
            (response-emit (:mime rc
                                  (html-edit-project-form (:i18n rc)
                                                          ($project 'get
@@ -127,7 +127,7 @@
 
        (get-edit)))
 
-(post "/projects/:project-id/edit"
+(post "/projects/:human-id/edit"
       #:auth '(table user "username" "password")
       #:session #t
       #:mime 'xml
@@ -150,7 +150,7 @@
                                (description ,(escape-str description))
                                (title ,(escape-str title))
                                (updated_at ,(current-time)))
-                             (where #:id (params rc "project-id"))))
+                             (where #:human_id (params rc "human-id"))))
 
             (redirect-to rc
                          (string->uri (format #f "~a/projects"
