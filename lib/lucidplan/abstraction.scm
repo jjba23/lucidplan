@@ -23,15 +23,9 @@
       (equal? (assoc-ref ticket "ticket_status") "work-in-progress")
       (equal? (assoc-ref ticket "ticket_status") "in-review")))
 
-(define-public (also-done-tickets-filter ticket)
-  (or (equal? (assoc-ref ticket "ticket_status") "todo")
-      (equal? (assoc-ref ticket "ticket_status") "work-in-progress")
-      (equal? (assoc-ref ticket "ticket_status") "in-review")
-      (equal? (assoc-ref ticket "ticket_status") "done")))
+(define-public (only-done-tickets-filter ticket)
+  (equal? (assoc-ref ticket "ticket_status") "done"))
 
-(define-public (all-tickets-filter ticket)
-  (or (equal? (assoc-ref ticket "ticket_status") "todo")
-      (equal? (assoc-ref ticket "ticket_status") "work-in-progress")
-      (equal? (assoc-ref ticket "ticket_status") "in-review")
-      (equal? (assoc-ref ticket "ticket_status") "done")
-      (equal? (assoc-ref ticket "ticket_status") "rejected")))
+(define-public (only-rejected-tickets-filter ticket)
+  (equal? (assoc-ref ticket "ticket_status") "rejected"))
+

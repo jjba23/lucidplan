@@ -42,23 +42,38 @@
      #:mime 'xml
      #:session #t
      #:i18n '(cookie "lang")
+     #:cookies '(names lucidplan-show-done lucidplan-show-rejected)
      (lambda (rc)
        (define (get)
          (let* ((project-id (project-id-from-human-id (params rc "project")))
-                (_ (display (format #f "project-id ~a" project-id)))
+                (with-done (cond
+                            ((not (equal? #f (get-from-qstr rc "with-done")))
+                             (:cookies-set! rc
+                              'lucidplan-show-done
+                              "lucidplan-show-done" (get-from-qstr rc "with-done"))
+                             (:cookies-setattr! rc
+                              'lucidplan-show-done
+                              #:expires 12000000
+                              #:path "/"
+                              #:http-only #t)
+                             (equal? (get-from-qstr rc "with-done") "true"))
+                            ((not (equal? #f (:cookies-value rc "lucidplan-show-done")))
+                             (equal? (:cookies-value rc "lucidplan-show-done") "true"))
+                            (else #f)))
+                (with-rejected #f)
                 (proj ($project 'get
                                 #:order-by '(human_id asc)))
+                (write (params rc "project"))
                 (project-details (car ($project 'get
                                                 #:ret 'top
                                                 #:condition (where #:human_id (params
                                                                                rc
                                                                                "project")))))
-                (project-tickets (filter only-active-tickets-filter
-                                         ($ticket 'get
-                                                  #:condition (where
-                                                               #:project_id
-                                                               project-id)
-                                                  #:order-by '(updated_at desc))))
+                (project-tickets ($ticket 'get
+                                          #:condition (where
+                                                       #:project_id
+                                                       project-id)
+                                          #:order-by '(updated_at desc)))
                 (ticket-id-to-human-id (map (lambda (t)
                                               `(,(assoc-ref t "id") unquote
                                                 (assoc-ref t "human_id")))
@@ -70,10 +85,13 @@
                                                      #:order-by '(human_id asc)))))
            
            (response-emit (:mime rc
-                                 (html-from-tickets (:i18n rc) proj
-                                                    project-details
-                                                    project-tickets
-                                                    ticket-id-to-human-id)))))
+                           (html-from-tickets (:i18n rc)
+                                              #:projects proj
+                                              #:project-details project-details
+                                              #:tickets project-tickets
+                                              #:ticket-id-to-human-id ticket-id-to-human-id
+                                              #:with-done with-done
+                                              #:with-rejected with-rejected)))))
        (get)))
 
 (get "/tickets/:project/:ticket-id"
@@ -89,9 +107,9 @@
                                  #:condition (where #:id (params rc
                                                                  "ticket-id"))))))
            (response-emit (:mime rc
-                                 (html-edit-ticket-form (:i18n rc) proj
-                                                        (params rc "project")
-                                                        t)))))
+                           (html-edit-ticket-form (:i18n rc) proj
+                                                  (params rc "project")
+                                                  t)))))
        (get-single)))
 
 (get "/tickets/:project/new"
