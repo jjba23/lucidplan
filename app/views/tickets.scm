@@ -181,6 +181,7 @@
                                                     (input (@ (id
                                                                "should-show-done")
                                                               (type checkbox)
+                                                              ,(if with-done '(checked true) '(not-checked true))
                                                               (onchange ,(format
                                                                           #f
                                                                           (string-append
@@ -195,6 +196,7 @@
                                                     (input (@ (id
                                                                "should-show-rejected")
                                                               (type checkbox)
+                                                              ,(if with-rejected '(checked true) '(not-checked true))
                                                               (onchange ,(format
                                                                           #f
                                                                           (string-append

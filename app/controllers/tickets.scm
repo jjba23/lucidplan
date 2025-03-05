@@ -60,7 +60,20 @@
                             ((not (equal? #f (:cookies-value rc "lucidplan-show-done")))
                              (equal? (:cookies-value rc "lucidplan-show-done") "true"))
                             (else #f)))
-                (with-rejected #f)
+                (with-rejected (cond
+                                ((not (equal? #f (get-from-qstr rc "with-rejected")))
+                                 (:cookies-set! rc
+                                  'lucidplan-show-rejected
+                                  "lucidplan-show-rejected" (get-from-qstr rc "with-rejected"))
+                                 (:cookies-setattr! rc
+                                  'lucidplan-show-rejected
+                                  #:expires 12000000
+                                  #:path "/"
+                                  #:http-only #t)
+                                 (equal? (get-from-qstr rc "with-rejected") "true"))
+                                ((not (equal? #f (:cookies-value rc "lucidplan-show-rejected")))
+                                 (equal? (:cookies-value rc "lucidplan-show-rejected") "true"))
+                                (else #f)))
                 (proj ($project 'get
                                 #:order-by '(human_id asc)))
                 (write (params rc "project"))
