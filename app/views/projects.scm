@@ -55,10 +55,11 @@
                                   border-2))))
          ,(render-if-nestring (lambda (x)
                                 `(p (@ (class ,(->css '(text-md py-3
-                                                        text-stone-800
-                                                        font-medium))))
+                                                                text-stone-800
+                                                                whitespace-pre-wrap                                                                
+                                                                font-medium))))
                                     ,x))
-                              (assoc-ref p "description"))
+                              (parse-org (unescape-str (assoc-ref p "description"))))
          (hr)
          (div (@ (class ,(->css '(flex flex-wrap flex-row gap-3))))
               (a (@ (href ,(format #f "/tickets/~a"
@@ -112,10 +113,10 @@
                                                                              flex-row
                                                                              gap-1))))
                                                                 ,(hyg-icon
-                                                                           #:type 'trash
-                                                                           #:icon-css '
-                                                                           (text-white
-                                                                            text-xl))
+                                                                  #:type 'trash
+                                                                  #:icon-css '
+                                                                  (text-white
+                                                                   text-xl))
                                                                 ,(G_ "delete")))))
          (small (@ (class ,(->css '(font-mono text-stone-600))))
                 ,(format #f "~a"
@@ -137,8 +138,8 @@
                                   cursor-pointer
                                   rounded-xl)))
             (onclick ,(format #f
-                       "document.getElementById('details-~a').toggleAttribute('hidden')"
-                       (assoc-ref p "id"))))
+                              "document.getElementById('details-~a').toggleAttribute('hidden')"
+                              (assoc-ref p "id"))))
 
          (h3 (@ (class ,(->css '(flex flex-row items-center gap-2 truncate))))
              ,(hyg-icon #:type 'list
@@ -147,9 +148,9 @@
                                                  font-black break-words))))
                    ,(format #f "~a"
                             (assoc-ref p "title"))))
-         (span (@ (class ,(->css '(font-sans text-stone-600 font-light
-                                             break-words truncate))))
-               ,(assoc-ref p "description")))
+         (p (@ (class ,(->css '(font-sans text-stone-600 text-sm
+                                          break-words truncate))))
+            ,(parse-org (unescape-str (assoc-ref p "description")))))
     (div (@ (id ,(format #f "details-~a"
                          (assoc-ref p "id")))
             (class "")
@@ -192,7 +193,7 @@
                      #:vcs-url (if (assoc-ref p "vcs_url")
                                    (assoc-ref p "vcs_url") "")
                      #:description (if (assoc-ref p "description")
-                                       (assoc-ref p "description") "")
+                                       (unescape-str (assoc-ref p "description"))"")
                      #:action (format #f "/projects/~a/edit"
                                       (assoc-ref p "human_id"))
                      #:proj proj))

@@ -63,8 +63,8 @@
               (div (@ (class ,(->css '(flex justify-right))))
                    (span (@ (class ,(->css '(cursor-pointer)))
                             (onclick ,(format #f
-                                       "document.getElementById('details-~a').toggleAttribute('hidden')"
-                                       (assoc-ref ticket "id"))))
+                                              "document.getElementById('details-~a').toggleAttribute('hidden')"
+                                              (assoc-ref ticket "id"))))
                          ,(hyg-icon #:type 'x
                                     #:icon-css '(text-stone-800 text-xl)))))
 
@@ -77,7 +77,7 @@
                    (p (@ (class ,(->css '(flex gap-2 items-center))))
                       (span (@ (class "text-2xl"))
                             ,(emoji-for-ticket-status (assoc-ref ticket
-                                                       "ticket_status")))
+                                                                 "ticket_status")))
                       (span (@ (class ,(->css '(font-sans text-stone-700
                                                           text-sm))))
                             ,(assoc-ref ticket "ticket_status"))))
@@ -102,6 +102,7 @@
                                            font-medium
                                            font-sans
                                            max-w-prose
+                                           whitespace-pre-wrap
                                            ml-4))))
                ,(parse-org (assoc-ref ticket "description")))
 
@@ -146,11 +147,11 @@
                                                                              flex-row
                                                                              gap-1))))
                                                                 ((i (@ (class ,
-                                                                              (->css '
-                                                                               (ph
-                                                                                ph-trash
-                                                                                text-white
-                                                                                text-xl))))
+                                                                         (->css '
+                                                                          (ph
+                                                                           ph-trash
+                                                                           text-white
+                                                                           text-xl))))
                                                                     ""))
                                                                 ,(G_ "delete")))))
 
