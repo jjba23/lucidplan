@@ -48,9 +48,9 @@
       (license license:gpl3+))))
 
 (define-public guile-hygguile
-  (let ((commit "9ff61694bc78819279248da63dc508a8600aac19")
+  (let ((commit "bae376a2d5857091082a00298a27745e0cd6c137")
         (base32-sha-signature
-         "15alz92ha6cr9fiqhzbkwd540961hkhhhyvjg8pg2jk9i5paf3w4")
+         "16dx0i9j83pikkdifib43475cavmji3xznym3phg4d9749z2cwvv")
         (revision "0"))
     (package
       (name "guile-hygguile")

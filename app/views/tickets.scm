@@ -105,13 +105,13 @@
               (a (@ (href ,(format #f "/tickets/~a/~a/edit" project
                                    (assoc-ref ticket "human_id"))))
                  ,(hyg-button #:content `(span (@ (class
-                                                      "items-center flex flex-row gap-1"))
-                                                  ((i (@ (class ,(->css '(ph
-                                                                          ph-pencil
-                                                                          text-white
-                                                                          text-xl))))
-                                                      ""))
-                                                  (G_ "edit ticket"))))
+                                                   "items-center flex flex-row gap-1"))
+                                               ((i (@ (class ,(->css '(ph
+                                                                       ph-pencil
+                                                                       text-white
+                                                                       text-xl))))
+                                                   ""))
+                                               (G_ "edit ticket"))))
               (form (@ (enctype "application/x-www-form-urlencoded")
                        (method "POST")
                        (action ,(format #f "/tickets/~a/delete" project)))
@@ -119,14 +119,15 @@
                               (name "id")
                               (value ,(assoc-ref ticket "id"))))
                     ,(hyg-danger-submit-button #:content `(span (@ (class
-                                                                "items-center flex flex-row gap-1"))
-                                                            ((i (@ (class ,(->css '
-                                                                            (ph
-                                                                             ph-trash
-                                                                             text-white
-                                                                             text-xl))))
-                                                                ""))
-                                                            ,(G_ "delete")))))
+                                                                    "items-center flex flex-row gap-1"))
+                                                                ((i (@ (class ,
+                                                                              (->css '
+                                                                               (ph
+                                                                                ph-trash
+                                                                                text-white
+                                                                                text-xl))))
+                                                                    ""))
+                                                                ,(G_ "delete")))))
 
          )))
 
@@ -200,44 +201,41 @@
                                                                     project-details
                                                                     "human_id"))))
 
-                                                        ,(hyg-button
-                                                                        #:content `
-                                                                        (span (@
-                                                                               (class
-                                                                                "items-center flex flex-row gap-1"))
+                                                        ,(hyg-button #:content `
+                                                                     (span (@ (class
+                                                                               "items-center flex flex-row gap-1"))
 
-                                                                              
-                                                                              (
-                                                                               (i
-                                                                                (@
-                                                                                 (class ,
-                                                                                  (->css '
-                                                                                   (ph
-                                                                                    ph-kanban
-                                                                                    text-white
-                                                                                    text-xl))))
-                                                                                ""))
-                                                                              ,
-                                                                              (G_
-                                                                               "kanban")))))
+                                                                           ((i
+                                                                             (@
+                                                                              (class ,
+                                                                               (->css '
+                                                                                (ph
+                                                                                 ph-kanban
+                                                                                 text-white
+                                                                                 text-xl))))
+                                                                             ""))
+                                                                           ,(G_
+                                                                             "kanban")))))
                                                 (a (@ (href ,(format #f
                                                               "/tickets/~a/new"
                                                               (assoc-ref
                                                                project-details
                                                                "human_id"))))
-                                                   ,(hyg-button #:content `
-                                                                   (span (@ (class
-                                                                             "items-center flex flex-row gap-1"))
-                                                                         ((i (@
-                                                                              (class ,
-                                                                               (->css '
-                                                                                (ph
-                                                                                 ph-plus
-                                                                                 text-white
-                                                                                 text-xl))))
-                                                                           ""))
-                                                                         ,(G_
-                                                                           "new ticket"))))))
+                                                   ,(hyg-button #:content `(span
+                                                                            (@
+                                                                             (class
+                                                                              "items-center flex flex-row gap-1"))
+                                                                            ((i
+                                                                              (@
+                                                                               (class ,
+                                                                                (->css '
+                                                                                 (ph
+                                                                                  ph-plus
+                                                                                  text-white
+                                                                                  text-xl))))
+                                                                              ""))
+                                                                            ,(G_
+                                                                              "new ticket"))))))
                                       ,(render-if-nestring (lambda (x)
                                                              `(p (@ (class
                                                                      "text-sm text-stone-500"))
@@ -396,23 +394,23 @@
                        (name "ticket-status")
                        (required ""))
                     ,(hyg-glyph-option #:value "todo"
-                                       #:glyph "☑️"
+                                       #:glyph (emoji-for-ticket-status "todo")
                                        #:content (G_ "To-do")
                                        #:selected-value ticket-status)
                     ,(hyg-glyph-option #:value "work-in-progress"
-                                       #:glyph "⚙️"
+                                       #:glyph (emoji-for-ticket-status "work-in-progress")
                                        #:content (G_ "Work in Progress")
                                        #:selected-value ticket-status)
                     ,(hyg-glyph-option #:value "in-review"
-                                       #:glyph "🔍"
+                                       #:glyph (emoji-for-ticket-status "in-review")
                                        #:content (G_ "In Review")
                                        #:selected-value ticket-status)
                     ,(hyg-glyph-option #:value "done"
-                                       #:glyph "✅"
+                                       #:glyph (emoji-for-ticket-status "done")
                                        #:content (G_ "Done")
                                        #:selected-value ticket-status)
                     ,(hyg-glyph-option #:value "rejected"
-                                       #:glyph "❌"
+                                       #:glyph (emoji-for-ticket-status "rejected")
                                        #:content (G_ "Rejected")
                                        #:selected-value ticket-status))
             (label ,(G_ "type"))
@@ -420,33 +418,33 @@
                        (name "ticket-type")
                        (required ""))
                     ,(hyg-glyph-option #:value "task"
-                                       #:glyph "🌿"
+                                       #:glyph (emoji-for-ticket-type "task")
                                        #:content (G_ "Task")
                                        #:selected-value ticket-type)
                     ,(hyg-glyph-option #:value "bug"
-                                       #:glyph "🐜"
+                                       #:glyph (emoji-for-ticket-type "bug")
                                        #:content (G_ "Bug")
                                        #:selected-value ticket-type)
                     ,(hyg-glyph-option #:value "story"
-                                       #:glyph "🌳"
+                                       #:glyph (emoji-for-ticket-type "story")
                                        #:content (G_ "Story")
                                        #:selected-value ticket-type)
                     ,(hyg-glyph-option #:value "spike"
-                                       #:glyph "🧪"
+                                       #:glyph (emoji-for-ticket-type "spike")
                                        #:content (G_ "Spike")
                                        #:selected-value ticket-type)
                     ,(hyg-glyph-option #:value "time-box"
-                                       #:glyph "🕙"
+                                       #:glyph (emoji-for-ticket-type "time-box")
                                        #:content (G_ "Time Box")
                                        #:selected-value ticket-type))
             (label ,(G_ "description"))
             (textarea (@ (class
-                           "p-3 w-full min-h-64 rounded-xl border-stone-400/75 border-2")
+                          "p-3 w-full min-h-64 rounded-xl border-stone-400/75 border-2")
                          (name "description")
                          (required ""))
                       ,(unescape-str description))
 
-            (div ,(success-submit-button #:content (G_ "submit"))))))
+            (div ,(hyg-submit-button #:content (G_ "submit"))))))
 
   (html-template G_
                  #:body `((div (@ (class "container mx-auto"))

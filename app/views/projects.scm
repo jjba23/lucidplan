@@ -61,62 +61,68 @@
                     (href ,(format #f "/tickets/~a"
                                    (assoc-ref p "human_id"))))
                  ,(hyg-button #:content `(span (@ (class
-                                                      "items-center flex flex-row gap-1"))
-                                                  ((i (@ (class ,(->css '(ph
-                                                                          ph-scroll
-                                                                          text-white
-                                                                          text-xl))))
-                                                      ""))
-                                                  ,(format #f "backlog: ~a"
-                                                           (assoc-ref p
-                                                                      "title")))))
+                                                   "items-center flex flex-row gap-1"))
+                                               ((i (@ (class ,(->css '(ph
+                                                                       ph-scroll
+                                                                       text-white
+                                                                       text-xl))))
+                                                   ""))
+                                               ,(format #f "backlog: ~a"
+                                                        (assoc-ref p "title")))))
               (a (@ (class "text-stone-800")
                     (href ,(format #f "/kanban/~a"
                                    (assoc-ref p "human_id"))))
                  ,(hyg-button #:content `(span (@ (class
-                                                      "items-center flex flex-row gap-1"))
-                                                  ((i (@ (class ,(->css '(ph
-                                                                          ph-kanban
-                                                                          text-white
-                                                                          text-xl))))
-                                                      ""))
-                                                  ,(format #f "kanban: ~a"
-                                                           (assoc-ref p
-                                                                      "title"))))))
+                                                   "items-center flex flex-row gap-1"))
+                                               ((i (@ (class ,(->css '(ph
+                                                                       ph-kanban
+                                                                       text-white
+                                                                       text-xl))))
+                                                   ""))
+                                               ,(format #f "kanban: ~a"
+                                                        (assoc-ref p "title"))))))
          (hr)
          (div (@ (class "flex flex-wrap flex-row gap-3"))
               ,(render-if-nestring (lambda (x)
                                      `(a (@ (class "text-stone-800")
                                             (href ,x))
                                          ,(hyg-button #:content
-                                                         "🔗 view project")))
+                                                      "🔗 view project")))
                                    (assoc-ref p "url"))
               ,(render-if-nestring (lambda (x)
                                      `(a (@ (class "text-stone-800")
                                             (href ,x))
                                          ,(hyg-button #:content
-                                                         "🔗 project code")))
+                                                      "🔗 project code")))
                                    (assoc-ref p "vcs_url")))
          (hr)
          (div (@ (class "flex flex-wrap flex-row gap-4"))
               (a (@ (href ,(format #f "/projects/~a/edit"
                                    (assoc-ref p "human_id"))))
-                 ,(hyg-button #:content (G_ "edit project")))
+                 ,(hyg-button #:content `(span (@ (class
+                                                   "items-center flex flex-row gap-1"))
+                                               ((i (@ (class ,(->css '(ph
+                                                                       ph-pencil
+                                                                       text-white
+                                                                       text-xl))))
+                                                   ""))
+                                               (span ,(G_ "edit project")))))
               (form (@ (enctype "application/x-www-form-urlencoded")
                        (method "POST")
                        (action "/projects/delete"))
                     (input (@ (name "id")
                               (hidden "")
                               (value ,(assoc-ref p "id"))) "")
-                                        ,(hyg-danger-submit-button #:content `(span (@ (class
-                                                                "items-center flex flex-row gap-1"))
-                                                            ((i (@ (class ,(->css '
-                                                                            (ph
-                                                                             ph-trash
-                                                                             text-white
-                                                                             text-xl))))
-                                                                ""))
-                                                            ,(G_ "delete")))))
+                    ,(hyg-danger-submit-button #:content `(span (@ (class
+                                                                    "items-center flex flex-row gap-1"))
+                                                                ((i (@ (class ,
+                                                                              (->css '
+                                                                               (ph
+                                                                                ph-trash
+                                                                                text-white
+                                                                                text-xl))))
+                                                                    ""))
+                                                                ,(G_ "delete")))))
          (small (@ (class "font-mono text-stone-600"))
                 ,(format #f "~a"
                          (assoc-ref p "human_id")))
@@ -215,6 +221,6 @@
                                                              description)
                                                     #:required #f)
 
-                                     (div ,(success-submit-button #:content (G_
-                                                                             "submit"))))))
+                                     (div ,(hyg-submit-button #:content (G_
+                                                                         "submit"))))))
                  #:proj proj))
