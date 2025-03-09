@@ -59,17 +59,23 @@
                    (small (@ (class
                               "font-sans text-stone-500 text-md font-light"))
                           ,(G_ "status"))
-                   (p (@ (class "font-sans text-stone-700 text-sm flex gap-1"))
-                      ,(emoji-for-ticket-status (assoc-ref ticket
-                                                           "ticket_status"))
-                      (span ,(assoc-ref ticket "ticket_status"))))
+                   (p (@ (class "flex gap-2 items-center"))
+                      (span (@ (class "text-2xl"))
+                            ,(emoji-for-ticket-status (assoc-ref ticket
+                                                       "ticket_status")))
+                      (span (@ (class "font-sans text-stone-700 text-sm"))
+                            ,(assoc-ref ticket "ticket_status"))))
 
               (div (@ (class "flex flex-col gap-3"))
                    (small (@ (class
                               "font-sans text-stone-500 text-md font-light"))
                           ,(G_ "type"))
-                   (p (@ (class "font-sans text-stone-700 text-sm ml-4"))
-                      ,(assoc-ref ticket "ticket_type"))))
+                   (p (@ (class "ml-4 flex gap-2 items-center"))
+                      (span (@ (class "text-2xl"))
+                            ,(emoji-for-ticket-type (assoc-ref ticket
+                                                               "ticket_type")))
+                      (span (@ (class "font-sans text-stone-700 text-sm"))
+                            ,(assoc-ref ticket "ticket_type")))))
 
          (small (@ (class "font-sans text-stone-500 text-md font-light"))
                 ,(G_ "description"))
@@ -98,14 +104,29 @@
          (div (@ (class "flex flex-row flex-wrap gap-4"))
               (a (@ (href ,(format #f "/tickets/~a/~a/edit" project
                                    (assoc-ref ticket "human_id"))))
-                 ,(action-button #:content (G_ "edit ticket")))
+                 ,(action-button #:content `(span (@ (class
+                                                      "items-center flex flex-row gap-1"))
+                                                  ((i (@ (class ,(->css '(ph
+                                                                          ph-pencil
+                                                                          text-white
+                                                                          text-xl))))
+                                                      ""))
+                                                  (G_ "edit ticket"))))
               (form (@ (enctype "application/x-www-form-urlencoded")
                        (method "POST")
                        (action ,(format #f "/tickets/~a/delete" project)))
                     (input (@ (hidden "")
                               (name "id")
                               (value ,(assoc-ref ticket "id"))))
-                    ,(danger-submit-button #:content (G_ "delete"))))
+                    ,(danger-submit-button #:content `(span (@ (class
+                                                                "items-center flex flex-row gap-1"))
+                                                            ((i (@ (class ,(->css '
+                                                                            (ph
+                                                                             ph-trash
+                                                                             text-white
+                                                                             text-xl))))
+                                                                ""))
+                                                            ,(G_ "delete")))))
 
          )))
 
@@ -119,17 +140,28 @@
          (div (@ (onclick ,(format #f
                                    ticket-listitem-reveal-details-js-template
                                    (assoc-ref ticket "id")))
-                 (class
-                  "flex flex-row flex-wrap gap-4 items-center justify-between bg-stone-300/75 border-stone-400/75 border-2 py-2 px-4 cursor-pointer rounded-xl"))
-              (div (small (@ (class "font-sans text-stone-800 text-sm"))
-                          ,(format #f "~a-~a" project
-                                   (assoc-ref ticket "human_id")))
-                   (h5 (@ (class ,(->css '(font-sans text-stone-700 text-lg
-                                                     font-black break-words))))
-                       ,(parse-org (assoc-ref ticket "title"))))
+                 (class ,(->css '(flex flex-row
+                                       gap-4
+                                       items-center
+                                       justify-left
+                                       bg-stone-300/75
+                                       border-stone-400/75
+                                       border-2
+                                       py-2
+                                       px-4
+                                       cursor-pointer
+                                       rounded-xl))))
+              ,(emoji-for-ticket-type (assoc-ref ticket "ticket_type"))
+              (small (@ (class "font-sans text-stone-800 text-sm"))
+                     ,(format #f "~a-~a" project
+                              (assoc-ref ticket "human_id")))
+              (h5 (@ (class ,(->css '(font-sans text-stone-700 text-md
+                                                font-black break-words))))
+                  ,(parse-org (assoc-ref ticket "title")))
               (div (a (@ (href ,(format #f "/tickets/~a/~a" project
                                         (assoc-ref ticket "human_id"))))
-                      (span "🔗"))))
+                      (span ((i (@ (class ,(->css '(ph ph-link text-stone-600))))
+                                ""))))))
          (div (@ (id ,(format #f "details-~a"
                               (assoc-ref ticket "id")))
                  (class "ml-4")
@@ -167,15 +199,44 @@
                                                                    (assoc-ref
                                                                     project-details
                                                                     "human_id"))))
+
                                                         ,(action-button
-                                                          #:content "💡 kanban")))
+                                                                        #:content `
+                                                                        (span (@
+                                                                               (class
+                                                                                "items-center flex flex-row gap-1"))
+                                                                              
+                                                                              (
+                                                                               (i
+                                                                                (@
+                                                                                 (class ,
+                                                                                  (->css '
+                                                                                   (ph
+                                                                                    ph-kanban
+                                                                                    text-white
+                                                                                    text-xl))))
+                                                                                ""))
+                                                                              ,
+                                                                              (G_
+                                                                               "kanban")))))
                                                 (a (@ (href ,(format #f
                                                               "/tickets/~a/new"
                                                               (assoc-ref
                                                                project-details
                                                                "human_id"))))
-                                                   ,(action-button #:content
-                                                     "➕ new ticket"))))
+                                                   ,(action-button #:content `
+                                                                   (span (@ (class
+                                                                             "items-center flex flex-row gap-1"))
+                                                                         ((i (@
+                                                                              (class ,
+                                                                               (->css '
+                                                                                (ph
+                                                                                 ph-plus
+                                                                                 text-white
+                                                                                 text-xl))))
+                                                                           ""))
+                                                                         ,(G_
+                                                                           "new ticket"))))))
                                       ,(render-if-nestring (lambda (x)
                                                              `(p (@ (class
                                                                      "text-sm text-stone-500"))

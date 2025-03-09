@@ -60,13 +60,29 @@
               (a (@ (class "text-stone-800")
                     (href ,(format #f "/tickets/~a"
                                    (assoc-ref p "human_id"))))
-                 ,(action-button #:content (format #f "📚 backlog: ~a"
-                                                   (assoc-ref p "title"))))
+                 ,(action-button #:content `(span (@ (class
+                                                      "items-center flex flex-row gap-1"))
+                                                  ((i (@ (class ,(->css '(ph
+                                                                          ph-scroll
+                                                                          text-white
+                                                                          text-xl))))
+                                                      ""))
+                                                  ,(format #f "backlog: ~a"
+                                                           (assoc-ref p
+                                                                      "title")))))
               (a (@ (class "text-stone-800")
                     (href ,(format #f "/kanban/~a"
                                    (assoc-ref p "human_id"))))
-                 ,(action-button #:content (format #f "💡 kanban: ~a"
-                                                   (assoc-ref p "title")))))
+                 ,(action-button #:content `(span (@ (class
+                                                      "items-center flex flex-row gap-1"))
+                                                  ((i (@ (class ,(->css '(ph
+                                                                          ph-kanban
+                                                                          text-white
+                                                                          text-xl))))
+                                                      ""))
+                                                  ,(format #f "kanban: ~a"
+                                                           (assoc-ref p
+                                                                      "title"))))))
          (hr)
          (div (@ (class "flex flex-wrap flex-row gap-3"))
               ,(render-if-nestring (lambda (x)
@@ -105,10 +121,13 @@
             (onclick ,(format #f project-listitem-reveal-details-js-template
                               (assoc-ref p "id"))))
 
-         (h3 (@ (class ,(->css '(font-sans text-stone-700 text-lg font-black
-                                           break-words))))
-             ,(format #f "~a"
-                      (assoc-ref p "title")))
+         (h3 (@ (class ,(->css '(flex flex-row items-center gap-2))))
+             (span (i (@ (class ,(->css '(ph ph-list text-stone-500 text-lg))))
+                      ""))
+             (span (@ (class ,(->css '(font-sans text-stone-700 text-lg
+                                                 font-black break-words))))
+                   ,(format #f "~a"
+                            (assoc-ref p "title"))))
          (span (@ (class ,(->css '(font-sans text-stone-600 font-light
                                              break-words truncate))))
                ,(assoc-ref p "description")))
@@ -182,11 +201,11 @@
                                                 #:name "vcs-url"
                                                 #:value vcs-url
                                                 #:required #f)
-                                     ,(mk-input #:label (G_ "description")
-                                                #:name "description"
-                                                #:value (unescape-str
-                                                         description)
-                                                #:required #f)
+                                     ,(mk-textarea #:label (G_ "description")
+                                                   #:name "description"
+                                                   #:value (unescape-str
+                                                            description)
+                                                   #:required #f)
 
                                      (div ,(success-submit-button #:content (G_
                                                                              "submit"))))))

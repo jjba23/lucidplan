@@ -30,6 +30,7 @@
   #:use-module (ice-9 hash-table)
   #:use-module (ice-9 threads)
   #:use-module (artanis i18n)
+  #:use-module (hygguile abstraction)
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
   #:use-module (ice-9 textual-ports)
@@ -61,13 +62,15 @@
             (a (@ (class "text-md text-white font-sans font-black px-4")
                   (href "/")) "LucidPlan")
             (a (@ (class
-                   "text-sm lowercase text-white font-sans font-medium px-2")
+                   "text-sm lowercase text-white font-sans font-medium px-2 flex-items-center gap-1")
                   (href "/login"))
-               ,(G_ "Login"))
+               (span (i (@ (class ,(->css '(ph ph-sign-in text-md)))) ""))
+               (span ,(G_ "Login")))
             (a (@ (class
-                   "text-sm lowercase text-white font-sans font-medium px-2")
+                   "text-sm lowercase text-white font-sans font-medium px-2 flex items-center gap-1")
                   (href "/projects"))
-               ,(G_ "Projects"))
+               (span (i (@ (class ,(->css '(ph ph-align-bottom text-md)))) ""))
+               (span ,(G_ "Projects")))
 
             (hr)
 
@@ -90,6 +93,9 @@
                           (crossorigin "")))
                  (link (@ (rel "stylesheet")
                           (href "/css/fonts.css")))
+                 (link (@ (rel "stylesheet")
+                          (href
+                           "https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css")))
                  (meta (@ (name "viewport")
                           (content "width=device-width, initial-scale=1.0")))
                  (script (@ (src "https://cdn.tailwindcss.com")) "")
@@ -103,30 +109,34 @@
                       (footer ,(page-footer G_))))))
   (export html-template))
 
+;; <i class="ph-bold ph-smiley"></i>
+
 (define-public (emoji-for-ticket-status ticket-status)
   (cond
     ((equal? "todo" ticket-status)
-     "")
+     `((i (@ (class ,(->css '(ph ph-anchor text-stone-600 text-xl)))) "")))
     ((equal? "work-in-progress" ticket-status)
-     "⚙️")
+     `((i (@ (class ,(->css '(ph ph-gear-fine text-stone-600 text-xl)))) "")))
     ((equal? "in-review" ticket-status)
-     "🔍")
+     `((i (@ (class ,(->css '(ph ph-list-magnifying-glass text-stone-600
+                                 text-xl)))) "")))
     ((equal? "done" ticket-status)
-     "✅")
+     `((i (@ (class ,(->css '(ph ph-check text-stone-600 text-xl)))) "")))
     ((equal? "rejected" ticket-status)
-     "❌")
+     `((i (@ (class ,(->css '(ph ph-x text-stone-600 text-xl)))) "")))
     (else "")))
 
 (define-public (emoji-for-ticket-type ticket-type)
   (cond
     ((equal? "task" ticket-type)
-     "🌿")
+     `((i (@ (class ,(->css '(ph ph-fire-simple text-stone-600 text-xl)))) "")))
     ((equal? "bug" ticket-type)
-     "🐜")
+     `((i (@ (class ,(->css '(ph ph-bug text-stone-600 text-xl)))) "")))
     ((equal? "story" ticket-type)
-     "🌳")
+     `((i (@ (class ,(->css '(ph ph-book-open-text text-stone-600 text-xl))))
+          "")))
     ((equal? "spike" ticket-type)
-     "🧪")
+     `((i (@ (class ,(->css '(ph ph-flask text-stone-600 text-xl)))) "")))
     ((equal? "time-box" ticket-type)
-     "🕙")
+     `((i (@ (class ,(->css '(ph ph-clock text-stone-600 text-xl)))) "")))
     (else "")))

@@ -52,7 +52,8 @@
                       (span ,(parse-org (assoc-ref t "title"))))
                    (a (@ (class "text-xs")
                          (href ,(format #f "/tickets/~a/~a" project
-                                        (assoc-ref t "human_id")))) "🔗"))))))
+                                        (assoc-ref t "human_id"))))
+                      ((i (@ (class ,(->css '(ph ph-link text-stone-600)))) ""))))))))
 
 (begin
   (define* (kanban-from-tickets G_ projects project tickets
@@ -102,15 +103,46 @@
                                                                   "/tickets/~a"
                                                                   project)))
                                                        ,(action-button
-                                                         #:content "📚 backlog")))
+                                                                       #:content `
+                                                                       (span (@
+                                                                              (class
+                                                                               "items-center flex flex-row gap-1"))
+                                                                             (
+                                                                              (i
+                                                                               (@
+                                                                                (class ,
+                                                                                 (->css '
+                                                                                  (ph
+                                                                                   ph-scroll
+                                                                                   text-white
+                                                                                   text-xl))))
+                                                                               ""))
+                                                                             ,
+                                                                             (G_
+                                                                              "backlog")))))
                                                (div (a (@ (class
                                                            "text-sm text-stone-800 my-3")
                                                           (href ,(format #f
                                                                   "/tickets/~a/new"
                                                                   project)))
                                                        ,(action-button
-                                                         #:content
-                                                         "➕ new ticket")))))
+                                                                       #:content `
+                                                                       (span (@
+                                                                              (class
+                                                                               "items-center flex flex-row gap-1"))
+                                                                             (
+                                                                              (i
+                                                                               (@
+                                                                                (class ,
+                                                                                 (->css '
+                                                                                  (ph
+                                                                                   ph-plus
+                                                                                   text-white
+                                                                                   text-xl))))
+                                                                               ""))
+                                                                             ,
+                                                                             (G_
+                                                                              "new ticket")))))))
 
                                      )))
                           (div (@ (class
@@ -119,7 +151,7 @@
                                         "sm:w-1/3 flex flex-col gap-2 p-2"))
                                     (h4 (@ (class
                                             "text-sm font-bold flex gap-2 items-center"))
-                                        (span "☑️")
+                                        ,(emoji-for-ticket-status "todo")
                                         (span ,(G_ "To-do"))
                                         (span (@ (class
                                                   "text-xs text-stone-700 font-light"))
@@ -132,7 +164,8 @@
                                         "sm:w-1/3 flex flex-col gap-2 p-2"))
                                     (h4 (@ (class
                                             "text-sm font-bold flex gap-2 items-center"))
-                                        (span "⚙️")
+                                        ,(emoji-for-ticket-status
+                                          "work-in-progress")
                                         (span ,(G_ "Work in Progress"))
                                         (span (@ (class
                                                   "text-xs text-stone-700 font-light"))
@@ -146,7 +179,7 @@
                                         "sm:w-1/3 flex flex-col gap-2 p-2"))
                                     (h4 (@ (class
                                             "text-sm font-bold flex gap-2 items-center"))
-                                        (span "🔍")
+                                        ,(emoji-for-ticket-status "in-review")
                                         (span ,(G_ "In Review"))
                                         (span (@ (class
                                                   "text-xs text-stone-700 font-light"))
@@ -164,7 +197,8 @@
                                                      "marker:block hover:cursor-pointer items-center"))
                                                  (h4 (@ (class
                                                          "text-sm font-bold flex gap-2 items-center"))
-                                                     (span "✅")
+                                                     ,(emoji-for-ticket-status
+                                                       "done")
                                                      (span ,(G_ "Done"))
                                                      (span (@ (class
                                                                "text-xs text-stone-700 font-light"))
@@ -187,7 +221,8 @@
                                                      "marker:block hover:cursor-pointer items-center"))
                                                  (h4 (@ (class
                                                          "text-sm font-bold flex gap-2 items-center"))
-                                                     (span "❌")
+                                                     ,(emoji-for-ticket-status
+                                                       "rejected")
                                                      (span ,(G_ "Rejected"))
                                                      (span (@ (class
                                                                "text-xs text-stone-700 font-light"))
