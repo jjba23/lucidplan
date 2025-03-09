@@ -129,7 +129,7 @@
 (define-public (emoji-for-ticket-type ticket-type)
   (cond
     ((equal? "task" ticket-type)
-     `((i (@ (class ,(->css '(ph ph-fire-simple text-stone-600 text-xl)))) "")))
+     `((i (@ (class ,(->css '(ph ph-gear-fine text-stone-600 text-xl)))) "")))
     ((equal? "bug" ticket-type)
      `((i (@ (class ,(->css '(ph ph-bug text-stone-600 text-xl)))) "")))
     ((equal? "story" ticket-type)

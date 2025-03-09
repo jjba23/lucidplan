@@ -55,8 +55,8 @@
                                   border-2))))
          ,(render-if-nestring (lambda (x)
                                 `(p (@ (class ,(->css '(text-md py-3
-                                                                text-stone-800
-                                                                font-medium))))
+                                                        text-stone-800
+                                                        font-medium))))
                                     ,x))
                               (assoc-ref p "description"))
          (hr)
@@ -111,7 +111,11 @@
                                                                              flex
                                                                              flex-row
                                                                              gap-1))))
-                                                                ,(hyg-icon #:type 'trash #:icon-css '(text-white text-xl))
+                                                                ,(hyg-icon
+                                                                           #:type 'trash
+                                                                           #:icon-css '
+                                                                           (text-white
+                                                                            text-xl))
                                                                 ,(G_ "delete")))))
          (small (@ (class ,(->css '(font-mono text-stone-600))))
                 ,(format #f "~a"
@@ -133,11 +137,12 @@
                                   cursor-pointer
                                   rounded-xl)))
             (onclick ,(format #f
-                              "document.getElementById('details-~a').toggleAttribute('hidden')"
-                              (assoc-ref p "id"))))
+                       "document.getElementById('details-~a').toggleAttribute('hidden')"
+                       (assoc-ref p "id"))))
 
-         (h3 (@ (class ,(->css '(flex flex-row items-center gap-2))))
-             ,(hyg-icon #:type 'list #:icon-css '(text-stone-500 text-lg))
+         (h3 (@ (class ,(->css '(flex flex-row items-center gap-2 truncate))))
+             ,(hyg-icon #:type 'list
+                        #:icon-css '(text-stone-500 text-lg))
              (span (@ (class ,(->css '(font-sans text-stone-700 text-lg
                                                  font-black break-words))))
                    ,(format #f "~a"
@@ -154,10 +159,19 @@
 (define-public (html-from-projects G_ projects)
   (html-template G_
                  #:body `(div (@ (class "container mx-auto"))
-                              ((div (@ (class "flex flex-col gap-4 flex-grow"))
-                                    (h2 (@ (class
-                                            "text-xl font-sans font-bold text-stone-600"))
-                                        ,(G_ "projects"))
+                              ((div (@ (class ,(->css '(flex flex-col gap-4
+                                                             flex-grow))))
+                                    (div (@ (class ,(->css '(flex flex-row
+                                                             items-center
+                                                             gap-1 my-3))))
+                                         ,(hyg-icon #:type 'align-bottom
+                                                    #:icon-css '(text-stone-800
+                                                                 text-2xl))
+                                         (h2 (@ (class ,(->css '(text-3xl
+                                                                 font-sans
+                                                                 font-bold
+                                                                 text-stone-700))))
+                                             ,(G_ "projects")))
                                     ,(map (lambda (x)
                                             (render-project-list-item G_ x))
                                           projects)

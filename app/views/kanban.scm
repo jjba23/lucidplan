@@ -38,6 +38,7 @@
   #:use-module (lucidplan html)
   #:use-module (hygguile abstraction)
   #:use-module (hygguile components button)
+  #:use-module (hygguile components icon)
   #:use-module (lucidplan prelude)
   #:use-module (artanis security nss)
   #:use-module (artanis route))
@@ -92,12 +93,19 @@
                                                               flex-row gap-4
                                                               items-center
                                                               justify-between))))
-                                          (h2 (@ (class ,(->css '(text-3xl
-                                                                  font-sans
-                                                                  font-bold
-                                                                  text-stone-700))))
-                                              ,(format #f "kanban for ~a"
-                                                       project))
+                                          (div (@ (class ,(->css '(flex
+                                                                   flex-row
+                                                                   gap-2
+                                                                   items-center))))
+                                               ,(hyg-icon #:type 'kanban
+                                                          #:icon-css '(text-stone-700
+                                                                       text-2xl))
+                                               (h2 (@ (class ,(->css '(text-3xl
+                                                                       font-sans
+                                                                       font-bold
+                                                                       text-stone-700))))
+                                                   ,(format #f "kanban for ~a"
+                                                            project)))
 
                                           (div (@ (class ,(->css '(flex
                                                                    flex-row

@@ -43,6 +43,7 @@
   #:use-module (hygguile components button)
   #:use-module (hygguile components select)
   #:use-module (hygguile components input)
+  #:use-module (hygguile components icon)
   #:use-module (hygguile abstraction)
   #:use-module (artanis security nss)
   #:use-module (artanis route))
@@ -55,9 +56,17 @@
                                   rounded-2xl
                                   border-stone-400/75
                                   border-2))))
-         (h4 (@ (class ,(->css '(font-sans text-stone-700 text-2xl font-bold
-                                           my-3))))
-             ,(parse-org (assoc-ref ticket "title")))
+         (div (@ (class ,(->css '(flex flex-row justify-between))))
+              (h4 (@ (class ,(->css '(font-sans text-stone-700 text-2xl
+                                                font-bold break-words my-3))))
+                  ,(parse-org (assoc-ref ticket "title")))
+              (div (@ (class ,(->css '(flex justify-right))))
+                   (span (@ (class ,(->css '(cursor-pointer)))
+                            (onclick ,(format #f
+                                       "document.getElementById('details-~a').toggleAttribute('hidden')"
+                                       (assoc-ref ticket "id"))))
+                         ,(hyg-icon #:type 'x
+                                    #:icon-css '(text-stone-800 text-xl)))))
 
          (div (@ (class ,(->css '(flex flex-row flex-wrap gap-8 justify-left))))
 
@@ -147,16 +156,13 @@
 
          )))
 
-(define-public ticket-listitem-reveal-details-js-template
-  "document.getElementById('details-~a').toggleAttribute('hidden')")
-
 (define-public (render-ticket-listitem G_ project ticket ticket-id-to-human-id)
   `((div (@ (class ,(->css '(flex flex-col gap-2)))
             (id ,(format #f "listitem-~a"
                          (assoc-ref ticket "id"))))
          (div (@ (onclick ,(format #f
-                                   ticket-listitem-reveal-details-js-template
-                                   (assoc-ref ticket "id")))
+                            "document.getElementById('details-~a').toggleAttribute('hidden')"
+                            (assoc-ref ticket "id")))
                  (class ,(->css '(flex flex-row
                                        gap-4
                                        items-center
@@ -169,7 +175,8 @@
                                        cursor-pointer
                                        rounded-xl))))
               ,(emoji-for-ticket-type (assoc-ref ticket "ticket_type"))
-              (small (@ (class ,(->css '(font-sans text-stone-800 text-sm))))
+              (small (@ (class ,(->css '(font-sans text-stone-600 text-xs
+                                                   hidden md:flex))))
                      ,(format #f "~a-~a" project
                               (assoc-ref ticket "human_id")))
               (h5 (@ (class ,(->css '(font-sans text-stone-700 text-md
@@ -203,14 +210,22 @@
                                                                flex-row gap-4
                                                                items-center
                                                                justify-between))))
-                                           (h2 (@ (class ,(->css '(text-3xl
-                                                                   font-sans
-                                                                   font-black
-                                                                   text-stone-700))))
-                                               ,(format #f "backlog of ~a"
-                                                        (assoc-ref
-                                                         project-details
-                                                         "title")))
+                                           (div (@ (class ,(->css '(flex
+                                                                    flex-row
+                                                                    gap-2
+                                                                    items-center))))
+                                                ,(hyg-icon #:type 'scroll
+                                                           #:icon-css '(text-stone-700
+                                                                        text-2xl))
+                                                (h2 (@ (class ,(->css '(text-3xl
+                                                                        font-sans
+                                                                        font-black
+                                                                        text-stone-700))))
+                                                    ,(format #f
+                                                             "backlog of ~a"
+                                                             (assoc-ref
+                                                              project-details
+                                                              "title"))))
                                            (div (@ (class ,(->css '(flex
                                                                     flex-row
                                                                     flex-wrap
