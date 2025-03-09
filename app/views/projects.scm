@@ -72,22 +72,22 @@
                                    (assoc-ref p "human_id"))))
                  ,(hyg-icon-button #:icon 'kanban
                                    #:content (format #f "kanban: ~a"
-                                                     (assoc-ref p "title")))))
-         (hr)
-         (div (@ (class "flex flex-wrap flex-row gap-3"))
+                                                     (assoc-ref p "title"))))
               ,(render-if-nestring (lambda (x)
                                      `(a (@ (class ,(->css '(text-stone-800)))
                                             (href ,x))
-                                         ,(hyg-button #:content
-                                                      "🔗 view project")))
+                                         ,(hyg-icon-button #:icon 'link
+                                                           #:content
+                                                           (G_ "view live"))))
                                    (assoc-ref p "url"))
               ,(render-if-nestring (lambda (x)
                                      `(a (@ (class ,(->css '(text-stone-800)))
                                             (href ,x))
-                                         ,(hyg-button #:content
-                                                      "🔗 project code")))
+                                         ,(hyg-icon-button #:icon 'link
+                                                           #:content
+                                                           (G_ "project code"))))
                                    (assoc-ref p "vcs_url")))
-         (hr)
+         (hr (@(class ,(->css '(my-3)))))
          (div (@ (class ,(->css '(flex flex-wrap flex-row gap-4))))
               (a (@ (href ,(format #f "/projects/~a/edit"
                                    (assoc-ref p "human_id"))))
