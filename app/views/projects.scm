@@ -60,7 +60,7 @@
               (a (@ (class "text-stone-800")
                     (href ,(format #f "/tickets/~a"
                                    (assoc-ref p "human_id"))))
-                 ,(action-button #:content `(span (@ (class
+                 ,(hyg-button #:content `(span (@ (class
                                                       "items-center flex flex-row gap-1"))
                                                   ((i (@ (class ,(->css '(ph
                                                                           ph-scroll
@@ -73,7 +73,7 @@
               (a (@ (class "text-stone-800")
                     (href ,(format #f "/kanban/~a"
                                    (assoc-ref p "human_id"))))
-                 ,(action-button #:content `(span (@ (class
+                 ,(hyg-button #:content `(span (@ (class
                                                       "items-center flex flex-row gap-1"))
                                                   ((i (@ (class ,(->css '(ph
                                                                           ph-kanban
@@ -88,27 +88,35 @@
               ,(render-if-nestring (lambda (x)
                                      `(a (@ (class "text-stone-800")
                                             (href ,x))
-                                         ,(action-button #:content
+                                         ,(hyg-button #:content
                                                          "🔗 view project")))
                                    (assoc-ref p "url"))
               ,(render-if-nestring (lambda (x)
                                      `(a (@ (class "text-stone-800")
                                             (href ,x))
-                                         ,(action-button #:content
+                                         ,(hyg-button #:content
                                                          "🔗 project code")))
                                    (assoc-ref p "vcs_url")))
          (hr)
          (div (@ (class "flex flex-wrap flex-row gap-4"))
               (a (@ (href ,(format #f "/projects/~a/edit"
                                    (assoc-ref p "human_id"))))
-                 ,(action-button #:content (G_ "edit project")))
+                 ,(hyg-button #:content (G_ "edit project")))
               (form (@ (enctype "application/x-www-form-urlencoded")
                        (method "POST")
                        (action "/projects/delete"))
                     (input (@ (name "id")
                               (hidden "")
                               (value ,(assoc-ref p "id"))) "")
-                    ,(danger-submit-button #:content (G_ "delete"))))
+                                        ,(hyg-danger-submit-button #:content `(span (@ (class
+                                                                "items-center flex flex-row gap-1"))
+                                                            ((i (@ (class ,(->css '
+                                                                            (ph
+                                                                             ph-trash
+                                                                             text-white
+                                                                             text-xl))))
+                                                                ""))
+                                                            ,(G_ "delete")))))
          (small (@ (class "font-mono text-stone-600"))
                 ,(format #f "~a"
                          (assoc-ref p "human_id")))
@@ -184,28 +192,28 @@
                                          "application/x-www-form-urlencoded")
                                         (method "POST")
                                         (action ,action))
-                                     ,(mk-input #:label (G_ "title")
-                                                #:name "title"
-                                                #:value (unescape-str title)
-                                                #:required #t)
-                                     ,(mk-input #:label (G_ "human id")
-                                                #:name "human-id"
-                                                #:value human-id
-                                                #:required #t)
-                                     ,(mk-input #:label (G_ "homepage url")
-                                                #:name "url"
-                                                #:value url
-                                                #:required #f)
-                                     ,(mk-input #:label (G_
-                                                         "version control url")
-                                                #:name "vcs-url"
-                                                #:value vcs-url
-                                                #:required #f)
-                                     ,(mk-textarea #:label (G_ "description")
-                                                   #:name "description"
-                                                   #:value (unescape-str
-                                                            description)
-                                                   #:required #f)
+                                     ,(hyg-input #:label (G_ "title")
+                                                 #:name "title"
+                                                 #:value (unescape-str title)
+                                                 #:required #t)
+                                     ,(hyg-input #:label (G_ "human id")
+                                                 #:name "human-id"
+                                                 #:value human-id
+                                                 #:required #t)
+                                     ,(hyg-input #:label (G_ "homepage url")
+                                                 #:name "url"
+                                                 #:value url
+                                                 #:required #f)
+                                     ,(hyg-input #:label (G_
+                                                          "version control url")
+                                                 #:name "vcs-url"
+                                                 #:value vcs-url
+                                                 #:required #f)
+                                     ,(hyg-textarea #:label (G_ "description")
+                                                    #:name "description"
+                                                    #:value (unescape-str
+                                                             description)
+                                                    #:required #f)
 
                                      (div ,(success-submit-button #:content (G_
                                                                              "submit"))))))

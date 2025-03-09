@@ -104,7 +104,7 @@
          (div (@ (class "flex flex-row flex-wrap gap-4"))
               (a (@ (href ,(format #f "/tickets/~a/~a/edit" project
                                    (assoc-ref ticket "human_id"))))
-                 ,(action-button #:content `(span (@ (class
+                 ,(hyg-button #:content `(span (@ (class
                                                       "items-center flex flex-row gap-1"))
                                                   ((i (@ (class ,(->css '(ph
                                                                           ph-pencil
@@ -118,7 +118,7 @@
                     (input (@ (hidden "")
                               (name "id")
                               (value ,(assoc-ref ticket "id"))))
-                    ,(danger-submit-button #:content `(span (@ (class
+                    ,(hyg-danger-submit-button #:content `(span (@ (class
                                                                 "items-center flex flex-row gap-1"))
                                                             ((i (@ (class ,(->css '
                                                                             (ph
@@ -200,11 +200,12 @@
                                                                     project-details
                                                                     "human_id"))))
 
-                                                        ,(action-button
+                                                        ,(hyg-button
                                                                         #:content `
                                                                         (span (@
                                                                                (class
                                                                                 "items-center flex flex-row gap-1"))
+
                                                                               
                                                                               (
                                                                                (i
@@ -224,7 +225,7 @@
                                                               (assoc-ref
                                                                project-details
                                                                "human_id"))))
-                                                   ,(action-button #:content `
+                                                   ,(hyg-button #:content `
                                                                    (span (@ (class
                                                                              "items-center flex flex-row gap-1"))
                                                                          ((i (@
@@ -385,62 +386,62 @@
                (enctype "application/x-www-form-urlencoded")
                (method "POST")
                (action ,action))
-            ,(mk-input #:label (G_ "title")
-                       #:name "title"
-                       #:value (unescape-str title)
-                       #:required #t)
+            ,(hyg-input #:label (G_ "title")
+                        #:name "title"
+                        #:value (unescape-str title)
+                        #:required #t)
 
             (label ,(G_ "status"))
             (select (@ (class "p-3 rounded-xl border-stone-400/75 border-2")
                        (name "ticket-status")
                        (required ""))
-                    ,(mk-glyph-option #:value "todo"
-                                      #:glyph "☑️"
-                                      #:content (G_ "To-do")
-                                      #:selected-value ticket-status)
-                    ,(mk-glyph-option #:value "work-in-progress"
-                                      #:glyph "⚙️"
-                                      #:content (G_ "Work in Progress")
-                                      #:selected-value ticket-status)
-                    ,(mk-glyph-option #:value "in-review"
-                                      #:glyph "🔍"
-                                      #:content (G_ "In Review")
-                                      #:selected-value ticket-status)
-                    ,(mk-glyph-option #:value "done"
-                                      #:glyph "✅"
-                                      #:content (G_ "Done")
-                                      #:selected-value ticket-status)
-                    ,(mk-glyph-option #:value "rejected"
-                                      #:glyph "❌"
-                                      #:content (G_ "Rejected")
-                                      #:selected-value ticket-status))
+                    ,(hyg-glyph-option #:value "todo"
+                                       #:glyph "☑️"
+                                       #:content (G_ "To-do")
+                                       #:selected-value ticket-status)
+                    ,(hyg-glyph-option #:value "work-in-progress"
+                                       #:glyph "⚙️"
+                                       #:content (G_ "Work in Progress")
+                                       #:selected-value ticket-status)
+                    ,(hyg-glyph-option #:value "in-review"
+                                       #:glyph "🔍"
+                                       #:content (G_ "In Review")
+                                       #:selected-value ticket-status)
+                    ,(hyg-glyph-option #:value "done"
+                                       #:glyph "✅"
+                                       #:content (G_ "Done")
+                                       #:selected-value ticket-status)
+                    ,(hyg-glyph-option #:value "rejected"
+                                       #:glyph "❌"
+                                       #:content (G_ "Rejected")
+                                       #:selected-value ticket-status))
             (label ,(G_ "type"))
             (select (@ (class "p-3 rounded-xl border-stone-400/75 border-2")
                        (name "ticket-type")
                        (required ""))
-                    ,(mk-glyph-option #:value "task"
-                                      #:glyph "🌿"
-                                      #:content (G_ "Task")
-                                      #:selected-value ticket-type)
-                    ,(mk-glyph-option #:value "bug"
-                                      #:glyph "🐜"
-                                      #:content (G_ "Bug")
-                                      #:selected-value ticket-type)
-                    ,(mk-glyph-option #:value "story"
-                                      #:glyph "🌳"
-                                      #:content (G_ "Story")
-                                      #:selected-value ticket-type)
-                    ,(mk-glyph-option #:value "spike"
-                                      #:glyph "🧪"
-                                      #:content (G_ "Spike")
-                                      #:selected-value ticket-type)
-                    ,(mk-glyph-option #:value "time-box"
-                                      #:glyph "🕙"
-                                      #:content (G_ "Time Box")
-                                      #:selected-value ticket-type))
+                    ,(hyg-glyph-option #:value "task"
+                                       #:glyph "🌿"
+                                       #:content (G_ "Task")
+                                       #:selected-value ticket-type)
+                    ,(hyg-glyph-option #:value "bug"
+                                       #:glyph "🐜"
+                                       #:content (G_ "Bug")
+                                       #:selected-value ticket-type)
+                    ,(hyg-glyph-option #:value "story"
+                                       #:glyph "🌳"
+                                       #:content (G_ "Story")
+                                       #:selected-value ticket-type)
+                    ,(hyg-glyph-option #:value "spike"
+                                       #:glyph "🧪"
+                                       #:content (G_ "Spike")
+                                       #:selected-value ticket-type)
+                    ,(hyg-glyph-option #:value "time-box"
+                                       #:glyph "🕙"
+                                       #:content (G_ "Time Box")
+                                       #:selected-value ticket-type))
             (label ,(G_ "description"))
             (textarea (@ (class
-                          "p-3 w-full min-h-64 rounded-xl border-stone-400/75 border-2")
+                           "p-3 w-full min-h-64 rounded-xl border-stone-400/75 border-2")
                          (name "description")
                          (required ""))
                       ,(unescape-str description))

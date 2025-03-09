@@ -102,47 +102,37 @@
                                                           (href ,(format #f
                                                                   "/tickets/~a"
                                                                   project)))
-                                                       ,(action-button
-                                                                       #:content `
-                                                                       (span (@
-                                                                              (class
-                                                                               "items-center flex flex-row gap-1"))
-                                                                             (
-                                                                              (i
-                                                                               (@
-                                                                                (class ,
-                                                                                 (->css '
-                                                                                  (ph
-                                                                                   ph-scroll
-                                                                                   text-white
-                                                                                   text-xl))))
-                                                                               ""))
-                                                                             ,
-                                                                             (G_
-                                                                              "backlog")))))
+                                                       ,(hyg-button #:content `
+                                                                    (span (@ (class
+                                                                              "items-center flex flex-row gap-1"))
+                                                                          ((i (@
+                                                                               (class ,
+                                                                                (->css '
+                                                                                 (ph
+                                                                                  ph-scroll
+                                                                                  text-white
+                                                                                  text-xl))))
+                                                                            ""))
+                                                                          ,(G_
+                                                                            "backlog")))))
                                                (div (a (@ (class
                                                            "text-sm text-stone-800 my-3")
                                                           (href ,(format #f
                                                                   "/tickets/~a/new"
                                                                   project)))
-                                                       ,(action-button
-                                                                       #:content `
-                                                                       (span (@
-                                                                              (class
-                                                                               "items-center flex flex-row gap-1"))
-                                                                             (
-                                                                              (i
-                                                                               (@
-                                                                                (class ,
-                                                                                 (->css '
-                                                                                  (ph
-                                                                                   ph-plus
-                                                                                   text-white
-                                                                                   text-xl))))
-                                                                               ""))
-                                                                             ,
-                                                                             (G_
-                                                                              "new ticket")))))))
+                                                       ,(hyg-button #:content `
+                                                                    (span (@ (class
+                                                                              "items-center flex flex-row gap-1"))
+                                                                          ((i (@
+                                                                               (class ,
+                                                                                (->css '
+                                                                                 (ph
+                                                                                  ph-plus
+                                                                                  text-white
+                                                                                  text-xl))))
+                                                                            ""))
+                                                                          ,(G_
+                                                                            "new ticket")))))))
 
                                      )))
                           (div (@ (class
