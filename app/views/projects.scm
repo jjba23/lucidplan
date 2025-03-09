@@ -39,68 +39,61 @@
   #:use-module (lucidplan query-escape)
   #:use-module (hygguile components button)
   #:use-module (hygguile components input)
+  #:use-module (hygguile components icon)
   #:use-module (hygguile abstraction)
   #:use-module (artanis security nss)
   #:use-module (artanis route))
 
-(define-public project-listitem-reveal-details-js-template
-  "document.getElementById('details-~a').toggleAttribute('hidden')")
-
 (define (render-project G_ p)
-  `((div (@ (class
-             "flex flex-col gap-2 px-3 py-6 bg-stone-100 rounded-2xl  border-stone-400/75 border-2"))
+  `((div (@ (class ,(->css '(flex flex-col
+                                  gap-2
+                                  px-3
+                                  py-6
+                                  bg-stone-100
+                                  rounded-2xl
+                                  border-stone-400/75
+                                  border-2))))
          ,(render-if-nestring (lambda (x)
                                 `(p (@ (class ,(->css '(text-md py-3
-                                                        text-stone-800
-                                                        font-medium))))
+                                                                text-stone-800
+                                                                font-medium))))
                                     ,x))
                               (assoc-ref p "description"))
          (hr)
-         (div (@ (class "flex flex-wrap flex-row gap-3"))
-              (a (@ (class "text-stone-800")
-                    (href ,(format #f "/tickets/~a"
+         (div (@ (class ,(->css '(flex flex-wrap flex-row gap-3))))
+              (a (@ (href ,(format #f "/tickets/~a"
                                    (assoc-ref p "human_id"))))
-                 ,(hyg-button #:content `(span (@ (class
-                                                   "items-center flex flex-row gap-1"))
-                                               ((i (@ (class ,(->css '(ph
-                                                                       ph-scroll
-                                                                       text-white
-                                                                       text-xl))))
-                                                   ""))
-                                               ,(format #f "backlog: ~a"
-                                                        (assoc-ref p "title")))))
+                 ,(hyg-icon-button #:icon 'scroll
+                                   #:content (format #f "backlog: ~a"
+                                                     (assoc-ref p "title"))))
               (a (@ (class "text-stone-800")
                     (href ,(format #f "/kanban/~a"
                                    (assoc-ref p "human_id"))))
-                 ,(hyg-button #:content `(span (@ (class
-                                                   "items-center flex flex-row gap-1"))
-                                               ((i (@ (class ,(->css '(ph
-                                                                       ph-kanban
-                                                                       text-white
-                                                                       text-xl))))
-                                                   ""))
-                                               ,(format #f "kanban: ~a"
-                                                        (assoc-ref p "title"))))))
+                 ,(hyg-icon-button #:icon 'kanban
+                                   #:content (format #f "kanban: ~a"
+                                                     (assoc-ref p "title")))))
          (hr)
          (div (@ (class "flex flex-wrap flex-row gap-3"))
               ,(render-if-nestring (lambda (x)
-                                     `(a (@ (class "text-stone-800")
+                                     `(a (@ (class ,(->css '(text-stone-800)))
                                             (href ,x))
                                          ,(hyg-button #:content
                                                       "🔗 view project")))
                                    (assoc-ref p "url"))
               ,(render-if-nestring (lambda (x)
-                                     `(a (@ (class "text-stone-800")
+                                     `(a (@ (class ,(->css '(text-stone-800)))
                                             (href ,x))
                                          ,(hyg-button #:content
                                                       "🔗 project code")))
                                    (assoc-ref p "vcs_url")))
          (hr)
-         (div (@ (class "flex flex-wrap flex-row gap-4"))
+         (div (@ (class ,(->css '(flex flex-wrap flex-row gap-4))))
               (a (@ (href ,(format #f "/projects/~a/edit"
                                    (assoc-ref p "human_id"))))
-                 ,(hyg-button #:content `(span (@ (class
-                                                   "items-center flex flex-row gap-1"))
+                 ,(hyg-button #:content `(span (@ (class ,(->css '(items-center
+                                                                   flex
+                                                                   flex-row
+                                                                   gap-1))))
                                                ((i (@ (class ,(->css '(ph
                                                                        ph-pencil
                                                                        text-white
@@ -113,31 +106,38 @@
                     (input (@ (name "id")
                               (hidden "")
                               (value ,(assoc-ref p "id"))) "")
-                    ,(hyg-danger-submit-button #:content `(span (@ (class
-                                                                    "items-center flex flex-row gap-1"))
-                                                                ((i (@ (class ,
-                                                                              (->css '
-                                                                               (ph
-                                                                                ph-trash
-                                                                                text-white
-                                                                                text-xl))))
-                                                                    ""))
+                    ,(hyg-danger-submit-button #:content `(span (@ (class ,(->css '
+                                                                            (items-center
+                                                                             flex
+                                                                             flex-row
+                                                                             gap-1))))
+                                                                ,(hyg-icon #:type 'trash #:icon-css '(text-white text-xl))
                                                                 ,(G_ "delete")))))
-         (small (@ (class "font-mono text-stone-600"))
+         (small (@ (class ,(->css '(font-mono text-stone-600))))
                 ,(format #f "~a"
                          (assoc-ref p "human_id")))
-         (small (@ (class "font-mono text-stone-600 text-xs"))
+         (small (@ (class ,(->css '(font-mono text-stone-600 text-xs))))
                 ,(assoc-ref p "id")))))
 
 (define (render-project-list-item G_ p)
-  `((div (@ (class
-             "flex flex-row flex-wrap gap-4 items-center justify-left bg-stone-300/75 border-stone-400/75 border-2 py-2 px-4 cursor-pointer rounded-xl")
-            (onclick ,(format #f project-listitem-reveal-details-js-template
+  `((div (@ (class ,(->css '(flex flex-row
+                                  flex-wrap
+                                  gap-4
+                                  items-center
+                                  justify-left
+                                  bg-stone-300/75
+                                  border-stone-400/75
+                                  border-2
+                                  py-2
+                                  px-4
+                                  cursor-pointer
+                                  rounded-xl)))
+            (onclick ,(format #f
+                              "document.getElementById('details-~a').toggleAttribute('hidden')"
                               (assoc-ref p "id"))))
 
          (h3 (@ (class ,(->css '(flex flex-row items-center gap-2))))
-             (span (i (@ (class ,(->css '(ph ph-list text-stone-500 text-lg))))
-                      ""))
+             ,(hyg-icon #:type 'list #:icon-css '(text-stone-500 text-lg))
              (span (@ (class ,(->css '(font-sans text-stone-700 text-lg
                                                  font-black break-words))))
                    ,(format #f "~a"

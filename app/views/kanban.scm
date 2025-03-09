@@ -88,51 +88,34 @@
 
            (kanban-html `((div (@ (class "container mx-auto"))
                                ((div (@ (class "flex flex-col gap-3 flex-grow"))
-                                     (div (@ (class
-                                              "flex flex-wrap flex-row gap-4 items-center justify-between"))
-                                          (h2 (@ (class
-                                                  "text-3xl font-sans font-bold text-stone-700"))
+                                     (div (@ (class ,(->css '(flex flex-wrap
+                                                              flex-row gap-4
+                                                              items-center
+                                                              justify-between))))
+                                          (h2 (@ (class ,(->css '(text-3xl
+                                                                  font-sans
+                                                                  font-bold
+                                                                  text-stone-700))))
                                               ,(format #f "kanban for ~a"
                                                        project))
 
-                                          (div (@ (class
-                                                   "flex flex-row flex-wrap gap-1 items-center"))
-                                               (div (a (@ (class
-                                                           "text-stone-600 text-md flex gap-1")
-                                                          (href ,(format #f
-                                                                  "/tickets/~a"
-                                                                  project)))
-                                                       ,(hyg-button #:content `
-                                                                    (span (@ (class
-                                                                              "items-center flex flex-row gap-1"))
-                                                                          ((i (@
-                                                                               (class ,
-                                                                                (->css '
-                                                                                 (ph
-                                                                                  ph-scroll
-                                                                                  text-white
-                                                                                  text-xl))))
-                                                                            ""))
-                                                                          ,(G_
-                                                                            "backlog")))))
-                                               (div (a (@ (class
-                                                           "text-sm text-stone-800 my-3")
-                                                          (href ,(format #f
-                                                                  "/tickets/~a/new"
-                                                                  project)))
-                                                       ,(hyg-button #:content `
-                                                                    (span (@ (class
-                                                                              "items-center flex flex-row gap-1"))
-                                                                          ((i (@
-                                                                               (class ,
-                                                                                (->css '
-                                                                                 (ph
-                                                                                  ph-plus
-                                                                                  text-white
-                                                                                  text-xl))))
-                                                                            ""))
-                                                                          ,(G_
-                                                                            "new ticket")))))))
+                                          (div (@ (class ,(->css '(flex
+                                                                   flex-row
+                                                                   flex-wrap
+                                                                   gap-1
+                                                                   items-center))))
+                                               (a (@ (href ,(format #f
+                                                             "/tickets/~a"
+                                                             project)))
+                                                  ,(hyg-icon-button #:icon 'scroll
+                                                                    #:content (G_
+                                                                               "backlog")))
+                                               (a (@ (href ,(format #f
+                                                             "/tickets/~a/new"
+                                                             project)))
+                                                  ,(hyg-icon-button #:icon 'plus
+                                                                    #:content (G_
+                                                                               "new ticket")))))
 
                                      )))
                           (div (@ (class

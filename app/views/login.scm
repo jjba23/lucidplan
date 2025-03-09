@@ -30,8 +30,14 @@
 
 (define-public (login-page G_)
   (let ((login-form `(form (@ (action "/login")
-                              (class
-                               "w-full rounded-xl bg-stone-200/50 p-4 flex flex-row flex-wrap items-center gap-4")
+                              (class ,(->css '(w-full rounded-xl
+                                                      bg-stone-200/50
+                                                      p-4
+                                                      flex
+                                                      flex-row
+                                                      flex-wrap
+                                                      items-center
+                                                      gap-4)))
                               (method "POST"))
                            ,(hyg-input #:label (G_ "username")
                                        #:name "username"
@@ -44,9 +50,10 @@
                                        #:required #t)
                            (div ,(hyg-submit-button #:content (G_ "login"))))))
     (html-template G_
-                   #:body `(div (@ (class "container mx-auto"))
-                                ((h2 (@ (class
-                                         "font-bold text-stone-800/75 text-md"))
+                   #:body `(div (@ (class ,(->css '(container mx-auto))))
+                                ((h2 (@ (class ,(->css '(font-bold
+                                                         text-stone-800/75
+                                                         text-md))))
                                      ,(G_ "login to lucidplan"))
                                  (div ,login-form))))))
 
