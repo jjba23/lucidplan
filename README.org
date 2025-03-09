@@ -13,6 +13,10 @@ LucidPlan is a project management for teams of all sizes and jobs.
 
 It's a flexible system made to simplify everyone's life, accessbile to all kinds of users.
 
+If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
+
+** Why ?
+
 It also enhances the use of Agile work methodologies in teams due to its fast-paced no nonesense-workflows and customizability, also thanks to being written in Lisp.
 
 This tool is the fruit of years of experience using bloated proprietary systems like Jira/Trello, and experiencing the insane frustrations they bring.
