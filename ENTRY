@@ -13,7 +13,6 @@
 (add-to-load-path (string-append (current-toplevel) "/lib"))
 ;; Put whatever you want to be called before server running here
 
-
 ;; Specify the directory where the MO file is located
 (bindtextdomain "translate" "./sys/i18n/locale")
 (bind-textdomain-codeset "translate" "UTF-8")

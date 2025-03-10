@@ -19,6 +19,7 @@
   #:use-module (ice-9 time)
   #:use-module (ice-9 format)
   #:use-module (ice-9 rdelim)
+  #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 regex)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-64)
@@ -196,6 +197,25 @@
            )
       with-parsed-code-block))
   (export parse-org))
+
+(begin
+  (define* (build-asset-library assets)
+    (let ((lib '()))
+      (for-each (lambda (f)
+                  (let* ((file-contents (get-string-all (open-input-file f)))
+                         (min-contents (cond
+                                         ((string-suffix? ".css" f)
+                                          (string-replace-substring
+                                           file-contents "\n" ""))
+                                         (else file-contents))))
+                    (set! lib
+                          (assoc-set! lib f min-contents)))) assets) lib))
+  (export build-asset-library))
+
+(define-public asset-library
+  (build-asset-library '("pub/css/fonts.css" "pub/css/phosphor.css"
+                         "pub/js/tickets.js" "pub/js/tailwind.js"
+                         "pub/js/tailwind.config.js")))
 
 ;; module tests
 (test-begin "prelude")

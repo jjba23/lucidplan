@@ -29,6 +29,7 @@
   #:use-module (ice-9 iconv)
   #:use-module (ice-9 hash-table)
   #:use-module (ice-9 threads)
+  #:use-module (lucidplan prelude)
   #:use-module (artanis i18n)
   #:use-module (hygguile abstraction)
   #:use-module (artanis i18n sxml)
@@ -58,17 +59,17 @@
                           (proj '()))
     (define nav
       `(div (@ (class
-                 "flex flex-row flex-wrap gap-3 p-3 bg-stone-900/90 items-center justify-left w-full shadow-lg"))
+                "flex flex-row flex-wrap gap-3 p-3 bg-stone-900/90 items-center justify-left w-full shadow-lg"))
             (a (@ (class "text-md text-white font-sans font-black px-4")
                   (href "/")) "LucidPlan")
             (a (@ (class
-                    "text-sm lowercase text-white font-sans font-medium px-2 flex-items-center gap-2")
+                   "text-sm lowercase text-white font-sans font-medium px-2 flex-items-center gap-2")
                   (href "/login"))
                (span (i (@ (class ,(->css '(ph ph-sign-in text-md)))) ""))
                "&nbsp;"
                (span ,(G_ "Login")))
             (a (@ (class
-                    "text-sm lowercase text-white font-sans font-medium px-2 flex items-center gap-2")
+                   "text-sm lowercase text-white font-sans font-medium px-2 flex items-center gap-2")
                   (href "/projects"))
                (span (i (@ (class ,(->css '(ph ph-align-bottom text-md)))) ""))
                (span ,(G_ "Projects")))
@@ -77,40 +78,30 @@
 
             (select (@ (onchange "window.location.href=this.value;")
                        (class
-                         "text-sm text-white bg-transparent font-medium font-sans"))
+                        "text-sm text-white bg-transparent font-medium font-sans"))
                     (option "🔗 go to")
                     ,(map (lambda (p)
                             `(option (@ (value ,(format #f "/tickets/~a"
                                                         (assoc-ref p
                                                                    "human_id")))
                                         (class
-                                          "text-sm font-light lowercase text-stone-800"))
+                                         "text-sm font-light lowercase text-stone-800"))
                                      ,(assoc-ref p "title"))) proj))))
     `(html (head (title "LucidPlan")
-                 (link (@ (rel "preconnect")
-                          (href "https://fonts.googleapis.com")))
-                 (link (@ (rel "preconnect")
-                          (href "https://fonts.gstatic.com")
-                          (crossorigin "")))
-                 (link (@ (rel "stylesheet")
-                          (href "/css/fonts.css")))
-                 (link (@ (rel "stylesheet")
-                          (href
-                           "https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css")))
+                 (style ,(assoc-ref asset-library "pub/css/fonts.css"))
+                 (style ,(assoc-ref asset-library "pub/css/phosphor.css"))
                  (meta (@ (name "viewport")
                           (content "width=device-width, initial-scale=1.0")))
-                 (script (@ (src "https://cdn.tailwindcss.com")) "")
-                 (script (@ (src "/js/tailwind.config.js")) ())
-                 (script (@ (src "/js/tickets.js")) ()))
+                 (script ,(assoc-ref asset-library "pub/js/tailwind.js"))
+                 (script ,(assoc-ref asset-library "pub/js/tailwind.config.js")))
            (body (@ (class "bg-stone-200/50"))
                  (div (@ (class "flex flex-col h-screen justify-between"))
                       (div ,nav
                            (div (@ (class "py-8"))
                                 ,body))
-                      (footer ,(page-footer G_))))))
+                      (footer ,(page-footer G_)))
+                 (script ,(assoc-ref asset-library "pub/js/tickets.js")))))
   (export html-template))
-
-;; <i class="ph-bold ph-smiley"></i>
 
 (define-public (emoji-for-ticket-status ticket-status)
   (cond
