@@ -87,22 +87,29 @@
                                         (class
                                          "text-sm font-light lowercase text-stone-800"))
                                      ,(assoc-ref p "title"))) proj))))
-    `(html (@ (lang en))
-           (head (title "LucidPlan")
-                 (style ,(assoc-ref asset-library "pub/css/fonts.css"))
-                 (style ,(assoc-ref asset-library "pub/css/phosphor.css"))
-                 (meta (@ (name viewport)
-                          (content "width=device-width, initial-scale=1.0")))
-                 (meta (@ (charset UTF-8)))
-                 (script ,(assoc-ref asset-library "pub/js/tailwind.js"))
-                 (script ,(assoc-ref asset-library "pub/js/tailwind.config.js")))
-           (body (@ (class "bg-stone-200/50"))
-                 (div (@ (class "flex flex-col h-screen justify-between"))
-                      (div ,nav
-                           (div (@ (class "py-8"))
-                                ,body))
-                      (footer ,(page-footer G_)))
-                 (script ,(assoc-ref asset-library "pub/js/tickets.js")))))
+    `("<!DOCTYPE html>" (html (@ (lang en))
+                              (head (title "LucidPlan")
+                                    (style ,(assoc-ref asset-library
+                                                       "pub/css/fonts.css"))
+                                    (style ,(assoc-ref asset-library
+                                                       "pub/css/phosphor.css"))
+                                    (meta (@ (name viewport)
+                                             (content
+                                              "width=device-width, initial-scale=1.0")))
+                                    (meta (@ (charset UTF-8)))
+                                    (script ,(assoc-ref asset-library
+                                                        "pub/js/tailwind.js"))
+                                    (script ,(assoc-ref asset-library
+                                              "pub/js/tailwind.config.js")))
+                              (body (@ (class "bg-stone-200/50"))
+                                    (div (@ (class
+                                             "flex flex-col h-screen justify-between"))
+                                         (div ,nav
+                                              (div (@ (class "py-8"))
+                                                   ,body))
+                                         (footer ,(page-footer G_)))
+                                    (script ,(assoc-ref asset-library
+                                                        "pub/js/tickets.js"))))))
   (export html-template))
 
 (define-public (emoji-for-ticket-status ticket-status)
