@@ -186,4 +186,4 @@ repl:
 
 # Unit tests
 test:
-	guix shell -m manifest.scm -- guile --fresh-auto-compile run-tests.scm
+	guix shell -m manifest.scm -- guile --fresh-auto-compile run-tests.scm | guile --fresh-auto-compile colorize-tests.scm
