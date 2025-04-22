@@ -208,9 +208,9 @@
                                 ((div (@ (class ,(->css '(flex flex-col gap-4
                                                                flex-grow))))
                                       (div (@ (class ,(->css '(flex flex-wrap
-                                                               flex-row gap-4
-                                                               items-center
-                                                               justify-between))))
+                                                                    flex-row gap-4
+                                                                    items-center
+                                                                    justify-between))))
                                            (div (@ (class ,(->css '(flex
                                                                     flex-row
                                                                     gap-2
@@ -233,20 +233,20 @@
                                                                     gap-1
                                                                     items-center))))
                                                 (div (a (@ (href ,(format #f
-                                                                   "/kanban/~a"
-                                                                   (assoc-ref
-                                                                    project-details
-                                                                    "human_id"))))
+                                                                          "/kanban/~a"
+                                                                          (assoc-ref
+                                                                           project-details
+                                                                           "human_id"))))
                                                         ,(hyg-icon-button
-                                                                          #:icon 'kanban
-                                                                          #:content
-                                                                          (G_
-                                                                           "kanban"))))
+                                                          #:icon 'kanban
+                                                          #:content
+                                                          (G_
+                                                           "kanban"))))
                                                 (a (@ (href ,(format #f
-                                                              "/tickets/~a/new"
-                                                              (assoc-ref
-                                                               project-details
-                                                               "human_id"))))
+                                                                     "/tickets/~a/new"
+                                                                     (assoc-ref
+                                                                      project-details
+                                                                      "human_id"))))
                                                    ,(hyg-icon-button #:icon 'plus
                                                                      #:content
                                                                      (G_
@@ -287,7 +287,7 @@
                                                                            project-details
                                                                            "human_id"))))
                                                            (span (@ (class
-                                                                     "text-stone-600 text-sm"))
+                                                                      "text-stone-600 text-sm"))
                                                                  ,(G_
                                                                    "show done?")))
                                                     (input (@ (id
@@ -308,19 +308,20 @@
                                                                            project-details
                                                                            "human_id"))))
                                                            (span (@ (class
-                                                                     "text-stone-600 text-sm"))
+                                                                      "text-stone-600 text-sm"))
                                                                  ,(G_
                                                                    "show rejected?")))))
+                                      ,(sort-select G_ #:project-id (assoc-ref project-details "human_id"))
                                       (div (@ (id "lucidplan-tickets-list")
                                               (ondrop "dropTicketsItem(event)")
                                               (ondragover "allowDrop(event)")
                                               (class
-                                               "flex flex-col gap-2 container"))
+                                                "flex flex-col gap-2 container"))
                                            ,(map (lambda (t)
                                                    (render-ticket-listitem G_
-                                                    (assoc-ref project-details
-                                                     "human_id") t
-                                                    ticket-id-to-human-id))
+                                                                           (assoc-ref project-details
+                                                                                      "human_id") t
+                                                                                      ticket-id-to-human-id))
                                                  (filter
                                                   only-active-tickets-filter
                                                   tickets)))
@@ -342,14 +343,14 @@
                                                        "done")
                                                      (span ,(G_ "done")))
                                                  (div (@ (class
-                                                          "flex flex-col gap-2 container"))
+                                                           "flex flex-col gap-2 container"))
                                                       ,(map (lambda (t)
                                                               (render-ticket-listitem
                                                                G_
                                                                (assoc-ref
                                                                 project-details
                                                                 "human_id") t
-                                                               ticket-id-to-human-id))
+                                                                ticket-id-to-human-id))
                                                             (filter
                                                              only-done-tickets-filter
                                                              tickets))))
@@ -371,14 +372,14 @@
                                                        "rejected")
                                                      (span ,(G_ "rejected")))
                                                  (div (@ (class
-                                                          "flex flex-col gap-2 container"))
+                                                           "flex flex-col gap-2 container"))
                                                       ,(map (lambda (t)
                                                               (render-ticket-listitem
                                                                G_
                                                                (assoc-ref
                                                                 project-details
                                                                 "human_id") t
-                                                               ticket-id-to-human-id))
+                                                                ticket-id-to-human-id))
                                                             (filter
                                                              only-rejected-tickets-filter
                                                              tickets))))

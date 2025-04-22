@@ -24,23 +24,23 @@
 (define-syntax awkish
   (lambda (stx)
     (syntax-case stx
-        (else)
-      ((_ var
-          (pat body ...) ...
-          (else else-body ...))
-       (with-syntax (((re ...)
-                      (datum->syntax #f
-                                     (generate-temporaries (syntax (pat
-                                                                    ...))))))
-         (syntax (let ((re (make-regexp pat))
-                       ...)
-                   (do ((var (read-line)
-                             (read-line)))
-                       ((eof-object? var))
-                     (cond
-                      ((regexp-exec re var)
-                       body ...) ...
-                       (else else-body ...))))))))))
+                 (else)
+                 ((_ var
+                     (pat body ...) ...
+                     (else else-body ...))
+                  (with-syntax (((re ...)
+                                 (datum->syntax #f
+                                                (generate-temporaries (syntax (pat
+                                                                               ...))))))
+                               (syntax (let ((re (make-regexp pat))
+                                             ...)
+                                         (do ((var (read-line)
+                                                   (read-line)))
+                                             ((eof-object? var))
+                                             (cond
+                                               ((regexp-exec re var)
+                                                body ...) ...
+                                               (else else-body ...))))))))))
 
 ;;; output utilities
 (define colors

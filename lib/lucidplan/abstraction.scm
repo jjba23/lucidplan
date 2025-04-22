@@ -29,3 +29,18 @@
 (define-public (only-rejected-tickets-filter ticket)
   (equal? (assoc-ref ticket "ticket_status") "rejected"))
 
+(define-public (entity-sort-from-query user-sort)
+  (cond
+   ((equal? "created-at-desc" user-sort)
+    '(created_at desc))
+   ((equal? "created-at-asc" user-sort)
+    '(created_at asc))
+   ((equal? "last-edited-at-desc" user-sort)
+    '(updated_at desc))
+   ((equal? "last-edited-at-asc" user-sort)
+    '(updated_at asc))
+   ((equal? "title-desc" user-sort)
+    '(title desc))
+   ((equal? "title-asc" user-sort)
+    '(title asc))
+   (else '(updated_at desc))))
