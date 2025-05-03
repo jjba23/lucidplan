@@ -111,7 +111,7 @@
 (define-public guile-orgwebalchemy
   (let ((commit "e97ee7bfe85d6dfde9e126899f9800cd36a25c2d")
         (base32-sha-signature
-         "0m9flnvhal62ik7k2sm2mhbrikzwvgdjpyr6s558z6d2ax41ikjd")
+         "1fabrak7x4287pzni7ysf1vppnl5bv75ng98yvn5xyfp4xi8rak8")
         (revision "0"))
     (package
       (name "guile-kracht")

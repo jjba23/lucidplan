@@ -38,6 +38,7 @@
   #:use-module (lucidplan html)
   #:use-module (lucidplan query-escape)
   #:use-module (lucidplan domain)
+  #:use-module (orgwebalchemy org-to-html)
   #:use-module (hygguile components button)
   #:use-module (hygguile components select)
   #:use-module (hygguile components input)
@@ -57,12 +58,12 @@
          (div (@ (class ,(->css '(flex flex-row justify-between))))
               (h4 (@ (class ,(->css '(font-sans text-stone-700 text-2xl
                                                 font-bold break-words my-3))))
-                  ,(parse-org (assoc-ref ticket "title")))
+                  ,(org-to-html (assoc-ref ticket "title")))
               (div (@ (class ,(->css '(flex justify-right))))
                    (span (@ (class ,(->css '(cursor-pointer)))
                             (onclick ,(format #f
-                                       "document.getElementById('details-~a').toggleAttribute('hidden')"
-                                       (assoc-ref ticket "id"))))
+                                              "document.getElementById('details-~a').toggleAttribute('hidden')"
+                                              (assoc-ref ticket "id"))))
                          ,(hyg-icon #:type 'x
                                     #:icon-css '(text-stone-800 text-xl)))))
 
@@ -75,7 +76,7 @@
                    (p (@ (class ,(->css '(flex gap-2 items-center))))
                       (span (@ (class "text-2xl"))
                             ,(emoji-for-ticket-status (assoc-ref ticket
-                                                       "ticket_status")))
+                                                                 "ticket_status")))
                       (span (@ (class ,(->css '(font-sans text-stone-700
                                                           text-sm))))
                             ,(assoc-ref ticket "ticket_status"))))
@@ -102,7 +103,7 @@
                                            max-w-prose
                                            whitespace-pre-wrap
                                            ml-4))))
-               ,(parse-org (assoc-ref ticket "description")))
+               ,(org-to-html (assoc-ref ticket "description")))
 
          (hr (@ (class "")))
 
@@ -145,11 +146,11 @@
                                                                              flex-row
                                                                              gap-1))))
                                                                 ((i (@ (class ,
-                                                                              (->css '
-                                                                               (ph
-                                                                                ph-trash
-                                                                                text-white
-                                                                                text-xl))))
+                                                                         (->css '
+                                                                          (ph
+                                                                           ph-trash
+                                                                           text-white
+                                                                           text-xl))))
                                                                     ""))
                                                                 ,(G_ "delete")))))
 
@@ -160,8 +161,8 @@
             (id ,(format #f "listitem-~a"
                          (assoc-ref ticket "id"))))
          (div (@ (onclick ,(format #f
-                            "document.getElementById('details-~a').toggleAttribute('hidden')"
-                            (assoc-ref ticket "id")))
+                                   "document.getElementById('details-~a').toggleAttribute('hidden')"
+                                   (assoc-ref ticket "id")))
                  (class ,(->css '(flex flex-row
                                        gap-4
                                        items-center
@@ -180,7 +181,7 @@
                               (assoc-ref ticket "human_id")))
               (h5 (@ (class ,(->css '(font-sans text-stone-700 text-md
                                                 font-black break-words))))
-                  ,(parse-org (assoc-ref ticket "title")))
+                  ,(org-to-html (assoc-ref ticket "title")))
               (div (a (@ (href ,(format #f "/tickets/~a/~a" project
                                         (assoc-ref ticket "human_id"))))
                       (span ((i (@ (class ,(->css '(ph ph-link text-stone-600))))

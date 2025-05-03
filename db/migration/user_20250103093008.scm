@@ -14,7 +14,7 @@
         #:salt salt)))
 
 (migrate-up (display "Adding user...")
-            (add-test-user! #:name "Joe"
+            (add-test-user! #:name "jjba23"
                             #:email "jjbigorra@gmail.com"
                             #:password ""
                             #:salt "asdf")

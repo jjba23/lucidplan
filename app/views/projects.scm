@@ -31,6 +31,7 @@
   #:use-module (ice-9 threads)
   #:use-module (lucidplan html)
   #:use-module (artanis artanis)
+  #:use-module (orgwebalchemy org-to-html)
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
@@ -54,12 +55,12 @@
                                   border-2))))
          ,(render-if-nestring (lambda (x)
                                 `(p (@ (class ,(->css '(text-md py-3
-                                                        text-stone-800
-                                                        whitespace-pre-wrap
-                                                        font-medium))))
+                                                                text-stone-800
+                                                                whitespace-pre-wrap
+                                                                font-medium))))
                                     ,x))
-                              (parse-org (unescape-str (assoc-ref p
-                                                        "description"))))
+                              (org-to-html (unescape-str (assoc-ref p
+                                                                    "description"))))
          (hr)
          (div (@ (class ,(->css '(flex flex-wrap flex-row gap-3))))
               (a (@ (href ,(format #f "/tickets/~a"
@@ -113,10 +114,10 @@
                                                                              flex-row
                                                                              gap-1))))
                                                                 ,(hyg-icon
-                                                                           #:type 'trash
-                                                                           #:icon-css '
-                                                                           (text-white
-                                                                            text-xl))
+                                                                  #:type 'trash
+                                                                  #:icon-css '
+                                                                  (text-white
+                                                                   text-xl))
                                                                 ,(G_ "delete")))))
          (small (@ (class ,(->css '(font-mono text-stone-600))))
                 ,(format #f "~a"
@@ -138,8 +139,8 @@
                                   cursor-pointer
                                   rounded-xl)))
             (onclick ,(format #f
-                       "document.getElementById('details-~a').toggleAttribute('hidden')"
-                       (assoc-ref p "id"))))
+                              "document.getElementById('details-~a').toggleAttribute('hidden')"
+                              (assoc-ref p "id"))))
 
          (h3 (@ (class ,(->css '(flex flex-row items-center gap-2 truncate))))
              ,(hyg-icon #:type 'list
@@ -150,7 +151,7 @@
                             (assoc-ref p "title"))))
          (p (@ (class ,(->css '(font-sans text-stone-600 text-sm break-words
                                           truncate))))
-            ,(parse-org (unescape-str (assoc-ref p "description")))))
+            ,(org-to-html (unescape-str (assoc-ref p "description")))))
     (div (@ (id ,(format #f "details-~a"
                          (assoc-ref p "id")))
             (class "")
