@@ -129,18 +129,18 @@
 
 (define-public (emoji-for-ticket-type ticket-type)
   (cond
-   ((equal? "task" ticket-type)
-    `((i (@ (class ,(->css '(ph ph-gear-fine text-stone-600 text-xl)))) "")))
-   ((equal? "bug" ticket-type)
-    `((i (@ (class ,(->css '(ph ph-bug text-stone-600 text-xl)))) "")))
-   ((equal? "story" ticket-type)
-    `((i (@ (class ,(->css '(ph ph-book-open-text text-stone-600 text-xl))))
-         "")))
-   ((equal? "spike" ticket-type)
-    `((i (@ (class ,(->css '(ph ph-flask text-stone-600 text-xl)))) "")))
-   ((equal? "time-box" ticket-type)
-    `((i (@ (class ,(->css '(ph ph-clock text-stone-600 text-xl)))) "")))
-   (else "")))
+    ((equal? "task" ticket-type)
+     `((i (@ (class ,(->css '(ph ph-gear-fine text-stone-600 text-xl)))) "")))
+    ((equal? "bug" ticket-type)
+     `((i (@ (class ,(->css '(ph ph-bug text-stone-600 text-xl)))) "")))
+    ((equal? "story" ticket-type)
+     `((i (@ (class ,(->css '(ph ph-book-open-text text-stone-600 text-xl))))
+          "")))
+    ((equal? "spike" ticket-type)
+     `((i (@ (class ,(->css '(ph ph-flask text-stone-600 text-xl)))) "")))
+    ((equal? "time-box" ticket-type)
+     `((i (@ (class ,(->css '(ph ph-clock text-stone-600 text-xl)))) "")))
+    (else "")))
 
 (begin
   (define* (sort-select G_
@@ -152,7 +152,8 @@
                       (class (->css '(p-2 rounded-xl bg-stone-200))))
                    (option ,(G_ "sort order"))
                    ,(map (lambda (s)
-                           `((option (@ (value ,(format #f "/tickets/~a?sort=~a"
+                           `((option (@ (value ,(format #f
+                                                        "/tickets/~a?sort=~a"
                                                         project-id
                                                         (car s))))
                                      ,(cdr s))))
