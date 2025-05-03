@@ -45,9 +45,9 @@
 (define (render-k-ticket project t)
   `((div (@ (class "w-auto"))
          (div (@ (class
-                   "rounded-xl bg-stone-200/25 p-3 border-stone-400/75 border-2"))
+                  "rounded-xl bg-stone-200/25 p-3 border-stone-400/75 border-2"))
               (div (@ (class
-                        "flex flex-row justify-between items-center gap-2"))
+                       "flex flex-row justify-between items-center gap-2"))
                    (p (@ (class "text-xs text-stone-700 flex flex-row gap-2"))
                       (span ,(org-to-html (assoc-ref t "title"))))
                    (a (@ (class "text-xs")
