@@ -21,7 +21,7 @@
         (web uri)
         (ice-9 string-fun)
         (lucidplan uri)
-        (lucidplan uuid)
+        (uuid generate)
         (lucidplan query-escape)
         (artanis security nss)
         (app models project)
@@ -91,7 +91,8 @@
                  (url (uri-decode (car (assoc-ref kv "url"))))
                  (vcs-url (uri-decode (car (assoc-ref kv "vcs-url"))))
                  (human-id (uri-decode (car (assoc-ref kv "human-id"))))
-                 (new-uuid (string-replace-substring (uuidgen) "\n" "")))
+                 (new-uuid (string-replace-substring (generate-string-uuid)
+                                                     "\n" "")))
             
             ($project 'set
                       #:id new-uuid

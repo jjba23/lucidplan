@@ -80,33 +80,65 @@
       (license license:lgpl3+))))
 
 (define-public guile-kracht
-  (let ((commit "2d32cbe562d76a20bfe73f26bc671e3a1b8708bd")
+  (let ((commit "428062660a31f7235125751b8e9343afdea9d9e1")
         (base32-sha-signature
-         "02f4p7qmw4wngikhjx9fahz64i3w7zli1cc3h8ksmc47sbfd3v7w")
+         "0m9flnvhal62ik7k2sm2mhbrikzwvgdjpyr6s558z6d2ax41ikjd")
         (revision "0"))
     (package
-      (name "guile-kracht")
-      (version (git-version "0.0.0" revision commit))
-      (source
-       (origin
-         (method git-fetch)
-         (uri (git-reference
-               (url "https://codeberg.org/jjba23/kracht.git")
-               (commit commit)))
-         (file-name (git-file-name name version))
-         (sha256
-          (base32 base32-sha-signature))))
-      (build-system guile-build-system)
-      (native-inputs (list guile-3.0))
-      (arguments
-       (list
-        #:source-directory "src"))
-      (home-page "https://codeberg.org/jjba23/kracht")
-      (synopsis
-       "Good prelude for Guile Scheme, an opt-in enhancement to the standard library")
-      (description
-       "Good prelude for Guile Scheme, an opt-in enhancement to the standard library. kracht means power/strength in the Dutch language, and is also a recursive acronym which stands for: KRACHT Reliable And Consistent Helper Tools")
-      (license license:lgpl3+))))
+     (name "guile-kracht")
+     (version (git-version "0.0.0" revision commit))
+     (source
+      (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://codeberg.org/jjba23/kracht.git")
+             (commit commit)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 base32-sha-signature))))
+     (build-system guile-build-system)
+     (native-inputs (list guile-3.0))
+     (arguments
+      (list
+       #:source-directory "src"))
+     (home-page "https://codeberg.org/jjba23/kracht")
+     (synopsis
+      "Good prelude for Guile Scheme, an opt-in enhancement to the standard library")
+     (description
+      "Good prelude for Guile Scheme, an opt-in enhancement to the standard library. kracht means power/strength in the Dutch language, and is also a recursive acronym which stands for: KRACHT Reliable And Consistent Helper Tools")
+     (license license:lgpl3+))))
+
+
+(define-public guile-orgwebalchemy
+  (let ((commit "e97ee7bfe85d6dfde9e126899f9800cd36a25c2d")
+        (base32-sha-signature
+         "0m9flnvhal62ik7k2sm2mhbrikzwvgdjpyr6s558z6d2ax41ikjd")
+        (revision "0"))
+    (package
+     (name "guile-kracht")
+     (version (git-version "0.0.0" revision commit))
+     (source
+      (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://codeberg.org/jjba23/kracht.git")
+             (commit commit)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 base32-sha-signature))))
+     (build-system guile-build-system)
+     (native-inputs (list guile-3.0))
+     (arguments
+      (list
+       #:source-directory "src"))
+     (home-page "https://codeberg.org/jjba23/kracht")
+     (synopsis
+      "Good prelude for Guile Scheme, an opt-in enhancement to the standard library")
+     (description
+      "Good prelude for Guile Scheme, an opt-in enhancement to the standard library. kracht means power/strength in the Dutch language, and is also a recursive acronym which stands for: KRACHT Reliable And Consistent Helper Tools")
+     (license license:lgpl3+))))
+
+
 
 ;;
 ;; define manifest
@@ -121,5 +153,7 @@
                           guile-kracht
                           guile-uuid
                           guile-dbi
+                          guile-orgwebalchemy
+                          sqlite
                           guile-dbd-sqlite3))
 

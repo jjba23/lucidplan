@@ -30,7 +30,6 @@
   #:use-module (ice-9 hash-table)
   #:use-module (ice-9 threads)
   #:use-module (lucidplan html)
-  #:use-module (lucidplan prelude)
   #:use-module (artanis artanis)
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)

@@ -32,6 +32,7 @@
   #:use-module (ice-9 regex)
   #:use-module (artanis artanis)
   #:use-module (artanis i18n)
+  #:use-module (orgwebalchemy org-to-html)
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
   #:use-module (ice-9 i18n)
@@ -39,18 +40,16 @@
   #:use-module (hygguile abstraction)
   #:use-module (hygguile components button)
   #:use-module (hygguile components icon)
-  #:use-module (lucidplan prelude)
-  #:use-module (artanis security nss)
   #:use-module (artanis route))
 
 (define (render-k-ticket project t)
   `((div (@ (class "w-auto"))
          (div (@ (class
-                  "rounded-xl bg-stone-200/25 p-3 border-stone-400/75 border-2"))
+                   "rounded-xl bg-stone-200/25 p-3 border-stone-400/75 border-2"))
               (div (@ (class
-                       "flex flex-row justify-between items-center gap-2"))
+                        "flex flex-row justify-between items-center gap-2"))
                    (p (@ (class "text-xs text-stone-700 flex flex-row gap-2"))
-                      (span ,(parse-org (assoc-ref t "title"))))
+                      (span ,(org-to-html (assoc-ref t "title"))))
                    (a (@ (class "text-xs")
                          (href ,(format #f "/tickets/~a/~a" project
                                         (assoc-ref t "human_id"))))

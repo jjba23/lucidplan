@@ -142,7 +142,7 @@ production-server:
 init-db:
 	$(call lucidplan-log-info,"initializing a new database")
 	-rm -v $(LUCIDPLAN_DB) $(LUCIDPLAN_DB)-shm $(LUCIDPLAN_DB)-wal
-	sqlite3 lucidplan.db 'PRAGMA journal_mode=WAL;'
+	guix shell -m manifest.scm -- sqlite3 lucidplan.db 'PRAGMA journal_mode=WAL;'
 
 # Compile translation files to .mo files
 compile-i18n:

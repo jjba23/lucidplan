@@ -16,7 +16,6 @@
 ;; along with lucidplan.  If not, see <https://www.gnu.org/licenses/>.
 
 (define-module (lucidplan uri)
-  #:use-module (lucidplan process)
   #:use-module (web request)
   #:use-module (web response)
   #:use-module (web uri)

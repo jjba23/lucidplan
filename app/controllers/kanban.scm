@@ -21,9 +21,7 @@
         (ice-9 string-fun)
         (lucidplan auth)
         (lucidplan uri)
-        (lucidplan prelude)
-        (lucidplan uuid)
-        (lucidplan abstraction)
+        (lucidplan domain)
         (lucidplan query-escape)
         (app models ticket)
         (artanis security nss)
@@ -33,7 +31,6 @@
   (let ((p ($project 'get
                      #:ret 'top
                      #:condition (where #:human_id project))))
-    (log-exprs (list p))
     (cond
       ((null? p)
        "")

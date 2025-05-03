@@ -27,6 +27,6 @@
 
 (define (run-all-tests)
   (for-each run-test
-            '("lib/lucidplan/prelude.scm")))
+            '()))
 
 (run-all-tests)

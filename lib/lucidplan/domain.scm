@@ -15,7 +15,7 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with lucidplan.  If not, see <https://www.gnu.org/licenses/>.
 
-(define-module (lucidplan abstraction)
+(define-module (lucidplan domain)
   #:use-module (ice-9 string-fun))
 
 (define-public (only-active-tickets-filter ticket)

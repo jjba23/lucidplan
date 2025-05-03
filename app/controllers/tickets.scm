@@ -22,9 +22,9 @@
         (ice-9 string-fun)
         (lucidplan auth)
         (lucidplan uri)
-        (lucidplan uuid)
+        (uuid generate)
         (lucidplan html)
-        (lucidplan abstraction)
+        (lucidplan domain)
         (lucidplan query-escape)
         (app models ticket)
         (artanis security nss)
@@ -195,7 +195,8 @@
                  (ticket-type (uri-decode (car (assoc-ref kv "ticket-type"))))
                  (description (uri-decode (car (assoc-ref kv "description"))))
                  (project-id (project-id-from-human-id (params rc "project")))
-                 (new-uuid (string-replace-substring (uuidgen) "\n" "")))
+                 (new-uuid (string-replace-substring (generate-string-uuid)
+                                                     "\n" "")))
             
             ($ticket 'set
                      #:id new-uuid

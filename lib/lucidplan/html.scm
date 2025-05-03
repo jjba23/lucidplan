@@ -29,13 +29,18 @@
   #:use-module (ice-9 iconv)
   #:use-module (ice-9 hash-table)
   #:use-module (ice-9 threads)
-  #:use-module (lucidplan prelude)
   #:use-module (artanis i18n)
   #:use-module (hygguile abstraction)
   #:use-module (artanis i18n sxml)
+  #:use-module (kracht prelude)
   #:use-module (artanis i18n locale)
   #:use-module (ice-9 textual-ports)
   #:use-module (artanis route))
+
+(define-public asset-library
+  (build-asset-library '("pub/css/fonts.css" "pub/css/phosphor.css"
+                         "pub/js/tickets.js" "pub/js/tailwind.js"
+                         "pub/js/tailwind.config.js")))
 
 (define-public (page-footer G_)
   `((div (@ (class "block text-center font-sans"))
