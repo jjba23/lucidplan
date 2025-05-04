@@ -48,7 +48,7 @@
                                        #:type 'password
                                        #:value ""
                                        #:required #t)
-                           (div ,(hyg-submit-button #:content (G_ "login"))))))
+                           (div ,(hyg-submit-button (G_ "login"))))))
     (html-template G_
                    #:body `(div (@ (class ,(->css '(container mx-auto))))
                                 ((h2 (@ (class ,(->css '(font-bold

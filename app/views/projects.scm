@@ -92,33 +92,33 @@
          (div (@ (class ,(->css '(flex flex-wrap flex-row gap-4))))
               (a (@ (href ,(format #f "/projects/~a/edit"
                                    (assoc-ref p "human_id"))))
-                 ,(hyg-button #:content `(span (@ (class ,(->css '(items-center
-                                                                   flex
-                                                                   flex-row
-                                                                   gap-1))))
-                                               ((i (@ (class ,(->css '(ph
-                                                                       ph-pencil
-                                                                       text-white
-                                                                       text-xl))))
-                                                   ""))
-                                               (span ,(G_ "edit project")))))
+                 ,(hyg-button `(span (@ (class ,(->css '(items-center
+                                                         flex
+                                                         flex-row
+                                                         gap-1))))
+                                     ((i (@ (class ,(->css '(ph
+                                                             ph-pencil
+                                                             text-white
+                                                             text-xl))))
+                                         ""))
+                                     (span ,(G_ "edit project")))))
               (form (@ (enctype "application/x-www-form-urlencoded")
                        (method "POST")
                        (action "/projects/delete"))
                     (input (@ (name "id")
                               (hidden "")
                               (value ,(assoc-ref p "id"))) "")
-                    ,(hyg-danger-submit-button #:content `(span (@ (class ,(->css '
-                                                                            (items-center
-                                                                             flex
-                                                                             flex-row
-                                                                             gap-1))))
-                                                                ,(hyg-icon
-                                                                  #:type 'trash
-                                                                  #:icon-css '
-                                                                  (text-white
-                                                                   text-xl))
-                                                                ,(G_ "delete")))))
+                    ,(hyg-danger-submit-button `(span (@ (class ,(->css '
+                                                                  (items-center
+                                                                   flex
+                                                                   flex-row
+                                                                   gap-1))))
+                                                      ,(hyg-icon
+                                                        #:type 'trash
+                                                        #:icon-css '
+                                                        (text-white
+                                                         text-xl))
+                                                      ,(G_ "delete")))))
          (small (@ (class ,(->css '(font-mono text-stone-600))))
                 ,(format #f "~a"
                          (assoc-ref p "human_id")))
@@ -239,6 +239,6 @@
                                                              description)
                                                     #:required #f)
 
-                                     (div ,(hyg-submit-button #:content (G_
-                                                                         "submit"))))))
+                                     (div ,(hyg-submit-button (G_
+                                                               "submit"))))))
                  #:proj proj))

@@ -124,35 +124,35 @@
          (div (@ (class ,(->css '(flex flex-row flex-wrap gap-4))))
               (a (@ (href ,(format #f "/tickets/~a/~a/edit" project
                                    (assoc-ref ticket "human_id"))))
-                 ,(hyg-button #:content `(span (@ (class ,(->css '(items-center
-                                                                   flex
-                                                                   flex-row
-                                                                   gap-1))))
-                                               ((i (@ (class ,(->css '(ph
-                                                                       ph-pencil
-                                                                       text-white
-                                                                       text-xl))))
-                                                   ""))
-                                               (G_ "edit ticket"))))
+                 ,(hyg-button `(span (@ (class ,(->css '(items-center
+                                                         flex
+                                                         flex-row
+                                                         gap-1))))
+                                     ((i (@ (class ,(->css '(ph
+                                                             ph-pencil
+                                                             text-white
+                                                             text-xl))))
+                                         ""))
+                                     (G_ "edit ticket"))))
               (form (@ (enctype application/x-www-form-urlencoded)
                        (method POST)
                        (action ,(format #f "/tickets/~a/delete" project)))
                     (input (@ (hidden "")
                               (name id)
                               (value ,(assoc-ref ticket "id"))))
-                    ,(hyg-danger-submit-button #:content `(span (@ (class ,(->css '
-                                                                            (items-center
-                                                                             flex
-                                                                             flex-row
-                                                                             gap-1))))
-                                                                ((i (@ (class ,
-                                                                         (->css '
-                                                                          (ph
-                                                                           ph-trash
-                                                                           text-white
-                                                                           text-xl))))
-                                                                    ""))
-                                                                ,(G_ "delete")))))
+                    ,(hyg-danger-submit-button `(span (@ (class ,(->css '
+                                                                  (items-center
+                                                                   flex
+                                                                   flex-row
+                                                                   gap-1))))
+                                                      ((i (@ (class ,
+                                                               (->css '
+                                                                (ph
+                                                                 ph-trash
+                                                                 text-white
+                                                                 text-xl))))
+                                                          ""))
+                                                      ,(G_ "delete")))))
 
          )))
 
@@ -486,7 +486,7 @@
                          (required ""))
                       ,(unescape-str description))
 
-            (div ,(hyg-submit-button #:content (G_ "submit"))))))
+            (div ,(hyg-submit-button (G_ "submit"))))))
 
   (html-template G_
                  #:body `((div (@ (class "container mx-auto"))
