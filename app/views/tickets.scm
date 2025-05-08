@@ -462,7 +462,7 @@
 
             (label ,(G_ "status"))
             (select (@ (class ,(->css '(p-3 rounded-xl border-stone-400/75
-                                            border-2)))
+                                            border-2 shadow-md)))
                        (name "ticket-status")
                        (required ""))
                     ,(hyg-glyph-option #:value "todo"
@@ -489,7 +489,8 @@
                                        #:content (G_ "Rejected")
                                        #:selected-value ticket-status))
             (label ,(G_ "type"))
-            (select (@ (class "p-3 rounded-xl border-stone-400/75 border-2")
+            (select (@ (class ,(->css '(p-3 rounded-xl border-stone-400/75
+                                            border-2 shadow-md)))
                        (name "ticket-type")
                        (required ""))
                     ,(hyg-glyph-option #:value "task"

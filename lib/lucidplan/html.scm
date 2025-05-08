@@ -111,7 +111,8 @@
 
             (select (@ (onchange "window.location.href=this.value;")
                        (class ,(->css '(text-sm text-white bg-transparent
-                                                font-medium font-sans))))
+                                                font-medium font-sans
+                                                shadow-md))))
                     (option "🔗 go to")
                     ,(map (lambda (p)
                             `(option (@ (value ,(format #f "/tickets/~a"
@@ -225,8 +226,11 @@ function addSearchQueryParam(form) {
            (select (@ (onchange "window.location.href=this.value;")
                       (name "sort-select")
                       (id "sort-select")
-                      (class ,(->css '(p-2 rounded-xl bg-white
-                                           border-stone-200 border-2
+                      (class ,(->css '(p-2 rounded-xl
+                                           bg-white
+                                           border-stone-200
+                                           border-2
+                                           shadow-md
                                            max-w-prose))))
                    (option ,(G_ "sort order"))
                    ,(map (lambda (s)
