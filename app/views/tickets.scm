@@ -165,6 +165,7 @@
                                        border-2
                                        py-2
                                        px-4
+                                       shadow
                                        cursor-pointer
                                        rounded-xl))))
               ,(emoji-for-ticket-type (assoc-ref ticket "ticket_type"))

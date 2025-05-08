@@ -130,7 +130,8 @@
                                   py-2
                                   px-4
                                   cursor-pointer
-                                  rounded-xl)))
+                                  rounded-xl
+                                  shadow)))
             (onclick ,(format #f
                        "document.getElementById('details-~a').toggleAttribute('hidden')"
                        (assoc-ref p "id"))))

@@ -39,19 +39,24 @@
   #:use-module (lucidplan html)
   #:use-module (hygguile abstraction)
   #:use-module (hygguile components button)
+  #:use-module (hygguile components typography)
   #:use-module (hygguile components icon)
   #:use-module (artanis route))
 
 (define (render-k-ticket project t)
   `((div (@ (class "w-auto"))
          (div (@ (class ,(->css '(rounded-xl bg-stone-200/25 p-3
-                                             border-stone-400/75 border-2))))
+                                             border-stone-400/75 border-2
+                                             shadow))))
               (div (@ (class ,(->css '(flex flex-row justify-between
                                             items-center gap-2))))
-                   ,(emoji-for-ticket-type (assoc-ref ticket "ticket_type"))
-                   (p (@ (class ,(->css '(text-xs text-stone-700 flex flex-row
-                                                  gap-2))))
-                      (span ,(org-to-html (assoc-ref t "title"))))
+                   (div (@ (class ,(->css '(flex flex-row justify-left
+                                                 items-center gap-2))))
+                        ,(emoji-for-ticket-type (assoc-ref t "ticket_type"))
+                        (p (@ (class ,(->css '(text-sm text-stone-700 flex
+                                                       flex-row gap-2))))
+                           (span ,(org-to-html (assoc-ref t "title")))))
+
                    (a (@ (class ,(->css '(text-xs)))
                          (href ,(format #f "/tickets/~a/~a" project
                                         (assoc-ref t "human_id"))))
@@ -102,12 +107,9 @@
                                                ,(hyg-icon #:type 'kanban
                                                           #:icon-css '(text-stone-700
                                                                        text-2xl))
-                                               (h2 (@ (class ,(->css '(text-3xl
-                                                                       font-sans
-                                                                       font-bold
-                                                                       text-stone-700))))
-                                                   ,(format #f "kanban for ~a"
-                                                            project)))
+                                               ,(hyg-h1 (format #f
+                                                         "kanban for ~a"
+                                                         project)))
 
                                           (div (@ (class ,(->css '(flex
                                                                    flex-row

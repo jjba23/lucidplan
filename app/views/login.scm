@@ -23,6 +23,7 @@
   #:use-module (artanis i18n locale)
   #:use-module (hygguile components input)
   #:use-module (hygguile abstraction)
+  #:use-module (hygguile components typography)
   #:use-module (hygguile components button)
   #:use-module (ice-9 i18n)
   #:use-module (ice-9 textual-ports)
@@ -51,9 +52,7 @@
                            (div ,(hyg-submit-button (G_ "login"))))))
     (html-template G_
                    #:body `(div (@ (class ,(->css '(container mx-auto))))
-                                ((h2 (@ (class ,(->css '(font-bold
-                                                         text-stone-800/75
-                                                         text-md))))
-                                     ,(G_ "login to lucidplan"))
-                                 (div ,login-form))))))
+                                ((div (@ (class ,(->css '(flex flex-col gap-8))))
+                                      ,(hyg-h2 (G_ "login to lucidplan"))
+                                      (div ,login-form)))))))
 
