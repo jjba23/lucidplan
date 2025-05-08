@@ -171,8 +171,12 @@
                                                       #:search-query
                                                       search-query)
 
-                                         (div (@(id lucidplan-projects-list)
-                                               (class ,(->css '(flex flex-col gap-2 container my-3))))
+                                         (div (@ (id lucidplan-projects-list)
+                                                 (class ,(->css '(flex
+                                                                  flex-col
+                                                                  gap-2
+                                                                  container
+                                                                  my-3))))
                                               ,(map (lambda (x)
                                                       (render-project-list-item
                                                        G_ x)) projects))

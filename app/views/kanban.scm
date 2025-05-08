@@ -44,12 +44,13 @@
 
 (define (render-k-ticket project t)
   `((div (@ (class "w-auto"))
-         (div (@ (class
-                   ,(->css '(rounded-xl bg-stone-200/25 p-3 border-stone-400/75 border-2))))
-              (div (@ (class
-                        ,(->css '(flex flex-row justify-between items-center gap-2))))
+         (div (@ (class ,(->css '(rounded-xl bg-stone-200/25 p-3
+                                             border-stone-400/75 border-2))))
+              (div (@ (class ,(->css '(flex flex-row justify-between
+                                            items-center gap-2))))
                    ,(emoji-for-ticket-type (assoc-ref ticket "ticket_type"))
-                   (p (@ (class ,(->css '(text-xs text-stone-700 flex flex-row gap-2))))
+                   (p (@ (class ,(->css '(text-xs text-stone-700 flex flex-row
+                                                  gap-2))))
                       (span ,(org-to-html (assoc-ref t "title"))))
                    (a (@ (class ,(->css '(text-xs)))
                          (href ,(format #f "/tickets/~a/~a" project
@@ -63,7 +64,7 @@
     (let* ((tickets-todo (filter (lambda (x)
                                    (eq? 'todo
                                         (string->symbol (assoc-ref x
-                                                                   "ticket_status"))))
+                                                         "ticket_status"))))
                                  tickets))
            (tickets-work-in-progress (filter (lambda (x)
                                                (eq? 'work-in-progress
@@ -74,25 +75,26 @@
            (tickets-in-review (filter (lambda (x)
                                         (eq? 'in-review
                                              (string->symbol (assoc-ref x
-                                                                        "ticket_status"))))
+                                                              "ticket_status"))))
                                       tickets))
            (tickets-rejected (filter (lambda (x)
                                        (eq? 'rejected
                                             (string->symbol (assoc-ref x
-                                                                       "ticket_status"))))
+                                                             "ticket_status"))))
                                      tickets))
            (tickets-done (filter (lambda (x)
                                    (eq? 'done
                                         (string->symbol (assoc-ref x
-                                                                   "ticket_status"))))
+                                                         "ticket_status"))))
                                  tickets))
 
            (kanban-html `((div (@ (class ,(->css '(container mx-auto))))
-                               ((div (@ (class ,(->css '(flex flex-col gap-3 flex-grow))))
+                               ((div (@ (class ,(->css '(flex flex-col gap-3
+                                                              flex-grow))))
                                      (div (@ (class ,(->css '(flex flex-wrap
-                                                                   flex-row gap-4
-                                                                   items-center
-                                                                   justify-between))))
+                                                              flex-row gap-4
+                                                              items-center
+                                                              justify-between))))
                                           (div (@ (class ,(->css '(flex
                                                                    flex-row
                                                                    gap-2
@@ -113,57 +115,63 @@
                                                                    gap-1
                                                                    items-center))))
                                                (a (@ (href ,(format #f
-                                                                    "/tickets/~a"
-                                                                    project)))
+                                                             "/tickets/~a"
+                                                             project)))
                                                   ,(hyg-icon-button #:icon 'scroll
                                                                     #:content (G_
                                                                                "backlog")))
                                                (a (@ (href ,(format #f
-                                                                    "/tickets/~a/new"
-                                                                    project)))
+                                                             "/tickets/~a/new"
+                                                             project)))
                                                   ,(hyg-icon-button #:icon 'plus
                                                                     #:content (G_
                                                                                "new ticket")))))
 
                                      )))
-                          (div (@ (class
-                                    ,(->css '(flex flex-wrap my-8 justify-between p-4))))
-                               (div (@ (class
-                                         ,(->css '(sm:w-1/3 flex flex-col gap-2 p-2))))
-                                    (h4 (@ (class
-                                             ,(->css '(text-sm font-bold flex gap-2 items-center))))
+                          (div (@ (class ,(->css '(flex flex-wrap my-8
+                                                        justify-between p-4))))
+                               (div (@ (class ,(->css '(sm:w-1/3 flex flex-col
+                                                                 gap-2 p-2))))
+                                    (h4 (@ (class ,(->css '(text-sm font-bold
+                                                            flex gap-2
+                                                            items-center))))
                                         ,(emoji-for-ticket-status "todo")
                                         (span ,(G_ "To-do"))
-                                        (span (@ (class
-                                                   ,(->css '(text-xs text-stone-700 font-light))))
+                                        (span (@ (class ,(->css '(text-xs
+                                                                  text-stone-700
+                                                                  font-light))))
                                               ,(format #f " ( ~a ) "
                                                        (length tickets-todo))))
                                     ,(map (lambda (t)
                                             (render-k-ticket project t))
                                           tickets-todo))
-                               (div (@ (class
-                                         ,(->css '(sm:w-1/3 flex flex-col gap-2 p-2))))
-                                    (h4 (@ (class
-                                             ,(->css '(text-sm font-bold flex gap-2 items-center))))
+                               (div (@ (class ,(->css '(sm:w-1/3 flex flex-col
+                                                                 gap-2 p-2))))
+                                    (h4 (@ (class ,(->css '(text-sm font-bold
+                                                            flex gap-2
+                                                            items-center))))
                                         ,(emoji-for-ticket-status
                                           "work-in-progress")
                                         (span ,(G_ "Work in Progress"))
-                                        (span (@ (class
-                                                   ,(->css '(text-xs text-stone-700 font-light))))
+                                        (span (@ (class ,(->css '(text-xs
+                                                                  text-stone-700
+                                                                  font-light))))
                                               ,(format #f " ( ~a ) "
                                                        (length
                                                         tickets-work-in-progress))))
                                     ,(map (lambda (t)
                                             (render-k-ticket project t))
                                           tickets-work-in-progress))
-                               (div (@ (class
-                                         ,(->css '(sm:w-1/3 flex flex-col gap-2 p-2))))
-                                    (h4 (@ (class
-                                             ,(->css '(text-sm font-bold flex gap-2 items-center))))
+                               (div (@ (class ,(->css '(sm:w-1/3 flex flex-col
+                                                                 gap-2 p-2))))
+                                    (h4 (@ (class ,(->css '(text-sm font-bold
+                                                            flex gap-2
+                                                            items-center))))
                                         ,(emoji-for-ticket-status "in-review")
                                         (span ,(G_ "In Review"))
-                                        (span (@ (class
-                                                   ,(->css '(text-xs text-stone-700 font-light))))
+                                        (span (@ (class ,(->css '(text-xs
+                                                                  text-stone-700
+                                                                  font-light))))
                                               ,(format #f " ( ~a ) "
                                                        (length
                                                         tickets-in-review))))
@@ -171,48 +179,69 @@
                                             (render-k-ticket project t))
                                           tickets-in-review)))
                           (hr)
-                          (div (@ (class
-                                    ,(->css '(sm:w-1/3 my-6 p-4 flex flex-col gap-2 p-2))))
-                               (details (@ (class "cursor-pointer "))
-                                        (summary (@ (class
-                                                      "marker:block hover:cursor-pointer items-center"))
-                                                 (h4 (@ (class
-                                                          "text-sm font-bold flex gap-2 items-center"))
+                          (div (@ (class ,(->css '(sm:w-1/3 my-6
+                                                            p-4
+                                                            flex
+                                                            flex-col
+                                                            gap-2
+                                                            p-2))))
+                               (details (@ (class ,(->css '(cursor-pointer))))
+                                        (summary (@ (class ,(->css '(marker:block
+                                                                     hover:cursor-pointer
+                                                                     items-center))))
+                                                 (h4 (@ (class ,(->css '(text-sm
+                                                                         font-bold
+                                                                         flex
+                                                                         gap-2
+                                                                         items-center))))
                                                      ,(emoji-for-ticket-status
                                                        "done")
                                                      (span ,(G_ "Done"))
-                                                     (span (@ (class
-                                                                "text-xs text-stone-700 font-light"))
+                                                     (span (@ (class ,(->css '
+                                                                             (text-xs
+                                                                              text-stone-700
+                                                                              font-light))))
                                                            ,(format #f
-                                                                    " ( ~a ) "
-                                                                    (length
-                                                                     tickets-done)))))
+                                                             " ( ~a ) "
+                                                             (length
+                                                              tickets-done)))))
                                         (div (@ (class
-                                                  "my-8 flex flex-col gap-2"))
+                                                 "my-8 flex flex-col gap-2"))
                                              ,(map (lambda (t)
                                                      (render-k-ticket project
                                                                       t))
                                                    tickets-done))))
 
                           (hr)
-                          (div (@ (class
-                                    "sm:w-1/3 my-6 p-4 flex flex-col gap-2 p-2"))
+                          (div (@ (class ,(->css '(sm:w-1/3 my-6
+                                                            p-4
+                                                            flex
+                                                            flex-col
+                                                            gap-2
+                                                            p-2))))
                                (details (@ (class "cursor-pointer"))
-                                        (summary (@ (class
-                                                      "marker:block hover:cursor-pointer items-center"))
-                                                 (h4 (@ (class
-                                                          "text-sm font-bold flex gap-2 items-center"))
+                                        (summary (@ (class ,(->css '(marker:block
+                                                                     hover:cursor-pointer
+                                                                     items-center))))
+                                                 (h4 (@ (class ,(->css '(text-sm
+                                                                         font-bold
+                                                                         flex
+                                                                         gap-2
+                                                                         items-center))))
                                                      ,(emoji-for-ticket-status
                                                        "rejected")
                                                      (span ,(G_ "Rejected"))
-                                                     (span (@ (class
-                                                                "text-xs text-stone-700 font-light"))
+                                                     (span (@ (class ,(->css '
+                                                                             (text-xs
+                                                                              text-stone-700
+                                                                              font-light))))
                                                            ,(format #f
-                                                                    " ( ~a ) "
-                                                                    (length
-                                                                     tickets-rejected)))))
-                                        (div (@ (class
-                                                  "my-8 flex flex-col gap-2"))
+                                                             " ( ~a ) "
+                                                             (length
+                                                              tickets-rejected)))))
+                                        (div (@ (class ,(->css '(my-8 flex
+                                                                 flex-col
+                                                                 gap-2))))
                                              ,(map (lambda (t)
                                                      (render-k-ticket project
                                                                       t))

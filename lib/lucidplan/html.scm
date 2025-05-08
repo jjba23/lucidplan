@@ -48,18 +48,23 @@
 
 (define-public (page-footer G_)
   `((div (@ (class "block text-center font-sans"))
-         (div (@ (class
-                  "flex flex-row flex-wrap gap-2 justify-center align-center py-3"))
+         (div (@ (class ,(->css '(flex flex-row
+                                       flex-wrap
+                                       gap-2
+                                       justify-center
+                                       align-center
+                                       py-3))))
               (p (@ (class "text-sm text-stone-600"))
                  ,(G_ "find the source code here"))
-              (a (@ (class "text-stone-800 font-bold cursor-pointer text-sm")
+              (a (@ (class ,(->css '(text-stone-800 font-bold cursor-pointer
+                                                    text-sm)))
                     (href "https://codeberg.org/jjba23/lucidplan"))
                  "https://codeberg.org/jjba23/lucidplan"))
-         (p (@ (class "py-3"))
+         (p (@ (class ,(->css '(py-3))))
             (em (@ (class "text-md text-stone-600"))
                 ,(G_ "Copyright 2025 © Josep Bigorra")))
-         (p (@ (class "py-3"))
-            (span (@ (class "text-sm text-stone-600"))
+         (p (@ (class ,(->css '(py-3))))
+            (span (@ (class ,(->css '(text-sm text-stone-600))))
                   ,(G_ "free project management for everyone"))))))
 
 (begin
@@ -67,18 +72,37 @@
                           #:key body
                           (proj '()))
     (define nav
-      `(div (@ (class
-                "flex flex-row flex-wrap gap-3 p-3 bg-stone-900/90 items-center justify-left w-full shadow-lg"))
-            (a (@ (class "text-md text-white font-sans font-black px-4")
+      `(div (@ (class ,(->css '(flex flex-row
+                                     flex-wrap
+                                     gap-3
+                                     p-3
+                                     bg-stone-900/90
+                                     items-center
+                                     justify-left
+                                     w-full
+                                     shadow-lg))))
+            (a (@ (class ,(->css '(text-md text-white font-sans font-black
+                                           px-4)))
                   (href "/")) "LucidPlan")
-            (a (@ (class
-                   "text-sm lowercase text-white font-sans font-medium px-2 flex-items-center gap-2")
+            (a (@ (class ,(->css '(text-sm lowercase
+                                           text-white
+                                           font-sans
+                                           font-medium
+                                           px-2
+                                           flex-items-center
+                                           gap-2)))
                   (href "/login"))
                (span (i (@ (class ,(->css '(ph ph-sign-in text-md)))) ""))
                "&nbsp;"
                (span ,(G_ "Login")))
-            (a (@ (class
-                   "text-sm lowercase text-white font-sans font-medium px-2 flex items-center gap-2")
+            (a (@ (class ,(->css '(text-sm lowercase
+                                           text-white
+                                           font-sans
+                                           font-medium
+                                           px-2
+                                           flex
+                                           items-center
+                                           gap-2)))
                   (href "/projects"))
                (span (i (@ (class ,(->css '(ph ph-align-bottom text-md)))) ""))
                (span ,(G_ "Projects")))
@@ -86,8 +110,8 @@
             (hr)
 
             (select (@ (onchange "window.location.href=this.value;")
-                       (class
-                        "text-sm text-white bg-transparent font-medium font-sans"))
+                       (class ,(->css '(text-sm text-white bg-transparent
+                                                font-medium font-sans))))
                     (option "🔗 go to")
                     ,(map (lambda (p)
                             `(option (@ (value ,(format #f "/tickets/~a"
@@ -138,22 +162,24 @@
 
 (define-public (emoji-for-ticket-type ticket-type)
   (cond
-   ((equal? "task" ticket-type)
-    `((i (@ (class ,(->css '(ph ph-gear-fine text-stone-600 text-xl)))) "")))
-   ((equal? "bug" ticket-type)
-    `((i (@ (class ,(->css '(ph ph-bug text-stone-600 text-xl)))) "")))
-   ((equal? "story" ticket-type)
-    `((i (@ (class ,(->css '(ph ph-book-open-text text-stone-600 text-xl))))
-         "")))
-   ((equal? "spike" ticket-type)
-    `((i (@ (class ,(->css '(ph ph-flask text-stone-600 text-xl)))) "")))
-   ((equal? "time-box" ticket-type)
-    `((i (@ (class ,(->css '(ph ph-clock text-stone-600 text-xl)))) "")))
-   (else "")))
+    ((equal? "task" ticket-type)
+     `((i (@ (class ,(->css '(ph ph-gear-fine text-stone-600 text-xl)))) "")))
+    ((equal? "bug" ticket-type)
+     `((i (@ (class ,(->css '(ph ph-bug text-stone-600 text-xl)))) "")))
+    ((equal? "story" ticket-type)
+     `((i (@ (class ,(->css '(ph ph-book-open-text text-stone-600 text-xl))))
+          "")))
+    ((equal? "spike" ticket-type)
+     `((i (@ (class ,(->css '(ph ph-flask text-stone-600 text-xl)))) "")))
+    ((equal? "time-box" ticket-type)
+     `((i (@ (class ,(->css '(ph ph-clock text-stone-600 text-xl)))) "")))
+    (else "")))
 
 (begin
-  (define* (search-box G_ #:key search-query)
-    `((script "
+  (define* (search-box G_
+                       #:key search-query)
+    `((script
+       "
 function addSearchQueryParam(form) {
   const searchInput = document.getElementsByName('search')[0].value;
   if (searchInput.value) {
@@ -163,20 +189,21 @@ function addSearchQueryParam(form) {
   return true; // Allow default submission if the input is empty
 }
 ")
-      (div (@(class ,(->css '(my-3))))
-           (form (@(onsubmit "addSearchQueryParam(this)"))
-                 (div (@(class ,(->css '(flex flex-row align-center items-center justify-left gap-2))))
+      (div (@ (class ,(->css '(my-3))))
+           (form (@ (onsubmit "addSearchQueryParam(this)"))
+                 (div (@ (class ,(->css '(flex flex-row align-center
+                                               items-center justify-left gap-2))))
                       ,(hyg-input #:label ""
                                   #:name "search"
                                   #:value (cond
-                                           ((equal? #f search-query) "")
-                                           (else search-query))
+                                            ((equal? #f search-query)
+                                             "")
+                                            (else search-query))
                                   #:placeholder (G_ "Search...")
-                                  #:input-css '(p-2 max-w-prose rounded-xl border-stone-200
-                                                    border-2)
+                                  #:input-css '(p-2 max-w-prose rounded-xl
+                                                    border-stone-200 border-2)
                                   #:input-flex-css #f)
-                      ,(hyg-submit-button (G_ "search")))
-                 ))))
+                      ,(hyg-submit-button (G_ "search")))))))
   (export search-box))
 
 (begin
@@ -186,7 +213,9 @@ function addSearchQueryParam(form) {
            (select (@ (onchange "window.location.href=this.value;")
                       (name "sort-select")
                       (id "sort-select")
-                      (class ,(->css '(p-2 rounded-xl bg-white border-stone-200 border-2 max-w-prose))))
+                      (class ,(->css '(p-2 rounded-xl bg-white
+                                           border-stone-200 border-2
+                                           max-w-prose))))
                    (option ,(G_ "sort order"))
                    ,(map (lambda (s)
                            `((option (@ (value ,(format #f
