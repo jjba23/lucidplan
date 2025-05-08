@@ -181,9 +181,20 @@
     `((script
        "
 function addSearchQueryParam(form) {
-  const searchInput = document.getElementsByName('search')[0].value;
+  const searchInput = document.getElementsByName('search')[0];
+
   if (searchInput.value) {
-    window.location.href = `${window.location.pathname}?search=${encodeURIComponent(searchInput.value)}`;
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    var params = Object.fromEntries(urlSearchParams.entries());
+
+    params.search = encodeURIComponent(searchInput.value);
+
+    const q = Object.entries(params).map((k,_)=>`${k[0]}=${k[1]}`).reduce((a,b) => `${a}&${b}`);
+
+    console.log(q);
+    console.log(`${window.location.pathname}?${q}`);
+
+    window.location.href = `${window.location.pathname}?${q}`;
     return false; // Prevent the default form submission
   }
   return true; // Allow default submission if the input is empty
