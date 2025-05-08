@@ -168,9 +168,13 @@
                                                                   gap-4))))
                                          ,tit
 
-                                         ,(search-box G_
-                                                      #:search-query
-                                                      search-query)
+                                         (div (@ (class ,(->css '(flex
+                                                                  flex-row
+                                                                  flex-wrap
+                                                                  justify-end))))
+                                              ,(search-box G_
+                                                           #:search-query
+                                                           search-query))
 
                                          (div (@ (id lucidplan-projects-list)
                                                  (class ,(->css '(flex

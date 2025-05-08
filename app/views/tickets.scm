@@ -322,20 +322,30 @@
                                                                       ,(G_
                                                                         "show rejected?"))))))
 
-                                      (div (@ (class ,(->css '(my-3 p-2
-                                                               flex
-                                                               flex-row
+                                      (div (@ (class ,(->css '(flex flex-row
                                                                flex-wrap
-                                                               justify-left
-                                                               align-center
-                                                               items-center))))
-                                           ,(sort-select G_
-                                                         #:project-id (assoc-ref
-                                                                       project-details
-                                                                       "human_id"))
-                                           ,(search-box G_
-                                                        #:search-query
-                                                        search-query))
+                                                               justify-between))))
+                                           (div (@ (class ,(->css '(my-3 p-2
+                                                                    flex
+                                                                    flex-row
+                                                                    flex-wrap
+                                                                    justify-start
+                                                                    align-center
+                                                                    items-center))))
+                                                ,(sort-select G_
+                                                              #:project-id (assoc-ref
+                                                                            project-details
+                                                                            "human_id")))
+                                           (div (@ (class ,(->css '(my-3 p-2
+                                                                    flex
+                                                                    flex-row
+                                                                    flex-wrap
+                                                                    justify-end
+                                                                    align-center
+                                                                    items-center))))
+                                                ,(search-box G_
+                                                             #:search-query
+                                                             search-query)))
 
                                       (div (@ (id lucidplan-tickets-list)
                                               (ondrop "dropTicketsItem(event)")

@@ -207,12 +207,13 @@ function addSearchQueryParam(form) {
                       ,(hyg-input #:label ""
                                   #:name "search"
                                   #:value (cond
-                                           ((equal? #f search-query)
-                                            "")
-                                           (else search-query))
+                                            ((equal? #f search-query)
+                                             "")
+                                            (else search-query))
                                   #:placeholder (G_ "Search...")
                                   #:input-css '(p-2 max-w-prose rounded-xl
-                                                    border-stone-200 border-2 shadow-md)
+                                                    border-stone-200 border-2
+                                                    shadow-md)
                                   #:input-flex-css #f)
                       ,(hyg-submit-button (G_ "search")))))))
   (export search-box))
