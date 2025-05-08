@@ -47,66 +47,71 @@
                        lucidplan-ticket-sort)
      (lambda (rc)
        (define (get)
-         (let* ((user-sort (cond
-                             ((not (equal? #f
-                                           (get-from-qstr rc "sort")))
-                              (:cookies-set! rc
-                                             'lucidplan-ticket-sort
-                                             "lucidplan-ticket-sort"
-                                             (get-from-qstr rc "sort"))
-                              (:cookies-setattr! rc
-                                                 'lucidplan-ticket-sort
-                                                 #:expires 12000000
-                                                 #:path "/"
-                                                 #:http-only #t)
+         (let* ((user-search (cond
+                              ((equal? #f
+                                       (get-from-qstr rc "search"))
+                               #f)
+                              (else (escape-str (get-from-qstr rc "search")))))
+                (user-sort (cond
+                            ((not (equal? #f
+                                          (get-from-qstr rc "sort")))
+                             (:cookies-set! rc
+                              'lucidplan-ticket-sort
+                              "lucidplan-ticket-sort"
                               (get-from-qstr rc "sort"))
-                             ((not (equal? #f
-                                           (:cookies-value rc
-                                            "lucidplan-ticket-sort")))
-                              (:cookies-value rc "lucidplan-ticket-sort"))
-                             (else "last-edited-at-desc")))
+                             (:cookies-setattr! rc
+                              'lucidplan-ticket-sort
+                              #:expires 12000000
+                              #:path "/"
+                              #:http-only #t)
+                             (get-from-qstr rc "sort"))
+                            ((not (equal? #f
+                                          (:cookies-value rc
+                                           "lucidplan-ticket-sort")))
+                             (:cookies-value rc "lucidplan-ticket-sort"))
+                            (else "last-edited-at-desc")))
                 (project-id (project-id-from-human-id (params rc "project")))
                 (with-done (cond
-                             ((not (equal? #f
-                                           (get-from-qstr rc "with-done")))
-                              (:cookies-set! rc
-                                             'lucidplan-show-done
-                                             "lucidplan-show-done"
-                                             (get-from-qstr rc "with-done"))
-                              (:cookies-setattr! rc
-                                                 'lucidplan-show-done
-                                                 #:expires 12000000
-                                                 #:path "/"
-                                                 #:http-only #t)
-                              (equal? (get-from-qstr rc "with-done") "true"))
-                             ((not (equal? #f
-                                           (:cookies-value rc
-                                            "lucidplan-show-done")))
-                              (equal? (:cookies-value rc "lucidplan-show-done")
-                                      "true"))
-                             (else #f)))
+                            ((not (equal? #f
+                                          (get-from-qstr rc "with-done")))
+                             (:cookies-set! rc
+                              'lucidplan-show-done
+                              "lucidplan-show-done"
+                              (get-from-qstr rc "with-done"))
+                             (:cookies-setattr! rc
+                              'lucidplan-show-done
+                              #:expires 12000000
+                              #:path "/"
+                              #:http-only #t)
+                             (equal? (get-from-qstr rc "with-done") "true"))
+                            ((not (equal? #f
+                                          (:cookies-value rc
+                                           "lucidplan-show-done")))
+                             (equal? (:cookies-value rc "lucidplan-show-done")
+                                     "true"))
+                            (else #f)))
                 (with-rejected (cond
-                                 ((not (equal? #f
-                                               (get-from-qstr rc
-                                                              "with-rejected")))
-                                  (:cookies-set! rc
-                                                 'lucidplan-show-rejected
-                                                 "lucidplan-show-rejected"
-                                                 (get-from-qstr rc
-                                                  "with-rejected"))
-                                  (:cookies-setattr! rc
-                                                     'lucidplan-show-rejected
-                                                     #:expires 12000000
-                                                     #:path "/"
-                                                     #:http-only #t)
-                                  (equal? (get-from-qstr rc "with-rejected")
-                                          "true"))
-                                 ((not (equal? #f
-                                               (:cookies-value rc
-                                                "lucidplan-show-rejected")))
-                                  (equal? (:cookies-value rc
-                                           "lucidplan-show-rejected") "true"))
-                                 (else #f)))
+                                ((not (equal? #f
+                                              (get-from-qstr rc
+                                                             "with-rejected")))
+                                 (:cookies-set! rc
+                                  'lucidplan-show-rejected
+                                  "lucidplan-show-rejected"
+                                  (get-from-qstr rc
+                                                 "with-rejected"))
+                                 (:cookies-setattr! rc
+                                  'lucidplan-show-rejected
+                                  #:expires 12000000
+                                  #:path "/"
+                                  #:http-only #t)
+                                 (equal? (get-from-qstr rc "with-rejected")
+                                         "true"))
+                                ((not (equal? #f
+                                              (:cookies-value rc
+                                               "lucidplan-show-rejected")))
+                                 (equal? (:cookies-value rc
+                                          "lucidplan-show-rejected") "true"))
+                                (else #f)))
                 (proj ($project 'get
                                 #:order-by '(human_id asc)))
                 (write (params rc "project"))
@@ -117,13 +122,32 @@
                                                                                rc
                                                                                "project")))))
                 (tickets (DB-get-all-rows (DB-query (get-conn-from-pool!)
-                                                    (->sql select * from
-                                                           'ticket
-                                                           (format #f
-                                                            " WHERE project_id = '~a' ORDER BY ~a ~a"
-                                                            project-id
-                                                            (car query-sort)
-                                                            (cadr query-sort))))))
+                                                    (cond
+                                                     ((equal? #f user-search)
+                                                      (->sql select * from
+                                                             'ticket
+                                                             (format #f
+                                                                     " WHERE project_id = '~a' ORDER BY ~a ~a"
+                                                                     project-id
+                                                                     (car query-sort)
+                                                                     (cadr
+                                                                      query-sort))))
+                                                     (else (->sql select *
+                                                                  from
+                                                                  'ticket
+                                                                  (format #f
+                                                                          (string-join '
+                                                                           (" WHERE project_id = '~a' "
+                                                                            " AND (title LIKE '%~a%' OR description LIKE '%~a%') "
+                                                                            " ORDER BY ~a ~a ")
+                                                                           " ")
+                                                                          project-id
+                                                                          user-search
+                                                                          user-search
+                                                                          (car
+                                                                           query-sort)
+                                                                          (cadr
+                                                                           query-sort))))))))
                 (ticket-id-to-human-id (map (lambda (t)
                                               `(,(assoc-ref t "id") unquote
                                                 (assoc-ref t "human_id")))
@@ -135,16 +159,18 @@
                                                      #:order-by '(human_id asc)))))
            
            (response-emit (:mime rc
-                                 (html-from-tickets (:i18n rc)
-                                                    #:projects proj
-                                                    #:project-details
-                                                    project-details
-                                                    #:tickets tickets
-                                                    #:ticket-id-to-human-id
-                                                    ticket-id-to-human-id
-                                                    #:with-done with-done
-                                                    #:with-rejected
-                                                    with-rejected)))))
+                           (html-from-tickets (:i18n rc)
+                                              #:projects proj
+                                              #:project-details
+                                              project-details
+                                              #:tickets tickets
+                                              #:ticket-id-to-human-id
+                                              ticket-id-to-human-id
+                                              #:with-done with-done
+                                              #:with-rejected
+                                              with-rejected
+                                              #:search-query
+                                              user-search)))))
        (get)))
 
 (get "/tickets/:project/new"
@@ -154,11 +180,11 @@
      (lambda (rc)
        (define (get-new)
          (response-emit (:mime rc
-                               (html-new-ticket-form (:i18n rc)
-                                                     ($project 'get
-                                                               #:order-by '(human_id
-                                                                            asc))
-                                                     (params rc "project")))))
+                         (html-new-ticket-form (:i18n rc)
+                                               ($project 'get
+                                                         #:order-by '(human_id
+                                                                      asc))
+                                               (params rc "project")))))
        (get-new)))
 
 (post "/tickets/:project/delete"

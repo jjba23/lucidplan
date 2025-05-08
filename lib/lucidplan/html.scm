@@ -31,6 +31,10 @@
   #:use-module (ice-9 threads)
   #:use-module (artanis i18n)
   #:use-module (hygguile abstraction)
+  #:use-module (hygguile components input)
+  #:use-module (hygguile components button)
+  #:use-module (hygguile components typography)
+  #:use-module (hygguile components select)
   #:use-module (artanis i18n sxml)
   #:use-module (kracht prelude)
   #:use-module (artanis i18n locale)
@@ -134,18 +138,45 @@
 
 (define-public (emoji-for-ticket-type ticket-type)
   (cond
-    ((equal? "task" ticket-type)
-     `((i (@ (class ,(->css '(ph ph-gear-fine text-stone-600 text-xl)))) "")))
-    ((equal? "bug" ticket-type)
-     `((i (@ (class ,(->css '(ph ph-bug text-stone-600 text-xl)))) "")))
-    ((equal? "story" ticket-type)
-     `((i (@ (class ,(->css '(ph ph-book-open-text text-stone-600 text-xl))))
-          "")))
-    ((equal? "spike" ticket-type)
-     `((i (@ (class ,(->css '(ph ph-flask text-stone-600 text-xl)))) "")))
-    ((equal? "time-box" ticket-type)
-     `((i (@ (class ,(->css '(ph ph-clock text-stone-600 text-xl)))) "")))
-    (else "")))
+   ((equal? "task" ticket-type)
+    `((i (@ (class ,(->css '(ph ph-gear-fine text-stone-600 text-xl)))) "")))
+   ((equal? "bug" ticket-type)
+    `((i (@ (class ,(->css '(ph ph-bug text-stone-600 text-xl)))) "")))
+   ((equal? "story" ticket-type)
+    `((i (@ (class ,(->css '(ph ph-book-open-text text-stone-600 text-xl))))
+         "")))
+   ((equal? "spike" ticket-type)
+    `((i (@ (class ,(->css '(ph ph-flask text-stone-600 text-xl)))) "")))
+   ((equal? "time-box" ticket-type)
+    `((i (@ (class ,(->css '(ph ph-clock text-stone-600 text-xl)))) "")))
+   (else "")))
+
+(begin
+  (define* (search-box G_ #:key project-id search-query)
+    `((script "
+function addSearchQueryParam(form) {
+  const searchInput = document.getElementsByName('search')[0].value;
+  if (searchInput.value) {
+    window.location.href = `${window.location.pathname}?search=${encodeURIComponent(searchInput.value)}`;
+    return false; // Prevent the default form submission
+  }
+  return true; // Allow default submission if the input is empty
+}
+")
+      (form (@(onsubmit "addSearchQueryParam(this)"))
+            (div (@(class ,(->css '(flex flex-row align-center items-center justify-left gap-2))))
+                 ,(hyg-input #:label ""
+                             #:name "search"
+                             #:value (cond
+                                      ((equal? #f search-query) "")
+                                      (else search-query))
+                             #:placeholder (G_ "Search...")
+                             #:input-css '(p-2 max-w-prose rounded-xl border-stone-200
+                                               border-2)
+                             #:input-flex-css #f)
+                 ,(hyg-submit-button (G_ "search")))
+            )))
+  (export search-box))
 
 (begin
   (define* (sort-select G_
@@ -154,7 +185,7 @@
            (select (@ (onchange "window.location.href=this.value;")
                       (name "sort-select")
                       (id "sort-select")
-                      (class (->css '(p-2 rounded-xl bg-stone-200))))
+                      (class ,(->css '(p-2 rounded-xl bg-white border-stone-200 border-2 max-w-prose))))
                    (option ,(G_ "sort order"))
                    ,(map (lambda (s)
                            `((option (@ (value ,(format #f

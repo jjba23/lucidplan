@@ -55,12 +55,12 @@
                                   border-2))))
          ,(render-if-nestring (lambda (x)
                                 `(p (@ (class ,(->css '(text-md py-3
-                                                                text-stone-800
-                                                                whitespace-pre-wrap
-                                                                font-medium))))
+                                                        text-stone-800
+                                                        whitespace-pre-wrap
+                                                        font-medium))))
                                     ,x))
                               (org-to-html (unescape-str (assoc-ref p
-                                                                    "description"))))
+                                                          "description"))))
          (hr)
          (div (@ (class ,(->css '(flex flex-wrap flex-row gap-3))))
               (a (@ (href ,(format #f "/tickets/~a"
@@ -92,15 +92,11 @@
          (div (@ (class ,(->css '(flex flex-wrap flex-row gap-4))))
               (a (@ (href ,(format #f "/projects/~a/edit"
                                    (assoc-ref p "human_id"))))
-                 ,(hyg-button `(span (@ (class ,(->css '(items-center
-                                                         flex
-                                                         flex-row
-                                                         gap-1))))
-                                     ((i (@ (class ,(->css '(ph
-                                                             ph-pencil
-                                                             text-white
-                                                             text-xl))))
-                                         ""))
+                 ,(hyg-button `(span (@ (class ,(->css '(items-center flex
+                                                         flex-row gap-1))))
+                                     ((i (@ (class ,(->css '(ph ph-pencil
+                                                                text-white
+                                                                text-xl)))) ""))
                                      (span ,(G_ "edit project")))))
               (form (@ (enctype "application/x-www-form-urlencoded")
                        (method "POST")
@@ -108,16 +104,13 @@
                     (input (@ (name "id")
                               (hidden "")
                               (value ,(assoc-ref p "id"))) "")
-                    ,(hyg-danger-submit-button `(span (@ (class ,(->css '
-                                                                  (items-center
-                                                                   flex
-                                                                   flex-row
-                                                                   gap-1))))
-                                                      ,(hyg-icon
-                                                        #:type 'trash
-                                                        #:icon-css '
-                                                        (text-white
-                                                         text-xl))
+                    ,(hyg-danger-submit-button `(span (@ (class ,(->css '(items-center
+                                                                          flex
+                                                                          flex-row
+                                                                          gap-1))))
+                                                      ,(hyg-icon #:type 'trash
+                                                                 #:icon-css '(text-white
+                                                                              text-xl))
                                                       ,(G_ "delete")))))
          (small (@ (class ,(->css '(font-mono text-stone-600))))
                 ,(format #f "~a"
@@ -139,8 +132,8 @@
                                   cursor-pointer
                                   rounded-xl)))
             (onclick ,(format #f
-                              "document.getElementById('details-~a').toggleAttribute('hidden')"
-                              (assoc-ref p "id"))))
+                       "document.getElementById('details-~a').toggleAttribute('hidden')"
+                       (assoc-ref p "id"))))
 
          (h3 (@ (class ,(->css '(flex flex-row items-center gap-2 truncate))))
              ,(hyg-icon #:type 'list
@@ -239,6 +232,5 @@
                                                              description)
                                                     #:required #f)
 
-                                     (div ,(hyg-submit-button (G_
-                                                               "submit"))))))
+                                     (div ,(hyg-submit-button (G_ "submit"))))))
                  #:proj proj))

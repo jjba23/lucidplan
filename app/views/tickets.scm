@@ -62,8 +62,8 @@
               (div (@ (class ,(->css '(flex justify-right))))
                    (span (@ (class ,(->css '(cursor-pointer)))
                             (onclick ,(format #f
-                                              "document.getElementById('details-~a').toggleAttribute('hidden')"
-                                              (assoc-ref ticket "id"))))
+                                       "document.getElementById('details-~a').toggleAttribute('hidden')"
+                                       (assoc-ref ticket "id"))))
                          ,(hyg-icon #:type 'x
                                     #:icon-css '(text-stone-800 text-xl)))))
 
@@ -76,7 +76,7 @@
                    (p (@ (class ,(->css '(flex gap-2 items-center))))
                       (span (@ (class "text-2xl"))
                             ,(emoji-for-ticket-status (assoc-ref ticket
-                                                                 "ticket_status")))
+                                                       "ticket_status")))
                       (span (@ (class ,(->css '(font-sans text-stone-700
                                                           text-sm))))
                             ,(assoc-ref ticket "ticket_status"))))
@@ -124,15 +124,11 @@
          (div (@ (class ,(->css '(flex flex-row flex-wrap gap-4))))
               (a (@ (href ,(format #f "/tickets/~a/~a/edit" project
                                    (assoc-ref ticket "human_id"))))
-                 ,(hyg-button `(span (@ (class ,(->css '(items-center
-                                                         flex
-                                                         flex-row
-                                                         gap-1))))
-                                     ((i (@ (class ,(->css '(ph
-                                                             ph-pencil
-                                                             text-white
-                                                             text-xl))))
-                                         ""))
+                 ,(hyg-button `(span (@ (class ,(->css '(items-center flex
+                                                         flex-row gap-1))))
+                                     ((i (@ (class ,(->css '(ph ph-pencil
+                                                                text-white
+                                                                text-xl)))) ""))
                                      (G_ "edit ticket"))))
               (form (@ (enctype application/x-www-form-urlencoded)
                        (method POST)
@@ -140,17 +136,14 @@
                     (input (@ (hidden "")
                               (name id)
                               (value ,(assoc-ref ticket "id"))))
-                    ,(hyg-danger-submit-button `(span (@ (class ,(->css '
-                                                                  (items-center
-                                                                   flex
-                                                                   flex-row
-                                                                   gap-1))))
-                                                      ((i (@ (class ,
-                                                               (->css '
-                                                                (ph
-                                                                 ph-trash
-                                                                 text-white
-                                                                 text-xl))))
+                    ,(hyg-danger-submit-button `(span (@ (class ,(->css '(items-center
+                                                                          flex
+                                                                          flex-row
+                                                                          gap-1))))
+                                                      ((i (@ (class ,(->css '(ph
+                                                                              ph-trash
+                                                                              text-white
+                                                                              text-xl))))
                                                           ""))
                                                       ,(G_ "delete")))))
 
@@ -161,8 +154,8 @@
             (id ,(format #f "listitem-~a"
                          (assoc-ref ticket "id"))))
          (div (@ (onclick ,(format #f
-                                   "document.getElementById('details-~a').toggleAttribute('hidden')"
-                                   (assoc-ref ticket "id")))
+                            "document.getElementById('details-~a').toggleAttribute('hidden')"
+                            (assoc-ref ticket "id")))
                  (class ,(->css '(flex flex-row
                                        gap-4
                                        items-center
@@ -201,7 +194,8 @@
                               tickets
                               ticket-id-to-human-id
                               with-done
-                              with-rejected)
+                              with-rejected
+                              search-query)
     (html-template G_
                    #:body `(div (@ (class "container mx-auto"))
                                 ((div (@ (class ,(->css '(flex flex-col gap-4
@@ -259,61 +253,88 @@
                                                             project-details
                                                             "description"))
 
-                                      (details (summary (@ (class ,(->css '(text-stone-600
-                                                                            text-sm
-                                                                            cursor-pointer))))
-                                                        ,(G_ "backlog options"))
-                                               (div (@ (class ,(->css '(flex
-                                                                        flex-wrap
-                                                                        flex-row
-                                                                        gap-4
-                                                                        my-3))))
-                                                    (input (@ (id
-                                                               "should-show-done")
-                                                              (type checkbox)
-                                                              ,(if with-done
-                                                                   '(checked
-                                                                     true)
-                                                                   '(not-checked
-                                                                     true))
-                                                              (onchange ,(format
-                                                                          #f
-                                                                          (string-append
-                                                                           "window.location.href ="
-                                                                           " `/tickets/~a?with-done="
-                                                                           "${document.getElementById('should-show-done').checked}`;")
-                                                                          (assoc-ref
-                                                                           project-details
-                                                                           "human_id"))))
-                                                           (span (@ (class
-                                                                     "text-stone-600 text-sm"))
-                                                                 ,(G_
-                                                                   "show done?")))
-                                                    (input (@ (id
-                                                               "should-show-rejected")
-                                                              (type checkbox)
-                                                              ,(if
-                                                                with-rejected
-                                                                '(checked true)
-                                                                '(not-checked
-                                                                  true))
-                                                              (onchange ,(format
-                                                                          #f
-                                                                          (string-append
-                                                                           "window.location.href ="
-                                                                           " `/tickets/~a?with-rejected="
-                                                                           "${document.getElementById('should-show-rejected').checked}`;")
-                                                                          (assoc-ref
-                                                                           project-details
-                                                                           "human_id"))))
-                                                           (span (@ (class
-                                                                     "text-stone-600 text-sm"))
-                                                                 ,(G_
-                                                                   "show rejected?")))))
-                                      ,(sort-select G_
-                                                    #:project-id (assoc-ref
-                                                                  project-details
-                                                                  "human_id"))
+                                      (div (details (summary (@ (class ,(->css '
+                                                                         (text-stone-600
+                                                                          text-sm
+                                                                          cursor-pointer))))
+                                                             ,(G_
+                                                               "backlog options"))
+                                                    (div (@ (class ,(->css '(flex
+                                                                             flex-wrap
+                                                                             flex-row
+                                                                             gap-4
+                                                                             my-3))))
+                                                         (input (@ (id
+                                                                    "should-show-done")
+                                                                   (type
+                                                                    checkbox)
+                                                                   ,(if
+                                                                     with-done
+                                                                     '(checked
+                                                                       true)
+                                                                     '(not-checked
+                                                                       true))
+                                                                   (onchange ,
+                                                                             (format
+                                                                              #f
+                                                                              
+                                                                              (string-append
+                                                                               "window.location.href ="
+                                                                               " `/tickets/~a?with-done="
+                                                                               "${document.getElementById('should-show-done').checked}`;")
+                                                                              
+                                                                              (assoc-ref
+                                                                               project-details
+                                                                               "human_id"))))
+                                                                (span (@ (class
+                                                                          "text-stone-600 text-sm"))
+                                                                      ,(G_
+                                                                        "show done?")))
+                                                         (input (@ (id
+                                                                    "should-show-rejected")
+                                                                   (type
+                                                                    checkbox)
+                                                                   ,(if
+                                                                     with-rejected
+                                                                     '(checked
+                                                                       true)
+                                                                     '(not-checked
+                                                                       true))
+                                                                   (onchange ,
+                                                                             (format
+                                                                              #f
+                                                                              
+                                                                              (string-append
+                                                                               "window.location.href ="
+                                                                               " `/tickets/~a?with-rejected="
+                                                                               "${document.getElementById('should-show-rejected').checked}`;")
+                                                                              
+                                                                              (assoc-ref
+                                                                               project-details
+                                                                               "human_id"))))
+                                                                (span (@ (class
+                                                                          "text-stone-600 text-sm"))
+                                                                      ,(G_
+                                                                        "show rejected?"))))))
+
+                                      (div (@ (class ,(->css '(my-3 p-2
+                                                               flex
+                                                               flex-row
+                                                               flex-wrap
+                                                               justify-left
+                                                               align-center
+                                                               items-center))))
+                                           ,(sort-select G_
+                                                         #:project-id (assoc-ref
+                                                                       project-details
+                                                                       "human_id"))
+                                           ,(search-box G_
+                                                        #:project-id (assoc-ref
+                                                                      project-details
+                                                                      "human_id")
+                                                        #:search-query
+                                                        search-query))
+
                                       (div (@ (id "lucidplan-tickets-list")
                                               (ondrop "dropTicketsItem(event)")
                                               (ondragover "allowDrop(event)")

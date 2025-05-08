@@ -23,7 +23,8 @@
 
 (define escape-alist
   '(("'" "&apos;")
-    ("\"" "&quot;")))
+    ("\"" "&quot;")
+    ("%" "&percnt;")))
 
 (define-public (escape-str str)
   (define result
