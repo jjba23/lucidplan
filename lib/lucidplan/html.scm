@@ -152,7 +152,7 @@
    (else "")))
 
 (begin
-  (define* (search-box G_ #:key project-id search-query)
+  (define* (search-box G_ #:key search-query)
     `((script "
 function addSearchQueryParam(form) {
   const searchInput = document.getElementsByName('search')[0].value;
@@ -163,19 +163,20 @@ function addSearchQueryParam(form) {
   return true; // Allow default submission if the input is empty
 }
 ")
-      (form (@(onsubmit "addSearchQueryParam(this)"))
-            (div (@(class ,(->css '(flex flex-row align-center items-center justify-left gap-2))))
-                 ,(hyg-input #:label ""
-                             #:name "search"
-                             #:value (cond
-                                      ((equal? #f search-query) "")
-                                      (else search-query))
-                             #:placeholder (G_ "Search...")
-                             #:input-css '(p-2 max-w-prose rounded-xl border-stone-200
-                                               border-2)
-                             #:input-flex-css #f)
-                 ,(hyg-submit-button (G_ "search")))
-            )))
+      (div (@(class ,(->css '(my-3))))
+           (form (@(onsubmit "addSearchQueryParam(this)"))
+                 (div (@(class ,(->css '(flex flex-row align-center items-center justify-left gap-2))))
+                      ,(hyg-input #:label ""
+                                  #:name "search"
+                                  #:value (cond
+                                           ((equal? #f search-query) "")
+                                           (else search-query))
+                                  #:placeholder (G_ "Search...")
+                                  #:input-css '(p-2 max-w-prose rounded-xl border-stone-200
+                                                    border-2)
+                                  #:input-flex-css #f)
+                      ,(hyg-submit-button (G_ "search")))
+                 ))))
   (export search-box))
 
 (begin

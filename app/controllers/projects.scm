@@ -34,16 +34,40 @@
                                          (current-myhost)))
                     #:status 302)))
 
+;; ($project 'get
+;;           #:order-by '(human_id asc))
+
 (get "/projects"
      #:session #t
      #:mime 'xml
      #:i18n '(cookie "lang")
      (lambda (rc)
        (define (get-p)
-         (let* ((proj ($project 'get
-                                #:order-by '(human_id asc))))
+         (let* ((user-search (cond
+                              ((equal? #f
+                                       (get-from-qstr rc "search"))
+                               #f)
+                              (else (escape-str (get-from-qstr rc "search")))))
+                (proj (DB-get-all-rows (DB-query (DB-open rc)
+                                                 (cond
+                                                  ((equal? #f user-search)
+                                                   (->sql select * from
+                                                          'project
+                                                          " ORDER BY title ASC"))
+                                                  (else (->sql select *
+                                                               from
+                                                               'project
+                                                               (format #f
+                                                                       (string-join '
+                                                                        (" WHERE title LIKE '%~a%' OR description LIKE '%~a%' "
+                                                                         " ORDER BY title ASC ")
+                                                                        " ")
+                                                                       user-search
+                                                                       user-search))))))))
            (response-emit (:mime rc
-                                 (html-from-projects (:i18n rc) proj)))))
+                           (html-from-projects (:i18n rc) proj
+                                               #:search-query
+                                               user-search)))))
        (get-p)))
 
 (get "/projects/new"

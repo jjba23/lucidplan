@@ -121,7 +121,7 @@
                                                 #:condition (where #:human_id (params
                                                                                rc
                                                                                "project")))))
-                (tickets (DB-get-all-rows (DB-query (get-conn-from-pool!)
+                (tickets (DB-get-all-rows (DB-query (DB-open rc)
                                                     (cond
                                                      ((equal? #f user-search)
                                                       (->sql select * from

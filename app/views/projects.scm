@@ -151,28 +151,37 @@
             (hidden ""))
          ,(render-project G_ p))))
 
-(define-public (html-from-projects G_ projects)
-  (html-template G_
-                 #:body `(div (@ (class "container mx-auto"))
-                              ((div (@ (class ,(->css '(flex flex-col gap-4
-                                                             flex-grow))))
-                                    (div (@ (class ,(->css '(flex flex-row
-                                                             items-center
-                                                             gap-1 my-3))))
-                                         ,(hyg-icon #:type 'align-bottom
-                                                    #:icon-css '(text-stone-800
-                                                                 text-2xl))
-                                         (h2 (@ (class ,(->css '(text-3xl
-                                                                 font-sans
-                                                                 font-bold
-                                                                 text-stone-700))))
-                                             ,(G_ "projects")))
-                                    ,(map (lambda (x)
-                                            (render-project-list-item G_ x))
-                                          projects)
-                                    (div (a (@ (href "/projects/new"))
-                                            ,(G_ "create a project"))))))
-                 #:proj projects))
+(begin
+  (define* (html-from-projects G_ projects
+                               #:key search-query)
+    (let* ((tit `((div (@ (class ,(->css '(flex flex-row items-center gap-1
+                                                my-3))))
+                       ,(hyg-icon #:type 'align-bottom
+                                  #:icon-css '(text-stone-800 text-2xl))
+                       (h2 (@ (class ,(->css '(text-3xl font-sans font-bold
+                                                        text-stone-700))))
+                           ,(G_ "projects"))))))
+      (html-template G_
+                     #:body `((div (@ (class "container mx-auto"))
+                                   ((div (@ (class ,(->css '(flex flex-col
+                                                                  gap-4))))
+                                         ,tit
+
+                                         ,(search-box G_
+                                                      #:search-query
+                                                      search-query)
+
+                                         (div (@(id lucidplan-projects-list)
+                                               (class ,(->css '(flex flex-col gap-2 container my-3))))
+                                              ,(map (lambda (x)
+                                                      (render-project-list-item
+                                                       G_ x)) projects))
+
+                                         (div (a (@ (href "/projects/new"))
+                                                 ,(G_ "create a project")))))))
+                     #:proj projects)))
+
+  (export html-from-projects))
 
 (define-public (html-new-project-form G_ proj)
   (html-project-form G_
