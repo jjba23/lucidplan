@@ -51,6 +51,19 @@ In summary, we foster an inclusive, respectful, and cooperative environment for 
 
 -------
 
+* Authentication
+
+Byggsteg requires an authenticated session for performing administrative tasks such as creating/deleting jobs and profiles.
+
+Upon starting a blank new byggsteg deployment you will have no users in the database.
+
+Check in ~db/migration~ and edit the password field, or add more users. An important note is that currently authentication works by using the username (NOT email) and the passwords should NOT contain any special characters.
+
+Then do a ~guix shell -m manifest.scm -- art migrate up user~ to add your users.
+
+
+----
+
 * Running LucidPlan
 
 If you are thinking of running LucidPlan yourself and hosting it on your own here follow some tips.
@@ -149,8 +162,4 @@ History
     19th January, 2015 - offers Artanis to FSF/GNU, and RMS inducts it as an official GNU project. Artanis becomes GNU Artanis.
     29 December 2021 - GNU Artanis donates to HardenedLinux community to connect with product environment more tightly.
 
-
-
 -----
-
-Join the community, a collective of passionate individuals who believe in the beauty and practicality of Lisps (and for sure GNU Guile Scheme) for modern web development.
