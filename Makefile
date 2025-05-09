@@ -130,7 +130,7 @@ endif
 # Start the server with the default configuration
 server:
 	$(call lucidplan-log-info,"starting lucidplan server")
-	art work
+	guix shell -m manifest.scm -- art work
 
 # Target to start the lucidplan server with production configuration
 production-server:
