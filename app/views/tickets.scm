@@ -246,10 +246,10 @@
                                                                      (G_
                                                                       "new ticket")))))
                                       ,(render-if-nestring (lambda (x)
-                                                             `(p (@ (class ,(->css '
-                                                                             (text-sm
-                                                                              text-stone-600))))
-                                                                 ,x))
+                                                             `(em (@ (class ,(->css '
+                                                                              (text-sm
+                                                                               text-stone-600))))
+                                                                  ,x))
                                                            (assoc-ref
                                                             project-details
                                                             "description"))
