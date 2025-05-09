@@ -9,17 +9,17 @@
 
 You are reading the manual for LucidPlan.
 
-This manual documents the LucidPlan project, its functionalities and how to use it, host it yourself, and do related system administration tasks.
+/LucidPlan is the free and open project management for everyone/
 
-/free and open project management for everyone/
+This manual documents the LucidPlan project, its functionalities and how to use it, host it yourself, and do related system administration tasks.
 
 LucidPlan is a project management for teams of all sizes and jobs.
 
-It's a flexible system made to simplify everyone's life, accessbile to all kinds of users.
+This is a flexible system made to simplify everyone's life, accessbile to all kinds of users and help you be more #agile in all your endeavours.
 
 If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
 
-LucidPlan enhances the use of Agile work methodologies in teams due to its fast-paced no nonesense-workflows and customizability, also thanks to being written in Lisp.
+LucidPlan enhances the use of Agile work methodologies in teams due to its fast-paced no nonesense-workflows and customizability, also thanks to being written in Lisp (GNU Guile Scheme language).
 
 This tool is the fruit of years of experience using bloated proprietary systems like Jira/Trello, and experiencing the insane frustrations they bring.
 
@@ -29,7 +29,9 @@ This is free software (free as in freedom), licensed under the GNU General Publi
 
 ------
 
-Built with Guile Scheme and GNU Artanis, SQLite, Tailwind CSS
+Lucidplan is powered by: Guile Scheme, GNU Artanis, SQLite, Tailwind CSS, GNU Make, Emacs
+
+LucidPlan and Artanis are written using GNU Guile, one of the best implementations of Scheme language.
 
 - *Fully Customizable:* Hack the behavior and content of each UI element with Scheme code.
 - *Cross-platform:* Runs anywhere that Guile Scheme can run, and exposes web endpoints, and is thus accessible from computers, phones, etc.
@@ -49,27 +51,15 @@ In summary, we foster an inclusive, respectful, and cooperative environment for 
 
 -------
 
-* On GNU Artanis
-
-Find the documentation for Artanis here: https://www.gnu.org/software/artanis/manual/
-
-GNU Artanis is the first production-level modern Web framework of Scheme programming language.
-
-It is designed and maintained to be robust, fast, and easy to use for professional web development.
-
-GNU Artanis was Certificated as Awesome Project at 2013 Lisp in summer projects
-
------
-
 * Running LucidPlan
 
 If you are thinking of running LucidPlan yourself and hosting it on your own here follow some tips.
 
 Firstly, make sure you use the Guix package manager, whether as a standalone distro (Guix system) or on top of any other GNU/Linux distribution.
 
-I include a manifest.scm in the repo so that it's easy to run the project if you use the Guix package manager.
+I include a ~manifest.scm~ in the repo so that it's easy to run the project if you use the Guix package manager.
 
-If you want to run without Guix you should check that manifest.scm anyway since it will give you exactly the packages that you need.
+If you want to run without Guix you should check that ~manifest.scm~ anyway since it will give you exactly the packages that you need.
 
 Then, you will need a database to be present in the root folder of the project (alongside ~app~, ~lib~, etc.).
 
@@ -82,8 +72,10 @@ You can run the migration with ~art migrate up user~.
 
 If you are hacking away at the project, I would suggest using ~make dev~ since this will effectively run the project with hot-reloading capabilities and it will use the default ~artanis.conf~ where we configure hostname, db path, etc.
 
-If you are hosting this for production, I would suggest running LucidPlan as a Herd service/daemon.
-Here follows an example:
+If you are hosting this for production, I would suggest running LucidPlan as a Shepherd service/daemon.
+You can alternatively just feel free to do this any other way, I recommend using the ~manifest.scm~ . Check the ~Makefile~ for more.
+
+Here follows an example of a Guix (Shepherd service):
 
 #+begin_src scheme
 (define-module (wolk-jjba lucidplan)
@@ -124,9 +116,40 @@ Here follows an example:
 
 --------
 
-* Tips
+* On accessibility
+
+We believe creating accessible websites for everyone, including people with disabilities, is crucial for equality, helps provide a good user experience.
+
+Lucidplan chooses lots of its UI to appeal to the widest public possible by default, but is very configurable to allow extensibility.
 
 
-It's recommended to run your SQLite database in WAL mode for concurrent writes.
+* On GNU Artanis
 
-sqlite3 lucidplan.db 'PRAGMA journal_mode=WAL;'
+Find the documentation for Artanis here: https://www.gnu.org/software/artanis/manual/
+
+GNU Artanis is the first production-level modern Web framework of Scheme programming language.
+
+It is designed and maintained to be robust, fast, and easy to use for professional web development.
+
+Here lies not just a framework, but a canvas where your ideas take flight with remarkable speed and grace. Artanis isn't about wrestling with complexity; it's about the joy of creation.
+
+It's about harnessing the power of a robust and mature language to build something truly your own, something beautiful, nimble, flexible, powerful, efficient, understandable and maintainable. GNU Artanis was Certificated as Awesome Project at 2013 Lisp in summer projects.
+
+One day, the folks at GNU were discussing what language they would write the GNU website in - and many chose Python. But I found that strange, because the official extension language of GNU is GNU Guile. And I wondered aloud - why not start a brand new project to provide a web framework written with GNU Guile? To which RMS said, "It's cool, I like this idea."
+
+But at that time, it was just an idea without a plan.
+
+Fortunately, a few months later, the Guile community held a hack-potluck to celebrate Guile2 turning two - which is a contest to write a cool program in a few weeks. And so, Artanis was born.
+History
+
+    February 2013 - Artanis born at the GNU Guile hack-potluck.
+    2013 - Artanis submitted to "Lisp In Summer Projects" contest. Received "Certificated awesome project award" in 2014.
+    1st January, 2015 - the first stable version Artanis-0.0.1 was released.
+    19th January, 2015 - offers Artanis to FSF/GNU, and RMS inducts it as an official GNU project. Artanis becomes GNU Artanis.
+    29 December 2021 - GNU Artanis donates to HardenedLinux community to connect with product environment more tightly.
+
+
+
+-----
+
+Join the community, a collective of passionate individuals who believe in the beauty and practicality of Lisps (and for sure GNU Guile Scheme) for modern web development.
