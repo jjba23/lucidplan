@@ -35,6 +35,9 @@ Built with Guile Scheme and GNU Artanis, SQLite, Tailwind CSS
 - *Free Software*: Contribute to its development or extend it with your own custom features.
 
 
+[[https://jointhefreeworld.org/static-assets/lucidplan/img/logo-small.jpg]]
+
+
 ** Tips
 
 

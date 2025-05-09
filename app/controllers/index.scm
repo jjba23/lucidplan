@@ -17,7 +17,7 @@
 
 (define-artanis-controller index)
 
-(import (wikimusic html)
+(import (lucidplan html)
         (web uri)
         (ice-9 string-fun)
         (app views index))
@@ -27,4 +27,4 @@
      #:i18n '(cookie "lang")
      (lambda (rc)
        (response-emit (:mime rc
-                       (welcome-page (:i18n rc))))))
+                             (welcome-page (:i18n rc))))))

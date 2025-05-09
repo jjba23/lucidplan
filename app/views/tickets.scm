@@ -515,8 +515,12 @@
                                        #:content (G_ "Time Box")
                                        #:selected-value ticket-type))
             (label ,(G_ "description"))
-            (textarea (@ (class ,(->css '(p-3 w-full min-h-96 rounded-xl
-                                              border-stone-400/75 border-2 shadow-md)))
+            (textarea (@ (class ,(->css '(p-3 w-full
+                                              min-h-96
+                                              rounded-xl
+                                              border-stone-400/75
+                                              border-2
+                                              shadow-md)))
                          (name "description")
                          (required ""))
                       ,(unescape-str description))
