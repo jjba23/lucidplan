@@ -55,6 +55,10 @@ If you are thinking of running LucidPlan yourself and hosting it on your own her
 
 Firstly, make sure you use the Guix package manager, whether as a standalone distro (Guix system) or on top of any other GNU/Linux distribution.
 
+I include a manifest.scm in the repo so that it's easy to run the project if you use the Guix package manager.
+
+If you want to run without Guix you should check that manifest.scm anyway since it will give you exactly the packages that you need.
+
 Then, you will need a database to be present in the root folder of the project (alongside ~app~, ~lib~, etc.).
 
 LucidPlan uses SQLite by default but is also compatible with PostgreSQL and MySQL.
