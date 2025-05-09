@@ -122,6 +122,7 @@ We believe creating accessible websites for everyone, including people with disa
 
 Lucidplan chooses lots of its UI to appeal to the widest public possible by default, but is very configurable to allow extensibility.
 
+-------
 
 * On GNU Artanis
 
