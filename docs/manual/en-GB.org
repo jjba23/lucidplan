@@ -49,6 +49,18 @@ In summary, we foster an inclusive, respectful, and cooperative environment for 
 
 -------
 
+* On GNU Artanis
+
+Find the documentation for Artanis here: https://www.gnu.org/software/artanis/manual/
+
+GNU Artanis is the first production-level modern Web framework of Scheme programming language.
+
+It is designed and maintained to be robust, fast, and easy to use for professional web development.
+
+GNU Artanis was Certificated as Awesome Project at 2013 Lisp in summer projects
+
+-----
+
 * Running LucidPlan
 
 If you are thinking of running LucidPlan yourself and hosting it on your own here follow some tips.
