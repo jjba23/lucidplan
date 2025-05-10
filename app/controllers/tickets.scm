@@ -1,6 +1,6 @@
-;;; index.scm
+;;; lucidplan - free and open project management for everyone
 
-;; Copyright © 2025 "Josep Bigorra" known as "jjba23" <jjbigorra@gmail.com>
+;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
 ;; lucidplan is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by

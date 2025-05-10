@@ -1,6 +1,6 @@
 ;;; index.scm
 
-;; Copyright © 2025 "Josep Bigorra" known as "jjba23" <jjbigorra@gmail.com>
+;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
 ;; lucidplan is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -26,16 +26,6 @@
         (artanis security nss)
         (app models project)
         (app views projects))
-
-(get "/"
-     (lambda (rc)
-       (redirect-to rc
-                    (string->uri (format #f "~a/projects"
-                                         (current-myhost)))
-                    #:status 302)))
-
-;; ($project 'get
-;;           #:order-by '(human_id asc))
 
 (get "/projects"
      #:session #t

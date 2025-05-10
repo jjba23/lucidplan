@@ -1,6 +1,6 @@
 ;;; lucidplan - free and open project management for everyone
 
-;; Copyright © 2025 "Josep Bigorra" known as "jjba23" <jjbigorra@gmail.com>
+;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
 ;; lucidplan is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -246,10 +246,10 @@
                                                                      (G_
                                                                       "new ticket")))))
                                       ,(render-if-nestring (lambda (x)
-                                                             `(p (@ (class ,(->css '
-                                                                             (text-sm
-                                                                              text-stone-600))))
-                                                                 ,x))
+                                                             `(em (@ (class ,(->css '
+                                                                              (text-sm
+                                                                               text-stone-600))))
+                                                                  ,x))
                                                            (assoc-ref
                                                             project-details
                                                             "description"))
@@ -515,8 +515,12 @@
                                        #:content (G_ "Time Box")
                                        #:selected-value ticket-type))
             (label ,(G_ "description"))
-            (textarea (@ (class ,(->css '(p-3 w-full min-h-64 rounded-xl
-                                              border-stone-400/75 border-2)))
+            (textarea (@ (class ,(->css '(p-3 w-full
+                                              min-h-96
+                                              rounded-xl
+                                              border-stone-400/75
+                                              border-2
+                                              shadow-md)))
                          (name "description")
                          (required ""))
                       ,(unescape-str description))

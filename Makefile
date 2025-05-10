@@ -1,6 +1,6 @@
 # lucidplan - the CI/CD orchestrator written in Guile Scheme
 
-# Copyright © 2025 "Josep Bigorra" known as "jjba23" <jjbigorra@gmail.com>
+# Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
 # lucidplan is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -130,7 +130,7 @@ endif
 # Start the server with the default configuration
 server:
 	$(call lucidplan-log-info,"starting lucidplan server")
-	art work
+	guix shell -m manifest.scm -- art work
 
 # Target to start the lucidplan server with production configuration
 production-server:
