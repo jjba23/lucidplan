@@ -9,6 +9,7 @@
              (gnu packages nss)
              (gnu packages gnupg)
              (gnu packages guile-xyz)
+             (gnu packages rust-apps)
              (gnu packages pkg-config)
              (guix build-system guile)
              (gnu packages linux)
@@ -146,6 +147,8 @@
                           guile-kracht
                           guile-uuid
                           guile-dbi
+                          guile-gcrypt
+                          watchexec
                           guile-orgwebalchemy
                           sqlite
                           guile-dbd-sqlite3))
