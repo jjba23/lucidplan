@@ -70,7 +70,8 @@
 (begin
   (define* (html-template G_
                           #:key body
-                          (proj '()))
+                          (proj '())
+                          (is-logged-in #f))
     (define nav
       `(div (@ (class ,(->css '(flex flex-row
                                      flex-wrap
@@ -84,17 +85,19 @@
             (a (@ (class ,(->css '(text-md text-white font-sans font-black
                                            px-4)))
                   (href "/")) "LucidPlan")
-            (a (@ (class ,(->css '(text-sm lowercase
-                                           text-white
-                                           font-sans
-                                           font-medium
-                                           px-2
-                                           flex-items-center
-                                           gap-2)))
-                  (href "/login"))
-               (span (i (@ (class ,(->css '(ph ph-sign-in text-md)))) ""))
-               "&nbsp;"
-               (span ,(G_ "Login")))
+            ,(if (not is-logged-in)
+                 `((a (@ (class ,(->css '(text-sm lowercase
+                                                  text-white
+                                                  font-sans
+                                                  font-medium
+                                                  px-2
+                                                  flex-items-center
+                                                  gap-2)))
+                         (href "/login"))
+                      (span (i (@ (class ,(->css '(ph ph-sign-in text-md))))
+                               "")) "&nbsp;"
+                               (span ,(G_ "Login"))))
+                 `())
             (a (@ (class ,(->css '(text-sm lowercase
                                            text-white
                                            font-sans
@@ -119,7 +122,7 @@
                                                         (assoc-ref p
                                                                    "human_id")))
                                         (class
-                                         "text-sm font-light lowercase text-stone-800"))
+                                          "text-sm font-light lowercase text-stone-800"))
                                      ,(assoc-ref p "title"))) proj))))
     `("<!DOCTYPE html>" (html (@ (lang en))
                               (head (title "LucidPlan")
@@ -134,10 +137,10 @@
                                     (script ,(assoc-ref asset-library
                                                         "pub/js/tailwind.js"))
                                     (script ,(assoc-ref asset-library
-                                              "pub/js/tailwind.config.js")))
+                                                        "pub/js/tailwind.config.js")))
                               (body (@ (class "bg-stone-200/50"))
                                     (div (@ (class
-                                             "flex flex-col h-screen justify-between"))
+                                              "flex flex-col h-screen justify-between"))
                                          (div ,nav
                                               (div (@ (class "py-8"))
                                                    ,body))

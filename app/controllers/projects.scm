@@ -31,9 +31,11 @@
      #:session #t
      #:mime 'xml
      #:i18n '(cookie "lang")
+     #:cookies '(names sid)
      (lambda (rc)
        (define (get-p)
-         (let* ((user-search (cond
+         (let* ((is-logged-in (:cookies-value rc "sid"))
+                (user-search (cond
                                ((equal? #f
                                         (get-from-qstr rc "search"))
                                 #f)
@@ -56,22 +58,26 @@
                                                                         (escape-str
                                                                          user-search)))))))))
            (response-emit (:mime rc
-                                 (html-from-projects (:i18n rc) proj
+                                 (html-from-projects (:i18n rc)
+                                                     proj
                                                      #:search-query
-                                                     user-search)))))
+                                                     user-search
+                                                     #:is-logged-in
+                                                     is-logged-in)))))
        (get-p)))
 
 (get "/projects/new"
      #:session #t
      #:mime 'xml
      #:i18n '(cookie "lang")
+     #:cookies '(names sid)
      (lambda (rc)
        (define (get-new)
          (response-emit (:mime rc
-                               (html-new-project-form (:i18n rc)
-                                                      ($project 'get
-                                                                #:order-by '(human_id
-                                                                             asc))))))
+                         (html-new-project-form (:i18n rc)
+                                                ($project 'get
+                                                          #:order-by '(human_id
+                                                                       asc))))))
        (get-new)))
 
 (post "/projects/delete"
@@ -128,18 +134,19 @@
      #:session #t
      #:mime 'xml
      #:i18n '(cookie "lang")
+     #:cookies '(names sid)
      (lambda (rc)
        (define (get-edit)
          (let ((p (car ($project 'get
                                  #:ret 'top
                                  #:condition (where #:human_id (params rc
-                                                                "human-id"))))))
+                                                                       "human-id"))))))
            (response-emit (:mime rc
-                                 (html-edit-project-form (:i18n rc)
-                                                         ($project 'get
-                                                                   #:order-by '
-                                                                   (human_id
-                                                                    asc)) p)))))
+                           (html-edit-project-form (:i18n rc)
+                                                   ($project 'get
+                                                             #:order-by '
+                                                             (human_id
+                                                              asc)) p)))))
 
        (get-edit)))
 

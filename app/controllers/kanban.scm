@@ -41,6 +41,7 @@
      #:mime 'xml
      #:session #t
      #:i18n '(cookie "lang")
+     #:cookies '(names sid)
      (lambda (rc)
        (define (get)
          (let* ((project-id (project-id-from-human-id (params rc "project")))
@@ -55,8 +56,8 @@
                                                 (assoc-ref t "human_id")))
                                             project-tickets)))
            (response-emit (:mime rc
-                                 (kanban-from-tickets (:i18n rc) proj
-                                                      (params rc "project")
-                                                      project-tickets
-                                                      ticket-id-to-human-id)))))
+                           (kanban-from-tickets (:i18n rc) proj
+                                                (params rc "project")
+                                                project-tickets
+                                                ticket-id-to-human-id)))))
        (get)))

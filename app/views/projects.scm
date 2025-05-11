@@ -154,7 +154,7 @@
 
 (begin
   (define* (html-from-projects G_ projects
-                               #:key search-query)
+                               #:key is-logged-in search-query)
     (let* ((tit `((div (@ (class ,(->css '(flex flex-row
                                                 justify-between
                                                 flex-wrap
@@ -173,6 +173,7 @@
                                ,(hyg-icon-button #:icon 'plus
                                                  #:content (G_ "new project"))))))))
       (html-template G_
+                     #:is-logged-in is-logged-in
                      #:body `((div (@ (class ,(->css '(container mx-auto))))
                                    ((div (@ (class ,(->css '(flex flex-col
                                                                   gap-4

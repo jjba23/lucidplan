@@ -190,7 +190,9 @@
 
 (begin
   (define* (html-from-tickets G_
-                              #:key projects
+                              #:key
+                              is-logged-in
+                              projects
                               project-details
                               tickets
                               ticket-id-to-human-id
@@ -198,26 +200,26 @@
                               with-rejected
                               search-query)
     (let* ((search-param-components `((div (@ (class ,(->css '(flex flex-row
-                                                               flex-wrap
-                                                               justify-between))))
-                                           (div (@ (class ,(->css '(my-3 p-2
-                                                                    flex
-                                                                    flex-row
                                                                     flex-wrap
-                                                                    justify-start
-                                                                    align-center
-                                                                    items-center))))
+                                                                    justify-between))))
+                                           (div (@ (class ,(->css '(my-3 p-2
+                                                                         flex
+                                                                         flex-row
+                                                                         flex-wrap
+                                                                         justify-start
+                                                                         align-center
+                                                                         items-center))))
                                                 ,(sort-select G_
                                                               #:project-id (assoc-ref
                                                                             project-details
                                                                             "human_id")))
                                            (div (@ (class ,(->css '(my-3 p-2
-                                                                    flex
-                                                                    flex-row
-                                                                    flex-wrap
-                                                                    justify-end
-                                                                    align-center
-                                                                    items-center))))
+                                                                         flex
+                                                                         flex-row
+                                                                         flex-wrap
+                                                                         justify-end
+                                                                         align-center
+                                                                         items-center))))
                                                 ,(search-box G_
                                                              #:search-query
                                                              search-query)))))
@@ -228,8 +230,8 @@
                                                         container))))
                                ,(map (lambda (t)
                                        (render-ticket-listitem G_
-                                        (assoc-ref project-details "human_id")
-                                        t ticket-id-to-human-id))
+                                                               (assoc-ref project-details "human_id")
+                                                               t ticket-id-to-human-id))
                                      (filter only-active-tickets-filter
                                              tickets)))))
            (done-ticket-list `(,(if with-done
@@ -256,7 +258,7 @@
                                                         (assoc-ref
                                                          project-details
                                                          "human_id") t
-                                                        ticket-id-to-human-id))
+                                                         ticket-id-to-human-id))
                                                      (filter
                                                       only-done-tickets-filter
                                                       tickets))))
@@ -287,12 +289,13 @@
                                                             (assoc-ref
                                                              project-details
                                                              "human_id") t
-                                                            ticket-id-to-human-id))
+                                                             ticket-id-to-human-id))
                                                          (filter
                                                           only-rejected-tickets-filter
                                                           tickets))))
                                         '()))))
       (html-template G_
+                     #:is-logged-in is-logged-in
                      #:body `(div (@ (class ,(->css '(container mx-auto))))
                                   ((div (@ (class ,(->css '(flex flex-col
                                                                  gap-4
@@ -315,10 +318,10 @@
                                                                           font-black
                                                                           text-stone-700))))
                                                       ,(format #f
-                                                        "backlog of ~a"
-                                                        (assoc-ref
-                                                         project-details
-                                                         "title"))))
+                                                               "backlog of ~a"
+                                                               (assoc-ref
+                                                                project-details
+                                                                "title"))))
                                              (div (@ (class ,(->css '(flex
                                                                       flex-row
                                                                       flex-wrap
@@ -330,24 +333,24 @@
                                                                              project-details
                                                                              "human_id"))))
                                                           ,(hyg-icon-button
-                                                                            #:icon 'kanban
-                                                                            #:content
-                                                                            (G_
-                                                                             "kanban"))))
+                                                            #:icon 'kanban
+                                                            #:content
+                                                            (G_
+                                                             "kanban"))))
                                                   (a (@ (href ,(format #f
-                                                                "/tickets/~a/new"
-                                                                (assoc-ref
-                                                                 project-details
-                                                                 "human_id"))))
+                                                                       "/tickets/~a/new"
+                                                                       (assoc-ref
+                                                                        project-details
+                                                                        "human_id"))))
                                                      ,(hyg-icon-button #:icon 'plus
                                                                        #:content
                                                                        (G_
                                                                         "new ticket")))))
                                         ,(render-if-nestring (lambda (x)
                                                                `(em (@ (class ,
-                                                                              (->css '
-                                                                               (text-sm
-                                                                                text-stone-600))))
+                                                                         (->css '
+                                                                          (text-sm
+                                                                           text-stone-600))))
                                                                     ,x))
                                                              (assoc-ref
                                                               project-details
@@ -360,11 +363,11 @@
                                                                ,(G_
                                                                  "backlog options"))
                                                       (div (@ (class ,(->css '
-                                                                             (flex
-                                                                              flex-wrap
-                                                                              flex-row
-                                                                              gap-4
-                                                                              my-3))))
+                                                                       (flex
+                                                                        flex-wrap
+                                                                        flex-row
+                                                                        gap-4
+                                                                        my-3))))
                                                            (input (@ (id
                                                                       "should-show-done")
                                                                      (type
@@ -377,20 +380,20 @@
                                                                          true))
                                                                      (onchange ,
                                                                       (format
-                                                                              #f
+                                                                       #f
 
-                                                                              
-                                                                              (string-append
-                                                                               "window.location.href ="
-                                                                               " `/tickets/~a?with-done="
-                                                                               "${document.getElementById('should-show-done').checked}`;")
+                                                                       
+                                                                       (string-append
+                                                                        "window.location.href ="
+                                                                        " `/tickets/~a?with-done="
+                                                                        "${document.getElementById('should-show-done').checked}`;")
 
-                                                                              
-                                                                              (assoc-ref
-                                                                               project-details
-                                                                               "human_id"))))
+                                                                       
+                                                                       (assoc-ref
+                                                                        project-details
+                                                                        "human_id"))))
                                                                   (span (@ (class
-                                                                            "text-stone-600 text-sm"))
+                                                                             "text-stone-600 text-sm"))
                                                                         ,(G_
                                                                           "show done?")))
                                                            (input (@ (id
@@ -405,20 +408,20 @@
                                                                          true))
                                                                      (onchange ,
                                                                       (format
-                                                                              #f
+                                                                       #f
 
-                                                                              
-                                                                              (string-append
-                                                                               "window.location.href ="
-                                                                               " `/tickets/~a?with-rejected="
-                                                                               "${document.getElementById('should-show-rejected').checked}`;")
+                                                                       
+                                                                       (string-append
+                                                                        "window.location.href ="
+                                                                        " `/tickets/~a?with-rejected="
+                                                                        "${document.getElementById('should-show-rejected').checked}`;")
 
-                                                                              
-                                                                              (assoc-ref
-                                                                               project-details
-                                                                               "human_id"))))
+                                                                       
+                                                                       (assoc-ref
+                                                                        project-details
+                                                                        "human_id"))))
                                                                   (span (@ (class
-                                                                            "text-stone-600 text-sm"))
+                                                                             "text-stone-600 text-sm"))
                                                                         ,(G_
                                                                           "show rejected?"))))))
 

@@ -25,6 +25,7 @@
 (get "/"
      #:mime 'xml
      #:i18n '(cookie "lang")
+     #:cookies '(names sid)
      (lambda (rc)
        (response-emit (:mime rc
-                             (welcome-page (:i18n rc))))))
+                       (welcome-page (:i18n rc))))))
