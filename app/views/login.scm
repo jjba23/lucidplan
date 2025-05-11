@@ -43,7 +43,7 @@
                               (method "POST"))
                            ,(hyg-input #:label (G_ "username")
                                        #:name "username"
-                                       #:value "jjba23"
+                                       #:value ""
                                        #:required #t)
                            ,(hyg-input #:label (G_ "password")
                                        #:name "password"

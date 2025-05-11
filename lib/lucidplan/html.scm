@@ -96,7 +96,7 @@
                          (href "/login"))
                       (span (i (@ (class ,(->css '(ph ph-sign-in text-md))))
                                "")) "&nbsp;"
-                               (span ,(G_ "Login"))))
+                      (span ,(G_ "Login"))))
                  `())
             (a (@ (class ,(->css '(text-sm lowercase
                                            text-white
@@ -114,15 +114,14 @@
 
             (select (@ (onchange "window.location.href=this.value;")
                        (class ,(->css '(text-sm text-white bg-transparent
-                                                font-medium font-sans
-                                                shadow-md))))
+                                                font-medium font-sans))))
                     (option "🔗 go to")
                     ,(map (lambda (p)
                             `(option (@ (value ,(format #f "/tickets/~a"
                                                         (assoc-ref p
                                                                    "human_id")))
                                         (class
-                                          "text-sm font-light lowercase text-stone-800"))
+                                         "text-sm font-light lowercase text-stone-800"))
                                      ,(assoc-ref p "title"))) proj))))
     `("<!DOCTYPE html>" (html (@ (lang en))
                               (head (title "LucidPlan")
@@ -137,10 +136,10 @@
                                     (script ,(assoc-ref asset-library
                                                         "pub/js/tailwind.js"))
                                     (script ,(assoc-ref asset-library
-                                                        "pub/js/tailwind.config.js")))
+                                              "pub/js/tailwind.config.js")))
                               (body (@ (class "bg-stone-200/50"))
                                     (div (@ (class
-                                              "flex flex-col h-screen justify-between"))
+                                             "flex flex-col h-screen justify-between"))
                                          (div ,nav
                                               (div (@ (class "py-8"))
                                                    ,body))

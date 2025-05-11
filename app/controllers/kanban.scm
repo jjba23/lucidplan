@@ -56,8 +56,14 @@
                                                 (assoc-ref t "human_id")))
                                             project-tickets)))
            (response-emit (:mime rc
-                           (kanban-from-tickets (:i18n rc) proj
-                                                (params rc "project")
-                                                project-tickets
-                                                ticket-id-to-human-id)))))
+                                 (kanban-from-tickets (:i18n rc)
+                                                      #:projects proj
+                                                      #:project (params rc
+                                                                 "project")
+                                                      #:tickets
+                                                      project-tickets
+                                                      #:ticket-id-to-human-id
+                                                      ticket-id-to-human-id
+                                                      #:is-logged-in (:cookies-value
+                                                                      rc "sid"))))))
        (get)))

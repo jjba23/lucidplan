@@ -63,8 +63,12 @@
                       ((i (@ (class ,(->css '(ph ph-link text-stone-600)))) ""))))))))
 
 (begin
-  (define* (kanban-from-tickets G_ projects project tickets
-                                ticket-id-to-human-id)
+  (define* (kanban-from-tickets G_
+                                #:key projects
+                                project
+                                tickets
+                                ticket-id-to-human-id
+                                is-logged-in)
     
     (let* ((tickets-todo (filter (lambda (x)
                                    (eq? 'todo
@@ -207,8 +211,9 @@
                                                              " ( ~a ) "
                                                              (length
                                                               tickets-done)))))
-                                        (div (@ (class
-                                                 "my-8 flex flex-col gap-2"))
+                                        (div (@ (class ,(->css '(my-8 flex
+                                                                 flex-col
+                                                                 gap-2))))
                                              ,(map (lambda (t)
                                                      (render-k-ticket project
                                                                       t))
@@ -221,7 +226,7 @@
                                                             flex-col
                                                             gap-2
                                                             p-2))))
-                               (details (@ (class "cursor-pointer"))
+                               (details (@ (class ,(->css '(cursor-pointer))))
                                         (summary (@ (class ,(->css '(marker:block
                                                                      hover:cursor-pointer
                                                                      items-center))))
@@ -249,6 +254,7 @@
                                                                       t))
                                                    tickets-rejected)))))))
       (html-template G_
+                     #:is-logged-in is-logged-in
                      #:body kanban-html
                      #:proj projects)))
   (export kanban-from-tickets))

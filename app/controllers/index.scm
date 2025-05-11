@@ -28,4 +28,6 @@
      #:cookies '(names sid)
      (lambda (rc)
        (response-emit (:mime rc
-                       (welcome-page (:i18n rc))))))
+                             (welcome-page (:i18n rc)
+                                           #:is-logged-in (:cookies-value rc
+                                                           "sid"))))))

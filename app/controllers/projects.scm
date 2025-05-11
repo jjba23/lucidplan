@@ -59,7 +59,7 @@
                                                                          user-search)))))))))
            (response-emit (:mime rc
                                  (html-from-projects (:i18n rc)
-                                                     proj
+                                                     #:projects proj
                                                      #:search-query
                                                      user-search
                                                      #:is-logged-in
@@ -74,10 +74,13 @@
      (lambda (rc)
        (define (get-new)
          (response-emit (:mime rc
-                         (html-new-project-form (:i18n rc)
-                                                ($project 'get
-                                                          #:order-by '(human_id
-                                                                       asc))))))
+                               (html-new-project-form (:i18n rc)
+                                                      #:is-logged-in (:cookies-value
+                                                                      rc "sid")
+                                                      #:projects ($project 'get
+                                                                           #:order-by '
+                                                                           (human_id
+                                                                            asc))))))
        (get-new)))
 
 (post "/projects/delete"
@@ -137,16 +140,20 @@
      #:cookies '(names sid)
      (lambda (rc)
        (define (get-edit)
-         (let ((p (car ($project 'get
-                                 #:ret 'top
-                                 #:condition (where #:human_id (params rc
-                                                                       "human-id"))))))
+         (let* ((p (car ($project 'get
+                                  #:ret 'top
+                                  #:condition (where #:human_id (params rc
+                                                                 "human-id"))))))
            (response-emit (:mime rc
-                           (html-edit-project-form (:i18n rc)
-                                                   ($project 'get
-                                                             #:order-by '
-                                                             (human_id
-                                                              asc)) p)))))
+                                 (html-edit-project-form (:i18n rc)
+                                                         #:is-logged-in (:cookies-value
+                                                                         rc
+                                                                         "sid")
+                                                         #:projects ($project 'get
+                                                                              #:order-by '
+                                                                              (human_id
+                                                                               asc))
+                                                         #:project p)))))
 
        (get-edit)))
 

@@ -153,8 +153,8 @@
          ,(render-project G_ p))))
 
 (begin
-  (define* (html-from-projects G_ projects
-                               #:key is-logged-in search-query)
+  (define* (html-from-projects G_
+                               #:key projects is-logged-in search-query)
     (let* ((tit `((div (@ (class ,(->css '(flex flex-row
                                                 justify-between
                                                 flex-wrap
@@ -201,25 +201,32 @@
 
   (export html-from-projects))
 
-(define-public (html-new-project-form G_ proj)
-  (html-project-form G_
-                     #:proj proj))
+(begin
+  (define* (html-new-project-form G_
+                                  #:key projects is-logged-in)
+    (html-project-form G_
+                       #:projects projects
+                       #:is-logged-in is-logged-in))
+  (export html-new-project-form))
 
-(define-public (html-edit-project-form G_ proj p)
-  (html-project-form G_
-                     #:title (assoc-ref p "title")
-                     #:human-id (assoc-ref p "human_id")
-                     #:url (if (assoc-ref p "url")
-                               (assoc-ref p "url") "")
-                     #:vcs-url (if (assoc-ref p "vcs_url")
-                                   (assoc-ref p "vcs_url") "")
-                     #:description (if (assoc-ref p "description")
-                                       (unescape-str (assoc-ref p
-                                                                "description"))
-                                       "")
-                     #:action (format #f "/projects/~a/edit"
-                                      (assoc-ref p "human_id"))
-                     #:proj proj))
+(begin
+  (define* (html-edit-project-form G_
+                                   #:key projects project is-logged-in)
+    (html-project-form G_
+                       #:is-logged-in is-logged-in
+                       #:title (assoc-ref project "title")
+                       #:human-id (assoc-ref project "human_id")
+                       #:url (if (assoc-ref project "url")
+                                 (assoc-ref project "url") "")
+                       #:vcs-url (if (assoc-ref project "vcs_url")
+                                     (assoc-ref project "vcs_url") "")
+                       #:description (if (assoc-ref project "description")
+                                         (unescape-str (assoc-ref project
+                                                        "description")) "")
+                       #:action (format #f "/projects/~a/edit"
+                                        (assoc-ref project "human_id"))
+                       #:projects projects))
+  (export html-edit-project-form))
 
 (define* (html-project-form G_
                             #:key (title "")
@@ -228,8 +235,10 @@
                             (url "")
                             (vcs-url "")
                             (action "/projects/new")
-                            (proj '()))
+                            (projects '())
+                            (is-logged-in #f))
   (html-template G_
+                 #:is-logged-in is-logged-in
                  #:body `(div (@ (class "container mx-auto"))
                               ((form (@ (class "flex flex-col gap-4 p-2")
                                         (enctype
@@ -260,4 +269,4 @@
                                                     #:required #f)
 
                                      (div ,(hyg-submit-button (G_ "submit"))))))
-                 #:proj proj))
+                 #:proj projects))
