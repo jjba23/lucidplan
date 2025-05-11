@@ -40,7 +40,7 @@
                                         (src
                                          "https://jointhefreeworld.org/static-assets/lucidplan/img/logo.jpg"))))))))
       (html-template G_
-                     #:is-logged-in is-logged-in
+                     #:is-logged-in #f
                      #:body `(div (@ (class ,(->css '(container mx-auto))))
                                   ,(hyg-h2 (G_ "welcome to lucidplan"))
                                   (em ,(G_
