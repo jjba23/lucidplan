@@ -46,7 +46,7 @@ byggsteg is licensed under the GNU GPL v3 License or newer.
 I strive to provide proper and extensive documentation on LucidPlan, available at your convenience.
 
 - Org format [[file:docs/manual/en-GB.org]]
-
+- Online HTML: https://jointhefreeworld.org/manuals/lucidplan/index.html
 
 [[https://jointhefreeworld.org/static-assets/lucidplan/img/logo-small.jpg]]
 
