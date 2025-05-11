@@ -21,6 +21,8 @@
 
 # Constants
 
+DEPLOY_WWW=/srv/http/jointhefreeworld.org
+
 LUCIDPLAN_LOCATION="/etc/lucidplan"
 LUCIDPLAN_DB="lucidplan.db"
 COPYRIGHT_HOLDERS="Josep Bigorra"
