@@ -155,17 +155,28 @@
 (begin
   (define* (html-from-projects G_ projects
                                #:key search-query)
-    (let* ((tit `((div (@ (class ,(->css '(flex flex-row items-center gap-1
+    (let* ((tit `((div (@ (class ,(->css '(flex flex-row
+                                                justify-between
+                                                flex-wrap
+                                                items-center
+                                                gap-1
                                                 my-3))))
-                       ,(hyg-icon #:type 'align-bottom
-                                  #:icon-css '(text-stone-800 text-2xl))
-                       (h2 (@ (class ,(->css '(text-3xl font-sans font-bold
-                                                        text-stone-700))))
-                           ,(G_ "projects"))))))
+                       (div (@ (class ,(->css '(flex flex-row items-center
+                                                     gap-1))))
+                            ,(hyg-icon #:type 'align-bottom
+                                       #:icon-css '(text-stone-800 text-2xl))
+                            (h2 (@ (class ,(->css '(text-3xl font-sans
+                                                             font-bold
+                                                             text-stone-700))))
+                                ,(G_ "projects")))
+                       (div (a (@ (href "/projects/new"))
+                               ,(hyg-icon-button #:icon 'plus
+                                                 #:content (G_ "new project"))))))))
       (html-template G_
-                     #:body `((div (@ (class "container mx-auto"))
+                     #:body `((div (@ (class ,(->css '(container mx-auto))))
                                    ((div (@ (class ,(->css '(flex flex-col
-                                                                  gap-4))))
+                                                                  gap-4
+                                                                  flex-grow))))
                                          ,tit
 
                                          (div (@ (class ,(->css '(flex
@@ -184,10 +195,7 @@
                                                                   my-3))))
                                               ,(map (lambda (x)
                                                       (render-project-list-item
-                                                       G_ x)) projects))
-
-                                         (div (a (@ (href "/projects/new"))
-                                                 ,(G_ "create a project")))))))
+                                                       G_ x)) projects))))))
                      #:proj projects)))
 
   (export html-from-projects))

@@ -197,132 +197,7 @@
                               with-done
                               with-rejected
                               search-query)
-    (html-template G_
-                   #:body `(div (@ (class "container mx-auto"))
-                                ((div (@ (class ,(->css '(flex flex-col gap-4
-                                                               flex-grow))))
-                                      (div (@ (class ,(->css '(flex flex-wrap
-                                                               flex-row gap-4
-                                                               items-center
-                                                               justify-between))))
-                                           (div (@ (class ,(->css '(flex
-                                                                    flex-row
-                                                                    gap-2
-                                                                    items-center))))
-                                                ,(hyg-icon #:type 'scroll
-                                                           #:icon-css '(text-stone-700
-                                                                        text-2xl))
-                                                (h2 (@ (class ,(->css '(text-3xl
-                                                                        font-sans
-                                                                        font-black
-                                                                        text-stone-700))))
-                                                    ,(format #f
-                                                             "backlog of ~a"
-                                                             (assoc-ref
-                                                              project-details
-                                                              "title"))))
-                                           (div (@ (class ,(->css '(flex
-                                                                    flex-row
-                                                                    flex-wrap
-                                                                    gap-1
-                                                                    items-center))))
-                                                (div (a (@ (href ,(format #f
-                                                                   "/kanban/~a"
-                                                                   (assoc-ref
-                                                                    project-details
-                                                                    "human_id"))))
-                                                        ,(hyg-icon-button
-                                                                          #:icon 'kanban
-                                                                          #:content
-                                                                          (G_
-                                                                           "kanban"))))
-                                                (a (@ (href ,(format #f
-                                                              "/tickets/~a/new"
-                                                              (assoc-ref
-                                                               project-details
-                                                               "human_id"))))
-                                                   ,(hyg-icon-button #:icon 'plus
-                                                                     #:content
-                                                                     (G_
-                                                                      "new ticket")))))
-                                      ,(render-if-nestring (lambda (x)
-                                                             `(em (@ (class ,(->css '
-                                                                              (text-sm
-                                                                               text-stone-600))))
-                                                                  ,x))
-                                                           (assoc-ref
-                                                            project-details
-                                                            "description"))
-
-                                      (div (details (summary (@ (class ,(->css '
-                                                                         (text-stone-600
-                                                                          text-sm
-                                                                          cursor-pointer))))
-                                                             ,(G_
-                                                               "backlog options"))
-                                                    (div (@ (class ,(->css '(flex
-                                                                             flex-wrap
-                                                                             flex-row
-                                                                             gap-4
-                                                                             my-3))))
-                                                         (input (@ (id
-                                                                    "should-show-done")
-                                                                   (type
-                                                                    checkbox)
-                                                                   ,(if
-                                                                     with-done
-                                                                     '(checked
-                                                                       true)
-                                                                     '(not-checked
-                                                                       true))
-                                                                   (onchange ,
-                                                                             (format
-                                                                              #f
-
-                                                                              
-                                                                              (string-append
-                                                                               "window.location.href ="
-                                                                               " `/tickets/~a?with-done="
-                                                                               "${document.getElementById('should-show-done').checked}`;")
-
-                                                                              
-                                                                              (assoc-ref
-                                                                               project-details
-                                                                               "human_id"))))
-                                                                (span (@ (class
-                                                                          "text-stone-600 text-sm"))
-                                                                      ,(G_
-                                                                        "show done?")))
-                                                         (input (@ (id
-                                                                    "should-show-rejected")
-                                                                   (type
-                                                                    checkbox)
-                                                                   ,(if
-                                                                     with-rejected
-                                                                     '(checked
-                                                                       true)
-                                                                     '(not-checked
-                                                                       true))
-                                                                   (onchange ,
-                                                                             (format
-                                                                              #f
-
-                                                                              
-                                                                              (string-append
-                                                                               "window.location.href ="
-                                                                               " `/tickets/~a?with-rejected="
-                                                                               "${document.getElementById('should-show-rejected').checked}`;")
-
-                                                                              
-                                                                              (assoc-ref
-                                                                               project-details
-                                                                               "human_id"))))
-                                                                (span (@ (class
-                                                                          "text-stone-600 text-sm"))
-                                                                      ,(G_
-                                                                        "show rejected?"))))))
-
-                                      (div (@ (class ,(->css '(flex flex-row
+    (let* ((search-param-components `((div (@ (class ,(->css '(flex flex-row
                                                                flex-wrap
                                                                justify-between))))
                                            (div (@ (class ,(->css '(my-3 p-2
@@ -345,82 +220,213 @@
                                                                     items-center))))
                                                 ,(search-box G_
                                                              #:search-query
-                                                             search-query)))
+                                                             search-query)))))
+           (ticket-list `((div (@ (id lucidplan-tickets-list)
+                                  (ondrop "dropTicketsItem(event)")
+                                  (ondragover "allowDrop(event)")
+                                  (class ,(->css '(flex flex-col gap-2
+                                                        container))))
+                               ,(map (lambda (t)
+                                       (render-ticket-listitem G_
+                                        (assoc-ref project-details "human_id")
+                                        t ticket-id-to-human-id))
+                                     (filter only-active-tickets-filter
+                                             tickets)))))
+           (done-ticket-list `(,(if with-done
+                                    `(div (@ (id lucidplan-done-tickets-list)
+                                             (class ,(->css '(my-4))))
+                                          (hr)
+                                          (h2 (@ (class ,(->css '(text-lg
+                                                                  font-sans
+                                                                  font-black
+                                                                  text-stone-600
+                                                                  flex
+                                                                  flex-row
+                                                                  gap-2
+                                                                  my-4))))
+                                              ,(emoji-for-ticket-status "done")
+                                              (span ,(G_ "done")))
+                                          (div (@ (class ,(->css '(flex
+                                                                   flex-col
+                                                                   gap-2
+                                                                   container))))
+                                               ,(map (lambda (t)
+                                                       (render-ticket-listitem
+                                                        G_
+                                                        (assoc-ref
+                                                         project-details
+                                                         "human_id") t
+                                                        ticket-id-to-human-id))
+                                                     (filter
+                                                      only-done-tickets-filter
+                                                      tickets))))
+                                    '())))
+           (rejected-ticket-list `(,(if with-rejected
+                                        `(div (@ (id
+                                                  lucidplan-rejected-tickets-list)
+                                                 (class ,(->css '(my-4))))
+                                              (hr)
+                                              (h2 (@ (class ,(->css '(text-lg
+                                                                      font-sans
+                                                                      font-black
+                                                                      text-stone-600
+                                                                      flex
+                                                                      flex-row
+                                                                      gap-2
+                                                                      my-4))))
+                                                  ,(emoji-for-ticket-status
+                                                    "rejected")
+                                                  (span ,(G_ "rejected")))
+                                              (div (@ (class ,(->css '(flex
+                                                                       flex-col
+                                                                       gap-2
+                                                                       container))))
+                                                   ,(map (lambda (t)
+                                                           (render-ticket-listitem
+                                                            G_
+                                                            (assoc-ref
+                                                             project-details
+                                                             "human_id") t
+                                                            ticket-id-to-human-id))
+                                                         (filter
+                                                          only-rejected-tickets-filter
+                                                          tickets))))
+                                        '()))))
+      (html-template G_
+                     #:body `(div (@ (class ,(->css '(container mx-auto))))
+                                  ((div (@ (class ,(->css '(flex flex-col
+                                                                 gap-4
+                                                                 flex-grow))))
+                                        (div (@ (class ,(->css '(flex
+                                                                 flex-wrap
+                                                                 flex-row
+                                                                 gap-4
+                                                                 items-center
+                                                                 justify-between))))
+                                             (div (@ (class ,(->css '(flex
+                                                                      flex-row
+                                                                      gap-2
+                                                                      items-center))))
+                                                  ,(hyg-icon #:type 'scroll
+                                                             #:icon-css '(text-stone-700
+                                                                          text-2xl))
+                                                  (h2 (@ (class ,(->css '(text-3xl
+                                                                          font-sans
+                                                                          font-black
+                                                                          text-stone-700))))
+                                                      ,(format #f
+                                                        "backlog of ~a"
+                                                        (assoc-ref
+                                                         project-details
+                                                         "title"))))
+                                             (div (@ (class ,(->css '(flex
+                                                                      flex-row
+                                                                      flex-wrap
+                                                                      gap-1
+                                                                      items-center))))
+                                                  (div (a (@ (href ,(format #f
+                                                                            "/kanban/~a"
+                                                                            (assoc-ref
+                                                                             project-details
+                                                                             "human_id"))))
+                                                          ,(hyg-icon-button
+                                                                            #:icon 'kanban
+                                                                            #:content
+                                                                            (G_
+                                                                             "kanban"))))
+                                                  (a (@ (href ,(format #f
+                                                                "/tickets/~a/new"
+                                                                (assoc-ref
+                                                                 project-details
+                                                                 "human_id"))))
+                                                     ,(hyg-icon-button #:icon 'plus
+                                                                       #:content
+                                                                       (G_
+                                                                        "new ticket")))))
+                                        ,(render-if-nestring (lambda (x)
+                                                               `(em (@ (class ,
+                                                                              (->css '
+                                                                               (text-sm
+                                                                                text-stone-600))))
+                                                                    ,x))
+                                                             (assoc-ref
+                                                              project-details
+                                                              "description"))
 
-                                      (div (@ (id lucidplan-tickets-list)
-                                              (ondrop "dropTicketsItem(event)")
-                                              (ondragover "allowDrop(event)")
-                                              (class ,(->css '(flex flex-col
-                                                                    gap-2
-                                                                    container))))
-                                           ,(map (lambda (t)
-                                                   (render-ticket-listitem G_
-                                                    (assoc-ref project-details
-                                                     "human_id") t
-                                                    ticket-id-to-human-id))
-                                                 (filter
-                                                  only-active-tickets-filter
-                                                  tickets)))
+                                        (div (details (summary (@ (class ,(->css '
+                                                                           (text-stone-600
+                                                                            text-sm
+                                                                            cursor-pointer))))
+                                                               ,(G_
+                                                                 "backlog options"))
+                                                      (div (@ (class ,(->css '
+                                                                             (flex
+                                                                              flex-wrap
+                                                                              flex-row
+                                                                              gap-4
+                                                                              my-3))))
+                                                           (input (@ (id
+                                                                      "should-show-done")
+                                                                     (type
+                                                                      checkbox)
+                                                                     ,(if
+                                                                       with-done
+                                                                       '(checked
+                                                                         true)
+                                                                       '(not-checked
+                                                                         true))
+                                                                     (onchange ,
+                                                                      (format
+                                                                              #f
 
-                                      ,(if with-done
-                                           `(div (@ (id
-                                                     "lucidplan-done-tickets-list")
-                                                    (class "my-4"))
-                                                 (hr)
-                                                 (h2 (@ (class ,(->css '(text-lg
-                                                                         font-sans
-                                                                         font-black
-                                                                         text-stone-600
-                                                                         flex
-                                                                         flex-row
-                                                                         gap-2
-                                                                         my-4))))
-                                                     ,(emoji-for-ticket-status
-                                                       "done")
-                                                     (span ,(G_ "done")))
-                                                 (div (@ (class
-                                                          "flex flex-col gap-2 container"))
-                                                      ,(map (lambda (t)
-                                                              (render-ticket-listitem
-                                                               G_
-                                                               (assoc-ref
-                                                                project-details
-                                                                "human_id") t
-                                                               ticket-id-to-human-id))
-                                                            (filter
-                                                             only-done-tickets-filter
-                                                             tickets))))
-                                           '())
-                                      ,(if with-rejected
-                                           `(div (@ (id
-                                                     "lucidplan-rejected-tickets-list")
-                                                    (class "my-4"))
-                                                 (hr)
-                                                 (h2 (@ (class ,(->css '(text-lg
-                                                                         font-sans
-                                                                         font-black
-                                                                         text-stone-600
-                                                                         flex
-                                                                         flex-row
-                                                                         gap-2
-                                                                         my-4))))
-                                                     ,(emoji-for-ticket-status
-                                                       "rejected")
-                                                     (span ,(G_ "rejected")))
-                                                 (div (@ (class
-                                                          "flex flex-col gap-2 container"))
-                                                      ,(map (lambda (t)
-                                                              (render-ticket-listitem
-                                                               G_
-                                                               (assoc-ref
-                                                                project-details
-                                                                "human_id") t
-                                                               ticket-id-to-human-id))
-                                                            (filter
-                                                             only-rejected-tickets-filter
-                                                             tickets))))
-                                           '()))))
-                   #:proj projects))
+                                                                              
+                                                                              (string-append
+                                                                               "window.location.href ="
+                                                                               " `/tickets/~a?with-done="
+                                                                               "${document.getElementById('should-show-done').checked}`;")
+
+                                                                              
+                                                                              (assoc-ref
+                                                                               project-details
+                                                                               "human_id"))))
+                                                                  (span (@ (class
+                                                                            "text-stone-600 text-sm"))
+                                                                        ,(G_
+                                                                          "show done?")))
+                                                           (input (@ (id
+                                                                      "should-show-rejected")
+                                                                     (type
+                                                                      checkbox)
+                                                                     ,(if
+                                                                       with-rejected
+                                                                       '(checked
+                                                                         true)
+                                                                       '(not-checked
+                                                                         true))
+                                                                     (onchange ,
+                                                                      (format
+                                                                              #f
+
+                                                                              
+                                                                              (string-append
+                                                                               "window.location.href ="
+                                                                               " `/tickets/~a?with-rejected="
+                                                                               "${document.getElementById('should-show-rejected').checked}`;")
+
+                                                                              
+                                                                              (assoc-ref
+                                                                               project-details
+                                                                               "human_id"))))
+                                                                  (span (@ (class
+                                                                            "text-stone-600 text-sm"))
+                                                                        ,(G_
+                                                                          "show rejected?"))))))
+
+                                        ,search-param-components
+                                        ,ticket-list
+                                        ,done-ticket-list
+                                        ,rejected-ticket-list)))
+                     #:proj projects)))
   (export html-from-tickets))
 
 (define-public (html-new-ticket-form G_ proj project)
@@ -528,7 +534,7 @@
             (div ,(hyg-submit-button (G_ "submit"))))))
 
   (html-template G_
-                 #:body `((div (@ (class "container mx-auto"))
+                 #:body `((div (@ (class ,(->css '(container mx-auto))))
                                ,form_))
                  #:proj proj))
 

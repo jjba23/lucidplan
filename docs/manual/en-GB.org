@@ -72,7 +72,16 @@ Check in ~db/migration~ and edit the password field, or add more users. An impor
 Then do a ~guix shell -m manifest.scm -- art migrate up user~ to add your users.
 
 
-----
+------
+
+* Practical usage tips
+
+Using LucidPlan is made to be easy and simple, however, here follow some tips that might help you out:
+
+In any ~title~ or ~description~ field you can use the Org mode syntax (like in the Emacs mode) and LucidPlan will automatically convert your markup to pretty HTML.
+
+
+------
 
 * Running LucidPlan
 

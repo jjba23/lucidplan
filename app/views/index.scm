@@ -31,7 +31,7 @@
 
 (define-public (welcome-page G_)
   (let ((project-logo `(((div (@ (class ,(->css '(bg-stone-200 rounded-2xl p-4
-                                                               shadow))))
+                                                               shadow-md))))
                               (img (@ (loading lazy)
                                       (class ,(->css '(w-64 h-auto rounded-2xl)))
                                       (src
@@ -48,7 +48,7 @@
                                                                bg-stone-200
                                                                rounded-2xl
                                                                p-4
-                                                               shadow
+                                                               shadow-md
                                                                flex
                                                                flex-col
                                                                gap-3))))
@@ -61,7 +61,7 @@
                                                                bg-stone-200
                                                                rounded-2xl
                                                                p-4
-                                                               shadow
+                                                               shadow-md
                                                                flex
                                                                flex-col
                                                                gap-3))))

@@ -38,7 +38,8 @@
                                                       flex-row
                                                       flex-wrap
                                                       items-center
-                                                      gap-4)))
+                                                      gap-4
+                                                      shadow-md)))
                               (method "POST"))
                            ,(hyg-input #:label (G_ "username")
                                        #:name "username"
