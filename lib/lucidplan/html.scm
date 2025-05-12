@@ -58,7 +58,14 @@
                      ,(hyg-a
                        "https://jointhefreeworld.org/manuals/lucidplan/index.html"))
                 ,(hyg-em (G_ "Copyright 2025 © Josep Bigorra"))
-                ,(hyg-em (G_ "free project management for everyone")))))
+                ,(hyg-em (G_ "free project management for everyone"))
+                (div (@ (class ,(->css '(flex flex-row flex-wrap gap-2
+                                              align-center items-center))))
+                     ,(hyg-p "version:")
+                     ,(hyg-mono (format #f "~a"
+                                        (get-short-commit-sha))
+                                #:color 'text-stone-600
+                                #:size 'text-md)))))
 
 (begin
   (define* (html-template G_
