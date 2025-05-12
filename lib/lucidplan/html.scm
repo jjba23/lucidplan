@@ -48,18 +48,15 @@
                          "pub/js/tailwind.config.js")))
 
 (define-public (page-footer G_)
-  (hyg-footer `((div (@ (class ,(->css '(flex flex-row
-                                              flex-wrap
-                                              gap-2
+  (hyg-footer `((div (@ (class ,(->css '(flex flex-row flex-wrap gap-2
                                               align-center))))
                      ,(hyg-p (G_ "find the source code here"))
                      ,(hyg-a "https://codeberg.org/jjba23/lucidplan"))
-                (div (@ (class ,(->css '(flex flex-row
-                                              flex-wrap
-                                              gap-2
+                (div (@ (class ,(->css '(flex flex-row flex-wrap gap-2
                                               align-center))))
                      ,(hyg-p (G_ "find the manual here"))
-                     ,(hyg-a "https://jointhefreeworld.org/manuals/lucidplan/index.html"))
+                     ,(hyg-a
+                       "https://jointhefreeworld.org/manuals/lucidplan/index.html"))
                 ,(hyg-em (G_ "Copyright 2025 © Josep Bigorra"))
                 ,(hyg-em (G_ "free project management for everyone")))))
 
@@ -92,7 +89,7 @@
                          (href "/login"))
                       (span (i (@ (class ,(->css '(ph ph-sign-in text-md))))
                                "")) "&nbsp;"
-                               (span ,(G_ "Login"))))
+                      (span ,(G_ "Login"))))
                  `())
             (a (@ (class ,(->css '(text-sm lowercase
                                            text-white
@@ -117,7 +114,7 @@
                                                         (assoc-ref p
                                                                    "human_id")))
                                         (class
-                                          "text-sm font-light lowercase text-stone-800"))
+                                         "text-sm font-light lowercase text-stone-800"))
                                      ,(assoc-ref p "title"))) proj))))
     `("<!DOCTYPE html>" (html (@ (lang en))
                               (head (title "LucidPlan")
@@ -132,16 +129,26 @@
                                     (script ,(assoc-ref asset-library
                                                         "pub/js/tailwind.js"))
                                     (script ,(assoc-ref asset-library
-                                                        "pub/js/tailwind.config.js")))
+                                              "pub/js/tailwind.config.js")))
                               (body
 
-                               ,(hyg-with-footer
-                                 #:main `((div (@ (class ,(->css '(flex flex-col justify-between h-screen))))
-                                               (div (@(class ,(->css '(flex flex-col gap-8 justify-start)))) ,nav
-                                                    ,body)))
-                                 #:footer (page-footer G_))
-                               (script ,(assoc-ref asset-library
-                                                   "pub/js/tickets.js"))))))
+                                    ,(hyg-with-footer #:main `((div (@ (class ,
+                                                                              (->css '
+                                                                               (flex
+                                                                                flex-col
+                                                                                justify-between
+                                                                                h-screen))))
+                                                                    (div (@ (class ,
+                                                                             (->css '
+                                                                              (flex
+                                                                               flex-col
+                                                                               gap-8
+                                                                               justify-start))))
+                                                                         ,nav
+                                                                         ,body)))
+                                                      #:footer (page-footer G_))
+                                    (script ,(assoc-ref asset-library
+                                                        "pub/js/tickets.js"))))))
   (export html-template))
 
 (define-public (emoji-for-ticket-status ticket-status)

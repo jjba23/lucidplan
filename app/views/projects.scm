@@ -240,39 +240,37 @@
   (html-template G_
                  #:is-logged-in is-logged-in
                  #:body `(div (@ (class ,(->css '(container mx-auto))))
-                              (div
-                               (form (@ (class ,(->css '(flex flex-col
-                                                              gap-4)))
-                                        (enctype
-                                         "application/x-www-form-urlencoded")
-                                        (method POST)
-                                        (action ,action))
-                                     ,(hyg-input #:label (G_ "title")
-                                                 #:name "title"
-                                                 #:value (unescape-str
-                                                          title)
-                                                 #:required #t)
-                                     ,(hyg-input #:label (G_ "human id")
-                                                 #:name "human-id"
-                                                 #:value human-id
-                                                 #:required #t)
-                                     ,(hyg-input #:label (G_
-                                                          "homepage url")
-                                                 #:name "url"
-                                                 #:value url
-                                                 #:required #f)
-                                     ,(hyg-input #:label (G_
-                                                          "version control url")
-                                                 #:name "vcs-url"
-                                                 #:value vcs-url
-                                                 #:required #f)
-                                     ,(hyg-textarea #:label (G_
-                                                             "description")
-                                                    #:name "description"
-                                                    #:value (unescape-str
-                                                             description)
-                                                    #:required #f)
+                              (div (form (@ (class ,(->css '(flex flex-col
+                                                                  gap-4)))
+                                            (enctype
+                                             "application/x-www-form-urlencoded")
+                                            (method POST)
+                                            (action ,action))
+                                         ,(hyg-input #:label (G_ "title")
+                                                     #:name "title"
+                                                     #:value (unescape-str
+                                                              title)
+                                                     #:required #t)
+                                         ,(hyg-input #:label (G_ "human id")
+                                                     #:name "human-id"
+                                                     #:value human-id
+                                                     #:required #t)
+                                         ,(hyg-input #:label (G_
+                                                              "homepage url")
+                                                     #:name "url"
+                                                     #:value url
+                                                     #:required #f)
+                                         ,(hyg-input #:label (G_
+                                                              "version control url")
+                                                     #:name "vcs-url"
+                                                     #:value vcs-url
+                                                     #:required #f)
+                                         ,(hyg-textarea #:label (G_
+                                                                 "description")
+                                                        #:name "description"
+                                                        #:value (unescape-str
+                                                                 description)
+                                                        #:required #f)
 
-                                     (div ,(hyg-submit-button (G_
-                                                               "submit"))))))
+                                         (div ,(hyg-submit-button (G_ "submit"))))))
                  #:proj projects))
