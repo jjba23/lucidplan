@@ -35,6 +35,7 @@
   #:use-module (hygguile components button)
   #:use-module (hygguile components typography)
   #:use-module (hygguile components select)
+  #:use-module (hygguile components container)
   #:use-module (artanis i18n sxml)
   #:use-module (kracht prelude)
   #:use-module (artanis i18n locale)
@@ -47,25 +48,14 @@
                          "pub/js/tailwind.config.js")))
 
 (define-public (page-footer G_)
-  `((div (@ (class "block text-center font-sans"))
-         (div (@ (class ,(->css '(flex flex-row
-                                       flex-wrap
-                                       gap-2
-                                       justify-center
-                                       align-center
-                                       py-3))))
-              (p (@ (class "text-sm text-stone-600"))
-                 ,(G_ "find the source code here"))
-              (a (@ (class ,(->css '(text-stone-800 font-bold cursor-pointer
-                                                    text-sm)))
-                    (href "https://codeberg.org/jjba23/lucidplan"))
-                 "https://codeberg.org/jjba23/lucidplan"))
-         (p (@ (class ,(->css '(py-3))))
-            (em (@ (class "text-md text-stone-600"))
-                ,(G_ "Copyright 2025 © Josep Bigorra")))
-         (p (@ (class ,(->css '(py-3))))
-            (span (@ (class ,(->css '(text-sm text-stone-600))))
-                  ,(G_ "free project management for everyone"))))))
+  (hyg-footer `((div (@ (class ,(->css '(flex flex-row
+                                              flex-wrap
+                                              gap-2
+                                              align-center))))
+                     ,(hyg-p (G_ "find the source code here"))
+                     ,(hyg-a "https://codeberg.org/jjba23/lucidplan"))
+                ,(hyg-em (G_ "Copyright 2025 © Josep Bigorra"))
+                ,(hyg-em (G_ "free project management for everyone")))))
 
 (begin
   (define* (html-template G_
@@ -96,7 +86,7 @@
                          (href "/login"))
                       (span (i (@ (class ,(->css '(ph ph-sign-in text-md))))
                                "")) "&nbsp;"
-                      (span ,(G_ "Login"))))
+                               (span ,(G_ "Login"))))
                  `())
             (a (@ (class ,(->css '(text-sm lowercase
                                            text-white
@@ -121,7 +111,7 @@
                                                         (assoc-ref p
                                                                    "human_id")))
                                         (class
-                                         "text-sm font-light lowercase text-stone-800"))
+                                          "text-sm font-light lowercase text-stone-800"))
                                      ,(assoc-ref p "title"))) proj))))
     `("<!DOCTYPE html>" (html (@ (lang en))
                               (head (title "LucidPlan")
@@ -136,16 +126,15 @@
                                     (script ,(assoc-ref asset-library
                                                         "pub/js/tailwind.js"))
                                     (script ,(assoc-ref asset-library
-                                              "pub/js/tailwind.config.js")))
-                              (body (@ (class "bg-stone-200/50"))
-                                    (div (@ (class
-                                             "flex flex-col h-screen justify-between"))
-                                         (div ,nav
-                                              (div (@ (class "py-8"))
-                                                   ,body))
-                                         (footer ,(page-footer G_)))
-                                    (script ,(assoc-ref asset-library
-                                                        "pub/js/tickets.js"))))))
+                                                        "pub/js/tailwind.config.js")))
+                              (body
+                               ,nav
+                               ,(hyg-with-footer
+                                 #:main `((div (@(class ,(->css '(py-6))))
+                                               ,body))
+                                 #:footer (page-footer G_))
+                               (script ,(assoc-ref asset-library
+                                                   "pub/js/tickets.js"))))))
   (export html-template))
 
 (define-public (emoji-for-ticket-status ticket-status)
