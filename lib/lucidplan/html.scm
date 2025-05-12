@@ -144,7 +144,7 @@
                                                                      (flex
                                                                       flex-col
                                                                       justify-between
-                                                                      min-h-screen))))
+                                                                      min-h-96))))
                                                                (div (@ (class ,
                                                                          (->css '
                                                                           (flex
