@@ -96,7 +96,7 @@
                          (href "/login"))
                       (span (i (@ (class ,(->css '(ph ph-sign-in text-md))))
                                "")) "&nbsp;"
-                      (span ,(G_ "Login"))))
+                               (span ,(G_ "Login"))))
                  `())
             (a (@ (class ,(->css '(text-sm lowercase
                                            text-white
@@ -121,7 +121,7 @@
                                                         (assoc-ref p
                                                                    "human_id")))
                                         (class
-                                         "text-sm font-light lowercase text-stone-800"))
+                                          "text-sm font-light lowercase text-stone-800"))
                                      ,(assoc-ref p "title"))) proj))))
     `("<!DOCTYPE html>" (html (@ (lang en))
                               (head (title "LucidPlan")
@@ -136,26 +136,26 @@
                                     (script ,(assoc-ref asset-library
                                                         "pub/js/tailwind.js"))
                                     (script ,(assoc-ref asset-library
-                                              "pub/js/tailwind.config.js")))
+                                                        "pub/js/tailwind.config.js")))
                               (body
 
-                                    ,(hyg-with-footer #:main `((div (@ (class ,
-                                                                              (->css '
-                                                                               (flex
-                                                                                flex-col
-                                                                                justify-between
-                                                                                h-screen))))
-                                                                    (div (@ (class ,
-                                                                             (->css '
-                                                                              (flex
-                                                                               flex-col
-                                                                               gap-8
-                                                                               justify-start))))
-                                                                         ,nav
-                                                                         ,body)))
-                                                      #:footer (page-footer G_))
-                                    (script ,(assoc-ref asset-library
-                                                        "pub/js/tickets.js"))))))
+                               ,(hyg-with-footer #:main `((div (@ (class ,
+                                                                    (->css '
+                                                                     (flex
+                                                                      flex-col
+                                                                      justify-between
+                                                                      min-h-screen))))
+                                                               (div (@ (class ,
+                                                                         (->css '
+                                                                          (flex
+                                                                           flex-col
+                                                                           gap-8
+                                                                           justify-start))))
+                                                                    ,nav
+                                                                    ,body)))
+                                                 #:footer (page-footer G_))
+                               (script ,(assoc-ref asset-library
+                                                   "pub/js/tickets.js"))))))
   (export html-template))
 
 (define-public (emoji-for-ticket-status ticket-status)
