@@ -21,6 +21,8 @@
 
 # Constants
 
+DEPLOY_WWW=/srv/http/jointhefreeworld.org
+
 LUCIDPLAN_LOCATION="/etc/lucidplan"
 LUCIDPLAN_DB="lucidplan.db"
 COPYRIGHT_HOLDERS="Josep Bigorra"
@@ -187,3 +189,11 @@ repl:
 # Unit tests
 test:
 	guix shell -m manifest.scm -- guile --fresh-auto-compile run-tests.scm | guile --fresh-auto-compile colorize-tests.scm
+
+# deploy: Deploys the manual HTML to a web server directory.
+deploy:
+	guix shell -m manifest.scm -- emacs -Q --batch \
+		--eval '(progn (find-file "$(shell realpath ./docs/manual/en-GB.org)")(org-html-export-to-html)(message "finished publishing LucidPlan manual"))'
+	mkdir -pv $(DEPLOY_WWW)/manuals/lucidplan
+	rm -rfv $(DEPLOY_WWW)/manuals/lucidplan/index.html
+	mv -v docs/manual/en-GB.html $(DEPLOY_WWW)/manuals/lucidplan/index.html
