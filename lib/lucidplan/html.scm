@@ -57,7 +57,7 @@
                      ,(hyg-p (G_ "find the manual here"))
                      ,(hyg-a
                        "https://jointhefreeworld.org/manuals/lucidplan/index.html"))
-                ,(hyg-em (G_ "Copyright 2025 © Josep Bigorra"))
+                ,(hyg-em (G_ "Copyright 2025 © Josep Bigorra  &lt;jjbigorra@gmail.com&gt;"))
                 ,(hyg-em (G_ "free project management for everyone"))
                 (div (@ (class ,(->css '(flex flex-row flex-wrap gap-2
                                               align-center items-center))))
