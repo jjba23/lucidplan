@@ -54,6 +54,12 @@
                                               align-center))))
                      ,(hyg-p (G_ "find the source code here"))
                      ,(hyg-a "https://codeberg.org/jjba23/lucidplan"))
+                (div (@ (class ,(->css '(flex flex-row
+                                              flex-wrap
+                                              gap-2
+                                              align-center))))
+                     ,(hyg-p (G_ "find the manual here"))
+                     ,(hyg-a "https://jointhefreeworld.org/manuals/lucidplan/index.html"))
                 ,(hyg-em (G_ "Copyright 2025 © Josep Bigorra"))
                 ,(hyg-em (G_ "free project management for everyone")))))
 
@@ -128,10 +134,11 @@
                                     (script ,(assoc-ref asset-library
                                                         "pub/js/tailwind.config.js")))
                               (body
-                               ,nav
+
                                ,(hyg-with-footer
-                                 #:main `((div (@(class ,(->css '(py-6))))
-                                               ,body))
+                                 #:main `((div (@ (class ,(->css '(flex flex-col justify-between h-screen))))
+                                               (div (@(class ,(->css '(flex flex-col gap-8 justify-start)))) ,nav
+                                                    ,body)))
                                  #:footer (page-footer G_))
                                (script ,(assoc-ref asset-library
                                                    "pub/js/tickets.js"))))))

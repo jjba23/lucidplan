@@ -471,9 +471,9 @@
                            (projects '())
                            (is-logged-in #f))
   (define form_
-    `((form (@ (class "flex flex-col gap-4")
+    `((form (@ (class ,(->css '(flex flex-col gap-4)))
                (enctype "application/x-www-form-urlencoded")
-               (method "POST")
+               (method POST)
                (action ,action))
             ,(hyg-input #:label (G_ "title")
                         #:name "title"
@@ -550,6 +550,6 @@
   (html-template G_
                  #:is-logged-in is-logged-in
                  #:body `((div (@ (class ,(->css '(container mx-auto))))
-                               ,form_))
+                               (div ,form_)))
                  #:proj projects))
 
