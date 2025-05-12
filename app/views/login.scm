@@ -21,39 +21,37 @@
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
-  #:use-module (hygguile components input)
-  #:use-module (hygguile abstraction)
-  #:use-module (hygguile components typography)
-  #:use-module (hygguile components button)
+  #:use-module (hygguile hygguile)
   #:use-module (ice-9 i18n)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
 
 (define-public (login-page G_)
   (let ((login-form `(form (@ (action "/login")
-                              (class ,(->css '(w-full rounded-xl
-                                                      bg-stone-200/50
-                                                      p-4
-                                                      flex
-                                                      flex-row
-                                                      flex-wrap
-                                                      items-center
-                                                      gap-4
-                                                      shadow-md)))
+                              (class ,(mk-class '(w-full rounded-xl
+                                                         bg-stone-200/50
+                                                         p-4
+                                                         flex
+                                                         flex-row
+                                                         flex-wrap
+                                                         items-center
+                                                         gap-4
+                                                         shadow-md)))
                               (method "POST"))
-                           ,(hyg-input #:label (G_ "username")
-                                       #:name "username"
-                                       #:value ""
-                                       #:required #t)
-                           ,(hyg-input #:label (G_ "password")
-                                       #:name "password"
-                                       #:type 'password
-                                       #:value ""
-                                       #:required #t)
-                           (div ,(hyg-submit-button (G_ "login"))))))
+                           ,(input #:label (G_ "username")
+                                   #:name "username"
+                                   #:value ""
+                                   #:required #t)
+                           ,(input #:label (G_ "password")
+                                   #:name "password"
+                                   #:type 'password
+                                   #:value ""
+                                   #:required #t)
+                           (div ,(submit-button (G_ "login"))))))
     (html-template G_
-                   #:body `(div (@ (class ,(->css '(container mx-auto))))
-                                ((div (@ (class ,(->css '(flex flex-col gap-8))))
-                                      ,(hyg-h2 (G_ "login to lucidplan"))
+                   #:body `(div (@ (class ,(mk-class '(container mx-auto))))
+                                ((div (@ (class ,(mk-class '(flex flex-col
+                                                                  gap-8))))
+                                      ,(h2 (G_ "login to lucidplan"))
                                       (div ,login-form)))))))
 

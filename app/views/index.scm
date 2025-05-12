@@ -21,10 +21,7 @@
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
-  #:use-module (hygguile components input)
-  #:use-module (hygguile abstraction)
-  #:use-module (hygguile components typography)
-  #:use-module (hygguile components button)
+  #:use-module (hygguile hygguile)
   #:use-module (ice-9 i18n)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun))
@@ -32,47 +29,48 @@
 (begin
   (define* (welcome-page G_
                          #:key is-logged-in)
-    (let ((project-logo `(((div (@ (class ,(->css '(bg-stone-200 rounded-2xl
-                                                                 p-4 shadow-md))))
+    (let ((project-logo `(((div (@ (class ,(mk-class '(bg-stone-200
+                                                       rounded-2xl p-4
+                                                       shadow-md))))
                                 (img (@ (loading lazy)
-                                        (class ,(->css '(w-64 h-auto
-                                                              rounded-2xl)))
+                                        (class ,(mk-class '(w-64 h-auto
+                                                                 rounded-2xl)))
                                         (src
                                          "https://jointhefreeworld.org/static-assets/lucidplan/img/logo.jpg"))))))))
       (html-template G_
                      #:is-logged-in #f
-                     #:body `(div (@ (class ,(->css '(container mx-auto))))
-                                  ,(hyg-h2 (G_ "welcome to lucidplan"))
-                                  ,(hyg-em (G_
-                                            "free and open project management for everyone"))
-                                  ((div (@ (class ,(->css '(flex flex-row
-                                                                 flex-wrap
-                                                                 gap-8 my-8))))
-                                        (div (@ (class ,(->css '(max-w-prose
-                                                                 bg-stone-200
-                                                                 rounded-2xl
-                                                                 p-4
-                                                                 shadow-md
-                                                                 flex
-                                                                 flex-col
-                                                                 gap-3))))
-                                             ,(hyg-p (G_
-                                                      "Take control of your projects with LucidPlan, the open and flexible project management solution built for teams of every shape and size."))
-                                             ,(hyg-p (G_
-                                                      "We believe powerful tools shouldn't be complicated or restricted. LucidPlan is designed to simplify workflows and make project management accessible to everyone.")))
+                     #:body `(div (@ (class ,(mk-class '(container mx-auto))))
+                                  ,(h2 (G_ "welcome to lucidplan"))
+                                  ,(em (G_
+                                        "free and open project management for everyone"))
+                                  ((div (@ (class ,(mk-class '(flex flex-row
+                                                                    flex-wrap
+                                                                    gap-8 my-8))))
+                                        (div (@ (class ,(mk-class '(max-w-prose
+                                                                    bg-stone-200
+                                                                    rounded-2xl
+                                                                    p-4
+                                                                    shadow-md
+                                                                    flex
+                                                                    flex-col
+                                                                    gap-3))))
+                                             ,(p (G_
+                                                  "Take control of your projects with LucidPlan, the open and flexible project management solution built for teams of every shape and size."))
+                                             ,(p (G_
+                                                  "We believe powerful tools shouldn't be complicated or restricted. LucidPlan is designed to simplify workflows and make project management accessible to everyone.")))
 
-                                        (div (@ (class ,(->css '(max-w-prose
-                                                                 bg-stone-200
-                                                                 rounded-2xl
-                                                                 p-4
-                                                                 shadow-md
-                                                                 flex
-                                                                 flex-col
-                                                                 gap-3))))
-                                             ,(hyg-p (G_
-                                                      "Discover how our fast-paced, no-nonsense workflows and deep customizability support Agile methodologies effectively."))
-                                             ,(hyg-p (G_
-                                                      "Built with the power of Lisp (Guile Scheme), LucidPlan offers a responsive and adaptable experience unlike those frustrating proprietary systems you might be used to.")))
+                                        (div (@ (class ,(mk-class '(max-w-prose
+                                                                    bg-stone-200
+                                                                    rounded-2xl
+                                                                    p-4
+                                                                    shadow-md
+                                                                    flex
+                                                                    flex-col
+                                                                    gap-3))))
+                                             ,(p (G_
+                                                  "Discover how our fast-paced, no-nonsense workflows and deep customizability support Agile methodologies effectively."))
+                                             ,(p (G_
+                                                  "Built with the power of Lisp (Guile Scheme), LucidPlan offers a responsive and adaptable experience unlike those frustrating proprietary systems you might be used to.")))
 
                                         (div ,project-logo)))))))
   (export welcome-page))

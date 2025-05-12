@@ -37,114 +37,112 @@
   #:use-module (artanis i18n locale)
   #:use-module (ice-9 i18n)
   #:use-module (lucidplan query-escape)
-  #:use-module (hygguile components button)
-  #:use-module (hygguile components input)
-  #:use-module (hygguile components icon)
-  #:use-module (hygguile abstraction)
+  #:use-module (hygguile hygguile)
   #:use-module (artanis security nss)
   #:use-module (artanis route))
 
 (define (render-project G_ p)
-  `((div (@ (class ,(->css '(flex flex-col
-                                  gap-2
-                                  px-3
-                                  py-6
-                                  bg-stone-100
-                                  rounded-2xl
-                                  border-stone-400/75
-                                  border-2))))
+  `((div (@ (class ,(mk-class '(flex flex-col
+                                     gap-2
+                                     px-3
+                                     py-6
+                                     bg-stone-100
+                                     rounded-2xl
+                                     border-stone-400/75
+                                     border-2))))
          ,(render-if-nestring (lambda (x)
-                                `(p (@ (class ,(->css '(text-md py-3
-                                                        text-stone-800
-                                                        whitespace-pre-wrap
-                                                        font-medium))))
+                                `(p (@ (class ,(mk-class '(text-md py-3
+                                                           text-stone-800
+                                                           whitespace-pre-wrap
+                                                           font-medium))))
                                     ,x))
                               (org-to-html (unescape-str (assoc-ref p
                                                           "description"))))
          (hr)
-         (div (@ (class ,(->css '(flex flex-wrap flex-row gap-3))))
+         (div (@ (class ,(mk-class '(flex flex-wrap flex-row gap-3))))
               (a (@ (href ,(format #f "/tickets/~a"
                                    (assoc-ref p "human_id"))))
-                 ,(hyg-icon-button #:icon 'scroll
-                                   #:content (format #f "backlog: ~a"
-                                                     (assoc-ref p "title"))))
+                 ,(icon-button #:icon 'scroll
+                               #:content (format #f "backlog: ~a"
+                                                 (assoc-ref p "title"))))
               (a (@ (class "text-stone-800")
                     (href ,(format #f "/kanban/~a"
                                    (assoc-ref p "human_id"))))
-                 ,(hyg-icon-button #:icon 'kanban
-                                   #:content (format #f "kanban: ~a"
-                                                     (assoc-ref p "title"))))
+                 ,(icon-button #:icon 'kanban
+                               #:content (format #f "kanban: ~a"
+                                                 (assoc-ref p "title"))))
               ,(render-if-nestring (lambda (x)
-                                     `(a (@ (class ,(->css '(text-stone-800)))
+                                     `(a (@ (class ,(mk-class '(text-stone-800)))
                                             (href ,x))
-                                         ,(hyg-icon-button #:icon 'link
-                                                           #:content (G_
-                                                                      "view live"))))
+                                         ,(icon-button #:icon 'link
+                                                       #:content (G_
+                                                                  "view live"))))
                                    (assoc-ref p "url"))
               ,(render-if-nestring (lambda (x)
-                                     `(a (@ (class ,(->css '(text-stone-800)))
+                                     `(a (@ (class ,(mk-class '(text-stone-800)))
                                             (href ,x))
-                                         ,(hyg-icon-button #:icon 'link
-                                                           #:content (G_
-                                                                      "project code"))))
+                                         ,(icon-button #:icon 'link
+                                                       #:content (G_
+                                                                  "project code"))))
                                    (assoc-ref p "vcs_url")))
-         (hr (@ (class ,(->css '(my-3)))))
-         (div (@ (class ,(->css '(flex flex-wrap flex-row gap-4))))
+         (hr (@ (class ,(mk-class '(my-3)))))
+         (div (@ (class ,(mk-class '(flex flex-wrap flex-row gap-4))))
               (a (@ (href ,(format #f "/projects/~a/edit"
                                    (assoc-ref p "human_id"))))
-                 ,(hyg-button `(span (@ (class ,(->css '(items-center flex
-                                                         flex-row gap-1))))
-                                     ((i (@ (class ,(->css '(ph ph-pencil
-                                                                text-white
-                                                                text-xl)))) ""))
-                                     (span ,(G_ "edit project")))))
+                 ,(button `(span (@ (class ,(mk-class '(items-center flex
+                                                                     flex-row
+                                                                     gap-1))))
+                                 ((i (@ (class ,(mk-class '(ph ph-pencil
+                                                               text-white
+                                                               text-xl)))) ""))
+                                 (span ,(G_ "edit project")))))
               (form (@ (enctype "application/x-www-form-urlencoded")
                        (method "POST")
                        (action "/projects/delete"))
                     (input (@ (name "id")
                               (hidden "")
                               (value ,(assoc-ref p "id"))) "")
-                    ,(hyg-danger-submit-button `(span (@ (class ,(->css '(items-center
-                                                                          flex
-                                                                          flex-row
-                                                                          gap-1))))
-                                                      ,(hyg-icon #:type 'trash
-                                                                 #:icon-css '(text-white
-                                                                              text-xl))
-                                                      ,(G_ "delete")))))
-         (small (@ (class ,(->css '(font-mono text-stone-600))))
+                    ,(danger-submit-button `(span (@ (class ,(mk-class '(items-center
+                                                                         flex
+                                                                         flex-row
+                                                                         gap-1))))
+                                                  ,(icon #:type 'trash
+                                                         #:icon-css '(text-white
+                                                                      text-xl))
+                                                  ,(G_ "delete")))))
+         (small (@ (class ,(mk-class '(font-mono text-stone-600))))
                 ,(format #f "~a"
                          (assoc-ref p "human_id")))
-         (small (@ (class ,(->css '(font-mono text-stone-600 text-xs))))
+         (small (@ (class ,(mk-class '(font-mono text-stone-600 text-xs))))
                 ,(assoc-ref p "id")))))
 
 (define (render-project-list-item G_ p)
-  `((div (@ (class ,(->css '(flex flex-row
-                                  flex-wrap
-                                  gap-4
-                                  items-center
-                                  justify-left
-                                  bg-stone-300/75
-                                  border-stone-400/75
-                                  border-2
-                                  py-2
-                                  px-4
-                                  cursor-pointer
-                                  rounded-xl
-                                  shadow)))
+  `((div (@ (class ,(mk-class '(flex flex-row
+                                     flex-wrap
+                                     gap-4
+                                     items-center
+                                     justify-left
+                                     bg-stone-300/75
+                                     border-stone-400/75
+                                     border-2
+                                     py-2
+                                     px-4
+                                     cursor-pointer
+                                     rounded-xl
+                                     shadow)))
             (onclick ,(format #f
                        "document.getElementById('details-~a').toggleAttribute('hidden')"
                        (assoc-ref p "id"))))
 
-         (h3 (@ (class ,(->css '(flex flex-row items-center gap-2 truncate))))
-             ,(hyg-icon #:type 'list
-                        #:icon-css '(text-stone-500 text-lg))
-             (span (@ (class ,(->css '(font-sans text-stone-700 text-lg
-                                                 font-black break-words))))
+         (h3 (@ (class ,(mk-class '(flex flex-row items-center gap-2 truncate))))
+             ,(icon #:type 'list
+                    #:icon-css '(text-stone-500 text-lg))
+             (span (@ (class ,(mk-class '(font-sans text-stone-700 text-lg
+                                                    font-black break-words))))
                    ,(format #f "~a"
                             (assoc-ref p "title"))))
-         (p (@ (class ,(->css '(font-sans text-stone-600 text-sm break-words
-                                          truncate))))
+         (p (@ (class ,(mk-class '(font-sans text-stone-600 text-sm
+                                             break-words truncate))))
             ,(org-to-html (unescape-str (assoc-ref p "description")))))
     (div (@ (id ,(format #f "details-~a"
                          (assoc-ref p "id")))
@@ -155,45 +153,45 @@
 (begin
   (define* (html-from-projects G_
                                #:key projects is-logged-in search-query)
-    (let* ((tit `((div (@ (class ,(->css '(flex flex-row
-                                                justify-between
-                                                flex-wrap
-                                                items-center
-                                                gap-1
-                                                my-3))))
-                       (div (@ (class ,(->css '(flex flex-row items-center
-                                                     gap-1))))
-                            ,(hyg-icon #:type 'align-bottom
-                                       #:icon-css '(text-stone-800 text-2xl))
-                            (h2 (@ (class ,(->css '(text-3xl font-sans
-                                                             font-bold
-                                                             text-stone-700))))
+    (let* ((tit `((div (@ (class ,(mk-class '(flex flex-row
+                                                   justify-between
+                                                   flex-wrap
+                                                   items-center
+                                                   gap-1
+                                                   my-3))))
+                       (div (@ (class ,(mk-class '(flex flex-row items-center
+                                                        gap-1))))
+                            ,(icon #:type 'align-bottom
+                                   #:icon-css '(text-stone-800 text-2xl))
+                            (h2 (@ (class ,(mk-class '(text-3xl font-sans
+                                                       font-bold
+                                                       text-stone-700))))
                                 ,(G_ "projects")))
                        (div (a (@ (href "/projects/new"))
-                               ,(hyg-icon-button #:icon 'plus
-                                                 #:content (G_ "new project"))))))))
+                               ,(icon-button #:icon 'plus
+                                             #:content (G_ "new project"))))))))
       (html-template G_
                      #:is-logged-in is-logged-in
-                     #:body `((div (@ (class ,(->css '(container mx-auto))))
-                                   ((div (@ (class ,(->css '(flex flex-col
-                                                                  gap-4
-                                                                  flex-grow))))
+                     #:body `((div (@ (class ,(mk-class '(container mx-auto))))
+                                   ((div (@ (class ,(mk-class '(flex flex-col
+                                                                gap-4
+                                                                flex-grow))))
                                          ,tit
 
-                                         (div (@ (class ,(->css '(flex
-                                                                  flex-row
-                                                                  flex-wrap
-                                                                  justify-end))))
+                                         (div (@ (class ,(mk-class '(flex
+                                                                     flex-row
+                                                                     flex-wrap
+                                                                     justify-end))))
                                               ,(search-box G_
                                                            #:search-query
                                                            search-query))
 
                                          (div (@ (id lucidplan-projects-list)
-                                                 (class ,(->css '(flex
-                                                                  flex-col
-                                                                  gap-2
-                                                                  container
-                                                                  my-3))))
+                                                 (class ,(mk-class '(flex
+                                                                     flex-col
+                                                                     gap-2
+                                                                     container
+                                                                     my-3))))
                                               ,(map (lambda (x)
                                                       (render-project-list-item
                                                        G_ x)) projects))))))
@@ -239,38 +237,35 @@
                             (is-logged-in #f))
   (html-template G_
                  #:is-logged-in is-logged-in
-                 #:body `(div (@ (class ,(->css '(container mx-auto))))
-                              (div (form (@ (class ,(->css '(flex flex-col
-                                                                  gap-4)))
+                 #:body `(div (@ (class ,(mk-class '(container mx-auto))))
+                              (div (form (@ (class ,(mk-class '(flex flex-col
+                                                                     gap-4)))
                                             (enctype
                                              "application/x-www-form-urlencoded")
                                             (method POST)
                                             (action ,action))
-                                         ,(hyg-input #:label (G_ "title")
-                                                     #:name "title"
-                                                     #:value (unescape-str
-                                                              title)
-                                                     #:required #t)
-                                         ,(hyg-input #:label (G_ "human id")
-                                                     #:name "human-id"
-                                                     #:value human-id
-                                                     #:required #t)
-                                         ,(hyg-input #:label (G_
-                                                              "homepage url")
-                                                     #:name "url"
-                                                     #:value url
-                                                     #:required #f)
-                                         ,(hyg-input #:label (G_
-                                                              "version control url")
-                                                     #:name "vcs-url"
-                                                     #:value vcs-url
-                                                     #:required #f)
-                                         ,(hyg-textarea #:label (G_
-                                                                 "description")
-                                                        #:name "description"
-                                                        #:value (unescape-str
-                                                                 description)
-                                                        #:required #f)
+                                         ,(input #:label (G_ "title")
+                                                 #:name "title"
+                                                 #:value (unescape-str title)
+                                                 #:required #t)
+                                         ,(input #:label (G_ "human id")
+                                                 #:name "human-id"
+                                                 #:value human-id
+                                                 #:required #t)
+                                         ,(input #:label (G_ "homepage url")
+                                                 #:name "url"
+                                                 #:value url
+                                                 #:required #f)
+                                         ,(input #:label (G_
+                                                          "version control url")
+                                                 #:name "vcs-url"
+                                                 #:value vcs-url
+                                                 #:required #f)
+                                         ,(textarea #:label (G_ "description")
+                                                    #:name "description"
+                                                    #:value (unescape-str
+                                                             description)
+                                                    #:required #f)
 
-                                         (div ,(hyg-submit-button (G_ "submit"))))))
+                                         (div ,(submit-button (G_ "submit"))))))
                  #:proj projects))
