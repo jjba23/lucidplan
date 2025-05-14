@@ -48,12 +48,17 @@
                                      gap-2
                                      p-3
                                      bg-stone-100
+                                     dark:bg-stone-900
                                      rounded-2xl
                                      border-stone-400/75
                                      border-2))))
          (div (@ (class ,(mk-class '(flex flex-row justify-between))))
-              (h4 (@ (class ,(mk-class '(font-sans text-stone-700 text-2xl
-                                                   font-bold break-words my-3))))
+              (h4 (@ (class ,(mk-class '(font-sans text-stone-700
+                                                   dark:text-stone-200
+                                                   text-2xl
+                                                   font-bold
+                                                   break-words
+                                                   my-3))))
                   ,(org-to-html (assoc-ref ticket "title")))
               (div (@ (class ,(mk-class '(flex justify-right))))
                    (span (@ (class ,(mk-class '(cursor-pointer)))
@@ -121,13 +126,9 @@
          (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-4))))
               (a (@ (href ,(format #f "/tickets/~a/~a/edit" project
                                    (assoc-ref ticket "human_id"))))
-                 ,(button `(span (@ (class ,(mk-class '(items-center flex
-                                                                     flex-row
-                                                                     gap-1))))
-                                 ((i (@ (class ,(mk-class '(ph ph-pencil
-                                                               text-white
-                                                               text-xl)))) ""))
-                                 (G_ "edit ticket"))))
+
+                 ,(icon-button #:icon 'pencil
+                               #:content (G_ "edit ticket")))
               (form (@ (enctype application/x-www-form-urlencoded)
                        (method POST)
                        (action ,(format #f "/tickets/~a/delete" project)))
@@ -138,11 +139,10 @@
                                                                          flex
                                                                          flex-row
                                                                          gap-1))))
-                                                  ((i (@ (class ,(mk-class '(ph
-                                                                             ph-trash
-                                                                             text-white
-                                                                             text-xl))))
-                                                      ""))
+                                                  (,(icon #:type 'trash
+                                                          #:icon-css '(text-stone-300
+                                                                       dark:text-stone-300
+                                                                       text-lg)))
                                                   ,(G_ "delete")))))
 
          )))
@@ -159,6 +159,7 @@
                                           items-center
                                           justify-left
                                           bg-stone-300/75
+                                          dark:bg-stone-700/75
                                           border-stone-400/75
                                           border-2
                                           py-2
@@ -167,18 +168,20 @@
                                           cursor-pointer
                                           rounded-xl))))
               ,(emoji-for-ticket-type (assoc-ref ticket "ticket_type"))
-              (small (@ (class ,(mk-class '(font-sans text-stone-600 text-xs
-                                                      hidden md:flex))))
+              (small (@ (class ,(mk-class '(font-sans text-stone-600
+                                                      dark:text-stone-400
+                                                      text-xs hidden md:flex))))
                      ,(format #f "~a-~a" project
                               (assoc-ref ticket "human_id")))
-              (h5 (@ (class ,(mk-class '(font-sans text-stone-700 text-md
+              (h5 (@ (class ,(mk-class '(font-sans text-stone-700
+                                                   dark:text-stone-300 text-md
                                                    font-black break-words))))
                   ,(org-to-html (assoc-ref ticket "title")))
               (div (a (@ (href ,(format #f "/tickets/~a/~a" project
                                         (assoc-ref ticket "human_id"))))
-                      (span ((i (@ (class ,(mk-class '(ph ph-link
-                                                          text-stone-600))))
-                                ""))))))
+                      ,(icon #:type 'list
+                             #:icon-css '(text-stone-500 dark:text-stone-400
+                                                         text-lg)))))
          (div (@ (id ,(format #f "details-~a"
                               (assoc-ref ticket "id")))
                  (class "ml-4")
