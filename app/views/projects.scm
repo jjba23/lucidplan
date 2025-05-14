@@ -31,7 +31,6 @@
   #:use-module (ice-9 threads)
   #:use-module (lucidplan html)
   #:use-module (artanis artanis)
-  #:use-module (orgwebalchemy org-to-html)
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
@@ -53,13 +52,13 @@
                                      border-2))))
          ,(render-if-nestring (lambda (x)
                                 `(p (@ (class ,(mk-class '(text-md py-3
-                                                                   text-stone-800
-                                                                   dark:text-stone-200
-                                                                   whitespace-pre-wrap
-                                                                   font-medium))))
+                                                           text-stone-800
+                                                           dark:text-stone-200
+                                                           whitespace-pre-wrap
+                                                           font-medium))))
                                     ,x))
-                              (org-to-html (unescape-str (assoc-ref p
-                                                                    "description"))))
+                              (org2html (unescape-str (assoc-ref p
+                                                       "description"))))
          ,(hr)
          (div (@ (class ,(mk-class '(flex flex-wrap flex-row gap-3))))
               (a (@ (href ,(format #f "/tickets/~a"
@@ -124,7 +123,7 @@
                                      items-center
                                      justify-left
                                      bg-stone-300/75
-                                     dark:bg-stone-700/75
+                                     dark:bg-stone-800/75
                                      border-stone-400/75
                                      border-2
                                      py-2
@@ -148,7 +147,7 @@
          (p (@ (class ,(mk-class '(font-sans text-stone-600
                                              dark:text-stone-400 text-sm
                                              break-words truncate))))
-            ,(org-to-html (unescape-str (assoc-ref p "description")))))
+            ,(org2html (unescape-str (assoc-ref p "description")))))
     (div (@ (id ,(format #f "details-~a"
                          (assoc-ref p "id")))
             (class "")
@@ -169,11 +168,7 @@
                             ,(icon #:type 'align-bottom
                                    #:icon-css '(text-stone-800
                                                 dark:text-stone-200 text-2xl))
-                            (h2 (@ (class ,(mk-class '(text-3xl font-sans
-                                                       font-bold
-                                                       text-stone-700
-                                                       dark:text-stone-200))))
-                                ,(G_ "projects")))
+                            ,(h2 (G_ "projects")))
                        (div (a (@ (href "/projects/new"))
                                ,(icon-button #:icon 'plus
                                              #:content (G_ "new project"))))))))

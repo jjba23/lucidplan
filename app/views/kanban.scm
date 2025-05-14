@@ -32,7 +32,6 @@
   #:use-module (ice-9 regex)
   #:use-module (artanis artanis)
   #:use-module (artanis i18n)
-  #:use-module (orgwebalchemy org-to-html)
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
   #:use-module (ice-9 i18n)
@@ -52,7 +51,7 @@
                         ,(emoji-for-ticket-type (assoc-ref t "ticket_type"))
                         (p (@ (class ,(mk-class '(text-sm text-stone-700 flex
                                                           flex-row gap-2))))
-                           (span ,(org-to-html (assoc-ref t "title")))))
+                           (span ,(org2html (assoc-ref t "title")))))
 
                    (a (@ (class ,(mk-class '(text-xs)))
                          (href ,(format #f "/tickets/~a/~a" project

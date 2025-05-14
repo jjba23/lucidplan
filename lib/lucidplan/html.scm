@@ -35,6 +35,7 @@
   #:use-module (kracht prelude)
   #:use-module (artanis i18n locale)
   #:use-module (ice-9 textual-ports)
+  #:use-module (orgwebalchemy org-to-html)
   #:use-module (artanis route))
 
 (define-public asset-library
@@ -118,8 +119,9 @@
                             `(option (@ (value ,(format #f "/tickets/~a"
                                                         (assoc-ref p
                                                                    "human_id")))
-                                        (class
-                                          ,(mk-class '(text-sm font-light lowercase text-stone-800))))
+                                        (class ,(mk-class '(text-sm font-light
+                                                            lowercase
+                                                            text-stone-800))))
                                      ,(assoc-ref p "title"))) proj))))
     `("<!DOCTYPE html>" (html (@ (lang en))
                               (head (title "LucidPlan")
@@ -128,7 +130,7 @@
                                     (style ,(assoc-ref asset-library
                                                        "pub/css/phosphor.css"))
                                     (style (@ (type "text/tailwindcss"))
-                                      "
+                                     "
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @theme {
@@ -151,11 +153,11 @@
                                                                              justify-between
                                                                              min-h-96))))
                                                                 (div (@ (class ,
-                                                                          (mk-class '
-                                                                           (flex
-                                                                            flex-col
-                                                                            gap-8
-                                                                            justify-start))))
+                                                                         (mk-class '
+                                                                          (flex
+                                                                           flex-col
+                                                                           gap-8
+                                                                           justify-start))))
                                                                      ,nav
                                                                      ,body)))
                                                   #:footer (page-footer G_))
@@ -168,31 +170,38 @@
 (define-public (emoji-for-ticket-status ticket-status)
   (cond
     ((equal? "todo" ticket-status)
-     `((i (@ (class ,(mk-class '(ph ph-anchor text-stone-600 text-xl)))) "")))
+     `((i (@ (class ,(mk-class '(ph ph-anchor text-stone-600
+                                    dark:text-stone-300 text-xl)))) "")))
     ((equal? "work-in-progress" ticket-status)
      `((i (@ (class ,(mk-class '(ph ph-gear-fine text-stone-600 text-xl)))) "")))
     ((equal? "in-review" ticket-status)
      `((i (@ (class ,(mk-class '(ph ph-list-magnifying-glass text-stone-600
-                                    text-xl)))) "")))
+                                    dark:text-stone-300 text-xl)))) "")))
     ((equal? "done" ticket-status)
-     `((i (@ (class ,(mk-class '(ph ph-check text-stone-600 text-xl)))) "")))
+     `((i (@ (class ,(mk-class '(ph ph-check text-stone-600
+                                    dark:text-stone-300 text-xl)))) "")))
     ((equal? "rejected" ticket-status)
-     `((i (@ (class ,(mk-class '(ph ph-x text-stone-600 text-xl)))) "")))
+     `((i (@ (class ,(mk-class '(ph ph-x text-stone-600 dark:text-stone-300
+                                    text-xl)))) "")))
     (else "")))
 
 (define-public (emoji-for-ticket-type ticket-type)
   (cond
     ((equal? "task" ticket-type)
-     `((i (@ (class ,(mk-class '(ph ph-gear-fine text-stone-600 text-xl)))) "")))
+     `((i (@ (class ,(mk-class '(ph ph-gear-fine text-stone-600
+                                    dark:text-stone-300 text-xl)))) "")))
     ((equal? "bug" ticket-type)
-     `((i (@ (class ,(mk-class '(ph ph-bug text-stone-600 text-xl)))) "")))
+     `((i (@ (class ,(mk-class '(ph ph-bug text-stone-600 dark:text-stone-300
+                                    text-xl)))) "")))
     ((equal? "story" ticket-type)
-     `((i (@ (class ,(mk-class '(ph ph-book-open-text text-stone-600 text-xl))))
-          "")))
+     `((i (@ (class ,(mk-class '(ph ph-book-open-text text-stone-600
+                                    dark:text-stone-300 text-xl)))) "")))
     ((equal? "spike" ticket-type)
-     `((i (@ (class ,(mk-class '(ph ph-flask text-stone-600 text-xl)))) "")))
+     `((i (@ (class ,(mk-class '(ph ph-flask text-stone-600
+                                    dark:text-stone-300 text-xl)))) "")))
     ((equal? "time-box" ticket-type)
-     `((i (@ (class ,(mk-class '(ph ph-clock text-stone-600 text-xl)))) "")))
+     `((i (@ (class ,(mk-class '(ph ph-clock text-stone-600
+                                    dark:text-stone-300 text-xl)))) "")))
     (else "")))
 
 (begin
@@ -228,14 +237,18 @@ function addSearchQueryParam(form) {
                       ,(input #:label ""
                               #:name "search"
                               #:value (cond
-                                       ((equal? #f search-query)
-                                        "")
-                                       (else search-query))
+                                        ((equal? #f search-query)
+                                         "")
+                                        (else search-query))
                               #:placeholder (G_ "Search...")
-                              #:input-css '(p-3 max-w-prose rounded-xl border-stone-200 dark:border-stone-700
+                              #:input-css '(p-3 max-w-prose
+                                                rounded-xl
+                                                border-stone-200
+                                                dark:border-stone-700
                                                 dark:text-stone-300
                                                 dark:bg-stone-700/75
-                                                border-2 shadow-md)
+                                                border-2
+                                                shadow-md)
                               #:input-flex-css #f)
                       ,(submit-button (G_ "search")))))))
   (export search-box))
@@ -277,3 +290,24 @@ function addSearchQueryParam(form) {
 
                            ))))))
   (export sort-select))
+
+(begin
+  (define (org2html org)
+    (org-to-html org
+                 #:link-classes '(text-blue-800 font-bold)
+                 #:code-block-classes '(bg-stone-300/75 dark:bg-stone-700/75
+                                                        text-stone-800
+                                                        dark:text-stone-200
+                                                        rounded-lg
+                                                        my-3
+                                                        py-2
+                                                        px-3
+                                                        whitespace-pre
+                                                        overflow-x-scroll)
+                 #:code-classes '(rounded-lg bg-stone-300/75
+                                             dark:bg-stone-700/75
+                                             text-stone-800
+                                             px-2
+                                             py-1
+                                             dark:text-stone-200)))
+  (export org2html))
