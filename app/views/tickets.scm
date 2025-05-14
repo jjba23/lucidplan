@@ -47,8 +47,8 @@
   `((div (@ (class ,(mk-class '(flex flex-col
                                      gap-2
                                      p-3
-                                     bg-stone-100
-                                     dark:bg-stone-900
+                                     bg-stone-200
+                                     dark:bg-stone-800
                                      rounded-2xl
                                      border-stone-400/75
                                      border-2))))
@@ -63,43 +63,44 @@
               (div (@ (class ,(mk-class '(flex justify-right))))
                    (span (@ (class ,(mk-class '(cursor-pointer)))
                             (onclick ,(format #f
-                                       "document.getElementById('details-~a').toggleAttribute('hidden')"
-                                       (assoc-ref ticket "id"))))
+                                              "document.getElementById('details-~a').toggleAttribute('hidden')"
+                                              (assoc-ref ticket "id"))))
                          ,(icon #:type 'x
-                                #:icon-css '(text-stone-800 text-xl)))))
+                                #:icon-css '(text-stone-800 dark:text-stone-200 text-xl)))))
 
          (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-8
                                           justify-left))))
 
               (div (@ (class ,(mk-class '(flex flex-col gap-3))))
-                   (small (@ (class ,(mk-class '(font-sans text-stone-500
+                   (small (@ (class ,(mk-class '(font-sans text-stone-500 dark:text-stone-300 
                                                            text-md font-light))))
                           ,(G_ "status"))
                    (p (@ (class ,(mk-class '(flex gap-2 items-center))))
                       (span (@ (class "text-2xl"))
                             ,(emoji-for-ticket-status (assoc-ref ticket
-                                                       "ticket_status")))
-                      (span (@ (class ,(mk-class '(font-sans text-stone-700
+                                                                 "ticket_status")))
+                      (span (@ (class ,(mk-class '(font-sans text-stone-700 dark:text-stone-300
                                                              text-sm))))
                             ,(assoc-ref ticket "ticket_status"))))
 
               (div (@ (class ,(mk-class '(flex flex-col gap-3))))
-                   (small (@ (class ,(mk-class '(font-sans text-stone-500
+                   (small (@ (class ,(mk-class '(font-sans text-stone-500 dark:text-stone-400
                                                            text-md font-light))))
                           ,(G_ "type"))
                    (p (@ (class ,(mk-class '(ml-4 flex gap-2 items-center))))
                       (span (@ (class "text-2xl"))
                             ,(emoji-for-ticket-type (assoc-ref ticket
                                                                "ticket_type")))
-                      (span (@ (class ,(mk-class '(font-sans text-stone-700
+                      (span (@ (class ,(mk-class '(font-sans text-stone-700 dark:text-stone-300
                                                              text-sm))))
                             ,(assoc-ref ticket "ticket_type")))))
 
-         (small (@ (class ,(mk-class '(font-sans text-stone-500 text-md
+         (small (@ (class ,(mk-class '(font-sans text-stone-500 dark:text-stone-300 text-md
                                                  font-light))))
                 ,(G_ "description"))
          (span (@ (class ,(mk-class '(text-md py-3
                                               text-stone-800
+                                              dark:text-stone-300
                                               font-medium
                                               font-sans
                                               max-w-prose
@@ -107,22 +108,22 @@
                                               ml-4))))
                ,(org-to-html (assoc-ref ticket "description")))
 
-         (hr (@ (class "")))
+         ,(hr)
 
-         (small (@ (class ,(mk-class '(font-sans text-stone-500 text-md
+         (small (@ (class ,(mk-class '(font-sans text-stone-500 dark:text-stone-300 text-md
                                                  font-light))))
                 ,(G_ "human id"))
-         (small (@ (class ,(mk-class '(font-sans text-stone-600 text-md ml-4))))
+         (small (@ (class ,(mk-class '(font-sans text-stone-600 dark:text-stone-400 text-md ml-4))))
                 ,(format #f "~a-~s" project
                          (assoc-ref ticket "human_id")))
 
-         (small (@ (class ,(mk-class '(font-sans text-stone-500 text-md
+         (small (@ (class ,(mk-class '(font-sans text-stone-500 dark:text-stone-400 text-md
                                                  font-light))))
                 ,(G_ "id"))
-         (small (@ (class ,(mk-class '(font-sans text-stone-600 text-md ml-4))))
+         (small (@ (class ,(mk-class '(font-sans text-stone-600 dark:text-stone-400 text-md ml-4))))
                 ,(assoc-ref ticket "id"))
 
-         (hr)
+         ,(hr)
          (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-4))))
               (a (@ (href ,(format #f "/tickets/~a/~a/edit" project
                                    (assoc-ref ticket "human_id"))))

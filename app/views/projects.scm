@@ -46,20 +46,20 @@
                                      gap-2
                                      px-3
                                      py-6
-                                     bg-stone-100
-                                     dark:bg-stone-900
+                                     bg-stone-200
+                                     dark:bg-stone-800
                                      rounded-2xl
                                      border-stone-400/75
                                      border-2))))
          ,(render-if-nestring (lambda (x)
                                 `(p (@ (class ,(mk-class '(text-md py-3
-                                                           text-stone-800
-                                                           dark:text-stone-200
-                                                           whitespace-pre-wrap
-                                                           font-medium))))
+                                                                   text-stone-800
+                                                                   dark:text-stone-200
+                                                                   whitespace-pre-wrap
+                                                                   font-medium))))
                                     ,x))
                               (org-to-html (unescape-str (assoc-ref p
-                                                          "description"))))
+                                                                    "description"))))
          ,(hr)
          (div (@ (class ,(mk-class '(flex flex-wrap flex-row gap-3))))
               (a (@ (href ,(format #f "/tickets/~a"

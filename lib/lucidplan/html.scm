@@ -119,7 +119,7 @@
                                                         (assoc-ref p
                                                                    "human_id")))
                                         (class
-                                         "text-sm font-light lowercase text-stone-800"))
+                                          ,(mk-class '(text-sm font-light lowercase text-stone-800))))
                                      ,(assoc-ref p "title"))) proj))))
     `("<!DOCTYPE html>" (html (@ (lang en))
                               (head (title "LucidPlan")
@@ -128,7 +128,7 @@
                                     (style ,(assoc-ref asset-library
                                                        "pub/css/phosphor.css"))
                                     (style (@ (type "text/tailwindcss"))
-                                     "
+                                      "
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @theme {
@@ -151,11 +151,11 @@
                                                                              justify-between
                                                                              min-h-96))))
                                                                 (div (@ (class ,
-                                                                         (mk-class '
-                                                                          (flex
-                                                                           flex-col
-                                                                           gap-8
-                                                                           justify-start))))
+                                                                          (mk-class '
+                                                                           (flex
+                                                                            flex-col
+                                                                            gap-8
+                                                                            justify-start))))
                                                                      ,nav
                                                                      ,body)))
                                                   #:footer (page-footer G_))
@@ -228,13 +228,14 @@ function addSearchQueryParam(form) {
                       ,(input #:label ""
                               #:name "search"
                               #:value (cond
-                                        ((equal? #f search-query)
-                                         "")
-                                        (else search-query))
+                                       ((equal? #f search-query)
+                                        "")
+                                       (else search-query))
                               #:placeholder (G_ "Search...")
-                              #:input-css '(p-2 max-w-prose rounded-xl
-                                                border-stone-200 border-2
-                                                shadow-md)
+                              #:input-css '(p-3 max-w-prose rounded-xl border-stone-200 dark:border-stone-700
+                                                dark:text-stone-300
+                                                dark:bg-stone-700/75
+                                                border-2 shadow-md)
                               #:input-flex-css #f)
                       ,(submit-button (G_ "search")))))))
   (export search-box))
