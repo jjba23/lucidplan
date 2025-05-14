@@ -30,6 +30,7 @@
   (define* (welcome-page G_
                          #:key is-logged-in)
     (let ((project-logo `(((div (@ (class ,(mk-class '(bg-stone-200
+                                                       dark:bg-stone-900
                                                        rounded-2xl p-4
                                                        shadow-md))))
                                 (img (@ (loading lazy)
@@ -48,6 +49,7 @@
                                                                     gap-8 my-8))))
                                         (div (@ (class ,(mk-class '(max-w-prose
                                                                     bg-stone-200
+                                                                    dark:bg-stone-900
                                                                     rounded-2xl
                                                                     p-4
                                                                     shadow-md
@@ -61,6 +63,7 @@
 
                                         (div (@ (class ,(mk-class '(max-w-prose
                                                                     bg-stone-200
+                                                                    dark:bg-stone-900
                                                                     rounded-2xl
                                                                     p-4
                                                                     shadow-md

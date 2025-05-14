@@ -46,40 +46,44 @@
                                      gap-2
                                      px-3
                                      py-6
-                                     bg-stone-100
+                                     bg-stone-200
+                                     dark:bg-stone-800
                                      rounded-2xl
                                      border-stone-400/75
                                      border-2))))
          ,(render-if-nestring (lambda (x)
                                 `(p (@ (class ,(mk-class '(text-md py-3
-                                                           text-stone-800
-                                                           whitespace-pre-wrap
-                                                           font-medium))))
+                                                                   text-stone-800
+                                                                   dark:text-stone-200
+                                                                   whitespace-pre-wrap
+                                                                   font-medium))))
                                     ,x))
                               (org-to-html (unescape-str (assoc-ref p
-                                                          "description"))))
-         (hr)
+                                                                    "description"))))
+         ,(hr)
          (div (@ (class ,(mk-class '(flex flex-wrap flex-row gap-3))))
               (a (@ (href ,(format #f "/tickets/~a"
                                    (assoc-ref p "human_id"))))
                  ,(icon-button #:icon 'scroll
                                #:content (format #f "backlog: ~a"
                                                  (assoc-ref p "title"))))
-              (a (@ (class "text-stone-800")
+              (a (@ (class ,(mk-class '(text-stone-800 dark:text-stone-200)))
                     (href ,(format #f "/kanban/~a"
                                    (assoc-ref p "human_id"))))
                  ,(icon-button #:icon 'kanban
                                #:content (format #f "kanban: ~a"
                                                  (assoc-ref p "title"))))
               ,(render-if-nestring (lambda (x)
-                                     `(a (@ (class ,(mk-class '(text-stone-800)))
+                                     `(a (@ (class ,(mk-class '(text-stone-800
+                                                                dark:text-stone-200)))
                                             (href ,x))
                                          ,(icon-button #:icon 'link
                                                        #:content (G_
                                                                   "view live"))))
                                    (assoc-ref p "url"))
               ,(render-if-nestring (lambda (x)
-                                     `(a (@ (class ,(mk-class '(text-stone-800)))
+                                     `(a (@ (class ,(mk-class '(text-stone-800
+                                                                dark:text-stone-200)))
                                             (href ,x))
                                          ,(icon-button #:icon 'link
                                                        #:content (G_
@@ -89,13 +93,8 @@
          (div (@ (class ,(mk-class '(flex flex-wrap flex-row gap-4))))
               (a (@ (href ,(format #f "/projects/~a/edit"
                                    (assoc-ref p "human_id"))))
-                 ,(button `(span (@ (class ,(mk-class '(items-center flex
-                                                                     flex-row
-                                                                     gap-1))))
-                                 ((i (@ (class ,(mk-class '(ph ph-pencil
-                                                               text-white
-                                                               text-xl)))) ""))
-                                 (span ,(G_ "edit project")))))
+                 ,(icon-button #:icon 'pencil
+                               #:content (G_ "edit project")))
               (form (@ (enctype "application/x-www-form-urlencoded")
                        (method "POST")
                        (action "/projects/delete"))
@@ -110,10 +109,12 @@
                                                          #:icon-css '(text-white
                                                                       text-xl))
                                                   ,(G_ "delete")))))
-         (small (@ (class ,(mk-class '(font-mono text-stone-600))))
+         (small (@ (class ,(mk-class '(font-mono text-stone-600
+                                                 dark:text-stone-400))))
                 ,(format #f "~a"
                          (assoc-ref p "human_id")))
-         (small (@ (class ,(mk-class '(font-mono text-stone-600 text-xs))))
+         (small (@ (class ,(mk-class '(font-mono text-stone-600
+                                                 dark:text-stone-400 text-xs))))
                 ,(assoc-ref p "id")))))
 
 (define (render-project-list-item G_ p)
@@ -123,6 +124,7 @@
                                      items-center
                                      justify-left
                                      bg-stone-300/75
+                                     dark:bg-stone-700/75
                                      border-stone-400/75
                                      border-2
                                      py-2
@@ -136,12 +138,15 @@
 
          (h3 (@ (class ,(mk-class '(flex flex-row items-center gap-2 truncate))))
              ,(icon #:type 'list
-                    #:icon-css '(text-stone-500 text-lg))
-             (span (@ (class ,(mk-class '(font-sans text-stone-700 text-lg
-                                                    font-black break-words))))
+                    #:icon-css '(text-stone-500 dark:text-stone-400 text-lg))
+             (span (@ (class ,(mk-class '(font-sans text-stone-700
+                                                    dark:text-stone-300
+                                                    text-lg font-black
+                                                    break-words))))
                    ,(format #f "~a"
                             (assoc-ref p "title"))))
-         (p (@ (class ,(mk-class '(font-sans text-stone-600 text-sm
+         (p (@ (class ,(mk-class '(font-sans text-stone-600
+                                             dark:text-stone-400 text-sm
                                              break-words truncate))))
             ,(org-to-html (unescape-str (assoc-ref p "description")))))
     (div (@ (id ,(format #f "details-~a"
@@ -162,10 +167,12 @@
                        (div (@ (class ,(mk-class '(flex flex-row items-center
                                                         gap-1))))
                             ,(icon #:type 'align-bottom
-                                   #:icon-css '(text-stone-800 text-2xl))
+                                   #:icon-css '(text-stone-800
+                                                dark:text-stone-200 text-2xl))
                             (h2 (@ (class ,(mk-class '(text-3xl font-sans
                                                        font-bold
-                                                       text-stone-700))))
+                                                       text-stone-700
+                                                       dark:text-stone-200))))
                                 ,(G_ "projects")))
                        (div (a (@ (href "/projects/new"))
                                ,(icon-button #:icon 'plus

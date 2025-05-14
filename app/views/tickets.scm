@@ -47,54 +47,60 @@
   `((div (@ (class ,(mk-class '(flex flex-col
                                      gap-2
                                      p-3
-                                     bg-stone-100
+                                     bg-stone-200
+                                     dark:bg-stone-800
                                      rounded-2xl
                                      border-stone-400/75
                                      border-2))))
          (div (@ (class ,(mk-class '(flex flex-row justify-between))))
-              (h4 (@ (class ,(mk-class '(font-sans text-stone-700 text-2xl
-                                                   font-bold break-words my-3))))
+              (h4 (@ (class ,(mk-class '(font-sans text-stone-700
+                                                   dark:text-stone-200
+                                                   text-2xl
+                                                   font-bold
+                                                   break-words
+                                                   my-3))))
                   ,(org-to-html (assoc-ref ticket "title")))
               (div (@ (class ,(mk-class '(flex justify-right))))
                    (span (@ (class ,(mk-class '(cursor-pointer)))
                             (onclick ,(format #f
-                                       "document.getElementById('details-~a').toggleAttribute('hidden')"
-                                       (assoc-ref ticket "id"))))
+                                              "document.getElementById('details-~a').toggleAttribute('hidden')"
+                                              (assoc-ref ticket "id"))))
                          ,(icon #:type 'x
-                                #:icon-css '(text-stone-800 text-xl)))))
+                                #:icon-css '(text-stone-800 dark:text-stone-200 text-xl)))))
 
          (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-8
                                           justify-left))))
 
               (div (@ (class ,(mk-class '(flex flex-col gap-3))))
-                   (small (@ (class ,(mk-class '(font-sans text-stone-500
+                   (small (@ (class ,(mk-class '(font-sans text-stone-500 dark:text-stone-300 
                                                            text-md font-light))))
                           ,(G_ "status"))
                    (p (@ (class ,(mk-class '(flex gap-2 items-center))))
                       (span (@ (class "text-2xl"))
                             ,(emoji-for-ticket-status (assoc-ref ticket
-                                                       "ticket_status")))
-                      (span (@ (class ,(mk-class '(font-sans text-stone-700
+                                                                 "ticket_status")))
+                      (span (@ (class ,(mk-class '(font-sans text-stone-700 dark:text-stone-300
                                                              text-sm))))
                             ,(assoc-ref ticket "ticket_status"))))
 
               (div (@ (class ,(mk-class '(flex flex-col gap-3))))
-                   (small (@ (class ,(mk-class '(font-sans text-stone-500
+                   (small (@ (class ,(mk-class '(font-sans text-stone-500 dark:text-stone-400
                                                            text-md font-light))))
                           ,(G_ "type"))
                    (p (@ (class ,(mk-class '(ml-4 flex gap-2 items-center))))
                       (span (@ (class "text-2xl"))
                             ,(emoji-for-ticket-type (assoc-ref ticket
                                                                "ticket_type")))
-                      (span (@ (class ,(mk-class '(font-sans text-stone-700
+                      (span (@ (class ,(mk-class '(font-sans text-stone-700 dark:text-stone-300
                                                              text-sm))))
                             ,(assoc-ref ticket "ticket_type")))))
 
-         (small (@ (class ,(mk-class '(font-sans text-stone-500 text-md
+         (small (@ (class ,(mk-class '(font-sans text-stone-500 dark:text-stone-300 text-md
                                                  font-light))))
                 ,(G_ "description"))
          (span (@ (class ,(mk-class '(text-md py-3
                                               text-stone-800
+                                              dark:text-stone-300
                                               font-medium
                                               font-sans
                                               max-w-prose
@@ -102,32 +108,28 @@
                                               ml-4))))
                ,(org-to-html (assoc-ref ticket "description")))
 
-         (hr (@ (class "")))
+         ,(hr)
 
-         (small (@ (class ,(mk-class '(font-sans text-stone-500 text-md
+         (small (@ (class ,(mk-class '(font-sans text-stone-500 dark:text-stone-300 text-md
                                                  font-light))))
                 ,(G_ "human id"))
-         (small (@ (class ,(mk-class '(font-sans text-stone-600 text-md ml-4))))
+         (small (@ (class ,(mk-class '(font-sans text-stone-600 dark:text-stone-400 text-md ml-4))))
                 ,(format #f "~a-~s" project
                          (assoc-ref ticket "human_id")))
 
-         (small (@ (class ,(mk-class '(font-sans text-stone-500 text-md
+         (small (@ (class ,(mk-class '(font-sans text-stone-500 dark:text-stone-400 text-md
                                                  font-light))))
                 ,(G_ "id"))
-         (small (@ (class ,(mk-class '(font-sans text-stone-600 text-md ml-4))))
+         (small (@ (class ,(mk-class '(font-sans text-stone-600 dark:text-stone-400 text-md ml-4))))
                 ,(assoc-ref ticket "id"))
 
-         (hr)
+         ,(hr)
          (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-4))))
               (a (@ (href ,(format #f "/tickets/~a/~a/edit" project
                                    (assoc-ref ticket "human_id"))))
-                 ,(button `(span (@ (class ,(mk-class '(items-center flex
-                                                                     flex-row
-                                                                     gap-1))))
-                                 ((i (@ (class ,(mk-class '(ph ph-pencil
-                                                               text-white
-                                                               text-xl)))) ""))
-                                 (G_ "edit ticket"))))
+
+                 ,(icon-button #:icon 'pencil
+                               #:content (G_ "edit ticket")))
               (form (@ (enctype application/x-www-form-urlencoded)
                        (method POST)
                        (action ,(format #f "/tickets/~a/delete" project)))
@@ -138,11 +140,10 @@
                                                                          flex
                                                                          flex-row
                                                                          gap-1))))
-                                                  ((i (@ (class ,(mk-class '(ph
-                                                                             ph-trash
-                                                                             text-white
-                                                                             text-xl))))
-                                                      ""))
+                                                  (,(icon #:type 'trash
+                                                          #:icon-css '(text-stone-300
+                                                                       dark:text-stone-300
+                                                                       text-lg)))
                                                   ,(G_ "delete")))))
 
          )))
@@ -159,6 +160,7 @@
                                           items-center
                                           justify-left
                                           bg-stone-300/75
+                                          dark:bg-stone-700/75
                                           border-stone-400/75
                                           border-2
                                           py-2
@@ -167,18 +169,20 @@
                                           cursor-pointer
                                           rounded-xl))))
               ,(emoji-for-ticket-type (assoc-ref ticket "ticket_type"))
-              (small (@ (class ,(mk-class '(font-sans text-stone-600 text-xs
-                                                      hidden md:flex))))
+              (small (@ (class ,(mk-class '(font-sans text-stone-600
+                                                      dark:text-stone-400
+                                                      text-xs hidden md:flex))))
                      ,(format #f "~a-~a" project
                               (assoc-ref ticket "human_id")))
-              (h5 (@ (class ,(mk-class '(font-sans text-stone-700 text-md
+              (h5 (@ (class ,(mk-class '(font-sans text-stone-700
+                                                   dark:text-stone-300 text-md
                                                    font-black break-words))))
                   ,(org-to-html (assoc-ref ticket "title")))
               (div (a (@ (href ,(format #f "/tickets/~a/~a" project
                                         (assoc-ref ticket "human_id"))))
-                      (span ((i (@ (class ,(mk-class '(ph ph-link
-                                                          text-stone-600))))
-                                ""))))))
+                      ,(icon #:type 'list
+                             #:icon-css '(text-stone-500 dark:text-stone-400
+                                                         text-lg)))))
          (div (@ (id ,(format #f "details-~a"
                               (assoc-ref ticket "id")))
                  (class "ml-4")

@@ -39,8 +39,7 @@
 
 (define-public asset-library
   (build-asset-library '("pub/css/fonts.css" "pub/css/phosphor.css"
-                         "pub/js/tickets.js" "pub/js/tailwind.js"
-                         "pub/js/tailwind.config.js")))
+                         "pub/js/tickets.js" "pub/js/tailwind.js")))
 
 (define-public (page-footer G_)
   (footer `((div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
@@ -60,7 +59,6 @@
                  ,(p "version:")
                  ,(mono (format #f "~a"
                                 (get-short-commit-sha))
-                        #:color 'text-stone-600
                         #:size 'text-md)))))
 
 (begin
@@ -73,29 +71,31 @@
                                         flex-wrap
                                         gap-3
                                         p-3
-                                        bg-stone-900/90
+                                        bg-stone-200
+                                        dark:bg-stone-900
                                         items-center
                                         justify-left
                                         w-full
                                         shadow-lg))))
-            (a (@ (class ,(mk-class '(text-md text-white font-sans font-black
-                                              px-4)))
-                  (href "/")) "LucidPlan")
+            (a (@ (href "/")
+                  (class ,(mk-class '(mx-3))))
+               ,(h4 "LucidPlan"))
             ,(if (not is-logged-in)
                  `((a (@ (class ,(mk-class '(text-sm lowercase
                                                      text-white
+                                                     dark:text-black
                                                      font-sans
                                                      font-medium
                                                      px-2
                                                      flex-items-center
                                                      gap-2)))
                          (href "/login"))
-                      (span (i (@ (class ,(mk-class '(ph ph-sign-in text-md))))
-                               "")) "&nbsp;"
-                      (span ,(G_ "Login"))))
+                      ,(icon-button #:icon 'sign-in
+                                    #:content (G_ "login"))))
                  `())
             (a (@ (class ,(mk-class '(text-sm lowercase
-                                              text-white
+                                              text-stone-900
+                                              dark:text-stone-100
                                               font-sans
                                               font-medium
                                               px-2
@@ -103,22 +103,23 @@
                                               items-center
                                               gap-2)))
                   (href "/projects"))
-               (span (i (@ (class ,(mk-class '(ph ph-align-bottom text-md))))
-                        ""))
-               (span ,(G_ "Projects")))
+               ,(icon-button #:icon 'align-bottom
+                             #:content (G_ "projects")))
 
-            (hr)
+            ,(ui-mode-button)
 
             (select (@ (onchange "window.location.href=this.value;")
-                       (class ,(mk-class '(text-sm text-white bg-transparent
-                                                   font-medium font-sans))))
+                       (class ,(mk-class '(text-sm text-stone-900
+                                                   dark:text-stone-100
+                                                   bg-transparent font-medium
+                                                   font-sans))))
                     (option "🔗 go to")
                     ,(map (lambda (p)
                             `(option (@ (value ,(format #f "/tickets/~a"
                                                         (assoc-ref p
                                                                    "human_id")))
                                         (class
-                                         "text-sm font-light lowercase text-stone-800"))
+                                          ,(mk-class '(text-sm font-light lowercase text-stone-800))))
                                      ,(assoc-ref p "title"))) proj))))
     `("<!DOCTYPE html>" (html (@ (lang en))
                               (head (title "LucidPlan")
@@ -126,15 +127,23 @@
                                                        "pub/css/fonts.css"))
                                     (style ,(assoc-ref asset-library
                                                        "pub/css/phosphor.css"))
+                                    (style (@ (type "text/tailwindcss"))
+                                      "
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+@theme {
+  --font-sans: \"Adwaita Sans\", sans-serif;
+  --font-mono: \"Adwaita Mono\", monospace;
+}
+")
                                     (meta (@ (name viewport)
                                              (content
                                               "width=device-width, initial-scale=1.0")))
                                     (meta (@ (charset UTF-8)))
                                     (script ,(assoc-ref asset-library
-                                                        "pub/js/tailwind.js"))
-                                    (script ,(assoc-ref asset-library
-                                              "pub/js/tailwind.config.js")))
-                              (body
+                                                        "pub/js/tailwind.js")))
+                              (body (@ (class ,(mk-class '(bg-stone-100
+                                                           dark:bg-stone-800))))
 
                                     ,(with-footer #:main `((div (@ (class ,(mk-class '
                                                                             (flex
@@ -142,16 +151,18 @@
                                                                              justify-between
                                                                              min-h-96))))
                                                                 (div (@ (class ,
-                                                                         (mk-class '
-                                                                          (flex
-                                                                           flex-col
-                                                                           gap-8
-                                                                           justify-start))))
+                                                                          (mk-class '
+                                                                           (flex
+                                                                            flex-col
+                                                                            gap-8
+                                                                            justify-start))))
                                                                      ,nav
                                                                      ,body)))
                                                   #:footer (page-footer G_))
                                     (script ,(assoc-ref asset-library
-                                                        "pub/js/tickets.js"))))))
+                                                        "pub/js/tickets.js"))
+                                    (script ,toggle-dark-theme-js)
+                                    (script ,remember-dark-theme-js)))))
   (export html-template))
 
 (define-public (emoji-for-ticket-status ticket-status)
@@ -217,13 +228,14 @@ function addSearchQueryParam(form) {
                       ,(input #:label ""
                               #:name "search"
                               #:value (cond
-                                        ((equal? #f search-query)
-                                         "")
-                                        (else search-query))
+                                       ((equal? #f search-query)
+                                        "")
+                                       (else search-query))
                               #:placeholder (G_ "Search...")
-                              #:input-css '(p-2 max-w-prose rounded-xl
-                                                border-stone-200 border-2
-                                                shadow-md)
+                              #:input-css '(p-3 max-w-prose rounded-xl border-stone-200 dark:border-stone-700
+                                                dark:text-stone-300
+                                                dark:bg-stone-700/75
+                                                border-2 shadow-md)
                               #:input-flex-css #f)
                       ,(submit-button (G_ "search")))))))
   (export search-box))
