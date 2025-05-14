@@ -45,7 +45,8 @@
 (define-public (render-ticket G_ project ticket)
   `((div (@ (class ,(mk-class '(flex flex-col
                                      gap-2
-                                     p-3
+                                     px-6
+                                     py-10
                                      bg-stone-200
                                      dark:bg-stone-800
                                      rounded-2xl
@@ -70,26 +71,22 @@
                                                  dark:text-stone-300 text-md
                                                  font-light))))
                           ,(G_ "status"))
-                   (p (@ (class ,(mk-class '(flex gap-2 items-center))))
-                      (span (@ (class "text-2xl"))
-                            ,(emoji-for-ticket-status (assoc-ref ticket
-                                                       "ticket_status")))
-                      (span (@ (class ,(mk-class '(font-sans text-stone-700
-                                                   dark:text-stone-300 text-sm))))
-                            ,(assoc-ref ticket "ticket_status"))))
+                   (div (@ (class ,(mk-class '(flex gap-2 items-center))))
+                        (span (@ (class "text-2xl"))
+                              ,(emoji-for-ticket-status (assoc-ref ticket
+                                                         "ticket_status")))
+                        ,(p (assoc-ref ticket "ticket_status"))))
 
               (div (@ (class ,(mk-class '(flex flex-col gap-3))))
                    (small (@ (class ,(mk-class '(font-sans text-stone-500
                                                  dark:text-stone-400 text-md
                                                  font-light))))
                           ,(G_ "type"))
-                   (p (@ (class ,(mk-class '(ml-4 flex gap-2 items-center))))
-                      (span (@ (class "text-2xl"))
-                            ,(emoji-for-ticket-type (assoc-ref ticket
-                                                               "ticket_type")))
-                      (span (@ (class ,(mk-class '(font-sans text-stone-700
-                                                   dark:text-stone-300 text-sm))))
-                            ,(assoc-ref ticket "ticket_type")))))
+                   (div (@ (class ,(mk-class '(ml-4 flex gap-2 items-center))))
+                        (span (@ (class "text-2xl"))
+                              ,(emoji-for-ticket-type (assoc-ref ticket
+                                                       "ticket_type")))
+                        ,(p (assoc-ref ticket "ticket_type")))))
 
          (small (@ (class ,(mk-class '(font-sans text-stone-500
                                                  dark:text-stone-300 text-md

@@ -43,13 +43,14 @@
 (define (render-project G_ p)
   `((div (@ (class ,(mk-class '(flex flex-col
                                      gap-2
-                                     px-3
-                                     py-6
+                                     px-6
+                                     py-10
                                      bg-stone-200
                                      dark:bg-stone-800
                                      rounded-2xl
                                      border-stone-400/75
                                      border-2))))
+         ,(h4 (assoc-ref p "title"))
          ,(render-if-nestring (lambda (x)
                                 `(p (@ (class ,(mk-class '(text-md py-3
                                                            text-stone-800

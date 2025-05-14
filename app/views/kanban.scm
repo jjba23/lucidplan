@@ -41,17 +41,18 @@
 
 (define (render-k-ticket project t)
   `((div (@ (class "w-auto"))
-         (div (@ (class ,(mk-class '(rounded-xl bg-stone-200/25 p-3
-                                                border-stone-400/75 border-2
+         (div (@ (class ,(mk-class '(rounded-xl bg-stone-200/25
+                                                dark:bg-stone-700/50
+                                                p-3
+                                                border-stone-400/75
+                                                border-2
                                                 shadow))))
               (div (@ (class ,(mk-class '(flex flex-row justify-between
                                                items-center gap-2))))
                    (div (@ (class ,(mk-class '(flex flex-row justify-left
                                                     items-center gap-2))))
                         ,(emoji-for-ticket-type (assoc-ref t "ticket_type"))
-                        (p (@ (class ,(mk-class '(text-sm text-stone-700 flex
-                                                          flex-row gap-2))))
-                           (span ,(org2html (assoc-ref t "title")))))
+                        ,(p (org2html (assoc-ref t "title"))))
 
                    (a (@ (class ,(mk-class '(text-xs)))
                          (href ,(format #f "/tickets/~a/~a" project
@@ -110,6 +111,7 @@
                                                                       items-center))))
                                                ,(icon #:type 'kanban
                                                       #:icon-css '(text-stone-700
+                                                                   dark:text-stone-200
                                                                    text-2xl))
                                                ,(h1 (format #f "kanban for ~a"
                                                             project)))
@@ -164,6 +166,7 @@
                                         (span ,(G_ "Work in Progress"))
                                         (span (@ (class ,(mk-class '(text-xs
                                                                      text-stone-700
+                                                                     dark:text-stone-200
                                                                      font-light))))
                                               ,(format #f " ( ~a ) "
                                                        (length
@@ -182,6 +185,7 @@
                                         (span ,(G_ "In Review"))
                                         (span (@ (class ,(mk-class '(text-xs
                                                                      text-stone-700
+                                                                     dark:text-stone-200
                                                                      font-light))))
                                               ,(format #f " ( ~a ) "
                                                        (length
@@ -211,6 +215,7 @@
                                                      (span (@ (class ,(mk-class '
                                                                        (text-xs
                                                                         text-stone-700
+                                                                        dark:text-stone-200
                                                                         font-light))))
                                                            ,(format #f
                                                              " ( ~a ) "
@@ -246,6 +251,7 @@
                                                      (span (@ (class ,(mk-class '
                                                                        (text-xs
                                                                         text-stone-700
+                                                                        dark:text-stone-200
                                                                         font-light))))
                                                            ,(format #f
                                                              " ( ~a ) "

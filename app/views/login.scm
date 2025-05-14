@@ -30,6 +30,7 @@
   (let ((login-form `(form (@ (action "/login")
                               (class ,(mk-class '(w-full rounded-xl
                                                          bg-stone-200/50
+                                                         dark:bg-stone-700/50
                                                          p-4
                                                          flex
                                                          flex-row
