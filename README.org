@@ -20,12 +20,10 @@ LucidPlan enhances the use of Agile work methodologies in teams due to its fast-
 
 This tool is the fruit of years of experience using bloated proprietary systems like Jira/Trello, and experiencing the insane frustrations they bring.
 
-Visit my instance of LucidPlan here: https://lucidplan.jointhefreeworld.org/
+Visit my instance of LucidPlan here:
+https://lucidplan.jointhefreeworld.org/
 
 This is free software (free as in freedom), licensed under the GNU General Public License v3 or newer.
-
-[[https://jointhefreeworld.org/static-assets/lucidplan/img/2025-02-25-1.png]]
-
 
 Built with Guile Scheme and GNU Artanis, SQLite, Tailwind CSS
 
