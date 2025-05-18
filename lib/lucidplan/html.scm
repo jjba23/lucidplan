@@ -45,11 +45,11 @@
 (define-public (page-footer G_)
   (footer `((div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
                                              align-center))))
-                 ,(p (G_ "find the source code here"))
+                 ,(em (G_ "find the source code here"))
                  ,(a "https://codeberg.org/jjba23/lucidplan"))
             (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
                                              align-center))))
-                 ,(p (G_ "find the manual here"))
+                 ,(em (G_ "find the manual here"))
                  ,(a
                    "https://jointhefreeworld.org/manuals/lucidplan/index.html"))
             ,(em (G_
@@ -57,7 +57,7 @@
             ,(em (G_ "free project management for everyone"))
             (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
                                              align-center items-center))))
-                 ,(p "version:")
+                 ,(em "version:")
                  ,(mono (format #f "~a"
                                 (get-short-commit-sha))
                         #:size 'text-md)))))
