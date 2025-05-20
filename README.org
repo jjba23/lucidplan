@@ -41,7 +41,7 @@ Built with Guile Scheme and GNU Artanis, SQLite, Tailwind CSS
 
 lucidplan and all of its source code are free software, licensed under the GNU Affero General Public License v3 (or newer at your convenience).
 
-https://www.gnu.org/licenses/agpl-3.0.nl.html
+https://www.gnu.org/licenses/agpl-3.0.html
 
 The documentation and examples, including this document, which are provided with lucidplan, are all licensed under the GNU Free Documentation License v1.3 (or newer at your convenience).
 
