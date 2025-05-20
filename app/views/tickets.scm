@@ -153,8 +153,8 @@
             (id ,(format #f "listitem-~a"
                          (assoc-ref ticket "id"))))
          (div (@ (onclick ,(format #f
-                            "document.getElementById('details-~a').toggleAttribute('hidden')"
-                            (assoc-ref ticket "id")))
+                                   "document.getElementById('details-~a').toggleAttribute('hidden')"
+                                   (assoc-ref ticket "id")))
                  (class ,(mk-class '(flex flex-row
                                           gap-4
                                           items-center
@@ -176,7 +176,7 @@
                               (assoc-ref ticket "human_id")))
               (h5 (@ (class ,(mk-class '(font-sans text-stone-700
                                                    dark:text-stone-300 text-md
-                                                   font-black break-words))))
+                                                   font-bold break-words))))
                   ,(org2html (assoc-ref ticket "title")))
               (div (a (@ (href ,(format #f "/tickets/~a/~a" project
                                         (assoc-ref ticket "human_id"))))
