@@ -25,7 +25,7 @@ This tool is the fruit of years of experience using bloated proprietary systems 
 Visit my instance of LucidPlan here:
 https://lucidplan.jointhefreeworld.org/
 
-This is free software (free as in freedom), licensed under the GNU General Public License v3 or newer.
+This is free software (free as in freedom), licensed under the GNU Affero General Public License v3 or newer.
 
 Built with Guile Scheme and GNU Artanis, SQLite, Tailwind CSS
 
