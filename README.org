@@ -4,9 +4,9 @@
 #+language: en
 
 
-[[https://codeberg.org/jjba23/ggg/raw/branch/trunk/dist/scheme-guile.svg]] [[https://codeberg.org/jjba23/ggg/raw/branch/trunk/dist/gnu-guix.svg]]  
-[[https://codeberg.org/jjba23/ggg/raw/branch/trunk/dist/gnu-make.svg]] 
-[[https://codeberg.org/jjba23/ggg/raw/branch/trunk/dist/license-agpl3+.svg]]    [[https://codeberg.org/jjba23/ggg/raw/branch/trunk/dist/license-fdl13+.svg]]
+[[https://jointhefreeworld.org/ggg/dist/scheme-guile.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-guix.svg]]  
+[[https://jointhefreeworld.org/ggg/dist/gnu-make.svg]] 
+[[https://jointhefreeworld.org/ggg/dist/license-agpl3+.svg]]    [[https://jointhefreeworld.org/ggg/dist/license-fdl13+.svg]]
 
 
 /free and open project management for everyone/
