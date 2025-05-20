@@ -43,11 +43,11 @@
                          "pub/js/tickets.js" "pub/js/tailwind.js")))
 
 (define-public (page-footer G_)
-  (footer `((div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
+  (footer `(,(em (G_ "lucidplan - free project management for everyone")) ,(em
+                                                                            (G_
+                                                                             "lucidplan is free software, available under the GNU AGPL v3 or newer"))
+            (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
                                              align-center))))
-                 ,(em (G_ "lucidplan - free project management for everyone"))
-                 ,(em (G_
-                       "lucidplan is free software, available under the GNU AGPL v3 or newer"))
                  ,(em (G_ "find the source code here"))
                  ,(a "https://codeberg.org/jjba23/lucidplan"))
             (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
@@ -55,8 +55,7 @@
                  ,(em (G_ "find the manual here"))
                  ,(a
                    "https://jointhefreeworld.org/manuals/lucidplan/index.html"))
-            ,(em (G_
-                  "Copyright © Josep Bigorra  &lt;jjbigorra@gmail.com&gt;"))
+            ,(em (G_ "Copyright © Josep Bigorra  &lt;jjbigorra@gmail.com&gt;"))
 
             (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
                                              align-center items-center))))
