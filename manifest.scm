@@ -52,7 +52,7 @@
 (define-public guile-hygguile
   (package
     (name "guile-hygguile")
-    (version "0.3.8")
+    (version "0.5.1")
     (source
      (origin
        (method git-fetch)
@@ -61,7 +61,7 @@
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "17vmf23fg8wrpawv10an23b8gcxdfi7ag9ln0sgznp1gd5sil0f3"))))
+        (base32 "1slcf51gvizq7d7i165fa1md32p8zvcmal9wfs85kqnj0y5szfw0"))))
     (build-system guile-build-system)
     (native-inputs (list guile-3.0))
     (arguments
@@ -79,7 +79,7 @@
 (define-public guile-kracht
   (package
     (name "guile-kracht")
-    (version "0.0.5")
+    (version "0.1.2")
     (source
      (origin
        (method git-fetch)
@@ -88,7 +88,7 @@
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1957aarwfha8mrqjygzl7j064j3h9xwaxl1qp54w6ypk5bx7f6bg"))))
+        (base32 "08pgkj111sjwlkv3q30zqhrz2zxis06iknmb09qkmf3vh9ww1d73"))))
     (build-system guile-build-system)
     (native-inputs (list guile-3.0))
     (arguments
@@ -102,33 +102,29 @@
     (license license:lgpl3+)))
 
 (define-public guile-orgwebalchemy
-  (let ((commit "e97ee7bfe85d6dfde9e126899f9800cd36a25c2d")
-        (base32-sha-signature
-         "1fabrak7x4287pzni7ysf1vppnl5bv75ng98yvn5xyfp4xi8rak8")
-        (revision "0"))
-    (package
-      (name "guile-kracht")
-      (version (git-version "0.0.1" revision commit))
-      (source
-       (origin
-         (method git-fetch)
-         (uri (git-reference
-               (url "https://codeberg.org/jjba23/orgwebalchemy.git")
-               (commit commit)))
-         (file-name (git-file-name name version))
-         (sha256
-          (base32 base32-sha-signature))))
-      (build-system guile-build-system)
-      (native-inputs (list guile-3.0))
-      (arguments
-       (list
-        #:source-directory "src"))
-      (home-page "https://codeberg.org/jjba23/orgwebalchemy")
-      (synopsis
-       "Convert Org markup to pretty HTML with a Lisp (Guile Scheme) library")
-      (description
-       "Convert Org markup to pretty HTML with a Lisp (Guile Scheme) library")
-      (license license:lgpl3+))))
+  (package
+    (name "guile-orgwebalchemy")
+    (version "0.1.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://codeberg.org/jjba23/orgwebalchemy.git")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0mzm3rbldfhzlj5mg70w11v2givpgl0bzlpw513vw1cg85l7vkf9"))))
+    (build-system guile-build-system)
+    (native-inputs (list guile-3.0))
+    (arguments
+     (list
+      #:source-directory "src"))
+    (home-page "https://codeberg.org/jjba23/orgwebalchemy")
+    (synopsis
+     "Convert Org markup to pretty HTML with a Lisp (Guile Scheme) library")
+    (description
+     "Convert Org markup to pretty HTML with a Lisp (Guile Scheme) library")
+    (license license:lgpl3+)))
 
 ;;
 ;; define manifest

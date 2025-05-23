@@ -183,12 +183,9 @@ merge-i18n-es:
 
 # Development REPL
 repl:
-	guix shell -m manifest.scm -- guile --fresh-auto-compile -c '((@ (ares server) run-nrepl-server))'
-
-
-# Unit tests
-test:
-	guix shell -m manifest.scm -- guile --fresh-auto-compile run-tests.scm | guile --fresh-auto-compile colorize-tests.scm
+	guix shell -m manifest.scm -- guile  \
+		-L lib -L . \
+		-c '((@ (ares server) run-nrepl-server))'
 
 # deploy: Deploys the manual HTML to a web server directory.
 deploy:

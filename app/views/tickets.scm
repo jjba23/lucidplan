@@ -153,8 +153,8 @@
             (id ,(format #f "listitem-~a"
                          (assoc-ref ticket "id"))))
          (div (@ (onclick ,(format #f
-                                   "document.getElementById('details-~a').toggleAttribute('hidden')"
-                                   (assoc-ref ticket "id")))
+                            "document.getElementById('details-~a').toggleAttribute('hidden')"
+                            (assoc-ref ticket "id")))
                  (class ,(mk-class '(flex flex-row
                                           gap-4
                                           items-center
