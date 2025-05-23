@@ -153,8 +153,8 @@
             (id ,(format #f "listitem-~a"
                          (assoc-ref ticket "id"))))
          (div (@ (onclick ,(format #f
-                            "document.getElementById('details-~a').toggleAttribute('hidden')"
-                            (assoc-ref ticket "id")))
+                                   "document.getElementById('details-~a').toggleAttribute('hidden')"
+                                   (assoc-ref ticket "id")))
                  (class ,(mk-class '(flex flex-row
                                           gap-4
                                           items-center
@@ -169,19 +169,22 @@
                                           cursor-pointer
                                           rounded-xl))))
               ,(emoji-for-ticket-type (assoc-ref ticket "ticket_type"))
-              (small (@ (class ,(mk-class '(font-sans text-stone-600
-                                                      dark:text-stone-400
-                                                      text-xs hidden md:flex))))
-                     ,(format #f "~a-~a" project
-                              (assoc-ref ticket "human_id")))
               (h5 (@ (class ,(mk-class '(font-sans text-stone-700
                                                    dark:text-stone-300 text-md
                                                    font-bold break-words))))
                   ,(org2html (assoc-ref ticket "title")))
-              (div (a (@ (href ,(format #f "/tickets/~a/~a" project
+
+              (div (a (@(class ,(mk-class '(flex flex-row flex-wrap gap-2 items-center justify-start))))
+                      (@ (href ,(format #f "/tickets/~a/~a" project
                                         (assoc-ref ticket "human_id"))))
-                      ,(icon #:type 'list
-                             #:icon-css '(text-stone-500 dark:text-stone-400
+                      (small (@ (class ,(mk-class '(font-sans text-stone-600
+                                                              dark:text-stone-400
+                                                              text-xs hidden md:flex))))
+                             ,(format #f "~a-~a" project
+                                      (assoc-ref ticket "human_id")))
+                      ,(icon #:type 'link
+                             #:icon-css '(text-stone-600 dark:text-stone-300
+                                                         hover:text-purple-400 hover:dark:text-purple-300
                                                          text-lg)))))
          (div (@ (id ,(format #f "details-~a"
                               (assoc-ref ticket "id")))
