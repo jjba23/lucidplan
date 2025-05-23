@@ -133,15 +133,15 @@
                                      rounded-xl
                                      shadow)))
             (onclick ,(format #f
-                       "document.getElementById('details-~a').toggleAttribute('hidden')"
-                       (assoc-ref p "id"))))
+                              "document.getElementById('details-~a').toggleAttribute('hidden')"
+                              (assoc-ref p "id"))))
 
          (h3 (@ (class ,(mk-class '(flex flex-row items-center gap-2 truncate))))
              ,(icon #:type 'list
                     #:icon-css '(text-stone-500 dark:text-stone-400 text-lg))
              (span (@ (class ,(mk-class '(font-sans text-stone-700
                                                     dark:text-stone-300
-                                                    text-lg font-black
+                                                    text-lg font-bold
                                                     break-words))))
                    ,(format #f "~a"
                             (assoc-ref p "title"))))
