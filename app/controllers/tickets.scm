@@ -229,6 +229,8 @@
                  (ticket-status (uri-decode (car (assoc-ref kv "ticket-status"))))
                  (ticket-type (uri-decode (car (assoc-ref kv "ticket-type"))))
                  (description (uri-decode (car (assoc-ref kv "description"))))
+                 (priority (string->number (uri-decode (car (assoc-ref kv
+                                                             "priority")))))
                  (project-id (project-id-from-human-id (params rc "project")))
                  (new-uuid (string-replace-substring (generate-string-uuid)
                                                      "\n" "")))
@@ -239,6 +241,7 @@
                      #:title (escape-str title)
                      #:ticket_status ticket-status
                      #:ticket_type ticket-type
+                     #:priority priority
                      #:description (escape-str description)
                      #:created_at (current-time))
 
@@ -284,6 +287,8 @@
                  (title (uri-decode (car (assoc-ref kv "title"))))
                  (description (uri-decode (car (assoc-ref kv "description"))))
                  (ticket-status (uri-decode (car (assoc-ref kv "ticket-status"))))
+                 (priority (string->number (uri-decode (car (assoc-ref kv
+                                                             "priority")))))
                  (ticket-type (uri-decode (car (assoc-ref kv "ticket-type")))))
             
             (DB-query (DB-open rc)
@@ -293,6 +298,7 @@
                                (ticket_type ,ticket-type)
                                (description ,(escape-str description))
                                (title ,(escape-str title))
+                               (priority ,priority)
                                (updated_at ,(current-time)))
                              (where #:human_id (params rc "human-id"))))
 

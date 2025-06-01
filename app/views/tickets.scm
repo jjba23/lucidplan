@@ -115,6 +115,17 @@
                          (assoc-ref ticket "human_id")))
 
          (small (@ (class ,(mk-class '(font-sans text-stone-500
+                                                 dark:text-stone-300 text-md
+                                                 font-light))))
+                ,(G_ "priority"))
+
+         (small (@ (class ,(mk-class '(font-sans text-stone-600
+                                                 dark:text-stone-400 text-md
+                                                 ml-4))))
+                ,(format #f "~a"
+                         (assoc-ref ticket "priority")))
+
+         (small (@ (class ,(mk-class '(font-sans text-stone-500
                                                  dark:text-stone-400 text-md
                                                  font-light))))
                 ,(G_ "id"))
@@ -153,8 +164,8 @@
             (id ,(format #f "listitem-~a"
                          (assoc-ref ticket "id"))))
          (div (@ (onclick ,(format #f
-                                   "document.getElementById('details-~a').toggleAttribute('hidden')"
-                                   (assoc-ref ticket "id")))
+                            "document.getElementById('details-~a').toggleAttribute('hidden')"
+                            (assoc-ref ticket "id")))
                  (class ,(mk-class '(flex flex-row
                                           gap-4
                                           items-center
@@ -179,7 +190,8 @@
                          (href ,(format #f "/tickets/~a/~a" project
                                         (assoc-ref ticket "human_id"))))
                       ,(icon #:type 'link
-                             #:icon-css '(text-md text-stone-600 dark:text-stone-300
+                             #:icon-css '(text-md text-stone-600
+                                                  dark:text-stone-300
                                                   hover:text-purple-400
                                                   hover:dark:text-purple-300)))))
          (div (@ (id ,(format #f "details-~a"
@@ -463,6 +475,7 @@
                       #:description (assoc-ref t "description")
                       #:ticket-type (assoc-ref t "ticket_type")
                       #:ticket-status (assoc-ref t "ticket_status")
+                      #:priority (assoc-ref t "priority")
                       #:action (format #f "/tickets/~a/~a/edit" project
                                        (assoc-ref t "human_id"))
                       #:projects projects))
@@ -474,6 +487,7 @@
                            (description "")
                            (ticket-status "")
                            (ticket-type "")
+                           (priority 0)
                            (action "")
                            (is-edit #f)
                            (projects '())
@@ -569,6 +583,11 @@
                                                            "time-box")
                                                   #:content (G_ "Time Box")
                                                   #:selected-value ticket-type)))
+                      ,(input #:label (G_ "priority")
+                              #:name "priority"
+                              #:required #f
+                              #:type 'number
+                              #:value (if (not priority) 0 priority))
                       ,(textarea #:label (G_ "description")
                                  #:name "description"
                                  #:required #t

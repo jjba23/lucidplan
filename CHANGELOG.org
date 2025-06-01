@@ -1,0 +1,35 @@
+#+title: ChangeLog for LucidPlan
+#+author: Josep Bigorra
+#+email: jjbigorra@gmail.com
+#+language: en
+#+options: toc:nil
+
+[[https://jointhefreeworld.org/ggg/dist/scheme-guile.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-guix.svg]]  
+[[https://jointhefreeworld.org/ggg/dist/gnu-make.svg]] 
+[[https://jointhefreeworld.org/ggg/dist/license-agpl3+.svg]]    [[https://jointhefreeworld.org/ggg/dist/license-fdl13+.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-artanis.svg]]
+
+
+/free and open project management for everyone/
+
+LucidPlan is a project management for teams of all sizes and jobs.
+
+It's a flexible system made to simplify everyone's life, accessbile to all kinds of users.
+
+If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
+
+---------------------------
+
+You can run migrations on your SQLite database with the following, or any other way you choose:
+#+begin_src sh
+sqlite3 database.db "INSERT INTO table VALUES (something)"
+#+end_src
+
+----------------------------------
+
+* v0.6.0
+
+Added ~priority~ column to ~ticket~ table. Migration will be needed:
+#+begin_src sql
+ALTER TABLE ticket ADD COLUMN priority INTEGER;
+#+end_src
+

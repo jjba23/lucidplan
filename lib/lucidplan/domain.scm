@@ -43,4 +43,8 @@
      '(title desc))
     ((equal? "title-asc" user-sort)
      '(title asc))
+    ((equal? "priority-desc" user-sort)
+     '(priority desc))
+    ((equal? "priority-asc" user-sort)
+     '(priority asc))
     (else '(updated_at desc))))

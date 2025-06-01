@@ -17,6 +17,8 @@
                                      (#:not-null #:maxlen 256))
                       (ticket_type char-field
                                    (#:not-null #:maxlen 256))
+                      (priority integer
+                                (#:maxlen 200000))
                       (created_at date-field
                                   (#:not-null))
                       (updated_at date-field))

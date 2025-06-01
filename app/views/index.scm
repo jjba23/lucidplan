@@ -28,7 +28,7 @@
 
 (begin
   (define* (welcome-page G_
-                         #:key is-logged-in)
+                         #:key is-logged-in projects)
     (let ((project-logo `(((div (@ (class ,(mk-class '(bg-stone-200
                                                        dark:bg-stone-900
                                                        rounded-2xl p-4
@@ -39,6 +39,7 @@
                                         (src
                                          "https://jointhefreeworld.org/static-assets/lucidplan/img/logo.jpg"))))))))
       (html-template G_
+                     #:proj projects
                      #:is-logged-in #f
                      #:body `(div (@ (class ,(mk-class '(container mx-auto))))
                                   ,(h2 (G_ "welcome to lucidplan"))

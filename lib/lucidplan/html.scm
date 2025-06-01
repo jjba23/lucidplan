@@ -290,6 +290,11 @@ function addSearchQueryParam(form) {
                            ("last-edited-at-desc" unquote
                             (G_ "Last edited - Descending"))
 
+                           ("priority-asc" unquote
+                            (G_ "Priority - Ascending"))
+                           ("priority-desc" unquote
+                            (G_ "Priority - Descending"))
+
                            ))))))
   (export sort-select))
 

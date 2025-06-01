@@ -20,6 +20,7 @@
 (import (lucidplan html)
         (web uri)
         (ice-9 string-fun)
+        (app models project)
         (app views index))
 
 (get "/"
@@ -27,7 +28,10 @@
      #:i18n '(cookie "lang")
      #:cookies '(names sid)
      (lambda (rc)
-       (response-emit (:mime rc
-                             (welcome-page (:i18n rc)
-                                           #:is-logged-in (:cookies-value rc
-                                                           "sid"))))))
+       (let* ((proj ($project 'get
+                              #:order-by '(human_id asc))))
+         (response-emit (:mime rc
+                               (welcome-page (:i18n rc)
+                                             #:projects proj
+                                             #:is-logged-in (:cookies-value rc
+                                                             "sid")))))))
