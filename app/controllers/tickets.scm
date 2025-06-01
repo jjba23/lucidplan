@@ -165,6 +165,7 @@
                                  (html-from-tickets (:i18n rc)
                                                     #:is-logged-in
                                                     is-logged-in
+                                                    #:current-sort user-sort
                                                     #:projects proj
                                                     #:project-details
                                                     project-details

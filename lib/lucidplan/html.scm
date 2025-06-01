@@ -257,45 +257,43 @@ function addSearchQueryParam(form) {
 
 (begin
   (define* (sort-select G_
-                        #:key project-id)
+                        #:key project-id
+                        (current-sort #f))
     `((div (@ (class ,(mk-class '(flex flex-col gap-2 w-min))))
-           (select (@ (onchange "window.location.href=this.value;")
-                      (name "sort-select")
-                      (id "sort-select")
-                      (class ,(mk-class '(p-2 rounded-xl
-                                              bg-white
-                                              border-stone-200
-                                              border-2
-                                              shadow-md
-                                              max-w-prose))))
-                   (option ,(G_ "sort order"))
-                   ,(map (lambda (s)
-                           `((option (@ (value ,(format #f
-                                                        "/tickets/~a?sort=~a"
-                                                        project-id
-                                                        (car s))))
-                                     ,(cdr s))))
-                         `(("title-asc" unquote
-                            (G_ "Title - Ascending"))
-                           ("title-desc" unquote
-                            (G_ "Title - Descending"))
+           ,(select #:name 'sort-select
+                    #:id 'sort-select
+                    #:on-change "window.location.href=this.value;"
+                    #:options (map (lambda (s)
+                                     (option #:value (format #f
+                                                      "/tickets/~a?sort=~a"
+                                                      project-id
+                                                      (car s))
+                                             #:content (cdr s)
+                                             #:selected-value (format #f
+                                                               "/tickets/~a?sort=~a"
+                                                               project-id
+                                                               current-sort)))
+                                   `(("title-asc" unquote
+                                      (G_ "Title - Ascending"))
+                                     ("title-desc" unquote
+                                      (G_ "Title - Descending"))
 
-                           ("created-at-asc" unquote
-                            (G_ "Created - Ascending"))
-                           ("created-at-desc" unquote
-                            (G_ "Created - Descending"))
+                                     ("created-at-asc" unquote
+                                      (G_ "Created - Ascending"))
+                                     ("created-at-desc" unquote
+                                      (G_ "Created - Descending"))
 
-                           ("last-edited-at-asc" unquote
-                            (G_ "Last edited - Ascending"))
-                           ("last-edited-at-desc" unquote
-                            (G_ "Last edited - Descending"))
+                                     ("last-edited-at-asc" unquote
+                                      (G_ "Last edited - Ascending"))
+                                     ("last-edited-at-desc" unquote
+                                      (G_ "Last edited - Descending"))
 
-                           ("priority-asc" unquote
-                            (G_ "Priority - Ascending"))
-                           ("priority-desc" unquote
-                            (G_ "Priority - Descending"))
+                                     ("priority-asc" unquote
+                                      (G_ "Priority - Ascending"))
+                                     ("priority-desc" unquote
+                                      (G_ "Priority - Descending"))
 
-                           ))))))
+                                     ))))))
   (export sort-select))
 
 (begin

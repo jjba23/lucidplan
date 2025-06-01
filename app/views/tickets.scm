@@ -205,6 +205,7 @@
 (begin
   (define* (html-from-tickets G_
                               #:key is-logged-in
+                              (current-sort #f)
                               projects
                               project-details
                               tickets
@@ -227,7 +228,9 @@
                                                 ,(sort-select G_
                                                               #:project-id (assoc-ref
                                                                             project-details
-                                                                            "human_id")))
+                                                                            "human_id")
+                                                              #:current-sort
+                                                              current-sort))
                                            (div (@ (class ,(mk-class '(my-3
                                                                        p-2
                                                                        flex
