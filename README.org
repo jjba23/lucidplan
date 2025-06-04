@@ -78,3 +78,4 @@ We welcome everyone to feel invited to the lucidplan Project, and encourage acti
 Find here the Backlog and Kanban boards for lucidplan: https://lucidplan.jointhefreeworld.org/tickets/lucidplan
 
 -----------
+
