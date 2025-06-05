@@ -62,7 +62,8 @@
                  ,(em "version:")
                  ,(mono (format #f "~a"
                                 (get-short-commit-sha))
-                        #:size 'text-md)))))
+                        #:size 'text-sm
+                        #:weight 'font-light)))))
 
 (begin
   (define* (html-template G_
