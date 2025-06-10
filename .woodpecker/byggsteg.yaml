@@ -1,16 +1,54 @@
-steps:
-  update-jointhefreeworld:
-    image: curlimages/curl
-    when:
-      - event: [push]
-        branch: [trunk]
-    environment:
-      BYGGSTEG_KEY:
-        from_secret: BYGGSTEG_KEY
-    commands: |
-      curl 'https://byggsteg.jointhefreeworld.org/api/v1/jobs/manage/submit' \
-        -X POST -H 'Content-Type: application/x-www-form-urlencoded' \
-        --data-urlencode 'username=Joe' \
-        --data-urlencode "password=$BYGGSTEG_KEY" \
-        --data-urlencode 'job-code=(lambda() `((project . "lucidplan")(branch-name . "trunk")(task . ("pull-and-restart" "pull-and-deploy"))(daemon-name . "lucidplan-daemon")(clone-url . "https://codeberg.org/jjba23/lucidplan")))'
+# lucidplan - the CI/CD orchestrator written in Guile Scheme
 
+# Copyright © Josep Bigorra <jjbigorra@gmail.com>
+
+# lucidplan is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# lucidplan is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License
+# along with lucidplan.  If not, see <https://www.gnu.org/licenses/>.
+
+
+variables:
+  - &byggsteg_url 'https://byggsteg.jointhefreeworld.org'
+  - &byggsteg_submit_job_image 'jjba23/byggsteg-woodpecker-submit-job:v0.1.3'
+  - &byggsteg_poll_job_image 'jjba23/byggsteg-woodpecker-poll-job:v0.1.3'
+  
+steps:
+  submit-byggsteg-job-jointhefreeworld:
+    image: *byggsteg_submit_job_image
+    when:
+      - event: [ "push" ]
+        branch: [ "trunk" ]
+    settings:
+      BYGGSTEG_USERNAME:
+        from_secret: "BYGGSTEG_USERNAME"
+      BYGGSTEG_KEY:
+        from_secret: "BYGGSTEG_KEY"      
+      BYGGSTEG_URL: *byggsteg_url
+      BYGGSTEG_JOB_CODE: |
+        (lambda()
+          `((task . ("pull-and-restart" "pull-and-deploy"))
+            (daemon-name . "lucidplan-daemon")
+            (project . "%%CI_REPO_NAME%%")
+            (branch-name . "%%CI_COMMIT_BRANCH%%")            
+            (clone-url . "%%CI_REPO_CLONE_URL%%")))
+            
+  poll-byggsteg-job-jointhefreeworld:
+    image: *byggsteg_poll_job_image
+    when:
+      - event: [ "push" ]
+        branch: [ "trunk" ]
+    settings:
+      BYGGSTEG_USERNAME:
+        from_secret: "BYGGSTEG_USERNAME"
+      BYGGSTEG_KEY:
+        from_secret: "BYGGSTEG_KEY"      
+      BYGGSTEG_URL: *byggsteg_url
