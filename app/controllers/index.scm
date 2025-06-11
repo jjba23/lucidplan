@@ -35,3 +35,5 @@
                                              #:projects proj
                                              #:is-logged-in (:cookies-value rc
                                                              "sid")))))))
+
+(get "/robots.txt" static-page-emitter)
