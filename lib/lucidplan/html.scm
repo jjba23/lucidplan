@@ -39,8 +39,7 @@
   #:use-module (artanis route))
 
 (define-public asset-library
-  (build-asset-library '("pub/css/phosphor.css"
-                         "pub/js/tickets.js" "pub/js/tailwind.js")))
+  (build-asset-library '("pub/js/tickets.js" "pub/js/tailwind.js")))
 
 (define-public (page-footer G_)
   (footer `(,(em (G_ "lucidplan - free project management for everyone")) ,(em
@@ -146,8 +145,10 @@
   --font-mono: \"IBM Plex Mono\", monospace;
 }
 ")
-                                    (style ,(assoc-ref asset-library
-                                                       "pub/css/phosphor.css"))
+                                    (link (@ (rel stylesheet)
+                                             (type text/css)
+                                             (href
+                                              "https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css")))
                                     (meta (@ (name viewport)
                                              (content
                                               "width=device-width, initial-scale=1.0")))
