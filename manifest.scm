@@ -15,6 +15,7 @@
              (gnu packages linux)
              (gnu packages perl)
              (gnu packages compression)
+             (gnu packages emacs)
              (gnu packages sqlite)
              (gnu packages texinfo)
              (gnu packages autotools)
@@ -143,5 +144,6 @@
                           watchexec
                           guile-orgwebalchemy
                           sqlite
+                          emacs
                           guile-dbd-sqlite3))
 
