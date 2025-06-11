@@ -194,3 +194,4 @@ deploy:
 	mkdir -pv $(DEPLOY_WWW)/manuals/lucidplan
 	rm -rfv $(DEPLOY_WWW)/manuals/lucidplan/index.html
 	mv -v docs/manual/en-GB.html $(DEPLOY_WWW)/manuals/lucidplan/index.html
+
