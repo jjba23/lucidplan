@@ -39,9 +39,8 @@
 
 (get "/kanban/:project"
      #:mime 'xml
-     #:session #t
      #:i18n '(cookie "lang")
-     #:cookies '(names sid)
+     #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
        (define (get)
          (let* ((project-id (project-id-from-human-id (params rc "project")))
@@ -65,5 +64,5 @@
                                                       #:ticket-id-to-human-id
                                                       ticket-id-to-human-id
                                                       #:is-logged-in (:cookies-value
-                                                                      rc "sid"))))))
+                                                                      rc "x-bewaking-lucidplan"))))))
        (get)))

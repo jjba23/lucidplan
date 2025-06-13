@@ -28,13 +28,12 @@
         (app views projects))
 
 (get "/projects"
-     #:session #t
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names sid)
+     #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
        (define (get-p)
-         (let* ((is-logged-in (:cookies-value rc "sid"))
+         (let* ((is-logged-in (:cookies-value rc "x-bewaking-lucidplan"))
                 (user-search (cond
                                ((equal? #f
                                         (get-from-qstr rc "search"))
@@ -67,16 +66,15 @@
        (get-p)))
 
 (get "/projects/new"
-     #:session #t
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names sid)
+     #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
        (define (get-new)
          (response-emit (:mime rc
                                (html-new-project-form (:i18n rc)
                                                       #:is-logged-in (:cookies-value
-                                                                      rc "sid")
+                                                                      rc "x-bewaking-lucidplan")
                                                       #:projects ($project 'get
                                                                            #:order-by '
                                                                            (human_id
@@ -84,9 +82,8 @@
        (get-new)))
 
 (post "/projects/delete"
-      #:auth '(table user "username" "password")
-      #:session #t
       #:mime 'xml
+      #:cookies '(names x-bewaking-lucidplan)
       (lambda (rc)
         (define (do-delete)
           (let* ((body (rc-body rc))
@@ -107,9 +104,8 @@
                            #:unhappy-flow back-to-login)))
 
 (post "/projects/new"
-      #:auth '(table user "username" "password")
-      #:session #t
       #:mime 'xml
+      #:cookies '(names x-bewaking-lucidplan)
       (lambda (rc)
         (define (do-new)
           (let* ((body (rc-body rc))
@@ -142,10 +138,9 @@
                            #:unhappy-flow back-to-login)))
 
 (get "/projects/:human-id/edit"
-     #:session #t
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names sid)
+     #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
        (define (get-edit)
          (let* ((p (car ($project 'get
@@ -156,7 +151,7 @@
                                  (html-edit-project-form (:i18n rc)
                                                          #:is-logged-in (:cookies-value
                                                                          rc
-                                                                         "sid")
+                                                                         "x-bewaking-lucidplan")
                                                          #:projects ($project 'get
                                                                               #:order-by '
                                                                               (human_id
@@ -166,9 +161,8 @@
        (get-edit)))
 
 (post "/projects/:human-id/edit"
-      #:auth '(table user "username" "password")
-      #:session #t
       #:mime 'xml
+      #:cookies '(names x-bewaking-lucidplan)
       (lambda (rc)
         (define (do-edit)
           (let* ((body (rc-body rc))

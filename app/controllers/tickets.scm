@@ -41,13 +41,12 @@
 
 (get "/tickets/:project"
      #:mime 'xml
-     #:session #t
      #:i18n '(cookie "lang")
      #:cookies '(names lucidplan-show-done lucidplan-show-rejected
-                       lucidplan-ticket-sort sid)
+                       lucidplan-ticket-sort x-bewaking-lucidplan)
      (lambda (rc)
        (define (get)
-         (let* ((is-logged-in (:cookies-value rc "sid"))
+         (let* ((is-logged-in (:cookies-value rc "x-bewaking-lucidplan"))
                 (user-search (cond
                                ((equal? #f
                                         (get-from-qstr rc "search"))
@@ -180,15 +179,14 @@
 
 (get "/tickets/:project/new"
      #:mime 'xml
-     #:session #t
      #:i18n '(cookie "lang")
-     #:cookies '(names sid)
+     #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
        (define (get-new)
          (response-emit (:mime rc
                                (html-new-ticket-form (:i18n rc)
                                                      #:is-logged-in (:cookies-value
-                                                                     rc "sid")
+                                                                     rc "x-bewaking-lucidplan")
                                                      #:projects ($project 'get
                                                                           #:order-by '
                                                                           (human_id
@@ -199,8 +197,7 @@
 
 (post "/tickets/:project/delete"
       #:mime 'xml
-      #:auth '(table user "username" "password")
-      #:session #t
+      #:cookies '(names x-bewaking-lucidplan)
       (lambda (rc)
         (define (do-delete)
           (let* ((body (rc-body rc))
@@ -224,8 +221,7 @@
 
 (post "/tickets/:project/new"
       #:mime 'xml
-      #:auth '(table user "username" "password")
-      #:session #t
+      #:cookies '(names x-bewaking-lucidplan)
       (lambda (rc)
         (define (do-new)
           (let* ((body (rc-body rc))
@@ -263,9 +259,8 @@
 
 (get "/tickets/:project/:human-id/edit"
      #:mime 'xml
-     #:session #t
      #:i18n '(cookie "lang")
-     #:cookies '(names sid)
+     #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
        (define (get-edit)
          (let* ((proj ($project 'get
@@ -282,13 +277,12 @@
                                                         #:t t
                                                         #:is-logged-in (:cookies-value
                                                                         rc
-                                                                        "sid"))))))
+                                                                        "x-bewaking-lucidplan"))))))
        (get-edit)))
 
 (post "/tickets/:project/:human-id/edit"
       #:mime 'xml
-      #:auth '(table user "username" "password")
-      #:session #t
+      #:cookies '(names x-bewaking-lucidplan)
       (lambda (rc)
         (define (do-edit)
           (let* ((body (rc-body rc))
@@ -324,9 +318,8 @@
 
 (get "/tickets/:project/:human-id"
      #:mime 'xml
-     #:session #t
      #:i18n '(cookie "lang")
-     #:cookies '(names sid)
+     #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
        (define (get-single)
          (let* ((proj ($project 'get
@@ -338,7 +331,7 @@
            (response-emit (:mime rc
                                  (html-template (:i18n rc)
                                                 #:is-logged-in (:cookies-value
-                                                                rc "sid")
+                                                                rc "x-bewaking-lucidplan")
                                                 #:body `(div (@ (class "p-2"))
                                                              ,(render-ticket (:i18n
                                                                               rc)

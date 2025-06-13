@@ -26,7 +26,7 @@
 (get "/"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names sid)
+     #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
        (let* ((proj ($project 'get
                               #:order-by '(human_id asc))))
@@ -34,7 +34,7 @@
                                (welcome-page (:i18n rc)
                                              #:projects proj
                                              #:is-logged-in (:cookies-value rc
-                                                             "sid")))))))
+                                                             "x-bewaking-lucidplan")))))))
 
 (get "/robots.txt" static-page-emitter)
 (get "/favicon.ico" static-page-emitter)

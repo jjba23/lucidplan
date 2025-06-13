@@ -145,7 +145,7 @@
                                                                gap-2
                                                                items-center))))
                                         ,(emoji-for-ticket-status "todo")
-                                        (span ,(G_ "To-do"))
+                                        ,(sub-h3 (G_ "To-do"))
                                         (span (@ (class ,(mk-class '(text-xs
                                                                      text-stone-700
                                                                      font-light))))
@@ -163,7 +163,7 @@
                                                                items-center))))
                                         ,(emoji-for-ticket-status
                                           "work-in-progress")
-                                        (span ,(G_ "Work in Progress"))
+                                        ,(sub-h3 (G_ "Work in Progress"))
                                         (span (@ (class ,(mk-class '(text-xs
                                                                      text-stone-700
                                                                      dark:text-stone-200
@@ -182,7 +182,7 @@
                                                                gap-2
                                                                items-center))))
                                         ,(emoji-for-ticket-status "in-review")
-                                        (span ,(G_ "In Review"))
+                                        ,(sub-h3 (G_ "In Review"))
                                         (span (@ (class ,(mk-class '(text-xs
                                                                      text-stone-700
                                                                      dark:text-stone-200
@@ -211,7 +211,7 @@
                                                                             items-center))))
                                                      ,(emoji-for-ticket-status
                                                        "done")
-                                                     (span ,(G_ "Done"))
+                                                     ,(sub-h3 (G_ "Done"))
                                                      (span (@ (class ,(mk-class '
                                                                        (text-xs
                                                                         text-stone-700
