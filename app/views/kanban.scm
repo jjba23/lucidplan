@@ -140,8 +140,9 @@
                                (div (@ (class ,(mk-class '(sm:w-1/3 flex
                                                                     flex-col
                                                                     gap-2 p-2))))
-                                    (h4 (@ (class ,(mk-class '(text-sm
-                                                               font-bold flex
+                                    (div (@ (class ,(mk-class '(text-sm
+                                                               font-bold
+                                                               flex flex-row flex-wrap
                                                                gap-2
                                                                items-center))))
                                         ,(emoji-for-ticket-status "todo")
@@ -157,8 +158,9 @@
                                (div (@ (class ,(mk-class '(sm:w-1/3 flex
                                                                     flex-col
                                                                     gap-2 p-2))))
-                                    (h4 (@ (class ,(mk-class '(text-sm
-                                                               font-bold flex
+                                    (div (@ (class ,(mk-class '(text-sm
+                                                               font-bold
+                                                               flex flex-row flex-wrap
                                                                gap-2
                                                                items-center))))
                                         ,(emoji-for-ticket-status
@@ -177,8 +179,9 @@
                                (div (@ (class ,(mk-class '(sm:w-1/3 flex
                                                                     flex-col
                                                                     gap-2 p-2))))
-                                    (h4 (@ (class ,(mk-class '(text-sm
-                                                               font-bold flex
+                                    (div (@ (class ,(mk-class '(text-sm
+                                                               font-bold
+                                                               flex flex-row flex-wrap
                                                                gap-2
                                                                items-center))))
                                         ,(emoji-for-ticket-status "in-review")
@@ -204,9 +207,9 @@
                                         (summary (@ (class ,(mk-class '(marker:block
                                                                         hover:cursor-pointer
                                                                         items-center))))
-                                                 (h4 (@ (class ,(mk-class '(text-sm
+                                                 (div (@ (class ,(mk-class '(text-sm
                                                                             font-bold
-                                                                            flex
+                                                                            flex flex-row flex-wrap
                                                                             gap-2
                                                                             items-center))))
                                                      ,(emoji-for-ticket-status
@@ -240,14 +243,14 @@
                                         (summary (@ (class ,(mk-class '(marker:block
                                                                         hover:cursor-pointer
                                                                         items-center))))
-                                                 (h4 (@ (class ,(mk-class '(text-sm
+                                                 (div (@ (class ,(mk-class '(text-sm
                                                                             font-bold
-                                                                            flex
+                                                                            flex flex-row flex-wrap
                                                                             gap-2
                                                                             items-center))))
                                                      ,(emoji-for-ticket-status
                                                        "rejected")
-                                                     (span ,(G_ "Rejected"))
+                                                     ,(sub-h3 (G_ "Rejected"))
                                                      (span (@ (class ,(mk-class '
                                                                        (text-xs
                                                                         text-stone-700
