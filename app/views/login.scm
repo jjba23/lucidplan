@@ -39,8 +39,9 @@
                                                          gap-4
                                                          shadow-md)))
                               (method "POST"))
-                           ,(input #:label (G_ "username")
-                                   #:name "username"
+                           ,(input #:label (G_ "email")
+                                   #:name "email"
+                                   #:type 'email
                                    #:value ""
                                    #:required #t)
                            ,(input #:label (G_ "password")

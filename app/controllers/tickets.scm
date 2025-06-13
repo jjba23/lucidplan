@@ -216,7 +216,11 @@
                                               (current-myhost)
                                               (params rc "project")))
                          #:status 302)))
-        (protected-endpoint rc do-delete)))
+        (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                           #:needed-permissions '(lucidplan:ticket-delete)
+                           #:rc rc
+                           #:happy-flow do-delete
+                           #:unhappy-flow back-to-login)))
 
 (post "/tickets/:project/new"
       #:mime 'xml
@@ -251,7 +255,11 @@
                                               (current-myhost)
                                               (params rc "project")))
                          #:status 302)))
-        (protected-endpoint rc do-new)))
+        (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                           #:needed-permissions '(lucidplan:ticket-create)
+                           #:rc rc
+                           #:happy-flow do-new
+                           #:unhappy-flow back-to-login)))
 
 (get "/tickets/:project/:human-id/edit"
      #:mime 'xml
@@ -308,7 +316,11 @@
                                               (current-myhost)
                                               (params rc "project")))
                          #:status 302)))
-        (protected-endpoint rc do-edit)))
+        (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                           #:needed-permissions '(lucidplan:ticket-create)
+                           #:rc rc
+                           #:happy-flow do-edit
+                           #:unhappy-flow back-to-login)))
 
 (get "/tickets/:project/:human-id"
      #:mime 'xml

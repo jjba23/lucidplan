@@ -100,7 +100,11 @@
                          (string->uri (format #f "~a/projects"
                                               (current-myhost)))
                          #:status 302)))
-        (protected-endpoint rc do-delete)))
+        (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                           #:needed-permissions '(lucidplan:project-delete)
+                           #:rc rc
+                           #:happy-flow do-delete
+                           #:unhappy-flow back-to-login)))
 
 (post "/projects/new"
       #:auth '(table user "username" "password")
@@ -131,7 +135,11 @@
                          (string->uri (format #f "~a/projects"
                                               (current-myhost)))
                          #:status 302)))
-        (protected-endpoint rc do-new)))
+        (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                           #:needed-permissions '(lucidplan:project-create)
+                           #:rc rc
+                           #:happy-flow do-new
+                           #:unhappy-flow back-to-login)))
 
 (get "/projects/:human-id/edit"
      #:session #t
@@ -186,5 +194,9 @@
                          (string->uri (format #f "~a/projects"
                                               (current-myhost)))
                          #:status 302)))
-        (protected-endpoint rc do-edit)))
+        (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                           #:needed-permissions '(lucidplan:project-create)
+                           #:rc rc
+                           #:happy-flow do-edit
+                           #:unhappy-flow back-to-login)))
 

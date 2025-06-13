@@ -3,7 +3,11 @@
 (use-modules (artanis artanis)
              (artanis security nss))
 
-(define* (add-test-user! #:key name email password salt)
+(define* (add-test-user! #:key name
+                         email
+                         password
+                         salt
+                         permissions)
   (let ((mt (map-table-from-DB (get-conn-from-pool!)))
         (real-pass (string->sha-256 (string-append password salt))))
     (mt 'set
@@ -11,11 +15,20 @@
         #:username name
         #:email email
         #:password real-pass
-        #:salt salt)))
+        #:salt salt
+        #:permissions permissions)))
 
 (migrate-up (display "Adding user...")
-            (add-test-user! #:name "jjba23"
-                            #:email "jjbigorra@gmail.com"
-                            #:password ""
-                            #:salt "asdf")
+            (add-test-user! #:name "Joe"
+             #:email "jjbigorra@gmail.com"
+             #:password ""
+             #:salt ""
+             ;; note: the ` is important due to Lisp quasi-quotation
+             ;; so as to have it interpreted as a list of symbols
+             #:permissions
+             "`(lucidplan:modify-permissions
+                                             lucidplan:ticket-create lucidplan:ticket-delete
+                                             lucidplan:project-create lucidplan:project-delete
+                                             lucidplan:users-create lucidplan:users-delete)")
             (display "done.\n"))
+

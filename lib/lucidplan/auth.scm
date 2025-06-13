@@ -1,6 +1,6 @@
 ;;; lucidplan - the CI/CD orchestrator written in Guile Scheme
 
-;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
+;; Copyright © Josep Bigorra known as "jjba23" <jjbigorra@gmail.com>
 
 ;; lucidplan is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU Affero General Public License as published by
@@ -17,31 +17,72 @@
 
 (define-module (lucidplan auth)
   #:use-module (web uri)
-  #:use-module (artanis artanis))
+  #:use-module (artanis artanis)
+  #:use-module (artanis route)
+  #:use-module (bewaking bewaking)
+  #:use-module (lucidplan env)
+  #:export (back-to-login unauthorized-api-message bewaking-endpoint
+                          bewaking-api-endpoint))
 
-(begin
-  (define-syntax-rule (protected-api-endpoint rc happy-flow-thunk)
-    "Protect an HTTP REST endpoint, preventing unauthorized access and returning proper error response."
-    (cond
-      ((:auth rc)
-       (happy-flow-thunk))
-      (else (:mime rc
-                   '((error . "You must be authenticated to use this API endpoint"))))))
-  (export protected-api-endpoint))
+(define* (bewaking-endpoint #:key token-name
+                            needed-permissions
+                            happy-flow
+                            unhappy-flow
+                            rc)
+  "Protect an HTTP endpoint with bewaking, preventing unauthorized access and
+executing either happy-flow-thunk or unhappy-flow-thunk."
+  (cond
+    ((not (equal? #f
+                  (:cookies-value rc
+                                  (symbol->string token-name))))
+     (let* ((t (decrypt-token #:token (:cookies-value rc
+                                                      (symbol->string
+                                                       token-name))
+                              #:encryption-key encryption-key
+                              #:signing-key signing-key))
+            (has-needed-permissions (has-needed-permissions? #:needed
+                                     needed-permissions
+                                     #:present (assoc-ref t
+                                                          'owner-permissions)))
+            (has-expired (is-token-expired? #:token t)))
+       (cond
+         ((and has-needed-permissions
+               (not has-expired))
+          (happy-flow))
+         (else (unhappy-flow rc)))))
+    (else (unhappy-flow rc))))
 
-(begin
-  (define-syntax-rule (protected-endpoint rc happy-flow-thunk)
-    "Protect an HTTP endpoint, preventing unauthorized access and redirecting to login page upon errors."
-    (cond
-      ((:session rc
-                 'check)
-       (happy-flow-thunk))
-      ((:auth rc)
-       (:session rc
-                 'spawn)
-       (happy-flow-thunk))
-      (else (redirect-to rc
-                         (string->uri (format #f "~a/login"
-                                              (current-myhost)))
-                         #:status 302))))
-  (export protected-endpoint))
+(define* (bewaking-api-endpoint #:key token-name
+                                needed-permissions
+                                happy-flow
+                                unhappy-flow
+                                rc)
+  "Protect an HTTP REST endpoint with bewaking, preventing unauthorized access and
+executing either happy-flow-thunk or unhappy-flow-thunk."
+  (cond
+    ((not (equal? #f
+                  (get-header rc token-name)))
+     (let* ((t (decrypt-token #:token (get-header rc token-name)
+                              #:encryption-key encryption-key
+                              #:signing-key signing-key))
+            (has-needed-permissions (has-needed-permissions? #:needed
+                                     needed-permissions
+                                     #:present (assoc-ref t
+                                                          'owner-permissions)))
+            (has-expired (is-token-expired? #:token t)))
+       (cond
+         ((and has-needed-permissions
+               (not has-expired))
+          (happy-flow))
+         (else (unhappy-flow rc)))))
+    (else (unhappy-flow rc))))
+
+(define (unauthorized-api-message rc)
+  (response-emit '((error . "You must be authenticated to use this API endpoint"))
+                 #:status 401))
+
+(define (back-to-login rc)
+  (redirect-to rc
+               (string->uri (format #f "~a/login"
+                                    (current-myhost)))
+               #:status 302))

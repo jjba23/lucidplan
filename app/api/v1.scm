@@ -18,7 +18,12 @@
 (define-restful-api v1)
 
 (import (lucidplan auth)
+        (lucidplan uri)
+        (bewaking bewaking)
+        (ice-9 textual-ports)
+        (artanis security nss)
         (app models project)
+        (app models user)
         (app models ticket))
 
 (get "/api/v1/tickets/:project"
@@ -31,7 +36,11 @@
                 ($ticket 'get
                          #:condition (where #:project_id (params rc "project"))
                          #:order-by '(human_id asc))))
-       (protected-api-endpoint rc do-get)))
+       (bewaking-api-endpoint #:token-name 'x-bewaking-lucidplan
+                              #:needed-permissions '()
+                              #:rc rc
+                              #:happy-flow do-get
+                              #:unhappy-flow unauthorized-api-message)))
 
 (get "/api/v1/projects"
      #:mime 'json
@@ -42,4 +51,44 @@
          (:mime rc
                 ($project 'get
                           #:order-by '(human_id asc))))
-       (protected-api-endpoint rc do-get)))
+       (bewaking-api-endpoint #:token-name 'x-bewaking-lucidplan
+                              #:needed-permissions '()
+                              #:rc rc
+                              #:happy-flow do-get
+                              #:unhappy-flow unauthorized-api-message)))
+
+(post "/api/v1/login"
+      #:mime 'json
+      (lambda (rc)
+        (let* ((body (rc-body rc))
+               (kv (read-url-encoded-body body))
+               (email (uri-decode (car (assoc-ref kv "email"))))
+               (password (uri-decode (car (assoc-ref kv "password"))))
+               (u ($user 'get
+                         #:ret 'top
+                         #:condition (where #:email email)))
+               (get-owner-details (lambda ()
+                                    `((id unquote
+                                          (assoc-ref (car u) "id"))
+                                      (email unquote
+                                             (assoc-ref (car u) "email"))
+                                      (name unquote
+                                            (assoc-ref (car u) "username"))
+                                      (permissions unquote
+                                                   (eval-string (assoc-ref (car
+                                                                            u)
+                                                                 "permissions"))))))
+               (t (generate-token #:encryption-key encryption-key
+                                  #:signing-key signing-key
+                                  #:get-owner-details get-owner-details)))
+          
+          (cond
+            ((equal? (string->sha-256 (string-append password
+                                                     (assoc-ref (car u) "salt")))
+                     (assoc-ref (car u) "password"))
+             (response-emit ""
+                            #:status 204
+                            #:headers `((x-bewaking-byggsteg unquote t))))
+            (else (response-emit '((error . "invalid credentials, could not make token"))
+                                 #:status 401
+                                 #:headers '()))))))

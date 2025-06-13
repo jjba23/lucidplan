@@ -1,3 +1,20 @@
+;;; lucidplan - the CI/CD orchestrator written in Guile Scheme
+
+;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
+
+;; lucidplan is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU Affero General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; lucidplan is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU Affero General Public License for more details.
+
+;; You should have received a copy of the GNU Affero General Public License
+;; along with lucidplan.  If not, see <https://www.gnu.org/licenses/>.
+
 (use-modules (gnu)
              (guix utils)
              (guix git-download)
@@ -130,6 +147,33 @@ easing the learning curve, and reducing the cognitive load.")
      "Convert Org markup to pretty HTML with a Lisp (Guile Scheme) library")
     (license license:lgpl3+)))
 
+(define-public guile-bewaking
+  (package
+    (name "guile-bewaking")
+    (version "0.0.21")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://codeberg.org/jjba23/bewaking.git")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0rh9jmcb8izfd49crmbamdgi0j6rlpbfyd25iv6dvld3g5c9ywxj"))))
+    (build-system guile-build-system)
+    (native-inputs (list guile-uuid guile-gcrypt guile-3.0))
+    (arguments
+     (list
+      #:source-directory "src"))
+    (home-page "https://codeberg.org/jjba23/bewaking")
+    (synopsis
+     "DSL and helpers for authentication/authorization in Guile Scheme projects")
+    (description
+     "bewaking helps you create and verify lifetime-limited encrypted digital credentials that carry
+specific user information securely, protected through multiple layers of cryptographic
+and obfuscation techniques, a.k.a secure tokens.")
+    (license license:lgpl3+)))
+
 ;;
 ;; define manifest
 ;;
@@ -141,6 +185,7 @@ easing the learning curve, and reducing the cognitive load.")
                           artanis
                           guile-hygguile
                           guile-kracht
+                          guile-bewaking
                           guile-uuid
                           guile-dbi
                           guile-gcrypt

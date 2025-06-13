@@ -3,3 +3,4 @@ lucidplan.db*
 tmp/*
 *.log
 en-GB.html
+env.scm

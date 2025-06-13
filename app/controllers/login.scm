@@ -21,6 +21,10 @@
         (lucidplan auth)
         (web uri)
         (ice-9 string-fun)
+        (bewaking bewaking)
+        (artanis security nss)
+        (lucidplan env)
+        (lucidplan uri)
         (app models user)
         (app models project)
         (app views login))
@@ -33,25 +37,49 @@
                              (login-page (:i18n rc))))))
 
 (post "/login"
-      #:auth '(table user "username" "password")
-      #:session #t
+      #:cookies '(names x-bewaking-lucidplan)
       (lambda (rc)
-        (cond
-          ((:session rc
-                     'check)
-           (redirect-to rc
-                        (string->uri (format #f "~a"
+        (let* ((body (rc-body rc))
+               (kv (read-url-encoded-body body))
+               (email (uri-decode (car (assoc-ref kv "email"))))
+               (password (uri-decode (car (assoc-ref kv "password"))))
+               (u ($user 'get
+                         #:ret 'top
+                         #:condition (where #:email email)))
+               (get-owner-details (lambda ()
+                                    `((id unquote
+                                          (assoc-ref (car u) "id"))
+                                      (email unquote
+                                             (assoc-ref (car u) "email"))
+                                      (name unquote
+                                            (assoc-ref (car u) "username"))
+                                      (permissions unquote
+                                                   (eval-string (assoc-ref (car
+                                                                            u)
+                                                                 "permissions"))))))
+               (t (generate-token #:encryption-key encryption-key
+                                  #:signing-key signing-key
+                                  #:get-owner-details get-owner-details)))
+          
+          (cond
+            ((equal? (string->sha-256 (string-append password
+                                                     (assoc-ref (car u) "salt")))
+                     (assoc-ref (car u) "password"))
+             (begin
+               (:cookies-set! rc
+                              'x-bewaking-lucidplan "x-bewaking-lucidplan" t)
+               (:cookies-setattr! rc
+                                  'x-bewaking-lucidplan
+                                  #:expires (* 3600 24 7)
+                                  #:path "/"
+                                  #:http-only #t)
+               (redirect-to rc
+                            (string->uri (format #f
+                                          "~a/projects?login_succeeded=true"
+                                          (current-myhost)))
+                            #:status 302)))
+            (else (redirect-to rc
+                               (string->uri (format #f
+                                             "~a/login?login_failed=true"
                                              (current-myhost)))
-                        #:status 302))
-          ((:auth rc)
-           (:session rc
-                     'spawn)
-           (redirect-to rc
-                        (string->uri (format #f "~a"
-                                             (current-myhost)))
-                        #:status 302))
-          (else (redirect-to rc
-                             (string->uri (format #f
-                                           "~a/login?login_failed=true"
-                                           (current-myhost)))
-                             #:status 302)))))
+                               #:status 302))))))
