@@ -2,8 +2,8 @@
 
 (create-artanis-model user
                       (:deps)
-                      (id integer
-                          (#:primary-key #:auto-increment))
+                      (id char-field
+                          (#:primary-key #:maxlen 36))
                       (username char-field
                                 (#:not-null #:maxlen 256))
                       (email char-field
