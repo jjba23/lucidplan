@@ -273,12 +273,8 @@ function addSearchQueryParam(form) {
 (begin
   (define* (sort-select G_
                         #:key project-id
-                        (current-sort #f))
-    `((div (@ (class ,(mk-class '(flex flex-col gap-2 w-min))))
-           ,(select #:name 'sort-select
-                    #:id 'sort-select
-                    #:on-change "window.location.href=this.value;"
-                    #:options (map (lambda (s)
+                        (current-sort #f)
+                        (option-maker (lambda (s)
                                      (option #:value (format #f
                                                       "/tickets/~a?sort=~a"
                                                       project-id
@@ -287,7 +283,12 @@ function addSearchQueryParam(form) {
                                              #:selected-value (format #f
                                                                "/tickets/~a?sort=~a"
                                                                project-id
-                                                               current-sort)))
+                                                               current-sort)))))
+    `((div (@ (class ,(mk-class '(flex flex-col gap-2 w-min))))
+           ,(select #:name 'sort-select
+                    #:id 'sort-select
+                    #:on-change "window.location.href=this.value;"
+                    #:options (map option-maker
                                    `(("title-asc" unquote
                                       (G_ "Title - Ascending"))
                                      ("title-desc" unquote

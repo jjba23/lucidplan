@@ -117,7 +117,6 @@
                                  (else #f)))
                 (proj ($project 'get
                                 #:order-by '(human_id asc)))
-                (write (params rc "project"))
                 (query-sort (entity-sort-from-query user-sort))
                 (project-details (car ($project 'get
                                                 #:ret 'top

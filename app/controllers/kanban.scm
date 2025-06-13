@@ -40,16 +40,41 @@
 (get "/kanban/:project"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names x-bewaking-lucidplan)
+     #:cookies '(names x-bewaking-lucidplan lucidplan-ticket-sort)
      (lambda (rc)
        (define (get)
          (let* ((project-id (project-id-from-human-id (params rc "project")))
                 (proj ($project 'get
                                 #:order-by '(human_id asc)))
-                (project-tickets ($ticket 'get
-                                          #:condition (where #:project_id
-                                                             project-id)
-                                          #:order-by '(updated_at desc)))
+                (user-sort (cond
+                             ((not (equal? #f
+                                           (get-from-qstr rc "sort")))
+                              (:cookies-set! rc
+                                             'lucidplan-ticket-sort
+                                             "lucidplan-ticket-sort"
+                                             (get-from-qstr rc "sort"))
+                              (:cookies-setattr! rc
+                                                 'lucidplan-ticket-sort
+                                                 #:expires 12000000
+                                                 #:path "/"
+                                                 #:secure #t
+                                                 #:http-only #t)
+                              (get-from-qstr rc "sort"))
+                             ((not (equal? #f
+                                           (:cookies-value rc
+                                            "lucidplan-ticket-sort")))
+                              (:cookies-value rc "lucidplan-ticket-sort"))
+                             (else "last-edited-at-desc")))
+                (query-sort (entity-sort-from-query user-sort))                
+                (ticket-query (->sql select * from
+                                     'ticket
+                                     (format #f
+                                      " WHERE project_id = '~a' ORDER BY ~a ~a"
+                                      project-id
+                                      (car query-sort)
+                                      (cadr query-sort))))
+                (project-tickets (DB-get-all-rows (DB-query (DB-open rc)
+                                                            ticket-query)))
                 (ticket-id-to-human-id (map (lambda (t)
                                               `(,(assoc-ref t "id") unquote
                                                 (assoc-ref t "human_id")))
@@ -61,6 +86,7 @@
                                                                  "project")
                                                       #:tickets
                                                       project-tickets
+                                                      #:current-sort user-sort
                                                       #:ticket-id-to-human-id
                                                       ticket-id-to-human-id
                                                       #:is-logged-in (:cookies-value
