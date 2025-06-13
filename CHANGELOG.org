@@ -26,6 +26,10 @@ sqlite3 database.db "INSERT INTO table VALUES (something)"
 
 ----------------------------------
 
+* v0.7.1
+
+Had to remake the users table, so as to accomodate the bewaking permission system.
+
 * v0.6.4
 
 Removed constraint of uniqueness in ticket titles, this might require some manual touches on the database ~ticket~ table.
