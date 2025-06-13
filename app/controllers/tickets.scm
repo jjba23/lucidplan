@@ -63,6 +63,7 @@
                                                  'lucidplan-ticket-sort
                                                  #:expires 12000000
                                                  #:path "/"
+                                                 #:secure #t
                                                  #:http-only #t)
                               (get-from-qstr rc "sort"))
                              ((not (equal? #f
@@ -82,6 +83,7 @@
                                                  'lucidplan-show-done
                                                  #:expires 12000000
                                                  #:path "/"
+                                                 #:secure #t
                                                  #:http-only #t)
                               (equal? (get-from-qstr rc "with-done") "true"))
                              ((not (equal? #f
@@ -103,6 +105,7 @@
                                                      'lucidplan-show-rejected
                                                      #:expires 12000000
                                                      #:path "/"
+                                                     #:secure #t
                                                      #:http-only #t)
                                   (equal? (get-from-qstr rc "with-rejected")
                                           "true"))
@@ -186,7 +189,8 @@
          (response-emit (:mime rc
                                (html-new-ticket-form (:i18n rc)
                                                      #:is-logged-in (:cookies-value
-                                                                     rc "x-bewaking-lucidplan")
+                                                                     rc
+                                                                     "x-bewaking-lucidplan")
                                                      #:projects ($project 'get
                                                                           #:order-by '
                                                                           (human_id
@@ -331,7 +335,8 @@
            (response-emit (:mime rc
                                  (html-template (:i18n rc)
                                                 #:is-logged-in (:cookies-value
-                                                                rc "x-bewaking-lucidplan")
+                                                                rc
+                                                                "x-bewaking-lucidplan")
                                                 #:body `(div (@ (class "p-2"))
                                                              ,(render-ticket (:i18n
                                                                               rc)

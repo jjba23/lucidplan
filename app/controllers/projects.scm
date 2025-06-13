@@ -74,7 +74,8 @@
          (response-emit (:mime rc
                                (html-new-project-form (:i18n rc)
                                                       #:is-logged-in (:cookies-value
-                                                                      rc "x-bewaking-lucidplan")
+                                                                      rc
+                                                                      "x-bewaking-lucidplan")
                                                       #:projects ($project 'get
                                                                            #:order-by '
                                                                            (human_id

@@ -64,5 +64,6 @@
                                                       #:ticket-id-to-human-id
                                                       ticket-id-to-human-id
                                                       #:is-logged-in (:cookies-value
-                                                                      rc "x-bewaking-lucidplan"))))))
+                                                                      rc
+                                                                      "x-bewaking-lucidplan"))))))
        (get)))

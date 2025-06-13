@@ -141,17 +141,19 @@
                                                                     flex-col
                                                                     gap-2 p-2))))
                                     (div (@ (class ,(mk-class '(text-sm
-                                                               font-bold
-                                                               flex flex-row flex-wrap
-                                                               gap-2
-                                                               items-center))))
-                                        ,(emoji-for-ticket-status "todo")
-                                        ,(sub-h3 (G_ "To-do"))
-                                        (span (@ (class ,(mk-class '(text-xs
-                                                                     text-stone-700
-                                                                     font-light))))
-                                              ,(format #f " ( ~a ) "
-                                                       (length tickets-todo))))
+                                                                font-bold
+                                                                flex
+                                                                flex-row
+                                                                flex-wrap
+                                                                gap-2
+                                                                items-center))))
+                                         ,(emoji-for-ticket-status "todo")
+                                         ,(sub-h3 (G_ "To-do"))
+                                         (span (@ (class ,(mk-class '(text-xs
+                                                                      text-stone-700
+                                                                      font-light))))
+                                               ,(format #f " ( ~a ) "
+                                                        (length tickets-todo))))
                                     ,(map (lambda (t)
                                             (render-k-ticket project t))
                                           tickets-todo))
@@ -159,20 +161,22 @@
                                                                     flex-col
                                                                     gap-2 p-2))))
                                     (div (@ (class ,(mk-class '(text-sm
-                                                               font-bold
-                                                               flex flex-row flex-wrap
-                                                               gap-2
-                                                               items-center))))
-                                        ,(emoji-for-ticket-status
-                                          "work-in-progress")
-                                        ,(sub-h3 (G_ "Work in Progress"))
-                                        (span (@ (class ,(mk-class '(text-xs
-                                                                     text-stone-700
-                                                                     dark:text-stone-200
-                                                                     font-light))))
-                                              ,(format #f " ( ~a ) "
-                                                       (length
-                                                        tickets-work-in-progress))))
+                                                                font-bold
+                                                                flex
+                                                                flex-row
+                                                                flex-wrap
+                                                                gap-2
+                                                                items-center))))
+                                         ,(emoji-for-ticket-status
+                                           "work-in-progress")
+                                         ,(sub-h3 (G_ "Work in Progress"))
+                                         (span (@ (class ,(mk-class '(text-xs
+                                                                      text-stone-700
+                                                                      dark:text-stone-200
+                                                                      font-light))))
+                                               ,(format #f " ( ~a ) "
+                                                        (length
+                                                         tickets-work-in-progress))))
                                     ,(map (lambda (t)
                                             (render-k-ticket project t))
                                           tickets-work-in-progress))
@@ -180,19 +184,21 @@
                                                                     flex-col
                                                                     gap-2 p-2))))
                                     (div (@ (class ,(mk-class '(text-sm
-                                                               font-bold
-                                                               flex flex-row flex-wrap
-                                                               gap-2
-                                                               items-center))))
-                                        ,(emoji-for-ticket-status "in-review")
-                                        ,(sub-h3 (G_ "In Review"))
-                                        (span (@ (class ,(mk-class '(text-xs
-                                                                     text-stone-700
-                                                                     dark:text-stone-200
-                                                                     font-light))))
-                                              ,(format #f " ( ~a ) "
-                                                       (length
-                                                        tickets-in-review))))
+                                                                font-bold
+                                                                flex
+                                                                flex-row
+                                                                flex-wrap
+                                                                gap-2
+                                                                items-center))))
+                                         ,(emoji-for-ticket-status "in-review")
+                                         ,(sub-h3 (G_ "In Review"))
+                                         (span (@ (class ,(mk-class '(text-xs
+                                                                      text-stone-700
+                                                                      dark:text-stone-200
+                                                                      font-light))))
+                                               ,(format #f " ( ~a ) "
+                                                        (length
+                                                         tickets-in-review))))
                                     ,(map (lambda (t)
                                             (render-k-ticket project t))
                                           tickets-in-review)))
@@ -208,22 +214,24 @@
                                                                         hover:cursor-pointer
                                                                         items-center))))
                                                  (div (@ (class ,(mk-class '(text-sm
-                                                                            font-bold
-                                                                            flex flex-row flex-wrap
-                                                                            gap-2
-                                                                            items-center))))
-                                                     ,(emoji-for-ticket-status
-                                                       "done")
-                                                     ,(sub-h3 (G_ "Done"))
-                                                     (span (@ (class ,(mk-class '
-                                                                       (text-xs
-                                                                        text-stone-700
-                                                                        dark:text-stone-200
-                                                                        font-light))))
-                                                           ,(format #f
-                                                             " ( ~a ) "
-                                                             (length
-                                                              tickets-done)))))
+                                                                             font-bold
+                                                                             flex
+                                                                             flex-row
+                                                                             flex-wrap
+                                                                             gap-2
+                                                                             items-center))))
+                                                      ,(emoji-for-ticket-status
+                                                        "done")
+                                                      ,(sub-h3 (G_ "Done"))
+                                                      (span (@ (class ,(mk-class '
+                                                                        (text-xs
+                                                                         text-stone-700
+                                                                         dark:text-stone-200
+                                                                         font-light))))
+                                                            ,(format #f
+                                                              " ( ~a ) "
+                                                              (length
+                                                               tickets-done)))))
                                         (div (@ (class ,(mk-class '(my-8 flex
                                                                     flex-col
                                                                     gap-2))))
@@ -244,22 +252,24 @@
                                                                         hover:cursor-pointer
                                                                         items-center))))
                                                  (div (@ (class ,(mk-class '(text-sm
-                                                                            font-bold
-                                                                            flex flex-row flex-wrap
-                                                                            gap-2
-                                                                            items-center))))
-                                                     ,(emoji-for-ticket-status
-                                                       "rejected")
-                                                     ,(sub-h3 (G_ "Rejected"))
-                                                     (span (@ (class ,(mk-class '
-                                                                       (text-xs
-                                                                        text-stone-700
-                                                                        dark:text-stone-200
-                                                                        font-light))))
-                                                           ,(format #f
-                                                             " ( ~a ) "
-                                                             (length
-                                                              tickets-rejected)))))
+                                                                             font-bold
+                                                                             flex
+                                                                             flex-row
+                                                                             flex-wrap
+                                                                             gap-2
+                                                                             items-center))))
+                                                      ,(emoji-for-ticket-status
+                                                        "rejected")
+                                                      ,(sub-h3 (G_ "Rejected"))
+                                                      (span (@ (class ,(mk-class '
+                                                                        (text-xs
+                                                                         text-stone-700
+                                                                         dark:text-stone-200
+                                                                         font-light))))
+                                                            ,(format #f
+                                                              " ( ~a ) "
+                                                              (length
+                                                               tickets-rejected)))))
                                         (div (@ (class ,(mk-class '(my-8 flex
                                                                     flex-col
                                                                     gap-2))))
