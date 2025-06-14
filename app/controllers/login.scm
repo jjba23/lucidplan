@@ -104,7 +104,6 @@
                               #:http-only #t)
 
            (redirect-to rc
-                        (string->uri (format #f
-                                      "~a/"
-                                      (current-myhost)))
+                        (string->uri (format #f "~a/"
+                                             (current-myhost)))
                         #:status 302)))))

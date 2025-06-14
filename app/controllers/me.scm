@@ -22,6 +22,7 @@
         (ice-9 string-fun)
         (app models user)
         (lucidplan env)
+        (lucidplan auth)
         (app views me)
         (bewaking bewaking))
 
@@ -40,7 +41,6 @@
                            #:ret 'top
                            #:condition (where #:id (assoc-ref t
                                                               'owner-id)))))
-         (write (car user))
          (response-emit (:mime rc
                                (me-page (:i18n rc)
                                         #:user (car user)
@@ -48,4 +48,37 @@
                                         #:token t
                                         #:is-logged-in (:cookies-value rc
                                                         "x-bewaking-lucidplan")))))))
+
+(get "/users/manage"
+     #:mime 'xml
+     #:i18n '(cookie "lang")
+     #:cookies '(names x-bewaking-lucidplan)
+     (lambda (rc)
+       (define (go-to-users-management)
+         (let* ((t (decrypt-token #:token (:cookies-value rc
+                                           "x-bewaking-lucidplan")
+                                  #:encryption-key encryption-key
+                                  #:signing-key signing-key))
+                (proj ($project 'get
+                                #:order-by '(human_id asc)))
+                (user ($user 'get
+                             #:ret 'top
+                             #:condition (where #:id (assoc-ref t
+                                                                'owner-id))))
+                (users ($user 'get
+                              #:ret 'all
+                              #:order-by '(username asc))))
+           (response-emit (:mime rc
+                                 (users-page (:i18n rc)
+                                             #:users users
+                                             #:projects proj
+                                             #:token t
+                                             #:is-logged-in (:cookies-value rc
+                                                             "x-bewaking-lucidplan"))))))
+
+       (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                          #:needed-permissions '(lucidplan:modify-permissions)
+                          #:rc rc
+                          #:happy-flow go-to-users-management
+                          #:unhappy-flow back-to-login)))
 
