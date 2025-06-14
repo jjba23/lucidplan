@@ -15,7 +15,7 @@
 ;; You should have received a copy of the GNU Affero General Public License
 ;; along with lucidplan.  If not, see <https://www.gnu.org/licenses/>.
 
-(define-artanis-controller index)
+(define-artanis-controller me)
 
 (import (lucidplan html)
         (web uri)
