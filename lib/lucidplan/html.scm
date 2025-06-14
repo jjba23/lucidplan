@@ -95,7 +95,17 @@
                          (href "/login"))
                       ,(icon-button #:icon 'sign-in
                                     #:content (G_ "login"))))
-                 `())
+                 `((a (@ (class ,(mk-class '(text-sm lowercase
+                                                     text-white
+                                                     dark:text-black
+                                                     font-sans
+                                                     font-medium
+                                                     px-2
+                                                     flex-items-center
+                                                     gap-2)))
+                         (href "/me"))
+                      ,(icon-button #:icon 'person
+                                    #:content (G_ "me")))))
             (a (@ (class ,(mk-class '(text-sm lowercase
                                               text-stone-900
                                               dark:text-stone-100
@@ -275,15 +285,15 @@ function addSearchQueryParam(form) {
                         #:key project-id
                         (current-sort #f)
                         (option-maker (lambda (s)
-                                     (option #:value (format #f
-                                                      "/tickets/~a?sort=~a"
-                                                      project-id
-                                                      (car s))
-                                             #:content (cdr s)
-                                             #:selected-value (format #f
-                                                               "/tickets/~a?sort=~a"
-                                                               project-id
-                                                               current-sort)))))
+                                        (option #:value (format #f
+                                                         "/tickets/~a?sort=~a"
+                                                         project-id
+                                                         (car s))
+                                                #:content (cdr s)
+                                                #:selected-value (format #f
+                                                                  "/tickets/~a?sort=~a"
+                                                                  project-id
+                                                                  current-sort)))))
     `((div (@ (class ,(mk-class '(flex flex-col gap-2 w-min))))
            ,(select #:name 'sort-select
                     #:id 'sort-select

@@ -40,7 +40,7 @@
                                          "https://jointhefreeworld.org/static-assets/lucidplan/img/logo.jpg"))))))))
       (html-template G_
                      #:proj projects
-                     #:is-logged-in #f
+                     #:is-logged-in is-logged-in
                      #:body `(div (@ (class ,(mk-class '(container mx-auto))))
                                   ,(h2 (G_ "welcome to lucidplan"))
                                   ,(em (G_

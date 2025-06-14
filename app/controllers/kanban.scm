@@ -65,7 +65,7 @@
                                             "lucidplan-ticket-sort")))
                               (:cookies-value rc "lucidplan-ticket-sort"))
                              (else "last-edited-at-desc")))
-                (query-sort (entity-sort-from-query user-sort))                
+                (query-sort (entity-sort-from-query user-sort))
                 (ticket-query (->sql select * from
                                      'ticket
                                      (format #f

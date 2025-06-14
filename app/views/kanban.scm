@@ -117,31 +117,42 @@
                                                ,(h1 (format #f "kanban for ~a"
                                                             project)))
 
-                                          (div (@ (class ,(mk-class '(my-3
-                                                                       p-2
-                                                                       flex
-                                                                       flex-row
-                                                                       flex-wrap
-                                                                       justify-start
-                                                                       align-center
-                                                                       items-center))))
-                                                ,(sort-select G_
-                                                              #:project-id (assoc-ref
-                                                                            project
-                                                                            "human_id")
-                                                              #:current-sort
-                                                              current-sort
-                                                              #:option-maker
-                                                              (lambda (s)
-                                     (option #:value (format #f
-                                                      "/kanban/~a?sort=~a"
-                                                      project
-                                                      (car s))
-                                             #:content (cdr s)
-                                             #:selected-value (format #f
-                                                               "/kanban/~a?sort=~a"
-                                                               project
-                                                               current-sort)))))
+                                          (div (@ (class ,(mk-class '(my-3 p-2
+                                                                      flex
+                                                                      flex-row
+                                                                      flex-wrap
+                                                                      justify-start
+                                                                      align-center
+                                                                      items-center))))
+                                               ,(sort-select G_
+                                                             #:project-id (assoc-ref
+                                                                           project
+                                                                           "human_id")
+                                                             #:current-sort
+                                                             current-sort
+                                                             #:option-maker (lambda 
+                                                                                    (s)
+                                                                              
+                                                                              
+                                                                              (option
+                                                                               #:value
+                                                                               (format
+                                                                                #f
+                                                                                "/kanban/~a?sort=~a"
+                                                                                project
+
+                                                                                
+                                                                                (car
+                                                                                 s))
+                                                                               #:content
+                                                                               (cdr
+                                                                                s)
+                                                                               #:selected-value
+                                                                               (format
+                                                                                #f
+                                                                                "/kanban/~a?sort=~a"
+                                                                                project
+                                                                                current-sort)))))
 
                                           (div (@ (class ,(mk-class '(flex
                                                                       flex-row
@@ -164,9 +175,13 @@
                                      )))
                           (div (@ (class ,(mk-class '(flex flex-wrap my-8
                                                            justify-between p-4))))
-                               (div (@ (class ,(mk-class '(w-full sm:w-1/2 md:w-1/3 lg:w-1/4 flex
-                                                                    flex-col
-                                                                    gap-2 p-2))))
+                               (div (@ (class ,(mk-class '(w-full sm:w-1/2
+                                                                  md:w-1/3
+                                                                  lg:w-1/4
+                                                                  flex
+                                                                  flex-col
+                                                                  gap-2
+                                                                  p-2))))
                                     (div (@ (class ,(mk-class '(text-sm
                                                                 font-bold
                                                                 flex
