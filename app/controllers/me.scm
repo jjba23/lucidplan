@@ -24,6 +24,7 @@
         (lucidplan env)
         (lucidplan auth)
         (app views me)
+        (app models project)
         (bewaking bewaking))
 
 (get "/me"
