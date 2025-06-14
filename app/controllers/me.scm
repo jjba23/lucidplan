@@ -45,6 +45,7 @@
                                (me-page (:i18n rc)
                                         #:user (car user)
                                         #:projects proj
+                                        #:token t
                                         #:is-logged-in (:cookies-value rc
                                                         "x-bewaking-lucidplan")))))))
 

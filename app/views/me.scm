@@ -28,16 +28,56 @@
   #:export (me-page))
 
 (define* (me-page G_
-                  #:key is-logged-in user projects)
+                  #:key is-logged-in
+                  token
+                  user
+                  projects)
   (let ((user-details `((div (@ (class ,(mk-class '())))
-                             ,(em (format #f "~a &lt;~a&gt;"
+                             ,(h3 (format #f "~a &lt;~a&gt;"
                                           (assoc-ref user "username")
-                                          (assoc-ref user "email")))))))
+                                          (assoc-ref user "email"))))))
+        (session-duration `((div (@ (class ,(mk-class '())))
+                                 ,(em (format #f "~a: ~a"
+                                              (G_ "logged in until")
+                                              (strftime "%c"
+                                                        (localtime (assoc-ref
+                                                                    token
+                                                                    'token-expires-at)))))))))
     (html-template G_
                    #:proj projects
                    #:is-logged-in is-logged-in
                    #:body `(div (@ (class ,(mk-class '(container mx-auto))))
-                                ,user-details))))
+                                (div (@ (class ,(mk-class '(flex flex-col
+                                                                 gap-6))))
+                                     ,user-details
+                                     ,session-duration)
+                                (div (@ (class ,(mk-class '(py-6 flex flex-row flex-wrap gap-6))))
+                                     (a (@ (class ,(mk-class '(text-sm
+                                                               lowercase
+                                                               text-white
+                                                               dark:text-black
+                                                               font-sans
+                                                               font-medium
+                                                               px-2
+                                                               flex-items-center
+                                                               gap-2)))
+                                           (href "/users/manage"))
+                                        ,(icon-button #:icon 'user-switch
+                                                      #:content (G_
+                                                                 "go to user management")))
+                                     (a (@ (class ,(mk-class '(text-sm
+                                                               lowercase
+                                                               text-white
+                                                               dark:text-black
+                                                               font-sans
+                                                               font-medium
+                                                               px-2
+                                                               flex-items-center
+                                                               gap-2)))
+                                           (href "/logout"))
+                                        ,(icon-button #:icon 'sign-out
+                                                      #:content (G_
+                                                                 "logout"))))))))
 unbalanced
 unbalanced
 

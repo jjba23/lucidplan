@@ -36,5 +36,6 @@
                                              #:is-logged-in (:cookies-value rc
                                                              "x-bewaking-lucidplan")))))))
 
+
 (get "/robots.txt" static-page-emitter)
 (get "/favicon.ico" static-page-emitter)

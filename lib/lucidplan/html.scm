@@ -104,7 +104,7 @@
                                                      flex-items-center
                                                      gap-2)))
                          (href "/me"))
-                      ,(icon-button #:icon 'person
+                      ,(icon-button #:icon 'user-circle
                                     #:content (G_ "me")))))
             (a (@ (class ,(mk-class '(text-sm lowercase
                                               text-stone-900
