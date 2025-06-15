@@ -48,18 +48,17 @@
               (user ($user 'get
                            #:ret 'top
                            #:condition (where #:id (assoc-ref t
-                                                              'owner-id))))
-              (happy-flow (response-emit (:mime rc
-                                                (me-page (:i18n rc)
-                                                         #:user (car user)
-                                                         #:projects proj
-                                                         #:token t
-                                                         #:is-logged-in (:cookies-value
-                                                                         rc
-                                                                         "x-bewaking-lucidplan"))))))
+                                                              'owner-id)))))
          (catch #t
                 (lambda ()
-                  (happy-flow))
+                  (response-emit (:mime rc
+                                        (me-page (:i18n rc)
+                                                 #:user (car user)
+                                                 #:projects proj
+                                                 #:token t
+                                                 #:is-logged-in (:cookies-value
+                                                                 rc
+                                                                 "x-bewaking-lucidplan")))))
                 (lambda (key . args)
                   (display (format #f
                             "error getting user details-me page: ~a: ~a" key
