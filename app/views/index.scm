@@ -61,7 +61,7 @@
                                                   "Take control of your projects with LucidPlan, the open and flexible project management solution built for teams of every shape and size."))
                                              ,(p (G_
                                                   "We believe powerful tools shouldn't be complicated or restricted. LucidPlan is designed to simplify workflows and make project management accessible to everyone.")))
-
+                                        (div ,project-logo)
                                         (div (@ (class ,(mk-class '(max-w-prose
                                                                     bg-stone-200
                                                                     dark:bg-stone-900
@@ -76,6 +76,6 @@
                                              ,(p (G_
                                                   "Built with the power of Lisp (Guile Scheme), LucidPlan offers a responsive and adaptable experience unlike those frustrating proprietary systems you might be used to.")))
 
-                                        (div ,project-logo)))))))
+                                        ))))))
   (export welcome-page))
 
