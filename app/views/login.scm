@@ -27,7 +27,7 @@
   #:use-module (ice-9 string-fun))
 
 (define-public (login-page G_)
-  (let ((login-form `(form (@ (action "/login")
+  (let* ((login-form `(form (@ (action "/login")
                               (class ,(mk-class '(w-full rounded-xl
                                                          bg-stone-200/50
                                                          dark:bg-stone-700/50
