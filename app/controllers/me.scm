@@ -27,6 +27,8 @@
         (lucidplan auth)
         (app views me)
         (uuid generate)
+        (rnrs bytevectors)
+        (json)
         (app models project)
         (app models password_reset)
         (bewaking bewaking))
@@ -88,7 +90,33 @@
                           #:happy-flow go-to-users-management
                           #:unhappy-flow back-to-login)))
 
-
+(define* (send-to-pingwing #:key
+                             body)
+  
+  (let* (
+         (handle (curl-easy-init))
+         (_ (begin
+              (curl-easy-setopt handle 'post #t)
+              (curl-easy-setopt handle
+                                'url
+                                (format #f "~a/api/v1/tasks" pingwing-url))
+              (curl-easy-setopt handle
+                                'postfields (string->utf8 (scm->json-string body)))              
+              (curl-easy-setopt handle
+                                'verbose #f)
+              (curl-easy-setopt handle
+                                'use-ssl 1)          
+              (curl-easy-setopt handle
+                                'username pingwing-basic-auth-user)
+              (curl-easy-setopt handle
+                                'password pingwing-basic-auth-password)))
+         (r (curl-easy-perform handle #t))
+         (rr (catch #t
+                    (lambda ()
+                      (bytevector->string r "utf-8"))
+                    (lambda (key . args)
+                      r))))
+    (display rr)))
 
 (post "/password/reset"
       #:cookies '(names x-bewaking-lucidplan)
@@ -141,6 +169,7 @@
           (write (assoc-ref (assoc-ref mail-payload
                                        'template-vars)
                             'reset-link))
+          (send-to-pingwing #:body mail-payload)
           (redirect-to rc
                        (string->uri (format #f "~a/?sent-password-reset=true"
                                             (current-myhost)))
