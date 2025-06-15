@@ -112,7 +112,7 @@ In any ~title~ or ~description~ field you can use the Org mode syntax (like in t
 
 ------
 
-* Running LucidPlan
+* Running LucidPlan yourself
 
 If you are thinking of running LucidPlan yourself and hosting it on your own here follow some tips.
 
