@@ -136,7 +136,7 @@
 
          ,(hr)
          (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-4))))
-              (a (@ (href ,(format #f "/tickets/~a/~a/edit" project
+              (a (@ (href ,(format #f "/tickets/~a/id/~a/edit" project
                                    (assoc-ref ticket "human_id"))))
 
                  ,(icon-button #:icon 'pencil
@@ -187,7 +187,7 @@
 
               (div (a (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
                                                   items-center justify-start)))
-                         (href ,(format #f "/tickets/~a/~a" project
+                         (href ,(format #f "/tickets/~a/id/~a" project
                                         (assoc-ref ticket "human_id"))))
                       ,(icon #:type 'link
                              #:icon-css '(text-md text-stone-600
@@ -479,7 +479,7 @@
                       #:ticket-type (assoc-ref t "ticket_type")
                       #:ticket-status (assoc-ref t "ticket_status")
                       #:priority (assoc-ref t "priority")
-                      #:action (format #f "/tickets/~a/~a/edit" project
+                      #:action (format #f "/tickets/~a/id/~a/edit" project
                                        (assoc-ref t "human_id"))
                       #:projects projects))
   (export html-edit-ticket-form))

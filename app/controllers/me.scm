@@ -90,6 +90,27 @@
                           #:happy-flow go-to-users-management
                           #:unhappy-flow back-to-login)))
 
+(get "/password/reset/token/:token"
+     #:mime 'xml
+     #:i18n '(cookie "lang")
+     (lambda (rc)
+       (let* ((user-id (assoc-ref (car ($password_reset 'get
+                                                        #:ret 'top
+                                                        #:condition (where
+                                                                           #:reset_token
+                                                                           (params
+                                                                            rc
+                                                                            "token"))))
+                                  "user_id"))
+              (email (assoc-ref (car ($user 'get
+                                            #:ret 'top
+                                            #:condition (where #:id user-id)))
+                                "email")))
+         (response-emit (:mime rc
+                               (reset-password-page (:i18n rc)
+                                                    #:token (params rc "token")
+                                                    #:email email))))))
+
 (define* (send-to-pingwing #:key body)
   
   (let* ((handle (curl-easy-init))
@@ -142,7 +163,8 @@
                (_ ($password_reset 'mod
                                    'row-delete
                                    (where #:user_id (assoc-ref (car u) "id"))))
-               (reset-token (base16-encode (format #f "~a-~a"
+               (reset-token (base16-encode (format #f "~a-~a-~a"
+                                                   (generate-string-uuid)
                                                    (generate-string-uuid)
                                                    (generate-string-uuid))))
                (pr ($password_reset 'set
@@ -162,7 +184,7 @@
                                (sender-name . "No Reply - LucidPlan")
                                (sender-address . "noreply@lucidplan.jointhefreeworld.org")
                                (subject . "LucidPlan - Password Reset")
-                               (recipients . #(((name . ,(assoc-ref (car u) "username")) (address . ,(assoc-ref (car u) "email"))))))))
+                               (recipients . #(((name unquote (assoc-ref (car u) "username")) (address unquote (assoc-ref (car u) "email"))))))))
           (write (assoc-ref (assoc-ref mail-payload
                                        'template-vars)
                             'reset-link))

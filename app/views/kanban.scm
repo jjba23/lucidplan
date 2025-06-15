@@ -55,7 +55,7 @@
                         ,(p (org2html (assoc-ref t "title"))))
 
                    (a (@ (class ,(mk-class '(text-xs)))
-                         (href ,(format #f "/tickets/~a/~a" project
+                         (href ,(format #f "/tickets/~a/id/~a" project
                                         (assoc-ref t "human_id"))))
                       ((i (@ (class ,(mk-class '(ph ph-link text-stone-600))))
                           ""))))))))

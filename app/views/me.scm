@@ -25,7 +25,7 @@
   #:use-module (ice-9 i18n)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun)
-  #:export (me-page users-page))
+  #:export (me-page users-page reset-password-page))
 
 (define* (me-page G_
                   #:key is-logged-in
@@ -148,3 +148,26 @@
                                                           dark:bg-stone-900))))
                                    ,(map (lambda (u)
                                            (render-user G_ u)) users)))))
+
+(define* (reset-password-page G_
+                              #:key token email)
+  (html-template G_
+                 #:proj '()
+                 #:is-logged-in #f
+                 #:body `((div (@ (class ,(mk-class '(py-8 px-4))))
+                               ,(h2 (G_ "Reset your password"))
+                               ,(sub-h3 (format #f "~a: ~a"
+                                                (G_
+                                                 "perform a password reset for")
+                                                email))
+                               ,(input #:label (G_ "new password")
+                                       #:name "new-password"
+                                       #:value ""
+                                       #:type 'password
+                                       #:required #t)
+                               ,(input #:label (G_ "confirm password")
+                                       #:name "confirm-password"
+                                       #:value ""
+                                       #:type 'password
+                                       #:required #t)
+                               (div ,(submit-button (G_ "reset")))))))
