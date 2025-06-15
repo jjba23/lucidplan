@@ -53,7 +53,7 @@
                                                               justify-start
                                                               my-4))))
                                   ,(em (G_ "my permissions (in database):"))
-                                  ,(mono (assoc-ref user "permissions")
+                                  ,(pre (assoc-ref user "permissions")
                                          #:size 'text-xs))
                              (div (@ (class ,(mk-class '(flex flex-row
                                                               flex-wrap
@@ -63,7 +63,7 @@
                                                               my-4))))
                                   ,(em (G_
                                         "current session permissions (in token):"))
-                                  ,(mono (format #f "~s"
+                                  ,(pre (format #f "~s"
                                                  (assoc-ref token
                                                             'owner-permissions))
                                          #:size 'text-xs))
