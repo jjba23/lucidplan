@@ -162,7 +162,7 @@
                                (sender-name . "No Reply - LucidPlan")
                                (sender-address . "noreply@lucidplan.jointhefreeworld.org")
                                (subject . "LucidPlan - Password Reset")
-                               (recipients . #((name unquote (assoc-ref (car u) "username")) (address unquote (assoc-ref (car u) "email")))))))
+                               (recipients . #(((name . ,(assoc-ref (car u) "username")) (address . ,(assoc-ref (car u) "email"))))))))
           (write (assoc-ref (assoc-ref mail-payload
                                        'template-vars)
                             'reset-link))
