@@ -90,22 +90,22 @@
                           #:happy-flow go-to-users-management
                           #:unhappy-flow back-to-login)))
 
-(define* (send-to-pingwing #:key
-                             body)
+(define* (send-to-pingwing #:key body)
   
-  (let* (
-         (handle (curl-easy-init))
+  (let* ((handle (curl-easy-init))
          (_ (begin
-              (curl-easy-setopt handle 'post #t)
+              (curl-easy-setopt handle
+                                'post #t)
               (curl-easy-setopt handle
                                 'url
                                 (format #f "~a/api/v1/tasks" pingwing-url))
               (curl-easy-setopt handle
-                                'postfields (string->utf8 (scm->json-string body)))              
+                                'postfields
+                                (string->utf8 (scm->json-string body)))
               (curl-easy-setopt handle
                                 'verbose #f)
               (curl-easy-setopt handle
-                                'use-ssl 1)          
+                                'use-ssl 1)
               (curl-easy-setopt handle
                                 'username pingwing-basic-auth-user)
               (curl-easy-setopt handle
@@ -162,10 +162,7 @@
                                (sender-name . "No Reply - LucidPlan")
                                (sender-address . "noreply@lucidplan.jointhefreeworld.org")
                                (subject . "LucidPlan - Password Reset")
-                               (recipients (name unquote
-                                                 (assoc-ref (car u) "username"))
-                                           (address unquote
-                                                    (assoc-ref (car u) "email"))))))
+                               (recipients . #((name unquote (assoc-ref (car u) "username")) (address unquote (assoc-ref (car u) "email")))))))
           (write (assoc-ref (assoc-ref mail-payload
                                        'template-vars)
                             'reset-link))
