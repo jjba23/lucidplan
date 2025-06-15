@@ -26,7 +26,9 @@
         (lucidplan uri)
         (lucidplan auth)
         (app views me)
+        (uuid generate)
         (app models project)
+        (app models password_reset)
         (bewaking bewaking))
 
 (get "/me"
@@ -87,8 +89,6 @@
                           #:unhappy-flow back-to-login)))
 
 
-;; (define (send-password-reset-mail)
-;;   )
 
 (post "/password/reset"
       #:cookies '(names x-bewaking-lucidplan)
@@ -111,23 +111,16 @@
                       ($user 'get
                              #:ret 'top
                              #:condition (where #:email (uri-decode (car email))))))
-               (get-owner-details (lambda ()
-                                    `((id unquote
-                                          (assoc-ref (car u) "id"))
-                                      (email unquote
-                                             (assoc-ref (car u) "email"))
-                                      (name unquote
-                                            (assoc-ref (car u) "username"))
-                                      (permissions unquote
-                                                   (eval-string (assoc-ref (car
-                                                                            u)
-                                                                 "permissions"))))))
-               (reset-token (generate-token #:encryption-key encryption-key
-                                            #:signing-key signing-key
-                                            #:get-owner-details
-                                            get-owner-details
-                                            #:token-validity-seconds (* 24
-                                                                        3600)))
+               (_ ($password_reset 'mod
+                                   'row-delete
+                                   (where #:user_id (assoc-ref (car u) "id"))))
+               (reset-token (base16-encode (format #f "~a-~a"
+                                                   (generate-string-uuid)
+                                                   (generate-string-uuid))))
+               (pr ($password_reset 'set
+                                    #:user_id (assoc-ref (car u) "id")
+                                    #:reset_token reset-token
+                                    #:created_at (current-time)))
                (mail-payload `((task-type . send-email)
                                (template . password-reset)
                                (template-vars (system-name . LucidPlan)

@@ -96,11 +96,12 @@
                                      (a (@ (href "/logout"))
                                         ,(icon-button #:icon 'sign-out
                                                       #:content (G_ "logout")))
-                                     (form (@ (action "/password/reset")(method POST))
-                                        ,(icon-button #:icon 'password
-                                                      #:type 'submit
-                                                      #:content (G_
-                                                                 "reset password"))))))))
+                                     (form (@ (action "/password/reset")
+                                              (method POST))
+                                           ,(icon-button #:icon 'password
+                                                         #:type 'submit
+                                                         #:content (G_
+                                                                    "reset password"))))))))
 
 (define row-class
   (mk-class '(flex flex-row gap-4)))
