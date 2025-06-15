@@ -23,6 +23,7 @@
         (curl)
         (app models user)
         (lucidplan env)
+        (lucidplan uri)
         (lucidplan auth)
         (app views me)
         (app models project)
@@ -61,6 +62,7 @@
                                            "x-bewaking-lucidplan")
                                   #:encryption-key encryption-key
                                   #:signing-key signing-key))
+                
                 (proj ($project 'get
                                 #:order-by '(human_id asc)))
                 (user ($user 'get
@@ -84,32 +86,6 @@
                           #:happy-flow go-to-users-management
                           #:unhappy-flow back-to-login)))
 
-;; -d '{
-;;     "task-type": "send-email",
-;;     "template": "password-reset",
-;;     "template-vars": {
-;;       "system-name": "WikiMusic",
-;;       "user": "jjbigorra@gmail.com",
-;;       "reset-link": "https://gnu.org"
-;;     },
-;;     "sender-name": "No Reply - WikiMusic",
-;;     "sender-address": "noreply@wikimusic.jointhefreeworld.org",
-;;     "subject": "Wikimusic - Password Reset",
-;;     "recipients": [
-;;       {"name": "Josep Bigorra", "address": "jjbigorra@gmail.com"},
-;;       {"name": "Another Person", "address": "jjbigorra+1@gmail.com"}
-;;     ]
-;;   }' \
-
-;; (mail-payload `((task-type . send-email)
-;;                 (template . password-reset)
-;;                 (template-vars . ((system-name . LucidPlan)
-;;                                   (user . "jjbigorra@gmail.com")
-;;                                   (reset-link . "http://localhost:50025/password/reset/token/")))
-;;                 (sender-name . "No Reply - LucidPlan")
-;;                 (sender-address . "noreply@lucidplan.jointhefreeworld.org")
-;;                 (subject . "LucidPlan - Password Reset")
-;;                 (recipients . ((name . "Josep Bigorra")(address . "jjbigorra@gmail.com")))))
 
 ;; (define (send-password-reset-mail)
 ;;   )
@@ -117,14 +93,24 @@
 (post "/password/reset"
       #:cookies '(names x-bewaking-lucidplan)
       (lambda (rc)
-        (let* ((existing-token (decrypt-token #:token (:cookies-value rc
-                                                       "x-bewaking-lucidplan")
-                                              #:encryption-key encryption-key
-                                              #:signing-key signing-key))
-               (u ($user 'get
-                         #:ret 'top
-                         #:condition (where #:id (assoc-ref existing-token
-                                                            'owner-id))))
+        (let* ((existing-token (if (:cookies-value rc "x-bewaking-lucidplan")
+                                   (decrypt-token #:token (:cookies-value rc
+                                                           "x-bewaking-lucidplan")
+                                                  #:encryption-key
+                                                  encryption-key
+                                                  #:signing-key signing-key)
+                                   #f))
+               (body (rc-body rc))
+               (email (if (not body) #f
+                          (assoc-ref (read-url-encoded-body body) "email")))
+               (u (if (not email)
+                      ($user 'get
+                             #:ret 'top
+                             #:condition (where #:id (assoc-ref existing-token
+                                                      'owner-id)))
+                      ($user 'get
+                             #:ret 'top
+                             #:condition (where #:email (uri-decode (car email))))))
                (get-owner-details (lambda ()
                                     `((id unquote
                                           (assoc-ref (car u) "id"))
@@ -147,9 +133,11 @@
                                (template-vars (system-name . LucidPlan)
                                               (user unquote
                                                     (assoc-ref (car u) "email"))
-                                              (reset-link format #f
-                                               "~a/password/reset/token/~a"
-                                               (current-myhost) reset-token))
+                                              (reset-link unquote
+                                                          (format #f
+                                                           "~a/password/reset/token/~a"
+                                                           (current-myhost)
+                                                           reset-token)))
                                (sender-name . "No Reply - LucidPlan")
                                (sender-address . "noreply@lucidplan.jointhefreeworld.org")
                                (subject . "LucidPlan - Password Reset")

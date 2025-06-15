@@ -89,31 +89,18 @@
                                 (div (@ (class ,(mk-class '(py-6 flex flex-row
                                                                  flex-wrap
                                                                  gap-6))))
-                                     (a (@ (class ,(mk-class '(text-sm
-                                                               lowercase
-                                                               text-white
-                                                               dark:text-black
-                                                               font-sans
-                                                               font-medium
-                                                               px-2
-                                                               flex-items-center
-                                                               gap-2)))
-                                           (href "/users/manage"))
+                                     (a (@ (href "/users/manage"))
                                         ,(icon-button #:icon 'user-switch
                                                       #:content (G_
                                                                  "go to user management")))
-                                     (a (@ (class ,(mk-class '(text-sm
-                                                               lowercase
-                                                               text-white
-                                                               dark:text-black
-                                                               font-sans
-                                                               font-medium
-                                                               px-2
-                                                               flex-items-center
-                                                               gap-2)))
-                                           (href "/logout"))
+                                     (a (@ (href "/logout"))
                                         ,(icon-button #:icon 'sign-out
-                                                      #:content (G_ "logout"))))))))
+                                                      #:content (G_ "logout")))
+                                     (form (@ (action "/password/reset")(method POST))
+                                        ,(icon-button #:icon 'password
+                                                      #:type 'submit
+                                                      #:content (G_
+                                                                 "reset password"))))))))
 
 (define row-class
   (mk-class '(flex flex-row gap-4)))
