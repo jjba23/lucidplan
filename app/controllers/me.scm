@@ -29,6 +29,7 @@
         (uuid generate)
         (rnrs bytevectors)
         (json)
+        (artanis security nss)
         (app models project)
         (app models password_reset)
         (bewaking bewaking))
@@ -94,14 +95,18 @@
      #:mime 'xml
      #:i18n '(cookie "lang")
      (lambda (rc)
-       (let* ((user-id (assoc-ref (car ($password_reset 'get
-                                                        #:ret 'top
-                                                        #:condition (where
-                                                                           #:reset_token
-                                                                           (params
-                                                                            rc
-                                                                            "token"))))
-                                  "user_id"))
+       (let* ((tt (car ($password_reset 'get
+                                        #:ret 'top
+                                        #:condition (where #:reset_token (params
+                                                                          rc
+                                                                          "token")))))
+              (now (current-time))
+              (allowance (* 24 7 3600)) ;reset token is valid for a week
+              (_ (when (> now
+                          (+ allowance
+                             (assoc-ref tt "created_at")))
+                   (error "reset token is found but not valid anymore")))
+              (user-id (assoc-ref tt "user_id"))
               (email (assoc-ref (car ($user 'get
                                             #:ret 'top
                                             #:condition (where #:id user-id)))
@@ -185,11 +190,59 @@
                                (sender-address . "noreply@lucidplan.jointhefreeworld.org")
                                (subject . "LucidPlan - Password Reset")
                                (recipients . #(((name unquote (assoc-ref (car u) "username")) (address unquote (assoc-ref (car u) "email"))))))))
-          (write (assoc-ref (assoc-ref mail-payload
-                                       'template-vars)
-                            'reset-link))
+          
           (send-to-pingwing #:body mail-payload)
           (redirect-to rc
                        (string->uri (format #f "~a/?sent-password-reset=true"
                                             (current-myhost)))
+                       #:status 302))))
+
+(post "/password/do-reset"
+      #:cookies '(names x-bewaking-lucidplan)
+      (lambda (rc)
+        (let* ((body (rc-body rc))
+               (kv (read-url-encoded-body body))
+               (email (uri-decode (car (assoc-ref kv "email"))))
+               (reset-token (uri-decode (car (assoc-ref kv "reset-token"))))
+               (new-password (uri-decode (car (assoc-ref kv "new-password"))))
+               (confirm-password (uri-decode (car (assoc-ref kv
+                                                   "confirm-password"))))
+               (tt (car ($password_reset 'get
+                                         #:ret 'top
+                                         #:condition (where #:reset_token
+                                                            reset-token))))
+               (now (current-time))
+               (allowance (* 24 7 3600)) ;reset token is valid for a week
+               (_ (when (> now
+                           (+ allowance
+                              (assoc-ref tt "created_at")))
+                    (error "reset token is found but not valid anymore!")))
+               (_ (when (not (equal? new-password confirm-password))
+                    (error "password confirmation did not match!")))
+               (user-id (assoc-ref tt "user_id"))
+               (u ($user 'get
+                         #:ret 'top
+                         #:condition (where #:id user-id)))
+               (new-salt (generate-string-uuid))
+               (h (string->sha-256 (string-append new-password new-salt)))
+               (_ (DB-query (DB-open rc)
+                            (format #f
+                             "UPDATE user SET salt = '~a', password = '~a' WHERE id = '~a'"
+                             new-salt h
+                             (assoc-ref (car u) "id"))))
+               (_ ($password_reset 'mod
+                                   'row-delete
+                                   (where #:user_id (assoc-ref (car u) "id")))))
+          (:cookies-set! rc
+                         'x-bewaking-lucidplan "x-bewaking-lucidplan" "")
+          (:cookies-setattr! rc
+                             'x-bewaking-lucidplan
+                             #:expires 1
+                             #:path "/"
+                             #:secure #t
+                             #:http-only #t)
+          (redirect-to rc
+                       (string->uri (format #f
+                                     "~a/login?has-reset-password=true"
+                                     (current-myhost)))
                        #:status 302))))

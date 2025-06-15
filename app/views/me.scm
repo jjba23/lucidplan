@@ -32,7 +32,7 @@
                   token
                   user
                   projects)
-  (write token)
+  
   (let ((user-details `((div (@ (class ,(mk-class '(py-8 px-4 max-w-prose))))
                              ,(h3 (format #f "~a &lt;~a&gt;"
                                           (assoc-ref user "username")
@@ -154,20 +154,37 @@
   (html-template G_
                  #:proj '()
                  #:is-logged-in #f
-                 #:body `((div (@ (class ,(mk-class '(py-8 px-4))))
+                 #:body `((div (@ (class ,(mk-class '(py-6 px-4))))
                                ,(h2 (G_ "Reset your password"))
                                ,(sub-h3 (format #f "~a: ~a"
                                                 (G_
                                                  "perform a password reset for")
                                                 email))
-                               ,(input #:label (G_ "new password")
-                                       #:name "new-password"
-                                       #:value ""
-                                       #:type 'password
-                                       #:required #t)
-                               ,(input #:label (G_ "confirm password")
-                                       #:name "confirm-password"
-                                       #:value ""
-                                       #:type 'password
-                                       #:required #t)
-                               (div ,(submit-button (G_ "reset")))))))
+                               (form (@ (method POST)
+                                        (action "/password/do-reset"))
+                                     (div (@ (class ,(mk-class '(rounded-xl
+                                                                 my-6
+                                                                 py-6
+                                                                 px-4
+                                                                 shadow-md
+                                                                 max-w-prose
+                                                                 bg-stone-200
+                                                                 dark:bg-stone-900))))
+                                          (input (@ (hidden true)
+                                                    (name email)
+                                                    (value ,email)) "")
+                                          (input (@ (hidden true)
+                                                    (name reset-token)
+                                                    (value ,token)) "")
+                                          ,(input #:label (G_ "new password")
+                                                  #:name "new-password"
+                                                  #:value ""
+                                                  #:type 'password
+                                                  #:required #t)
+                                          ,(input #:label (G_
+                                                           "confirm password")
+                                                  #:name "confirm-password"
+                                                  #:value ""
+                                                  #:type 'password
+                                                  #:required #t)
+                                          (div ,(submit-button (G_ "reset")))))))))
