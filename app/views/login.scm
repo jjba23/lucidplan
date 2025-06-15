@@ -49,11 +49,39 @@
                                    #:type 'password
                                    #:value ""
                                    #:required #t)
-                           (div ,(submit-button (G_ "login"))))))
+                           (div ,(submit-button (G_ "login")))))
+        (reset-form `((form (@ (action "/password/reset")
+                               (class ,(mk-class '(w-full rounded-xl
+                                                   bg-stone-200/50
+                                                   dark:bg-stone-700/50
+                                                   p-4
+                                                   flex
+                                                   flex-row
+                                                   flex-wrap
+                                                   items-center
+                                                   gap-4
+                                                   shadow-md)))
+                               (method POST))
+                            ,(input #:label (G_ "account to reset (email)")
+                                    #:name "email"
+                                    #:type 'email
+                                    #:value ""
+                                    #:required #t)
+                            (div ,(icon-button #:icon 'password
+                                               #:type 'submit
+                                               #:content (G_ "reset password")))))))
     (html-template G_
-                   #:body `(div (@ (class ,(mk-class '(container mx-auto))))
-                                ((div (@ (class ,(mk-class '(flex flex-col
+                   #:body `((div (@ (class ,(mk-class '(container mx-auto))))
+                                 (div (@ (class ,(mk-class '(w-full flex
+                                                                    flex-row
+                                                                    flex-wrap
+                                                                    gap-2))))
+                                      (div (@ (class ,(mk-class '(flex
+                                                                  flex-col
                                                                   gap-8))))
-                                      ,(h2 (G_ "login to lucidplan"))
-                                      (div ,login-form)))))))
+                                           ,(h2 (G_ "login to lucidplan"))
+                                           (div ,login-form)))
+                                 (div (@ (class ,(mk-class '(flex flex-col
+                                                                  gap-8))))
+                                      (div ,reset-form)))))))
 

@@ -121,20 +121,25 @@
 
             ,(ui-mode-button)
 
-            (select (@ (onchange "window.location.href=this.value;")
-                       (class ,(mk-class '(text-sm text-stone-900
-                                                   dark:text-stone-100
-                                                   bg-transparent font-medium
-                                                   font-sans))))
-                    (option "🔗 go to")
-                    ,(map (lambda (p)
-                            `(option (@ (value ,(format #f "/tickets/~a"
-                                                        (assoc-ref p
-                                                                   "human_id")))
-                                        (class ,(mk-class '(text-sm font-light
-                                                            lowercase
-                                                            text-stone-800))))
-                                     ,(assoc-ref p "title"))) proj))))
+            ,(if (nil? proj)
+                 '()
+                 `((select (@ (onchange "window.location.href=this.value;")
+                              (class ,(mk-class '(text-sm text-stone-900
+                                                          dark:text-stone-100
+                                                          bg-transparent
+                                                          font-medium
+                                                          font-sans))))
+                           (option "🔗 go to")
+                           ,(map (lambda (p)
+                                   `(option (@ (value ,(format #f
+                                                               "/tickets/~a"
+                                                               (assoc-ref p
+                                                                "human_id")))
+                                               (class ,(mk-class '(text-sm
+                                                                   font-light
+                                                                   lowercase
+                                                                   text-stone-800))))
+                                            ,(assoc-ref p "title"))) proj))))))
     `("<!DOCTYPE html>" (html (@ (lang en))
                               (head (title "LucidPlan")
                                     (link (@ (rel preconnect)

@@ -25,14 +25,14 @@
   #:use-module (ice-9 i18n)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun)
-  #:export (me-page users-page))
+  #:export (me-page users-page reset-password-page))
 
 (define* (me-page G_
                   #:key is-logged-in
                   token
                   user
                   projects)
-  (write token)
+  
   (let ((user-details `((div (@ (class ,(mk-class '(py-8 px-4 max-w-prose))))
                              ,(h3 (format #f "~a &lt;~a&gt;"
                                           (assoc-ref user "username")
@@ -89,31 +89,19 @@
                                 (div (@ (class ,(mk-class '(py-6 flex flex-row
                                                                  flex-wrap
                                                                  gap-6))))
-                                     (a (@ (class ,(mk-class '(text-sm
-                                                               lowercase
-                                                               text-white
-                                                               dark:text-black
-                                                               font-sans
-                                                               font-medium
-                                                               px-2
-                                                               flex-items-center
-                                                               gap-2)))
-                                           (href "/users/manage"))
+                                     (a (@ (href "/users/manage"))
                                         ,(icon-button #:icon 'user-switch
                                                       #:content (G_
                                                                  "go to user management")))
-                                     (a (@ (class ,(mk-class '(text-sm
-                                                               lowercase
-                                                               text-white
-                                                               dark:text-black
-                                                               font-sans
-                                                               font-medium
-                                                               px-2
-                                                               flex-items-center
-                                                               gap-2)))
-                                           (href "/logout"))
+                                     (a (@ (href "/logout"))
                                         ,(icon-button #:icon 'sign-out
-                                                      #:content (G_ "logout"))))))))
+                                                      #:content (G_ "logout")))
+                                     (form (@ (action "/password/reset")
+                                              (method POST))
+                                           ,(icon-button #:icon 'password
+                                                         #:type 'submit
+                                                         #:content (G_
+                                                                    "reset password"))))))))
 
 (define row-class
   (mk-class '(flex flex-row gap-4)))
@@ -160,3 +148,43 @@
                                                           dark:bg-stone-900))))
                                    ,(map (lambda (u)
                                            (render-user G_ u)) users)))))
+
+(define* (reset-password-page G_
+                              #:key token email)
+  (html-template G_
+                 #:proj '()
+                 #:is-logged-in #f
+                 #:body `((div (@ (class ,(mk-class '(py-6 px-4))))
+                               ,(h2 (G_ "Reset your password"))
+                               ,(sub-h3 (format #f "~a: ~a"
+                                                (G_
+                                                 "perform a password reset for")
+                                                email))
+                               (form (@ (method POST)
+                                        (action "/password/do-reset"))
+                                     (div (@ (class ,(mk-class '(rounded-xl
+                                                                 my-6
+                                                                 py-6
+                                                                 px-4
+                                                                 shadow-md
+                                                                 max-w-prose
+                                                                 bg-stone-200
+                                                                 dark:bg-stone-900))))
+                                          (input (@ (hidden true)
+                                                    (name email)
+                                                    (value ,email)) "")
+                                          (input (@ (hidden true)
+                                                    (name reset-token)
+                                                    (value ,token)) "")
+                                          ,(input #:label (G_ "new password")
+                                                  #:name "new-password"
+                                                  #:value ""
+                                                  #:type 'password
+                                                  #:required #t)
+                                          ,(input #:label (G_
+                                                           "confirm password")
+                                                  #:name "confirm-password"
+                                                  #:value ""
+                                                  #:type 'password
+                                                  #:required #t)
+                                          (div ,(submit-button (G_ "reset")))))))))
