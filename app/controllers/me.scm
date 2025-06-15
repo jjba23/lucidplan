@@ -20,6 +20,7 @@
 (import (lucidplan html)
         (web uri)
         (ice-9 string-fun)
+        (curl)
         (app models user)
         (lucidplan env)
         (lucidplan auth)
@@ -83,3 +84,83 @@
                           #:happy-flow go-to-users-management
                           #:unhappy-flow back-to-login)))
 
+;; -d '{
+;;     "task-type": "send-email",
+;;     "template": "password-reset",
+;;     "template-vars": {
+;;       "system-name": "WikiMusic",
+;;       "user": "jjbigorra@gmail.com",
+;;       "reset-link": "https://gnu.org"
+;;     },
+;;     "sender-name": "No Reply - WikiMusic",
+;;     "sender-address": "noreply@wikimusic.jointhefreeworld.org",
+;;     "subject": "Wikimusic - Password Reset",
+;;     "recipients": [
+;;       {"name": "Josep Bigorra", "address": "jjbigorra@gmail.com"},
+;;       {"name": "Another Person", "address": "jjbigorra+1@gmail.com"}
+;;     ]
+;;   }' \
+
+;; (mail-payload `((task-type . send-email)
+;;                 (template . password-reset)
+;;                 (template-vars . ((system-name . LucidPlan)
+;;                                   (user . "jjbigorra@gmail.com")
+;;                                   (reset-link . "http://localhost:50025/password/reset/token/")))
+;;                 (sender-name . "No Reply - LucidPlan")
+;;                 (sender-address . "noreply@lucidplan.jointhefreeworld.org")
+;;                 (subject . "LucidPlan - Password Reset")
+;;                 (recipients . ((name . "Josep Bigorra")(address . "jjbigorra@gmail.com")))))
+
+;; (define (send-password-reset-mail)
+;;   )
+
+(post "/password/reset"
+      #:cookies '(names x-bewaking-lucidplan)
+      (lambda (rc)
+        (let* ((existing-token (decrypt-token #:token (:cookies-value rc
+                                                       "x-bewaking-lucidplan")
+                                              #:encryption-key encryption-key
+                                              #:signing-key signing-key))
+               (u ($user 'get
+                         #:ret 'top
+                         #:condition (where #:id (assoc-ref existing-token
+                                                            'owner-id))))
+               (get-owner-details (lambda ()
+                                    `((id unquote
+                                          (assoc-ref (car u) "id"))
+                                      (email unquote
+                                             (assoc-ref (car u) "email"))
+                                      (name unquote
+                                            (assoc-ref (car u) "username"))
+                                      (permissions unquote
+                                                   (eval-string (assoc-ref (car
+                                                                            u)
+                                                                 "permissions"))))))
+               (reset-token (generate-token #:encryption-key encryption-key
+                                            #:signing-key signing-key
+                                            #:get-owner-details
+                                            get-owner-details
+                                            #:token-validity-seconds (* 24
+                                                                        3600)))
+               (mail-payload `((task-type . send-email)
+                               (template . password-reset)
+                               (template-vars (system-name . LucidPlan)
+                                              (user unquote
+                                                    (assoc-ref (car u) "email"))
+                                              (reset-link format #f
+                                               "~a/password/reset/token/~a"
+                                               (current-myhost) reset-token))
+                               (sender-name . "No Reply - LucidPlan")
+                               (sender-address . "noreply@lucidplan.jointhefreeworld.org")
+                               (subject . "LucidPlan - Password Reset")
+                               (recipients (name unquote
+                                                 (assoc-ref (car u) "username"))
+                                           (address unquote
+                                                    (assoc-ref (car u) "email"))))))
+          (write (assoc-ref (assoc-ref mail-payload
+                                       'template-vars)
+                            'reset-link))
+          (redirect-to rc
+                       (string->uri (format #f "~a/?sent-password-reset=true"
+                                            (current-myhost)))
+                       #:status 302))))

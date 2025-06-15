@@ -182,6 +182,7 @@ and obfuscation techniques, a.k.a secure tokens.")
                           artanis
                           guile-hygguile
                           guile-kracht
+                          guile-curl
                           guile-bewaking
                           guile-uuid
                           guile-dbi

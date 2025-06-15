@@ -49,11 +49,20 @@
                                    #:type 'password
                                    #:value ""
                                    #:required #t)
-                           (div ,(submit-button (G_ "login"))))))
+                           (div ,(submit-button (G_ "login")))))
+        (reset-form `((form (@ (action "/password/reset")
+                               (method POST))
+                            (div ,(submit-button (G_ "reset password")))))))
     (html-template G_
                    #:body `(div (@ (class ,(mk-class '(container mx-auto))))
-                                ((div (@ (class ,(mk-class '(flex flex-col
-                                                                  gap-8))))
-                                      ,(h2 (G_ "login to lucidplan"))
-                                      (div ,login-form)))))))
+                                (div (@ (class ,(mk-class '(flex flex-row
+                                                                 flex-wrap
+                                                                 gap-2))))
+                                     (div (@ (class ,(mk-class '(flex flex-col
+                                                                 gap-8))))
+                                          ,(h2 (G_ "login to lucidplan"))
+                                          (div ,login-form))
+                                     (div (@ (class ,(mk-class '(flex flex-col
+                                                                 gap-8))))
+                                          (div ,reset-form)))))))
 
