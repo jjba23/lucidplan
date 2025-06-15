@@ -101,7 +101,10 @@
                                            ,(icon-button #:icon 'password
                                                          #:type 'submit
                                                          #:content (G_
-                                                                    "reset password"))))))))
+                                                                    "reset password")))
+                                     (a (@ (href "/login"))
+                                         ,(icon-button #:icon 'sign-in
+                                                       #:content (G_ "login"))))))))
 
 (define row-class
   (mk-class '(flex flex-row gap-4)))
