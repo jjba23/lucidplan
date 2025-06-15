@@ -124,7 +124,7 @@
                                      items-center
                                      justify-left
                                      bg-stone-300/75
-                                     dark:bg-stone-800/75
+                                     dark:bg-stone-900/85
                                      border-stone-400/75
                                      border-2
                                      py-2
