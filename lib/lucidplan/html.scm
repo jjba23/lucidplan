@@ -61,8 +61,8 @@
                  ,(em "version:")
                  ,(mono (format #f "~a"
                                 (get-short-commit-sha))
-                        #:size 'text-sm
-                        #:weight 'font-light)))))
+                        #:size '(text-sm)
+                        #:weight '(font-light))))))
 
 (begin
   (define* (html-template G_
@@ -330,7 +330,10 @@ function addSearchQueryParam(form) {
 (begin
   (define (org2html org)
     (org-to-html org
-                 #:link-classes '(text-blue-800 font-bold)
+                 #:link-classes '(text-blue-500 hover:text-blue-600
+                                                dark:text-blue:400
+                                                hover:dark:text-blue-300
+                                                font-bold)
                  #:code-block-classes '(bg-stone-300/75 dark:bg-stone-700/75
                                                         text-stone-800
                                                         dark:text-stone-200
