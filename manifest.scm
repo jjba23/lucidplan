@@ -33,6 +33,8 @@
              (gnu packages perl)
              (gnu packages compression)
              (gnu packages emacs)
+             (gnu packages vim)
+             (gnu packages tls)
              (gnu packages sqlite)
              (gnu packages texinfo)
              (gnu packages autotools)
@@ -191,5 +193,7 @@ and obfuscation techniques, a.k.a secure tokens.")
                           guile-orgwebalchemy
                           sqlite
                           emacs
+                          openssl
+                          xxd
                           guile-dbd-sqlite3))
 
