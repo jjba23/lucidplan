@@ -80,9 +80,13 @@
                                         justify-left
                                         w-full
                                         shadow-lg))))
-            (a (@ (href "/")
-                  (class ,(mk-class '(mx-3))))
-               ,(h4 "LucidPlan"))
+            (div (@ (class ,(mk-class '(px-4 py-1 w-full md:w-min))))
+                 (a (@ (href "/")
+                       (class ,(mk-class '(flex flex-row gap-2 items-center))))
+                    ,(icon #:type 'scroll
+                           #:icon-css '(text-xl text-stone-800
+                                                dark:text-stone-200))
+                    ,(h3 "LucidPlan")))
             ,(if (not is-logged-in)
                  `((a (@ (class ,(mk-class '(text-sm lowercase
                                                      text-white
@@ -94,7 +98,11 @@
                                                      gap-2)))
                          (href "/login"))
                       ,(icon-button #:icon 'sign-in
-                                    #:content (G_ "login"))))
+                                    #:content (G_ "login")
+                                    #:size '(text-xs md:text-sm)
+                                    #:extra-classes '(py-1 md:py-2 px-2
+                                                           md:px-3 max-w-prose
+                                                           cursor-pointer))))
                  `((a (@ (class ,(mk-class '(text-sm lowercase
                                                      text-white
                                                      dark:text-black
@@ -105,7 +113,11 @@
                                                      gap-2)))
                          (href "/me"))
                       ,(icon-button #:icon 'user-circle
-                                    #:content (G_ "me")))))
+                                    #:content (G_ "me")
+                                    #:size '(text-xs md:text-sm)
+                                    #:extra-classes '(py-1 md:py-2 px-2
+                                                           md:px-3 max-w-prose
+                                                           cursor-pointer)))))
             (a (@ (class ,(mk-class '(text-sm lowercase
                                               text-stone-900
                                               dark:text-stone-100
@@ -117,9 +129,14 @@
                                               gap-2)))
                   (href "/projects"))
                ,(icon-button #:icon 'align-bottom
-                             #:content (G_ "projects")))
+                             #:content (G_ "projects")
+                             #:size '(text-xs md:text-sm)
+                             #:extra-classes '(py-1 md:py-2 px-2 md:px-3
+                                                    max-w-prose cursor-pointer)))
 
-            ,(ui-mode-button)
+            ,(ui-mode-button #:size '(text-xs md:text-sm)
+                             #:extra-classes '(py-1 md:py-2 px-2 md:px-3
+                                                    max-w-prose cursor-pointer))
 
             ,(if (nil? proj)
                  '()
@@ -330,9 +347,10 @@ function addSearchQueryParam(form) {
 (begin
   (define (org2html org)
     (org-to-html org
-                 #:link-classes '(text-blue-500 hover:text-blue-600
+                 #:link-classes '(text-blue-500 hover:text-blue-700
                                                 dark:text-blue:400
                                                 hover:dark:text-blue-300
+                                                hover:underline
                                                 font-bold)
                  #:code-block-classes '(bg-stone-300/75 dark:bg-stone-700/75
                                                         text-stone-800
