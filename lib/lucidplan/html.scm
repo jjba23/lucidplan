@@ -66,7 +66,9 @@
 
 (begin
   (define* (html-template G_
-                          #:key body
+                          #:key
+                          (title "LucidPlan")
+                          body
                           (proj '())
                           (is-logged-in #f))
     (define nav
@@ -350,8 +352,7 @@ function addSearchQueryParam(form) {
                  #:link-classes '(text-blue-500 hover:text-blue-700
                                                 dark:text-blue:400
                                                 hover:dark:text-blue-300
-                                                hover:underline
-                                                font-bold)
+                                                hover:underline font-bold)
                  #:code-block-classes '(bg-stone-300/75 dark:bg-stone-700/75
                                                         text-stone-800
                                                         dark:text-stone-200
