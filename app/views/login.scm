@@ -80,8 +80,6 @@
                                                                   flex-col
                                                                   gap-8))))
                                            ,(h2 (G_ "login to lucidplan"))
-                                           (div ,login-form)))
-                                 (div (@ (class ,(mk-class '(flex flex-col
-                                                                  gap-8))))
+                                           (div ,login-form))
                                       (div ,reset-form)))))))
 
