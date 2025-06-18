@@ -29,6 +29,6 @@
              "`(lucidplan:modify-permissions
                                              lucidplan:ticket-create lucidplan:ticket-delete
                                              lucidplan:project-create lucidplan:project-delete
-                                             lucidplan:users-create lucidplan:users-delete)")
+                                             lucidplan:user-create lucidplan:user-delete)")
             (display "done.\n"))
 
