@@ -70,7 +70,9 @@
                              (div (@ (class ,(mk-class '(max-w-prose))))
                                   ,(em (G_
                                         "tip: if your session permissions don't match the DB consider logging out and logging in again"))))))
-        
+        (has-modify-permissions (member 'byggsteg:modify-permissions
+                                        (assoc-ref token
+                                                   'owner-permissions)))
         (session-duration `((div (@ (class ,(mk-class '(py-8 px-4))))
                                  ,(em (format #f "~a: ~a"
                                               (G_ "logged in until")
@@ -89,10 +91,12 @@
                                 (div (@ (class ,(mk-class '(py-6 flex flex-row
                                                                  flex-wrap
                                                                  gap-6))))
-                                     (a (@ (href "/users/manage"))
-                                        ,(icon-button #:icon 'user-switch
-                                                      #:content (G_
-                                                                 "go to user management")))
+                                     ,(if has-modify-permissions
+                                          `((a (@ (href "/users/manage"))
+                                               ,(icon-button #:icon 'user-switch
+                                                             #:content (G_
+                                                                        "go to user management"))))
+                                          '())
                                      (a (@ (href "/logout"))
                                         ,(icon-button #:icon 'sign-out
                                                       #:content (G_ "logout")))
