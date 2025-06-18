@@ -66,8 +66,7 @@
 
 (begin
   (define* (html-template G_
-                          #:key
-                          (title "LucidPlan")
+                          #:key (title "LucidPlan")
                           body
                           (proj '())
                           (is-logged-in #f))
@@ -85,10 +84,17 @@
             (div (@ (class ,(mk-class '(px-4 py-1 w-full md:w-min))))
                  (a (@ (href "/")
                        (class ,(mk-class '(flex flex-row gap-2 items-center))))
-                    ,(icon #:type 'scroll
-                           #:icon-css '(text-xl text-stone-800
-                                                dark:text-stone-200))
-                    ,(h3 "LucidPlan")))
+                    ,(sub-h3 (list (icon #:type 'scroll
+                                         #:icon-css '(text-xl text-stone-700
+                                                      dark:text-stone-200
+                                                      hover:text-teal-800
+                                                      hover:dark:text-teal-300))
+                                   "&nbsp;"
+                                   (G_ "LucidPlan"))
+                             #:color '(text-stone-700 dark:text-stone-200
+                                       hover:text-teal-800
+                                       hover:dark:text-teak-300)
+                             #:size '(text-xl lg:text-2xl))))
             ,(if (not is-logged-in)
                  `((a (@ (class ,(mk-class '(text-sm lowercase
                                                      text-white
