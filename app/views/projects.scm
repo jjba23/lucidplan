@@ -58,8 +58,9 @@
                                                            whitespace-pre-wrap
                                                            font-medium))))
                                     ,x))
-                              (org2html (html-unescape (assoc-ref p
-                                                        "description"))))
+                              (org2html (html-unescape (format #f "~a"
+                                                               (assoc-ref p
+                                                                "description")))))
          ,(hr)
          (div (@ (class ,(mk-class '(flex flex-wrap flex-row gap-3))))
               (a (@ (href ,(format #f "/tickets/~a"
@@ -148,7 +149,8 @@
          (p (@ (class ,(mk-class '(font-sans text-stone-600
                                              dark:text-stone-400 text-sm
                                              break-words truncate))))
-            ,(org2html (html-unescape (assoc-ref p "description")))))
+            ,(org2html (html-unescape (format #f "~a"
+                                              (assoc-ref p "description"))))))
     (div (@ (id ,(format #f "details-~a"
                          (assoc-ref p "id")))
             (class "")

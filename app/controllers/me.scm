@@ -162,7 +162,7 @@
                                                   encryption-key
                                                   #:signing-key signing-key)
                                    #f))
-               (body (if (not (rc-body body)) #f
+               (body (if (not (rc-body rc)) #f
                          (alist-from-url-encoded-body (rc-body rc))))
                (email (if (not body) #f
                           (assoc-ref body "email")))
