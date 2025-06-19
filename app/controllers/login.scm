@@ -24,7 +24,7 @@
         (bewaking bewaking)
         (artanis security nss)
         (lucidplan env)
-        (lucidplan uri)
+        (kracht prelude)
         (app models user)
         (app models project)
         (app views login))
@@ -39,10 +39,9 @@
 (post "/login"
       #:cookies '(names x-bewaking-lucidplan)
       (lambda (rc)
-        (let* ((body (rc-body rc))
-               (kv (read-url-encoded-body body))
-               (email (uri-decode (car (assoc-ref kv "email"))))
-               (password (uri-decode (car (assoc-ref kv "password"))))
+        (let* ((body (alist-from-url-encoded-body (rc-body rc)))
+               (email (assoc-ref body "email"))
+               (password (assoc-ref body "password"))
                (u ($user 'get
                          #:ret 'top
                          #:condition (where #:email email)))

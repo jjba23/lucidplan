@@ -21,11 +21,10 @@
         (web uri)
         (ice-9 string-fun)
         (lucidplan auth)
-        (lucidplan uri)
+        (kracht prelude)
         (uuid generate)
         (lucidplan html)
         (lucidplan domain)
-        (lucidplan query-escape)
         (app models ticket)
         (artanis security nss)
         (app models project))
@@ -51,7 +50,7 @@
                                ((equal? #f
                                         (get-from-qstr rc "search"))
                                 #f)
-                               (else (escape-str (get-from-qstr rc "search")))))
+                               (else (html-escape (get-from-qstr rc "search")))))
                 (user-sort (cond
                              ((not (equal? #f
                                            (get-from-qstr rc "sort")))
@@ -144,9 +143,9 @@
                                                                       " ORDER BY ~a ~a ")
                                                                      " ")
                                                                     project-id
-                                                                    (escape-str
+                                                                    (html-escape
                                                                      user-search)
-                                                                    (escape-str
+                                                                    (html-escape
                                                                      user-search)
                                                                     (car
                                                                      query-sort)
@@ -203,9 +202,8 @@
       #:cookies '(names x-bewaking-lucidplan)
       (lambda (rc)
         (define (do-delete)
-          (let* ((body (rc-body rc))
-                 (kv (read-url-encoded-body body))
-                 (id (uri-decode (car (assoc-ref kv "id")))))
+          (let* ((body (alist-from-url-encoded-body (rc-body rc)))
+                 (id (assoc-ref body "id")))
             
             ($ticket 'mod
                      'row-delete
@@ -227,14 +225,12 @@
       #:cookies '(names x-bewaking-lucidplan)
       (lambda (rc)
         (define (do-new)
-          (let* ((body (rc-body rc))
-                 (kv (read-url-encoded-body body))
-                 (title (uri-decode (car (assoc-ref kv "title"))))
-                 (ticket-status (uri-decode (car (assoc-ref kv "ticket-status"))))
-                 (ticket-type (uri-decode (car (assoc-ref kv "ticket-type"))))
-                 (description (uri-decode (car (assoc-ref kv "description"))))
-                 (priority (string->number (uri-decode (car (assoc-ref kv
-                                                             "priority")))))
+          (let* ((body (alist-from-url-encoded-body (rc-body rc)))
+                 (title (html-escape (assoc-ref body "title")))
+                 (ticket-status (assoc-ref body "ticket-status"))
+                 (ticket-type (assoc-ref body "ticket-type"))
+                 (description (html-escape (assoc-ref body "description")))
+                 (priority (string->number (assoc-ref body "priority")))
                  (project-id (project-id-from-human-id (params rc "project")))
                  (new-uuid (string-replace-substring (generate-string-uuid)
                                                      "\n" "")))
@@ -242,11 +238,11 @@
             ($ticket 'set
                      #:id new-uuid
                      #:project_id project-id
-                     #:title (escape-str title)
+                     #:title title
                      #:ticket_status ticket-status
                      #:ticket_type ticket-type
                      #:priority priority
-                     #:description (escape-str description)
+                     #:description description
                      #:created_at (current-time))
 
             (redirect-to rc
@@ -288,22 +284,20 @@
       #:cookies '(names x-bewaking-lucidplan)
       (lambda (rc)
         (define (do-edit)
-          (let* ((body (rc-body rc))
-                 (kv (read-url-encoded-body body))
-                 (title (uri-decode (car (assoc-ref kv "title"))))
-                 (description (uri-decode (car (assoc-ref kv "description"))))
-                 (ticket-status (uri-decode (car (assoc-ref kv "ticket-status"))))
-                 (priority (string->number (uri-decode (car (assoc-ref kv
-                                                             "priority")))))
-                 (ticket-type (uri-decode (car (assoc-ref kv "ticket-type")))))
+          (let* ((body (alist-from-url-encoded-body (rc-body rc)))
+                 (title (html-escape (assoc-ref body "title")))
+                 (description (html-escape (assoc-ref body "description")))
+                 (ticket-status (assoc-ref body "ticket-status"))
+                 (priority (string->number (assoc-ref body "priority")))
+                 (ticket-type (assoc-ref body "ticket-type")))
             
             (DB-query (DB-open rc)
                       (->sql update
                              'ticket set
                              `((ticket_status ,ticket-status)
                                (ticket_type ,ticket-type)
-                               (description ,(escape-str description))
-                               (title ,(escape-str title))
+                               (description ,description)
+                               (title ,title)
                                (priority ,priority)
                                (updated_at ,(current-time)))
                              (where #:human_id (params rc "human-id"))))

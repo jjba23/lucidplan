@@ -69,17 +69,21 @@
                                      #:required #t)
                              (div ,(icon-button #:icon 'password
                                                 #:type 'submit
-                                                #:content (G_ "reset password")))))))
+                                                #:content (G_ "reset")))))))
     (html-template G_
                    #:body `((div (@ (class ,(mk-class '(container mx-auto))))
                                  (div (@ (class ,(mk-class '(w-full flex
                                                                     flex-row
                                                                     flex-wrap
-                                                                    gap-2))))
+                                                                    gap-10))))
                                       (div (@ (class ,(mk-class '(flex
                                                                   flex-col
                                                                   gap-8))))
                                            ,(h2 (G_ "login to lucidplan"))
                                            (div ,login-form))
-                                      (div ,reset-form)))))))
+                                      (div (@ (class ,(mk-class '(flex
+                                                                  flex-col
+                                                                  gap-8))))
+                                           ,(h2 (G_ "reset password"))
+                                           (div ,reset-form))))))))
 

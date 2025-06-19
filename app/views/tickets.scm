@@ -36,7 +36,7 @@
   #:use-module (artanis i18n locale)
   #:use-module (ice-9 i18n)
   #:use-module (lucidplan html)
-  #:use-module (lucidplan query-escape)
+  #:use-module (kracht prelude)
   #:use-module (lucidplan domain)
   #:use-module (hygguile hygguile)
   #:use-module (artanis security nss)
@@ -504,7 +504,7 @@
 
                       ,(input #:label (G_ "title")
                               #:name "title"
-                              #:value (unescape-str title)
+                              #:value (html-unescape title)
                               #:required #t)
                       (div
 
@@ -594,7 +594,7 @@
                       ,(textarea #:label (G_ "description")
                                  #:name "description"
                                  #:required #t
-                                 #:value (unescape-str description))
+                                 #:value (html-unescape description))
 
                       (div ,(submit-button (G_ "submit"))))))))
 

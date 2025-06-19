@@ -20,9 +20,8 @@
 (import (lucidplan auth)
         (web uri)
         (ice-9 string-fun)
-        (lucidplan uri)
+        (kracht prelude)
         (uuid generate)
-        (lucidplan query-escape)
         (artanis security nss)
         (app models project)
         (app views projects))
@@ -38,7 +37,7 @@
                                ((equal? #f
                                         (get-from-qstr rc "search"))
                                 #f)
-                               (else (escape-str (get-from-qstr rc "search")))))
+                               (else (html-escape (get-from-qstr rc "search")))))
                 (proj (DB-get-all-rows (DB-query (DB-open rc)
                                                  (cond
                                                    ((equal? #f user-search)
@@ -52,9 +51,9 @@
                                                                          (" WHERE title LIKE '%~a%' OR description LIKE '%~a%' "
                                                                           " ORDER BY title ASC ")
                                                                          " ")
-                                                                        (escape-str
+                                                                        (html-escape
                                                                          user-search)
-                                                                        (escape-str
+                                                                        (html-escape
                                                                          user-search)))))))))
            (response-emit (:mime rc
                                  (html-from-projects (:i18n rc)
@@ -87,9 +86,8 @@
       #:cookies '(names x-bewaking-lucidplan)
       (lambda (rc)
         (define (do-delete)
-          (let* ((body (rc-body rc))
-                 (kv (read-url-encoded-body body))
-                 (id (uri-decode (car (assoc-ref kv "id")))))
+          (let* ((body (alist-from-url-encoded-body (rc-body rc)))
+                 (id (assoc-ref body "id")))
             ($project 'mod
                       'row-delete
                       (where #:id id))
@@ -109,21 +107,20 @@
       #:cookies '(names x-bewaking-lucidplan)
       (lambda (rc)
         (define (do-new)
-          (let* ((body (rc-body rc))
-                 (kv (read-url-encoded-body body))
-                 (title (uri-decode (car (assoc-ref kv "title"))))
-                 (description (uri-decode (car (assoc-ref kv "description"))))
-                 (url (uri-decode (car (assoc-ref kv "url"))))
-                 (vcs-url (uri-decode (car (assoc-ref kv "vcs-url"))))
-                 (human-id (uri-decode (car (assoc-ref kv "human-id"))))
+          (let* ((body (alist-from-url-encoded-body (rc-body rc)))
+                 (title (html-escape (assoc-ref body "title")))
+                 (description (html-escape (assoc-ref body "description")))
+                 (url (assoc-ref body "url"))
+                 (vcs-url (assoc-ref body "vcs-url"))
+                 (human-id (assoc-ref body "human-id"))
                  (new-uuid (string-replace-substring (generate-string-uuid)
                                                      "\n" "")))
             
             ($project 'set
                       #:id new-uuid
                       #:human_id human-id
-                      #:title (escape-str title)
-                      #:description (escape-str description)
+                      #:title title
+                      #:description description
                       #:url url
                       #:vcs_url vcs-url
                       #:created_at (current-time))
@@ -166,13 +163,12 @@
       #:cookies '(names x-bewaking-lucidplan)
       (lambda (rc)
         (define (do-edit)
-          (let* ((body (rc-body rc))
-                 (kv (read-url-encoded-body body))
-                 (title (uri-decode (car (assoc-ref kv "title"))))
-                 (description (uri-decode (car (assoc-ref kv "description"))))
-                 (url (uri-decode (car (assoc-ref kv "url"))))
-                 (vcs-url (uri-decode (car (assoc-ref kv "vcs-url"))))
-                 (human-id (uri-decode (car (assoc-ref kv "human-id")))))
+          (let* ((body (alist-from-url-encoded-body (rc-body rc)))
+                 (title (html-escape (assoc-ref body "title")))
+                 (description (html-escape (assoc-ref body "description")))
+                 (url (assoc-ref body "url"))
+                 (vcs-url (assoc-ref body "vcs-url"))
+                 (human-id (assoc-ref body "human-id")))
             
             (DB-query (DB-open rc)
                       (->sql update
@@ -180,8 +176,8 @@
                              `((human_id ,human-id)
                                (url ,url)
                                (vcs_url ,vcs-url)
-                               (description ,(escape-str description))
-                               (title ,(escape-str title))
+                               (description ,description)
+                               (title ,title)
                                (updated_at ,(current-time)))
                              (where #:human_id (params rc "human-id"))))
 

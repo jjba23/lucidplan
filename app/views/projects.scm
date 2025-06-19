@@ -35,7 +35,7 @@
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
   #:use-module (ice-9 i18n)
-  #:use-module (lucidplan query-escape)
+  #:use-module (kracht prelude)
   #:use-module (hygguile hygguile)
   #:use-module (artanis security nss)
   #:use-module (artanis route))
@@ -58,8 +58,8 @@
                                                            whitespace-pre-wrap
                                                            font-medium))))
                                     ,x))
-                              (org2html (unescape-str (assoc-ref p
-                                                       "description"))))
+                              (org2html (html-unescape (assoc-ref p
+                                                        "description"))))
          ,(hr)
          (div (@ (class ,(mk-class '(flex flex-wrap flex-row gap-3))))
               (a (@ (href ,(format #f "/tickets/~a"
@@ -148,7 +148,7 @@
          (p (@ (class ,(mk-class '(font-sans text-stone-600
                                              dark:text-stone-400 text-sm
                                              break-words truncate))))
-            ,(org2html (unescape-str (assoc-ref p "description")))))
+            ,(org2html (html-unescape (assoc-ref p "description")))))
     (div (@ (id ,(format #f "details-~a"
                          (assoc-ref p "id")))
             (class "")
@@ -222,8 +222,8 @@
                        #:vcs-url (if (assoc-ref project "vcs_url")
                                      (assoc-ref project "vcs_url") "")
                        #:description (if (assoc-ref project "description")
-                                         (unescape-str (assoc-ref project
-                                                        "description")) "")
+                                         (html-unescape (assoc-ref project
+                                                         "description")) "")
                        #:action (format #f "/projects/~a/edit"
                                         (assoc-ref project "human_id"))
                        #:projects projects))
@@ -249,7 +249,7 @@
                                             (action ,action))
                                          ,(input #:label (G_ "title")
                                                  #:name "title"
-                                                 #:value (unescape-str title)
+                                                 #:value (html-unescape title)
                                                  #:required #t)
                                          ,(input #:label (G_ "human id")
                                                  #:name "human-id"
@@ -266,7 +266,7 @@
                                                  #:required #f)
                                          ,(textarea #:label (G_ "description")
                                                     #:name "description"
-                                                    #:value (unescape-str
+                                                    #:value (html-unescape
                                                              description)
                                                     #:required #f)
 

@@ -18,7 +18,7 @@
 (define-restful-api v1)
 
 (import (lucidplan auth)
-        (lucidplan uri)
+        (kracht prelude)
         (bewaking bewaking)
         (ice-9 textual-ports)
         (artanis security nss)
@@ -60,10 +60,9 @@
 (post "/api/v1/login"
       #:mime 'json
       (lambda (rc)
-        (let* ((body (rc-body rc))
-               (kv (read-url-encoded-body body))
-               (email (uri-decode (car (assoc-ref kv "email"))))
-               (password (uri-decode (car (assoc-ref kv "password"))))
+        (let* ((body (alist-from-url-encoded-body (rc-body rc)))
+               (email (assoc-ref body "email"))
+               (password (assoc-ref body "password"))
                (u ($user 'get
                          #:ret 'top
                          #:condition (where #:email email)))
