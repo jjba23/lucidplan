@@ -204,7 +204,7 @@
                                                                      ,nav
                                                                      ,body)))
                                                   #:footer (page-footer G_))
-
+                                    ,notification-tray
                                     ))))
   (export html-template))
 
