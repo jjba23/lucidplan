@@ -81,7 +81,7 @@
                                          ,(icon-button #:icon 'link
                                                        #:content (G_
                                                                   "view live"))))
-                                   (assoc-ref p "url"))
+                                   (uri-decode (assoc-ref p "url")))
               ,(render-if-nestring (lambda (x)
                                      `(a (@ (class ,(mk-class '(text-stone-800
                                                                 dark:text-stone-200)))
@@ -89,7 +89,7 @@
                                          ,(icon-button #:icon 'link
                                                        #:content (G_
                                                                   "project code"))))
-                                   (assoc-ref p "vcs_url")))
+                                   (uri-decode (assoc-ref p "vcs_url"))))
          (hr (@ (class ,(mk-class '(my-3)))))
          (div (@ (class ,(mk-class '(flex flex-wrap flex-row gap-4))))
               (a (@ (href ,(format #f "/projects/~a/edit"
@@ -220,9 +220,10 @@
                        #:title (assoc-ref project "title")
                        #:human-id (assoc-ref project "human_id")
                        #:url (if (assoc-ref project "url")
-                                 (assoc-ref project "url") "")
+                                 (uri-decode (assoc-ref project "url")) "")
                        #:vcs-url (if (assoc-ref project "vcs_url")
-                                     (assoc-ref project "vcs_url") "")
+                                     (uri-decode (assoc-ref project "vcs_url"))
+                                     "")
                        #:description (if (assoc-ref project "description")
                                          (html-unescape (assoc-ref project
                                                          "description")) "")
@@ -259,12 +260,12 @@
                                                  #:required #t)
                                          ,(input #:label (G_ "homepage url")
                                                  #:name "url"
-                                                 #:value url
+                                                 #:value (uri-decode url)
                                                  #:required #f)
                                          ,(input #:label (G_
                                                           "version control url")
                                                  #:name "vcs-url"
-                                                 #:value vcs-url
+                                                 #:value (uri-decode vcs-url)
                                                  #:required #f)
                                          ,(textarea #:label (G_ "description")
                                                     #:name "description"
