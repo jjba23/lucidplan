@@ -167,28 +167,6 @@
                                             ,(assoc-ref p "title"))) proj))))))
     `("<!DOCTYPE html>" (html (@ (lang en))
                               (head (title "LucidPlan")
-                                    (link (@ (rel preconnect)
-                                             (href
-                                              "https://fonts.googleapis.com")))
-                                    (link (@ (rel preconnect)
-                                             (href "https://fonts.gstatic.com")
-                                             (crossorigin "")))
-                                    (link (@ (rel stylesheet)
-                                             (href
-                                              "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap")))
-                                    (style (@ (type "text/tailwindcss"))
-                                     "
-@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
-
-@theme {
-  --font-sans: \"IBM Plex Sans\", sans-serif;
-  --font-mono: \"IBM Plex Mono\", monospace;
-}
-")
-                                    (link (@ (rel stylesheet)
-                                             (type text/css)
-                                             (href
-                                              "https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css")))
                                     (meta (@ (name viewport)
                                              (content
                                               "width=device-width, initial-scale=1.0")))
@@ -200,10 +178,18 @@
                                              (href "/favicon.ico")
                                              (type "image/x-icon")))
                                     (script ,(assoc-ref asset-library
-                                                        "pub/js/tailwind.js")))
+                                                        "pub/js/tailwind.js"))
+                                    ,(custom-fonts)
+                                    ,(phosphor-icons)
+                                    ,(custom-tailwind-theme)
+                                    ,(toggle-dark-theme-js)
+                                    ,(copy-pre-inner-text-js)
+                                    ,(show-notifications-from-url-js)
+                                    ,(remember-dark-theme-js)
+                                    (script ,(assoc-ref asset-library
+                                                        "pub/js/tickets.js")))
                               (body (@ (class ,(mk-class '(bg-stone-100
                                                            dark:bg-stone-800))))
-
                                     ,(with-footer #:main `((div (@ (class ,(mk-class '
                                                                             (flex
                                                                              flex-col
@@ -218,10 +204,8 @@
                                                                      ,nav
                                                                      ,body)))
                                                   #:footer (page-footer G_))
-                                    (script ,(assoc-ref asset-library
-                                                        "pub/js/tickets.js"))
-                                    (script ,toggle-dark-theme-js)
-                                    (script ,remember-dark-theme-js)))))
+
+                                    ))))
   (export html-template))
 
 (define-public (emoji-for-ticket-status ticket-status)

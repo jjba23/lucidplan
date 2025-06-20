@@ -81,7 +81,9 @@
                                          ,(icon-button #:icon 'link
                                                        #:content (G_
                                                                   "view live"))))
-                                   (uri-decode (assoc-ref p "url")))
+                                   (uri-decode (if (assoc-ref p "url")
+                                                   (format #f "~a" (assoc-ref p "url"))
+                                                   "")))
               ,(render-if-nestring (lambda (x)
                                      `(a (@ (class ,(mk-class '(text-stone-800
                                                                 dark:text-stone-200)))
@@ -89,7 +91,9 @@
                                          ,(icon-button #:icon 'link
                                                        #:content (G_
                                                                   "project code"))))
-                                   (uri-decode (assoc-ref p "vcs_url"))))
+                                   (uri-decode (if (assoc-ref p "vcs_url")
+                                                   (format #f "~a" (assoc-ref p "vcs_url"))
+                                                   ""))))
          (hr (@ (class ,(mk-class '(my-3)))))
          (div (@ (class ,(mk-class '(flex flex-wrap flex-row gap-4))))
               (a (@ (href ,(format #f "/projects/~a/edit"
@@ -218,15 +222,15 @@
     (html-project-form G_
                        #:is-logged-in is-logged-in
                        #:title (assoc-ref project "title")
-                       #:human-id (assoc-ref project "human_id")
+                       #:human-id (format #f "~a" (assoc-ref project "human_id"))
                        #:url (if (assoc-ref project "url")
-                                 (uri-decode (assoc-ref project "url")) "")
+                                 (format #f "~a" (assoc-ref project "url")) "")
                        #:vcs-url (if (assoc-ref project "vcs_url")
-                                     (uri-decode (assoc-ref project "vcs_url"))
+                                     (format #f "~a" (assoc-ref project "vcs_url"))
                                      "")
                        #:description (if (assoc-ref project "description")
-                                         (html-unescape (assoc-ref project
-                                                         "description")) "")
+                                         (html-unescape (format #f "~a" (assoc-ref project
+                                                         "description"))) "")
                        #:action (format #f "/projects/~a/edit"
                                         (assoc-ref project "human_id"))
                        #:projects projects))
