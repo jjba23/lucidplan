@@ -191,6 +191,7 @@
                                                         "pub/js/tickets.js")))
                               (body (@ (class ,(mk-class '(bg-stone-100
                                                            dark:bg-stone-800))))
+                                    ,notification-tray
                                     ,(with-footer #:main `((div (@ (class ,(mk-class '
                                                                             (flex
                                                                              flex-col
@@ -204,8 +205,7 @@
                                                                            justify-start))))
                                                                      ,nav
                                                                      ,body)))
-                                                  #:footer (page-footer G_))
-                                    ,notification-tray))))
+                                                  #:footer (page-footer G_))))))
   (export html-template))
 
 (define-public (emoji-for-ticket-status ticket-status)
