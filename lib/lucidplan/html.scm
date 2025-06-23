@@ -53,7 +53,7 @@
                                              align-center))))
                  ,(em (G_ "find the manual here"))
                  ,(a
-                   "https://jointhefreeworld.org/manuals/lucidplan/index.html" #:size '(text-sm)))
+                   "https://jointhefreeworld.org/manuals/lucidplan/" #:size '(text-sm)))
             ,(em (G_ "Copyright © Josep Bigorra  &lt;jjbigorra@gmail.com&gt;"))
 
             (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
