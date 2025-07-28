@@ -46,14 +46,15 @@
                                                                             (G_
                                                                              "lucidplan is free software, available under the GNU AGPL v3 or newer"))
             (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
-                                             align-center))))
+                                             align-center items-center))))
                  ,(em (G_ "find the source code here"))
-                 ,(a "https://codeberg.org/jjba23/lucidplan"))
+                 ,(a "https://codeberg.org/jjba23/lucidplan"
+                     #:size '(text-sm)))
             (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
-                                             align-center))))
+                                             align-center items-center))))
                  ,(em (G_ "find the manual here"))
-                 ,(a
-                   "https://jointhefreeworld.org/manuals/lucidplan/index.html"))
+                 ,(a "https://jointhefreeworld.org/manuals/lucidplan/"
+                     #:size '(text-sm)))
             ,(em (G_ "Copyright © Josep Bigorra  &lt;jjbigorra@gmail.com&gt;"))
 
             (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
@@ -190,6 +191,7 @@
                                                         "pub/js/tickets.js")))
                               (body (@ (class ,(mk-class '(bg-stone-100
                                                            dark:bg-stone-800))))
+                                    ,notification-tray
                                     ,(with-footer #:main `((div (@ (class ,(mk-class '
                                                                             (flex
                                                                              flex-col
@@ -203,9 +205,7 @@
                                                                            justify-start))))
                                                                      ,nav
                                                                      ,body)))
-                                                  #:footer (page-footer G_))
-                                    ,notification-tray
-                                    ))))
+                                                  #:footer (page-footer G_))))))
   (export html-template))
 
 (define-public (emoji-for-ticket-status ticket-status)
