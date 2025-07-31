@@ -178,8 +178,35 @@
                                     (link (@ (rel "icon")
                                              (href "/favicon.ico")
                                              (type "image/x-icon")))
+                                    (style "
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: fade 0.04s ease both;
+}
+
+@keyframes fade {
+  from { opacity: 0.3; }
+  to   { opacity: 1; }
+}
+")
                                     (script ,(assoc-ref asset-library
                                                         "pub/js/tailwind.js"))
+                                    (script (@ (type speculationrules))
+                                            "
+{
+  \"prerender\": [
+    {
+      \"where\": {
+        \"selector_matches\": \"a\"
+      }
+    }
+  ]
+}
+")
                                     ,(custom-fonts)
                                     ,(phosphor-icons)
                                     ,(custom-tailwind-theme)
