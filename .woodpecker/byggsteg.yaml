@@ -53,7 +53,7 @@ steps:
       BYGGSTEG_JOB_CODE: |
         (lambda()
           `((task . ("pull-and-restart" "pull-and-deploy"))
-            (daemon-name . "wikimusic-daemon")
+            (daemon-name . "lucidplan-daemon")
             (project . "%%CI_REPO_NAME%%")
             (branch-name . "%%CI_COMMIT_BRANCH%%")            
             (clone-url . "%%CI_REPO_CLONE_URL%%")))
