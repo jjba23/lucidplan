@@ -39,7 +39,7 @@
   #:use-module (artanis route))
 
 (define-public asset-library
-  (build-asset-library '("pub/js/tickets.js" "pub/js/tailwind.js")))
+  (build-asset-library '("pub/js/tickets.js")))
 
 (define-public (page-footer G_)
   (footer `(,(em (G_ "lucidplan - free project management for everyone")) ,(em
@@ -166,19 +166,17 @@
                                                                    lowercase
                                                                    text-stone-800))))
                                             ,(assoc-ref p "title"))) proj))))))
-    `("<!DOCTYPE html>" (html (@ (lang en))
-                              (head (title "LucidPlan")
-                                    (meta (@ (name viewport)
-                                             (content
-                                              "width=device-width, initial-scale=1.0")))
-                                    (meta (@ (charset UTF-8)))
-                                    (link (@ (rel "shortcut icon")
-                                             (href "/favicon.ico")
-                                             (type "image/x-icon")))
-                                    (link (@ (rel "icon")
-                                             (href "/favicon.ico")
-                                             (type "image/x-icon")))
-                                    (style "
+    `(,doctype-html (html (@ (lang en))
+                          (head (title "LucidPlan")
+                                ,hygguile-recommended-meta
+                                ,hygguile-recommended-resources
+                                (link (@ (rel "shortcut icon")
+                                         (href "/favicon.ico")
+                                         (type "image/x-icon")))
+                                (link (@ (rel "icon")
+                                         (href "/favicon.ico")
+                                         (type "image/x-icon")))
+                                (style "
 @view-transition {
   navigation: auto;
 }
@@ -193,10 +191,9 @@
   to   { opacity: 1; }
 }
 ")
-                                    (script ,(assoc-ref asset-library
-                                                        "pub/js/tailwind.js"))
-                                    (script (@ (type speculationrules))
-                                            "
+
+                                (script (@ (type speculationrules))
+                                        "
 {
   \"prerender\": [
     {
@@ -207,32 +204,24 @@
   ]
 }
 ")
-                                    ,(custom-fonts)
-                                    ,(phosphor-icons)
-                                    ,(custom-tailwind-theme)
-                                    ,(toggle-dark-theme-js)
-                                    ,(copy-pre-inner-text-js)
-                                    ,(show-notifications-from-url-js)
-                                    ,(remember-dark-theme-js)
-                                    (script ,(assoc-ref asset-library
-                                                        "pub/js/tickets.js")))
-                              (body (@ (class ,(mk-class '(bg-stone-100
-                                                           dark:bg-stone-800))))
-                                    ,notification-tray
-                                    ,(with-footer #:main `((div (@ (class ,(mk-class '
-                                                                            (flex
-                                                                             flex-col
-                                                                             justify-between
-                                                                             min-h-96))))
-                                                                (div (@ (class ,
-                                                                         (mk-class '
-                                                                          (flex
-                                                                           flex-col
-                                                                           gap-8
-                                                                           justify-start))))
-                                                                     ,nav
-                                                                     ,body)))
-                                                  #:footer (page-footer G_))))))
+                                (script ,(assoc-ref asset-library
+                                                    "pub/js/tickets.js")))
+                          (body (@ (class ,(mk-class '(bg-stone-100
+                                                       dark:bg-stone-800))))
+                                ,notification-tray
+                                ,(with-footer #:main `((div (@ (class ,(mk-class '
+                                                                        (flex
+                                                                         flex-col
+                                                                         justify-between
+                                                                         min-h-96))))
+                                                            (div (@ (class ,(mk-class '
+                                                                             (flex
+                                                                              flex-col
+                                                                              gap-8
+                                                                              justify-start))))
+                                                                 ,nav
+                                                                 ,body)))
+                                              #:footer (page-footer G_))))))
   (export html-template))
 
 (define-public (emoji-for-ticket-status ticket-status)

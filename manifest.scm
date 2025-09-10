@@ -69,7 +69,7 @@ between binary and hex-and-dash string UUIDs are included.")
 (define-public guile-hygguile
   (package
     (name "guile-hygguile")
-    (version "1.0.7")
+    (version "1.1.7")
     (source
      (origin
        (method git-fetch)
@@ -78,7 +78,7 @@ between binary and hex-and-dash string UUIDs are included.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "16w87zcy867kx8ihm0sh69xl74iwyn7vi3x7q5cvmwkjqspragka"))))
+        (base32 "12aj5czzsnw5zxymy0v5f3sjvh6cg57kximr9kr8qgvqn3p3frmj"))))
     (build-system guile-build-system)
     (native-inputs (list guile-3.0))
     (arguments
@@ -166,8 +166,7 @@ easing the learning curve, and reducing the cognitive load.")
      (list
       #:source-directory "src"))
     (home-page "https://codeberg.org/jjba23/bewaking")
-    (synopsis
-     "Authentication / Authorization library for Guile Scheme")
+    (synopsis "Authentication / Authorization library for Guile Scheme")
     (description
      "bewaking is a library that helps you with secure tokens.
 It allows you to create and verify lifetime-limited encrypted digital
