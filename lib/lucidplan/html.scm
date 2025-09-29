@@ -84,18 +84,19 @@
                                         shadow-lg))))
             (div (@ (class ,(mk-class '(px-4 py-1 w-full md:w-min))))
                  (a (@ (href "/")
-                       (class ,(mk-class '(flex flex-row gap-2 items-center))))
-                    ,(sub-h3 (list (icon #:type 'scroll
-                                         #:icon-css '(text-xl text-onyx-700
+                       (class ,(mk-class '(flex flex-row gap-2 items-center no-underline hover:text-asparagus-700))))
+                    ,(h4 (list (icon #:type 'scroll
+                                         #:icon-css '(text-xl text-onyx-300
                                                       dark:text-stone-300
-                                                      hover:text-teal-700
+                                                      hover:text-asparagus-700
                                                       hover:dark:text-teal-300))
                                    "&nbsp;"
-                                   (G_ "LucidPlan"))
-                             #:color '(text-onyx-700 dark:text-stone-300
+                                   `(span (@(class ,(mk-class '(hover:text-asparagus-700))))
+                                         ,(G_ "LucidPlan")))
+                             #:color '(text-onyx-300 dark:text-stone-300
                                                      hover:text-teal-700
                                                      hover:dark:text-teak-300)
-                             #:size '(text-xl lg:text-2xl))))
+                             #:size '(text-xl))))
             ,(if (not is-logged-in)
                  `((a (@ (class ,(mk-class '(lowercase font-sans font-medium
                                                        px-2 flex-items-center
@@ -308,7 +309,7 @@ function addSearchQueryParam(form) {
                               #:input-css '(p-3 max-w-prose
                                                 rounded-xl
                                                 border-stone-300
-                                                dark:border-stone-700
+                                                dark:border-onyx-100
                                                 dark:text-stone-300
                                                 dark:bg-onyx-700/75
                                                 border-2

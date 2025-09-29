@@ -81,7 +81,7 @@
                                                  (assoc-ref p "title"))))
               ,(render-if-nestring (lambda (x)
                                      `(a (@ (class ,(mk-class '(text-onyx-700
-                                                                dark:text-stone-300)))
+                                                                dark:text-stone-300 no-underline)))
                                             (href ,x))
                                          ,(icon-button #:icon 'link
                                                        #:content (G_
@@ -92,7 +92,8 @@
                                                    "")))
               ,(render-if-nestring (lambda (x)
                                      `(a (@ (class ,(mk-class '(text-onyx-700
-                                                                dark:text-stone-300)))
+                                                                dark:text-stone-300
+                                                                no-underline)))
                                             (href ,x))
                                          ,(icon-button #:icon 'link
                                                        #:content (G_
@@ -150,7 +151,8 @@
                        "document.getElementById('details-~a').toggleAttribute('hidden')"
                        (assoc-ref p "id"))))
 
-         (h3 (@ (class ,(mk-class '(flex flex-row items-center gap-2 truncate  leading-6))))
+         (h3 (@ (class ,(mk-class '(flex flex-row items-center gap-2 truncate
+                                         leading-6))))
              ,(icon #:type 'list
                     #:icon-css '(text-onyx-700 dark:text-stone-300 text-lg))
              (span (@ (class ,(mk-class '(font-sans text-onyx-700
@@ -160,10 +162,12 @@
                    ,(format #f "~a"
                             (assoc-ref p "title"))))
          (p (@ (class ,(mk-class '(font-sans text-stone-600
-                                             dark:text-stone-500 text-md
+                                             dark:text-stone-500
+                                             text-md
                                              leading-6
-                                             max-w-full
-                                             break-words truncate))))
+                                             max-w-196
+                                             break-words
+                                             truncate))))
             ,(org2html (html-unescape (format #f "~a"
                                               (assoc-ref p "description"))))))
     (div (@ (id ,(format #f "details-~a"

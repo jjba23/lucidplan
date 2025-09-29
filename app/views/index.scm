@@ -30,7 +30,7 @@
 (define* (welcome-page G_
                        #:key is-logged-in projects)
   (let ((project-logo `(((div (@ (class ,(mk-class '(bg-stone-300
-                                                     dark:bg-onyx-900
+                                                     dark:bg-onyx-700
                                                      rounded-2xl p-4 shadow-md))))
                               (img (@ (loading lazy)
                                       (class ,(mk-class '(w-64 h-auto
@@ -40,8 +40,8 @@
     (html-template G_
                    #:proj projects
                    #:is-logged-in is-logged-in
-                   #:body `(div (@ (class ,(mk-class '(px-3 md:px-6 max-w-prose))))
-                                ,(h2 (G_ "welcome to lucidplan"))
+                   #:body `(div (@ (class ,(mk-class '(px-3 md:px-6 max-w-prose flex flex-col gap-3))))
+                                ,(h2 (G_ "Welcome to LucidPlan"))
                                 ,(em (G_
                                       "free and open project management for everyone"))
                                 ((div (@ (class ,(mk-class '(flex flex-row
@@ -49,7 +49,7 @@
                                                                   gap-8 my-8))))
                                       (div (@ (class ,(mk-class '(
                                                                   bg-stone-300
-                                                                  dark:bg-onyx-900
+                                                                  dark:bg-onyx-700
                                                                   rounded-2xl
                                                                   p-4
                                                                   shadow-md
@@ -63,7 +63,7 @@
                                       (div ,project-logo)
                                       (div (@ (class ,(mk-class '(max-w-prose
                                                                   bg-stone-300
-                                                                  dark:bg-onyx-900
+                                                                  dark:bg-onyx-700
                                                                   rounded-2xl
                                                                   p-4
                                                                   shadow-md

@@ -274,7 +274,7 @@
                                         (input-css '(p-3 max-w-prose
                                                      rounded-xl
                                                      border-stone-300
-                                                     dark:border-stone-700
+                                                     dark:border-onyx-100
                                                      dark:text-stone-300
                                                      bg-stone-300/75
                                                      dark:bg-onyx-700/75

@@ -45,7 +45,8 @@
          (div (@ (class ,(mk-class '(rounded-xl bg-stone-300/25
                                                 dark:bg-onyx-700/50
                                                 p-3
-                                                border-stone-400/75
+                                                border-stone-500/75
+                                                dark:border-onyx-100/75
                                                 border-2
                                                 shadow))))
               (div (@ (class ,(mk-class '(flex flex-row justify-between
@@ -55,10 +56,11 @@
                         ,(emoji-for-ticket-type (assoc-ref t "ticket_type"))
                         ,(p (org2html (assoc-ref t "title"))))
 
-                   (a (@ (class ,(mk-class '(text-xs)))
+                   (a (@ (class ,(mk-class '(text-md no-underline)))
                          (href ,(format #f "/tickets/~a/id/~a" project
                                         (assoc-ref t "human_id"))))
-                      ((i (@ (class ,(mk-class '(ph ph-link text-stone-600))))
+                      ((i (@ (class ,(mk-class '(ph ph-link text-onyx-500 dark:text-stone-500 hover:text-asparagus-500
+                                                     ))))
                           ""))))))))
 
 (define* (kanban-from-tickets G_
@@ -177,7 +179,7 @@
                                                                 flex-col
                                                                 gap-2
                                                                 p-2))))
-                                  (div (@ (class ,(mk-class '(text-sm
+                                  (div (@ (class ,(mk-class '(text-md
                                                               font-bold
                                                               flex
                                                               flex-row
@@ -186,7 +188,7 @@
                                                               items-center))))
                                        ,(emoji-for-ticket-status "todo")
                                        ,(sub-h3 (G_ "To-do"))
-                                       (span (@ (class ,(mk-class '(text-xs
+                                       (span (@ (class ,(mk-class '(text-sm
                                                                     text-onyx-700
                                                                     font-light))))
                                              ,(format #f " ( ~a ) "
@@ -197,7 +199,7 @@
                              (div (@ (class ,(mk-class '(sm:w-1/3 flex
                                                                   flex-col
                                                                   gap-2 p-2))))
-                                  (div (@ (class ,(mk-class '(text-sm
+                                  (div (@ (class ,(mk-class '(text-md
                                                               font-bold
                                                               flex
                                                               flex-row
@@ -207,7 +209,7 @@
                                        ,(emoji-for-ticket-status
                                          "work-in-progress")
                                        ,(sub-h3 (G_ "Work in Progress"))
-                                       (span (@ (class ,(mk-class '(text-xs
+                                       (span (@ (class ,(mk-class '(text-sm
                                                                     text-onyx-700
                                                                     dark:text-stone-300
                                                                     font-light))))
@@ -220,7 +222,7 @@
                              (div (@ (class ,(mk-class '(sm:w-1/3 flex
                                                                   flex-col
                                                                   gap-2 p-2))))
-                                  (div (@ (class ,(mk-class '(text-sm
+                                  (div (@ (class ,(mk-class '(text-md
                                                               font-bold
                                                               flex
                                                               flex-row
@@ -229,7 +231,7 @@
                                                               items-center))))
                                        ,(emoji-for-ticket-status "in-review")
                                        ,(sub-h3 (G_ "In Review"))
-                                       (span (@ (class ,(mk-class '(text-xs
+                                       (span (@ (class ,(mk-class '(text-sm
                                                                     text-onyx-700
                                                                     dark:text-stone-300
                                                                     font-light))))
@@ -250,7 +252,7 @@
                                       (summary (@ (class ,(mk-class '(marker:block
                                                                       hover:cursor-pointer
                                                                       items-center))))
-                                               (div (@ (class ,(mk-class '(text-sm
+                                               (div (@ (class ,(mk-class '(text-md
                                                                            font-bold
                                                                            flex
                                                                            flex-row
@@ -261,7 +263,7 @@
                                                       "done")
                                                     ,(sub-h3 (G_ "Done"))
                                                     (span (@ (class ,(mk-class '
-                                                                      (text-xs
+                                                                      (text-sm
                                                                        text-onyx-700
                                                                        dark:text-stone-300
                                                                        font-light))))
@@ -287,7 +289,7 @@
                                       (summary (@ (class ,(mk-class '(marker:block
                                                                       hover:cursor-pointer
                                                                       items-center))))
-                                               (div (@ (class ,(mk-class '(text-sm
+                                               (div (@ (class ,(mk-class '(text-md
                                                                            font-bold
                                                                            flex
                                                                            flex-row
@@ -298,7 +300,7 @@
                                                       "rejected")
                                                     ,(sub-h3 (G_ "Rejected"))
                                                     (span (@ (class ,(mk-class '
-                                                                      (text-xs
+                                                                      (text-sm
                                                                        text-onyx-700
                                                                        dark:text-stone-300
                                                                        font-light))))

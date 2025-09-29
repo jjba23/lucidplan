@@ -50,10 +50,12 @@
                                      gap-2
                                      px-6
                                      py-10
-                                     bg-stone-300
-                                     dark:bg-onyx-700
+                                     bg-stone-100
+                                     dark:bg-onyx-900
                                      rounded-2xl
-                                     border-stone-400/75
+                                     dark:border-onyx-100/75
+                                     border-stone-300/75
+                                     shadow-md
                                      border-2))))
          (div (@ (class ,(mk-class '(flex flex-row justify-between))))
               ,(h4 (org2html (assoc-ref ticket "title")))
@@ -63,8 +65,8 @@
                                        "document.getElementById('details-~a').toggleAttribute('hidden')"
                                        (assoc-ref ticket "id"))))
                          ,(icon #:type 'x
-                                #:icon-css '(text-onyx-700
-                                             dark:text-stone-300 text-xl)))))
+                                #:icon-css '(text-onyx-700 dark:text-stone-300
+                                             text-xl)))))
 
          (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-8
                                           justify-left))))
@@ -75,7 +77,7 @@
                                                  font-light))))
                           ,(G_ "status"))
                    (div (@ (class ,(mk-class '(flex gap-2 items-center))))
-                        (span (@ (class "text-2xl"))
+                        (span (@ (class ,(mk-class '(text-2xl))))
                               ,(emoji-for-ticket-status (assoc-ref ticket
                                                          "ticket_status")))
                         ,(p (assoc-ref ticket "ticket_status"))))
@@ -86,7 +88,7 @@
                                                  font-light))))
                           ,(G_ "type"))
                    (div (@ (class ,(mk-class '(ml-4 flex gap-2 items-center))))
-                        (span (@ (class "text-2xl"))
+                        (span (@ (class ,(mk-class '(text-2xl))))
                               ,(emoji-for-ticket-type (assoc-ref ticket
                                                        "ticket_type")))
                         ,(p (assoc-ref ticket "ticket_type")))))
@@ -107,33 +109,33 @@
 
          ,(hr)
 
-         (small (@ (class ,(mk-class '(font-sans text-stone-500
+         (small (@ (class ,(mk-class '(font-sans text-onyx-700
                                                  dark:text-stone-300 text-md
                                                  font-light))))
                 ,(G_ "human id"))
-         (small (@ (class ,(mk-class '(font-sans text-stone-600
-                                                 dark:text-stone-400 text-md
+         (small (@ (class ,(mk-class '(font-sans text-onyx-700
+                                                 dark:text-stone-300 text-md
                                                  ml-4))))
                 ,(format #f "~a-~s" project
                          (assoc-ref ticket "human_id")))
 
-         (small (@ (class ,(mk-class '(font-sans text-stone-500
+         (small (@ (class ,(mk-class '(font-sans text-onyx-700
                                                  dark:text-stone-300 text-md
                                                  font-light))))
                 ,(G_ "priority"))
 
-         (small (@ (class ,(mk-class '(font-sans text-stone-600
-                                                 dark:text-stone-400 text-md
+         (small (@ (class ,(mk-class '(font-sans text-onyx-700
+                                                 dark:text-stone-300 text-md
                                                  ml-4))))
                 ,(format #f "~a"
                          (assoc-ref ticket "priority")))
 
-         (small (@ (class ,(mk-class '(font-sans text-stone-500
-                                                 dark:text-stone-400 text-md
+         (small (@ (class ,(mk-class '(font-sans text-onyx-700
+                                                 dark:text-stone-300 text-md
                                                  font-light))))
                 ,(G_ "id"))
-         (small (@ (class ,(mk-class '(font-sans text-stone-600
-                                                 dark:text-stone-400 text-md
+         (small (@ (class ,(mk-class '(font-sans text-onyx-700
+                                                 dark:text-stone-300 text-md
                                                  ml-4))))
                 ,(assoc-ref ticket "id"))
 
@@ -174,8 +176,10 @@
                                           items-center
                                           justify-left
                                           bg-stone-300/75
-                                          dark:bg-onyx-900/85
-                                          border-stone-400/75
+                                          dark:bg-onyx-700
+                                          dark:border-onyx-100/75
+                                          border-stone-300/75
+                                          shadow-md
                                           border-2
                                           py-2
                                           px-4
@@ -184,19 +188,27 @@
                                           rounded-xl))))
               ,(emoji-for-ticket-type (assoc-ref ticket "ticket_type"))
               (h5 (@ (class ,(mk-class '(font-sans text-onyx-700
-                                                   dark:text-stone-300 text-md
-                                                   font-bold break-words))))
+                                                   dark:text-stone-300
+                                                   text-md
+                                                   font-bold
+                                                   break-words
+                                                   max-w-196
+                                                   truncate))))
                   ,(org2html (assoc-ref ticket "title")))
 
-              (div (a (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
-                                                  items-center justify-start)))
+              (div (a (@ (class ,(mk-class '(flex flex-row
+                                                  flex-wrap
+                                                  gap-2
+                                                  items-center
+                                                  justify-start
+                                                  no-underline)))
                          (href ,(format #f "/tickets/~a/id/~a" project
                                         (assoc-ref ticket "human_id"))))
                       ,(icon #:type 'link
-                             #:icon-css '(text-md text-stone-600
-                                                  dark:text-stone-300
-                                                  hover:text-purple-400
-                                                  hover:dark:text-purple-300)))))
+                             #:icon-css '(text-md text-onyx-700
+                                          dark:text-stone-300
+                                          hover:text-asparagus-500
+                                          hover:dark:text-asparagus-300)))))
          (div (@ (id ,(format #f "details-~a"
                               (assoc-ref ticket "id")))
                  (class "ml-4")
@@ -244,8 +256,7 @@
          (ticket-list `((div (@ (id lucidplan-tickets-list)
                                 (ondrop "dropTicketsItem(event)")
                                 (ondragover "allowDrop(event)")
-                                (class ,(mk-class '(flex flex-col gap-2
-                                                         ))))
+                                (class ,(mk-class '(flex flex-col gap-2))))
                              ,(map (lambda (t)
                                      (render-ticket-listitem G_
                                       (assoc-ref project-details "human_id") t
@@ -267,8 +278,7 @@
                                             (span ,(G_ "done")))
                                         (div (@ (class ,(mk-class '(flex
                                                                     flex-col
-                                                                    gap-2
-                                                                    ))))
+                                                                    gap-2))))
                                              ,(map (lambda (t)
                                                      (render-ticket-listitem
                                                       G_
@@ -298,8 +308,7 @@
                                                 (span ,(G_ "rejected")))
                                             (div (@ (class ,(mk-class '(flex
                                                                         flex-col
-                                                                        gap-2
-                                                                        ))))
+                                                                        gap-2))))
                                                  ,(map (lambda (t)
                                                          (render-ticket-listitem
                                                           G_
@@ -498,91 +507,104 @@
                               #:name "title"
                               #:value (html-unescape title)
                               #:required #t)
-                      (div
-
+                      (div (@ (class ,(mk-class '(max-w-128))))
                            (label (@ (class ,(mk-class '(text-onyx-700
                                                          dark:text-stone-300))))
                                   ,(G_ "status"))
-                           (select (@ (class ,(mk-class '(p-3 rounded-xl
-                                                          border-stone-400/75
-                                                          border-2
-                                                          shadow-md
-                                                          text-onyx-700
-                                                          dark:text-stone-300)))
-                                      (name "ticket-status")
-                                      (required ""))
-                                   ,(glyph-option #:value "todo"
-                                                  #:glyph (emoji-for-ticket-status
-                                                           "todo")
-                                                  #:content (G_ "To-do")
-                                                  #:selected-value
-                                                  ticket-status)
-                                   ,(glyph-option #:value "work-in-progress"
-                                                  #:glyph (emoji-for-ticket-status
-                                                           "work-in-progress")
-                                                  #:content (G_
-                                                             "Work in Progress")
-                                                  #:selected-value
-                                                  ticket-status)
-                                   ,(glyph-option #:value "in-review"
-                                                  #:glyph (emoji-for-ticket-status
-                                                           "in-review")
-                                                  #:content (G_ "In Review")
-                                                  #:selected-value
-                                                  ticket-status)
-                                   ,(glyph-option #:value "done"
-                                                  #:glyph (emoji-for-ticket-status
-                                                           "done")
-                                                  #:content (G_ "Done")
-                                                  #:selected-value
-                                                  ticket-status)
-                                   ,(glyph-option #:value "rejected"
-                                                  #:glyph (emoji-for-ticket-status
-                                                           "rejected")
-                                                  #:content (G_ "Rejected")
-                                                  #:selected-value
-                                                  ticket-status)))
-                      (div (label (@ (class ,(mk-class '(text-onyx-700
+                           (div ,(select #:name 'ticket-status
+                                         #:on-change ""
+                                         #:options (list (glyph-option #:value
+                                                          "todo"
+                                                          #:glyph (emoji-for-ticket-status
+                                                                   "todo")
+                                                          #:content (G_
+                                                                     "To-do")
+                                                          #:selected-value
+                                                          ticket-status)
+                                                         (glyph-option #:value
+                                                          "work-in-progress"
+                                                          #:glyph (emoji-for-ticket-status
+                                                                   "work-in-progress")
+                                                          #:content (G_
+                                                                     "Work in Progress")
+                                                          #:selected-value
+                                                          ticket-status)
+                                                         (glyph-option #:value
+                                                          "in-review"
+                                                          #:glyph (emoji-for-ticket-status
+                                                                   "in-review")
+                                                          #:content (G_
+                                                                     "In Review")
+                                                          #:selected-value
+                                                          ticket-status)
+                                                         (glyph-option #:value
+                                                          "done"
+                                                          #:glyph (emoji-for-ticket-status
+                                                                   "done")
+                                                          #:content (G_ "Done")
+                                                          #:selected-value
+                                                          ticket-status)
+                                                         (glyph-option #:value
+                                                          "rejected"
+                                                          #:glyph (emoji-for-ticket-status
+                                                                   "rejected")
+                                                          #:content (G_
+                                                                     "Rejected")
+                                                          #:selected-value
+                                                          ticket-status))))
+
+                           )
+                      (div (@ (class ,(mk-class '(max-w-128))))
+                           (label (@ (class ,(mk-class '(text-onyx-700
                                                          dark:text-stone-300))))
                                   ,(G_ "type"))
-                           (select (@ (class ,(mk-class '(p-3 rounded-xl
-                                                          border-stone-400/75
-                                                          border-2
-                                                          shadow-md
-                                                          text-onyx-700
-                                                          dark:text-stone-300)))
-                                      (name "ticket-type")
-                                      (required ""))
-                                   ,(glyph-option #:value "task"
-                                                  #:glyph (emoji-for-ticket-type
-                                                           "task")
-                                                  #:content (G_ "Task")
-                                                  #:selected-value ticket-type)
-                                   ,(glyph-option #:value "bug"
-                                                  #:glyph (emoji-for-ticket-type
-                                                           "bug")
-                                                  #:content (G_ "Bug")
-                                                  #:selected-value ticket-type)
-                                   ,(glyph-option #:value "story"
-                                                  #:glyph (emoji-for-ticket-type
-                                                           "story")
-                                                  #:content (G_ "Story")
-                                                  #:selected-value ticket-type)
-                                   ,(glyph-option #:value "spike"
-                                                  #:glyph (emoji-for-ticket-type
-                                                           "spike")
-                                                  #:content (G_ "Spike")
-                                                  #:selected-value ticket-type)
-                                   ,(glyph-option #:value "time-box"
-                                                  #:glyph (emoji-for-ticket-type
-                                                           "time-box")
-                                                  #:content (G_ "Time Box")
-                                                  #:selected-value ticket-type)))
-                      ,(input #:label (G_ "priority")
-                              #:name "priority"
-                              #:required #f
-                              #:type 'number
-                              #:value (if (not priority) 0 priority))
+                           (div ,(select #:name 'ticket-type
+                                         #:on-change ""
+                                         #:options (list (glyph-option #:value
+                                                          "task"
+                                                          #:glyph (emoji-for-ticket-type
+                                                                   "task")
+                                                          #:content (G_ "Task")
+                                                          #:selected-value
+                                                          ticket-type)
+                                                         (glyph-option #:value
+                                                          "bug"
+                                                          #:glyph (emoji-for-ticket-type
+                                                                   "bug")
+                                                          #:content (G_ "Bug")
+                                                          #:selected-value
+                                                          ticket-type)
+                                                         (glyph-option #:value
+                                                          "story"
+                                                          #:glyph (emoji-for-ticket-type
+                                                                   "story")
+                                                          #:content (G_
+                                                                     "Story")
+                                                          #:selected-value
+                                                          ticket-type)
+                                                         (glyph-option #:value
+                                                          "spike"
+                                                          #:glyph (emoji-for-ticket-type
+                                                                   "spike")
+                                                          #:content (G_
+                                                                     "Spike")
+                                                          #:selected-value
+                                                          ticket-type)
+                                                         (glyph-option #:value
+                                                          "time-box"
+                                                          #:glyph (emoji-for-ticket-type
+                                                                   "time-box")
+                                                          #:content (G_
+                                                                     "Time Box")
+                                                          #:selected-value
+                                                          ticket-type)))))
+                      (div (@ (class ,(mk-class '(max-w-128))))
+                           ,(input #:label (G_ "priority")
+                                   #:name "priority"
+                                   #:required #f
+                                   #:type 'number
+                                   #:value (if (not priority) 0 priority)))
+
                       ,(textarea #:label (G_ "description")
                                  #:name "description"
                                  #:required #t
