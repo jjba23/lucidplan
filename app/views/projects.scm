@@ -48,10 +48,12 @@
                                      gap-2
                                      px-6
                                      py-10
-                                     bg-stone-300
-                                     dark:bg-onyx-700
+                                     bg-stone-100
+                                     dark:bg-onyx-900
                                      rounded-2xl
-                                     border-stone-400/75
+                                     dark:border-onyx-100/75
+                                     border-stone-300/75
+                                     shadow-md
                                      border-2))))
          ,(h4 (assoc-ref p "title"))
          ,(render-if-nestring (lambda (x)
@@ -134,8 +136,10 @@
                                      items-center
                                      justify-left
                                      bg-stone-300/75
-                                     dark:bg-onyx-900/85
-                                     border-stone-400/75
+                                     dark:bg-onyx-700
+                                     dark:border-onyx-100/75
+                                     border-stone-300/75
+                                     shadow-md
                                      border-2
                                      py-2
                                      px-4
@@ -146,9 +150,9 @@
                        "document.getElementById('details-~a').toggleAttribute('hidden')"
                        (assoc-ref p "id"))))
 
-         (h3 (@ (class ,(mk-class '(flex flex-row items-center gap-2 truncate))))
+         (h3 (@ (class ,(mk-class '(flex flex-row items-center gap-2 truncate  leading-6))))
              ,(icon #:type 'list
-                    #:icon-css '(text-stone-500 dark:text-stone-400 text-lg))
+                    #:icon-css '(text-onyx-700 dark:text-stone-300 text-lg))
              (span (@ (class ,(mk-class '(font-sans text-onyx-700
                                                     dark:text-stone-300
                                                     text-lg font-bold
@@ -156,7 +160,9 @@
                    ,(format #f "~a"
                             (assoc-ref p "title"))))
          (p (@ (class ,(mk-class '(font-sans text-stone-600
-                                             dark:text-stone-400 text-sm
+                                             dark:text-stone-500 text-md
+                                             leading-6
+                                             max-w-full
                                              break-words truncate))))
             ,(org2html (html-unescape (format #f "~a"
                                               (assoc-ref p "description"))))))
@@ -185,7 +191,7 @@
                                            #:content (G_ "new project"))))))))
     (html-template G_
                    #:is-logged-in is-logged-in
-                   #:body `((div (@ (class ,(mk-class '(container mx-auto))))
+                   #:body `((div (@ (class ,(mk-class '(px-4 py-4))))
                                  ((div (@ (class ,(mk-class '(flex flex-col
                                                                    gap-4
                                                                    flex-grow))))
@@ -250,7 +256,7 @@
                             (is-logged-in #f))
   (html-template G_
                  #:is-logged-in is-logged-in
-                 #:body `(div (@ (class ,(mk-class '(container mx-auto))))
+                 #:body `(div (@ (class ,(mk-class '(px-4 py-4))))
                               (div (form (@ (class ,(mk-class '(flex flex-col
                                                                      gap-4)))
                                             (enctype

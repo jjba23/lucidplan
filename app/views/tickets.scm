@@ -245,7 +245,7 @@
                                 (ondrop "dropTicketsItem(event)")
                                 (ondragover "allowDrop(event)")
                                 (class ,(mk-class '(flex flex-col gap-2
-                                                         container))))
+                                                         ))))
                              ,(map (lambda (t)
                                      (render-ticket-listitem G_
                                       (assoc-ref project-details "human_id") t
@@ -268,7 +268,7 @@
                                         (div (@ (class ,(mk-class '(flex
                                                                     flex-col
                                                                     gap-2
-                                                                    container))))
+                                                                    ))))
                                              ,(map (lambda (t)
                                                      (render-ticket-listitem
                                                       G_
@@ -299,7 +299,7 @@
                                             (div (@ (class ,(mk-class '(flex
                                                                         flex-col
                                                                         gap-2
-                                                                        container))))
+                                                                        ))))
                                                  ,(map (lambda (t)
                                                          (render-ticket-listitem
                                                           G_
@@ -313,7 +313,7 @@
                                       '()))))
     (html-template G_
                    #:is-logged-in is-logged-in
-                   #:body `(div (@ (class ,(mk-class '(container mx-auto))))
+                   #:body `(div (@ (class ,(mk-class '(px-4 py-4))))
                                 ((div (@ (class ,(mk-class '(flex flex-col
                                                                   gap-4
                                                                   flex-grow))))
@@ -592,7 +592,7 @@
 
   (html-template G_
                  #:is-logged-in is-logged-in
-                 #:body `((div (@ (class ,(mk-class '(container mx-auto))))
+                 #:body `((div (@ (class ,(mk-class '(px-4 py-4))))
                                (div ,form_)))
                  #:proj projects))
 

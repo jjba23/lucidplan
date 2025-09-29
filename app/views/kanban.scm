@@ -95,7 +95,7 @@
                                                        "ticket_status"))))
                                tickets))
 
-         (kanban-html `((div (@ (class ,(mk-class '(container mx-auto))))
+         (kanban-html `((div (@ (class ,(mk-class '(px-4 py-4))))
                              ((div (@ (class ,(mk-class '(flex flex-col gap-3
                                                                flex-grow))))
                                    (div (@ (class ,(mk-class '(flex flex-wrap
