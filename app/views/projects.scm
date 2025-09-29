@@ -38,23 +38,26 @@
   #:use-module (kracht prelude)
   #:use-module (hygguile hygguile)
   #:use-module (artanis security nss)
-  #:use-module (artanis route))
+  #:use-module (artanis route)
+  #:export (render-project render-project-list-item html-from-projects
+                           html-new-project-form html-edit-project-form
+                           html-project-form))
 
 (define (render-project G_ p)
   `((div (@ (class ,(mk-class '(flex flex-col
                                      gap-2
                                      px-6
                                      py-10
-                                     bg-stone-200
-                                     dark:bg-stone-800
+                                     bg-stone-300
+                                     dark:bg-onyx-700
                                      rounded-2xl
                                      border-stone-400/75
                                      border-2))))
          ,(h4 (assoc-ref p "title"))
          ,(render-if-nestring (lambda (x)
                                 `(p (@ (class ,(mk-class '(text-md py-3
-                                                           text-stone-800
-                                                           dark:text-stone-200
+                                                           text-onyx-700
+                                                           dark:text-stone-300
                                                            whitespace-pre-wrap
                                                            font-medium))))
                                     ,x))
@@ -68,15 +71,15 @@
                  ,(icon-button #:icon 'scroll
                                #:content (format #f "backlog: ~a"
                                                  (assoc-ref p "title"))))
-              (a (@ (class ,(mk-class '(text-stone-800 dark:text-stone-200)))
+              (a (@ (class ,(mk-class '(text-onyx-700 dark:text-stone-300)))
                     (href ,(format #f "/kanban/~a"
                                    (assoc-ref p "human_id"))))
                  ,(icon-button #:icon 'kanban
                                #:content (format #f "kanban: ~a"
                                                  (assoc-ref p "title"))))
               ,(render-if-nestring (lambda (x)
-                                     `(a (@ (class ,(mk-class '(text-stone-800
-                                                                dark:text-stone-200)))
+                                     `(a (@ (class ,(mk-class '(text-onyx-700
+                                                                dark:text-stone-300)))
                                             (href ,x))
                                          ,(icon-button #:icon 'link
                                                        #:content (G_
@@ -86,8 +89,8 @@
                                                            (assoc-ref p "url"))
                                                    "")))
               ,(render-if-nestring (lambda (x)
-                                     `(a (@ (class ,(mk-class '(text-stone-800
-                                                                dark:text-stone-200)))
+                                     `(a (@ (class ,(mk-class '(text-onyx-700
+                                                                dark:text-stone-300)))
                                             (href ,x))
                                          ,(icon-button #:icon 'link
                                                        #:content (G_
@@ -131,7 +134,7 @@
                                      items-center
                                      justify-left
                                      bg-stone-300/75
-                                     dark:bg-stone-900/85
+                                     dark:bg-onyx-900/85
                                      border-stone-400/75
                                      border-2
                                      py-2
@@ -146,7 +149,7 @@
          (h3 (@ (class ,(mk-class '(flex flex-row items-center gap-2 truncate))))
              ,(icon #:type 'list
                     #:icon-css '(text-stone-500 dark:text-stone-400 text-lg))
-             (span (@ (class ,(mk-class '(font-sans text-stone-700
+             (span (@ (class ,(mk-class '(font-sans text-onyx-700
                                                     dark:text-stone-300
                                                     text-lg font-bold
                                                     break-words))))
@@ -163,85 +166,78 @@
             (hidden ""))
          ,(render-project G_ p))))
 
-(begin
-  (define* (html-from-projects G_
-                               #:key projects is-logged-in search-query)
-    (let* ((tit `((div (@ (class ,(mk-class '(flex flex-row
-                                                   justify-between
-                                                   flex-wrap
-                                                   items-center
-                                                   gap-1
-                                                   my-3))))
-                       (div (@ (class ,(mk-class '(flex flex-row items-center
-                                                        gap-1))))
-                            ,(icon #:type 'align-bottom
-                                   #:icon-css '(text-stone-800
-                                                dark:text-stone-200 text-2xl))
-                            ,(h2 (G_ "projects")))
-                       (div (a (@ (href "/projects/new"))
-                               ,(icon-button #:icon 'plus
-                                             #:content (G_ "new project"))))))))
-      (html-template G_
+(define* (html-from-projects G_
+                             #:key projects is-logged-in search-query)
+  (let* ((tit `((div (@ (class ,(mk-class '(flex flex-row
+                                                 justify-between
+                                                 flex-wrap
+                                                 items-center
+                                                 gap-1
+                                                 my-3))))
+                     (div (@ (class ,(mk-class '(flex flex-row items-center
+                                                      gap-1))))
+                          ,(icon #:type 'align-bottom
+                                 #:icon-css '(text-onyx-700
+                                              dark:text-stone-300 text-2xl))
+                          ,(h2 (G_ "projects")))
+                     (div (a (@ (href "/projects/new"))
+                             ,(icon-button #:icon 'plus
+                                           #:content (G_ "new project"))))))))
+    (html-template G_
+                   #:is-logged-in is-logged-in
+                   #:body `((div (@ (class ,(mk-class '(container mx-auto))))
+                                 ((div (@ (class ,(mk-class '(flex flex-col
+                                                                   gap-4
+                                                                   flex-grow))))
+                                       ,tit
+
+                                       (div (@ (class ,(mk-class '(flex
+                                                                   flex-row
+                                                                   flex-wrap
+                                                                   justify-end))))
+                                            ,(search-box G_
+                                                         #:search-query
+                                                         search-query))
+
+                                       (div (@ (id lucidplan-projects-list)
+                                               (class ,(mk-class '(flex
+                                                                   flex-col
+                                                                   gap-2
+                                                                   container
+                                                                   my-3))))
+                                            ,(map (lambda (x)
+                                                    (render-project-list-item
+                                                     G_ x)) projects))))))
+                   #:proj projects)))
+
+(define* (html-new-project-form G_
+                                #:key projects is-logged-in)
+  (html-project-form G_
+                     #:projects projects
+                     #:is-logged-in is-logged-in))
+
+(define* (html-edit-project-form G_
+                                 #:key projects project is-logged-in)
+  (html-project-form G_
                      #:is-logged-in is-logged-in
-                     #:body `((div (@ (class ,(mk-class '(container mx-auto))))
-                                   ((div (@ (class ,(mk-class '(flex flex-col
-                                                                gap-4
-                                                                flex-grow))))
-                                         ,tit
-
-                                         (div (@ (class ,(mk-class '(flex
-                                                                     flex-row
-                                                                     flex-wrap
-                                                                     justify-end))))
-                                              ,(search-box G_
-                                                           #:search-query
-                                                           search-query))
-
-                                         (div (@ (id lucidplan-projects-list)
-                                                 (class ,(mk-class '(flex
-                                                                     flex-col
-                                                                     gap-2
-                                                                     container
-                                                                     my-3))))
-                                              ,(map (lambda (x)
-                                                      (render-project-list-item
-                                                       G_ x)) projects))))))
-                     #:proj projects)))
-
-  (export html-from-projects))
-
-(begin
-  (define* (html-new-project-form G_
-                                  #:key projects is-logged-in)
-    (html-project-form G_
-                       #:projects projects
-                       #:is-logged-in is-logged-in))
-  (export html-new-project-form))
-
-(begin
-  (define* (html-edit-project-form G_
-                                   #:key projects project is-logged-in)
-    (html-project-form G_
-                       #:is-logged-in is-logged-in
-                       #:title (assoc-ref project "title")
-                       #:human-id (format #f "~a"
-                                          (assoc-ref project "human_id"))
-                       #:url (if (assoc-ref project "url")
-                                 (format #f "~a"
-                                         (assoc-ref project "url")) "")
-                       #:vcs-url (if (assoc-ref project "vcs_url")
-                                     (format #f "~a"
-                                             (assoc-ref project "vcs_url")) "")
-                       #:description (if (assoc-ref project "description")
-                                         (html-unescape (format #f "~a"
-                                                                (assoc-ref
-                                                                 project
-                                                                 "description")))
-                                         "")
-                       #:action (format #f "/projects/~a/edit"
+                     #:title (assoc-ref project "title")
+                     #:human-id (format #f "~a"
                                         (assoc-ref project "human_id"))
-                       #:projects projects))
-  (export html-edit-project-form))
+                     #:url (if (assoc-ref project "url")
+                               (format #f "~a"
+                                       (assoc-ref project "url")) "")
+                     #:vcs-url (if (assoc-ref project "vcs_url")
+                                   (format #f "~a"
+                                           (assoc-ref project "vcs_url")) "")
+                     #:description (if (assoc-ref project "description")
+                                       (html-unescape (format #f "~a"
+                                                              (assoc-ref
+                                                               project
+                                                               "description")))
+                                       "")
+                     #:action (format #f "/projects/~a/edit"
+                                      (assoc-ref project "human_id"))
+                     #:projects projects))
 
 (define* (html-project-form G_
                             #:key (title "")

@@ -76,8 +76,8 @@
                                         flex-wrap
                                         gap-3
                                         p-3
-                                        bg-stone-200
-                                        dark:bg-stone-900
+                                        bg-stone-300
+                                        dark:bg-onyx-700
                                         items-center
                                         justify-left
                                         w-full
@@ -86,66 +86,85 @@
                  (a (@ (href "/")
                        (class ,(mk-class '(flex flex-row gap-2 items-center))))
                     ,(sub-h3 (list (icon #:type 'scroll
-                                         #:icon-css '(text-xl text-stone-700
-                                                      dark:text-stone-200
-                                                      hover:text-teal-800
+                                         #:icon-css '(text-xl text-onyx-700
+                                                      dark:text-stone-300
+                                                      hover:text-teal-700
                                                       hover:dark:text-teal-300))
                                    "&nbsp;"
                                    (G_ "LucidPlan"))
-                             #:color '(text-stone-700 dark:text-stone-200
-                                       hover:text-teal-800
-                                       hover:dark:text-teak-300)
+                             #:color '(text-onyx-700 dark:text-stone-300
+                                                     hover:text-teal-700
+                                                     hover:dark:text-teak-300)
                              #:size '(text-xl lg:text-2xl))))
             ,(if (not is-logged-in)
-                 `((a (@ (class ,(mk-class '(text-sm lowercase
-                                                     text-white
-                                                     dark:text-black
-                                                     font-sans
-                                                     font-medium
-                                                     px-2
-                                                     flex-items-center
-                                                     gap-2)))
+                 `((a (@ (class ,(mk-class '(lowercase font-sans font-medium
+                                                       px-2 flex-items-center
+                                                       gap-2)))
                          (href "/login"))
                       ,(icon-button #:icon 'sign-in
                                     #:content (G_ "login")
-                                    #:size '(text-xs md:text-sm)
-                                    #:extra-classes '(py-1 md:py-2 px-2
-                                                           md:px-3 max-w-prose
-                                                           cursor-pointer))))
-                 `((a (@ (class ,(mk-class '(text-sm lowercase
-                                                     text-white
-                                                     dark:text-black
-                                                     font-sans
-                                                     font-medium
-                                                     px-2
-                                                     flex-items-center
-                                                     gap-2)))
+                                    #:size '(text-md)
+                                    #:extra-classes '(py-1 md:py-2
+                                                      px-2
+                                                      md:px-3
+                                                      max-w-prose
+                                                      cursor-pointer
+                                                      text-onyx-700
+                                                      dark:text-stone-300)
+                                    #:icon-css '(text-md text-onyx-700
+                                                         dark:text-stone-300))))
+                 `((a (@ (class ,(mk-class '(lowercase
+
+                                                       font-sans
+                                                       font-medium
+                                                       px-2
+                                                       flex-items-center
+                                                       gap-2)))
                          (href "/me"))
                       ,(icon-button #:icon 'user-circle
                                     #:content (G_ "me")
-                                    #:size '(text-xs md:text-sm)
-                                    #:extra-classes '(py-1 md:py-2 px-2
-                                                           md:px-3 max-w-prose
-                                                           cursor-pointer)))))
-            (a (@ (class ,(mk-class '(text-sm lowercase
-                                              text-stone-900
-                                              dark:text-stone-100
-                                              font-sans
-                                              font-medium
-                                              px-2
-                                              flex
-                                              items-center
-                                              gap-2)))
+                                    #:size '(text-md)
+                                    #:extra-classes '(py-1 md:py-2
+                                                      px-2
+                                                      md:px-3
+                                                      max-w-prose
+                                                      cursor-pointer
+                                                      text-onyx-700
+                                                      dark:text-stone-300)
+                                    #:icon-css '(text-md text-onyx-700
+                                                         dark:text-stone-300)))))
+            (a (@ (class ,(mk-class '(lowercase
+
+                                                font-sans
+                                                font-medium
+                                                px-2
+                                                flex
+                                                items-center
+                                                gap-2)))
                   (href "/projects"))
                ,(icon-button #:icon 'align-bottom
                              #:content (G_ "projects")
-                             #:size '(text-xs md:text-sm)
-                             #:extra-classes '(py-1 md:py-2 px-2 md:px-3
-                                                    max-w-prose cursor-pointer)))
+                             #:size '(text-md)
+                             #:extra-classes '(py-1 md:py-2
+                                                    px-2
+                                                    md:px-3
+                                                    max-w-prose
+                                                    cursor-pointer
+                                                    text-onyx-700
+                                                    dark:text-stone-300)
+                             #:icon-css '(text-md text-onyx-700
+                                                  dark:text-stone-300)))
 
-            ,(ui-mode-button #:size '(text-xs md:text-sm)
-                             #:extra-classes '(py-1 md:py-2 px-2 md:px-3
-                                                    max-w-prose cursor-pointer))
+            ,(ui-mode-button #:size '(text-md)
+                             #:extra-classes '(py-1 md:py-2
+                                                    px-2
+                                                    md:px-3
+                                                    max-w-prose
+                                                    cursor-pointer
+                                                    text-onyx-700
+                                                    dark:text-stone-300)
+                             #:icon-css '(text-md text-onyx-700
+                                                      dark:text-stone-300))
 
             ,(if (nil? proj)
                  '()
@@ -164,7 +183,7 @@
                                                (class ,(mk-class '(text-sm
                                                                    font-light
                                                                    lowercase
-                                                                   text-stone-800))))
+                                                                   text-onyx-700))))
                                             ,(assoc-ref p "title"))) proj))))))
     `(,doctype-html (html (@ (lang en))
                           (head (title "LucidPlan")
@@ -172,25 +191,13 @@
                                 ,hygguile-recommended-resources
                                 (link (@ (rel "shortcut icon")
                                          (href "/favicon.ico")
-                                         (type "image/x-icon")))
-                                (link (@ (rel "icon")
+                                         (type "image/x-icon")) "")
+                                (link (@ (rel icon)
                                          (href "/favicon.ico")
-                                         (type "image/x-icon")))
-                                (style "
-@view-transition {
-  navigation: auto;
-}
-
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: fade 0.04s ease both;
-}
-
-@keyframes fade {
-  from { opacity: 0.3; }
-  to   { opacity: 1; }
-}
-")
+                                         (type "image/x-icon")) "")
+                                (link (@ (rel stylesheet)
+                                         (href "/css/lucidplan.olive.min.css"))
+                                      "")
 
                                 (script (@ (type speculationrules))
                                         "
@@ -207,7 +214,7 @@
                                 (script ,(assoc-ref asset-library
                                                     "pub/js/tickets.js")))
                           (body (@ (class ,(mk-class '(bg-stone-100
-                                                       dark:bg-stone-800))))
+                                                       dark:bg-onyx-900))))
                                 ,notification-tray
                                 ,(with-footer #:main `((div (@ (class ,(mk-class '
                                                                         (flex
@@ -300,10 +307,10 @@ function addSearchQueryParam(form) {
                               #:placeholder (G_ "Search...")
                               #:input-css '(p-3 max-w-prose
                                                 rounded-xl
-                                                border-stone-200
+                                                border-stone-300
                                                 dark:border-stone-700
                                                 dark:text-stone-300
-                                                dark:bg-stone-700/75
+                                                dark:bg-onyx-700/75
                                                 border-2
                                                 shadow-md)
                               #:input-flex-css #f)
@@ -359,9 +366,9 @@ function addSearchQueryParam(form) {
                                                 dark:text-blue:400
                                                 hover:dark:text-blue-300
                                                 hover:underline font-bold)
-                 #:code-block-classes '(bg-stone-300/75 dark:bg-stone-700/75
-                                                        text-stone-800
-                                                        dark:text-stone-200
+                 #:code-block-classes '(bg-stone-300/75 dark:bg-onyx-700/75
+                                                        text-onyx-700
+                                                        dark:text-stone-300
                                                         rounded-lg
                                                         my-3
                                                         py-2
@@ -369,9 +376,9 @@ function addSearchQueryParam(form) {
                                                         whitespace-pre
                                                         overflow-x-scroll)
                  #:code-classes '(rounded-lg bg-stone-300/75
-                                             dark:bg-stone-700/75
-                                             text-stone-800
+                                             dark:bg-onyx-700/75
+                                             text-onyx-700
                                              px-2
                                              py-1
-                                             dark:text-stone-200)))
+                                             dark:text-stone-300)))
   (export org2html))

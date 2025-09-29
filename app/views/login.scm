@@ -24,13 +24,14 @@
   #:use-module (hygguile hygguile)
   #:use-module (ice-9 i18n)
   #:use-module (ice-9 textual-ports)
-  #:use-module (ice-9 string-fun))
+  #:use-module (ice-9 string-fun)
+  #:export (login-page))
 
-(define-public (login-page G_)
+(define (login-page G_)
   (let* ((login-form `(form (@ (action "/login")
                                (class ,(mk-class '(w-full rounded-xl
-                                                   bg-stone-200/50
-                                                   dark:bg-stone-700/50
+                                                   bg-stone-300/50
+                                                   dark:bg-onyx-700/50
                                                    p-4
                                                    flex
                                                    flex-row
@@ -52,8 +53,8 @@
                             (div ,(submit-button (G_ "login")))))
          (reset-form `((form (@ (action "/password/reset")
                                 (class ,(mk-class '(w-full rounded-xl
-                                                    bg-stone-200/50
-                                                    dark:bg-stone-700/50
+                                                    bg-stone-300/50
+                                                    dark:bg-onyx-700/50
                                                     p-4
                                                     flex
                                                     flex-row
@@ -71,7 +72,7 @@
                                                 #:type 'submit
                                                 #:content (G_ "reset")))))))
     (html-template G_
-                   #:body `((div (@ (class ,(mk-class '(container mx-auto))))
+                   #:body `((div (@ (class ,(mk-class '(px-4 py-4))))
                                  (div (@ (class ,(mk-class '(w-full flex
                                                                     flex-row
                                                                     flex-wrap

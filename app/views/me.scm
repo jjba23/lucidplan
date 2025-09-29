@@ -149,7 +149,7 @@
                                                "are you sure you want to delete this user?"))
                                   #:type 'submit
                                   #:background '(bg-red-700)
-                                  #:color '(text-stone-200)
+                                  #:color '(text-stone-300)
                                   #:hover-background '(hover:bg-red-900)))
                    (a (@ (href ,(format #f "/users/edit/~a"
                                         (assoc-ref u "id"))))
@@ -174,8 +174,8 @@
                                                           py-8
                                                           px-4
                                                           rounded-xl
-                                                          bg-stone-200
-                                                          dark:bg-stone-900))))
+                                                          bg-stone-300
+                                                          dark:bg-onyx-900))))
                                    ,(map (lambda (u)
                                            (render-user G_ u)) users)))))
 
@@ -198,8 +198,8 @@
                                                                  px-4
                                                                  shadow-md
                                                                  max-w-prose
-                                                                 bg-stone-200
-                                                                 dark:bg-stone-900))))
+                                                                 bg-stone-300
+                                                                 dark:bg-onyx-900))))
                                           (input (@ (hidden true)
                                                     (name email)
                                                     (value ,email)) "")
@@ -237,8 +237,8 @@
                                                            py-8
                                                            px-4
                                                            rounded-xl
-                                                           bg-stone-200
-                                                           dark:bg-stone-900))))
+                                                           bg-stone-300
+                                                           dark:bg-onyx-900))))
                                     (form (@ (method POST)
                                              (action "/users/new"))
                                           (div ,(input #:label (G_ "username")
@@ -273,11 +273,11 @@
                                         (checked #f)
                                         (input-css '(p-3 max-w-prose
                                                      rounded-xl
-                                                     border-stone-200
+                                                     border-stone-300
                                                      dark:border-stone-700
                                                      dark:text-stone-300
-                                                     bg-stone-200/75
-                                                     dark:bg-stone-700/75
+                                                     bg-stone-300/75
+                                                     dark:bg-onyx-700/75
                                                      border-2
                                                      shadow-md))
                                         (label-css '(text-sm font-bold
@@ -309,8 +309,8 @@
                                                            py-8
                                                            px-4
                                                            rounded-xl
-                                                           bg-stone-200
-                                                           dark:bg-stone-900))))
+                                                           bg-stone-300
+                                                           dark:bg-onyx-900))))
                                     (form (@ (method POST)
                                              (action ,(format #f
                                                        "/users/edit/~a"

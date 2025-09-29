@@ -195,3 +195,6 @@ deploy:
 	rm -rfv $(DEPLOY_WWW)/manuals/lucidplan/index.html
 	mv -v docs/manual/en-GB.html $(DEPLOY_WWW)/manuals/lucidplan/index.html
 
+olive-css:
+	curl --output "./pub/css/lucidplan.olive.min.css" \
+		"https://codeberg.org/jjba23/olive-css/raw/branch/trunk/resources/css/lucidplan.olive.min.css"
