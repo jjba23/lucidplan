@@ -189,10 +189,12 @@
                           ,(icon #:type 'align-bottom
                                  #:icon-css '(text-onyx-700
                                               dark:text-stone-300 text-2xl))
-                          ,(h2 (G_ "projects")))
+                          ,(h2 (G_ "Projects")))
                      (div (a (@ (href "/projects/new"))
                              ,(icon-button #:icon 'plus
-                                           #:content (G_ "new project"))))))))
+                                           #:content (G_ "new project")
+                                           #:icon-css '(text-md text-onyx-700
+                                              dark:text-stone-300))))))))
     (html-template G_
                    #:is-logged-in is-logged-in
                    #:body `((div (@ (class ,(mk-class '(px-4 py-4))))

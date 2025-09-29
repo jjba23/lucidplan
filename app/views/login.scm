@@ -37,6 +37,7 @@
                                                    flex-row
                                                    flex-wrap
                                                    items-center
+                                                   align-middle
                                                    gap-4
                                                    shadow-md)))
                                (method "POST"))
@@ -60,6 +61,7 @@
                                                     flex-row
                                                     flex-wrap
                                                     items-center
+                                                    align-center
                                                     gap-4
                                                     shadow-md)))
                                 (method POST))
@@ -70,7 +72,9 @@
                                      #:required #t)
                              (div ,(icon-button #:icon 'password
                                                 #:type 'submit
-                                                #:content (G_ "reset")))))))
+                                                #:content (G_ "reset")
+                                                #:icon-css '(text-md text-onyx-700
+                                              dark:text-stone-300)))))))
     (html-template G_
                    #:body `((div (@ (class ,(mk-class '(px-4 py-4))))
                                  (div (@ (class ,(mk-class '(w-full flex

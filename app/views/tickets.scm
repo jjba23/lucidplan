@@ -358,7 +358,9 @@
                                                         ,(icon-button #:icon 'kanban
                                                                       #:content
                                                                       (G_
-                                                                       "kanban"))))
+                                                                       "kanban")
+                                                                      #:icon-css '(text-md text-onyx-700
+                                              dark:text-stone-300))))
                                                 (a (@ (href ,(format #f
                                                               "/tickets/~a/new"
                                                               (assoc-ref
@@ -366,7 +368,9 @@
                                                                "human_id"))))
                                                    ,(icon-button #:icon 'plus
                                                                  #:content (G_
-                                                                            "new ticket")))))
+                                                                            "new ticket")
+                                                                 #:icon-css '(text-md text-onyx-700
+                                              dark:text-stone-300)))))
                                       ,(render-if-nestring (lambda (x)
                                                              `(em (@ (class ,(mk-class '
                                                                               (text-sm

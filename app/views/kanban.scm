@@ -161,13 +161,17 @@
                                                            project)))
                                                 ,(icon-button #:icon 'scroll
                                                               #:content (G_
-                                                                         "backlog")))
+                                                                         "backlog")
+                                                              #:icon-css '(text-md text-onyx-700
+                                              dark:text-stone-300)))
                                              (a (@ (href ,(format #f
                                                            "/tickets/~a/new"
                                                            project)))
                                                 ,(icon-button #:icon 'plus
                                                               #:content (G_
-                                                                         "new ticket")))))
+                                                                         "new ticket")
+                                                              #:icon-css '(text-md text-onyx-700
+                                              dark:text-stone-300)))))
 
                                    )))
                         (div (@ (class ,(mk-class '(flex flex-wrap my-8
