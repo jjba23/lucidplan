@@ -40,15 +40,22 @@
     (html-template G_
                    #:proj projects
                    #:is-logged-in is-logged-in
-                   #:body `(div (@ (class ,(mk-class '(px-3 md:px-6 max-w-prose flex flex-col gap-3))))
-                                ,(h2 (G_ "Welcome to LucidPlan"))
+                   #:body `(div (@ (class ,(mk-class '(px-3 md:px-6
+                                                            max-w-prose flex
+                                                            flex-col gap-3))))
+                                ,(sub-h2 `(div (@ (class ,(mk-class '(flex
+                                                                      flex-row
+                                                                      gap-2))))
+                                               (span ,(G_
+                                                       "Welcome to LucidPlan"))
+                                               (span "✨"))
+                                         #:weight '(font-light))
                                 ,(em (G_
                                       "free and open project management for everyone"))
                                 ((div (@ (class ,(mk-class '(flex flex-row
                                                                   flex-wrap
                                                                   gap-8 my-8))))
-                                      (div (@ (class ,(mk-class '(
-                                                                  bg-stone-300
+                                      (div (@ (class ,(mk-class '(bg-stone-300
                                                                   dark:bg-onyx-700
                                                                   rounded-2xl
                                                                   p-4

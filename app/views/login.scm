@@ -30,16 +30,16 @@
 (define (login-page G_)
   (let* ((login-form `(form (@ (action "/login")
                                (class ,(mk-class '(w-full rounded-xl
-                                                   bg-stone-300/50
-                                                   dark:bg-onyx-700/50
-                                                   p-4
-                                                   flex
-                                                   flex-row
-                                                   flex-wrap
-                                                   items-center
-                                                   align-middle
-                                                   gap-4
-                                                   shadow-md)))
+                                                          bg-stone-300/50
+                                                          dark:bg-onyx-700/50
+                                                          p-4
+                                                          flex
+                                                          flex-row
+                                                          flex-wrap
+                                                          items-center
+                                                          align-middle
+                                                          gap-4
+                                                          shadow-md)))
                                (method "POST"))
                             ,(input #:label (G_ "email")
                                     #:name "email"
@@ -73,10 +73,11 @@
                              (div ,(icon-button #:icon 'password
                                                 #:type 'submit
                                                 #:content (G_ "reset")
-                                                #:icon-css '(text-md text-onyx-700
-                                              dark:text-stone-300)))))))
+                                                #:icon-css '(text-md
+                                                             text-onyx-700
+                                                             dark:text-stone-300)))))))
     (html-template G_
-                   #:body `((div (@ (class ,(mk-class '(px-4 py-4))))
+                   #:body `((div (@ (class ,(mk-class '(px-4 pt-4 pb-24))))
                                  (div (@ (class ,(mk-class '(w-full flex
                                                                     flex-row
                                                                     flex-wrap

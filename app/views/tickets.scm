@@ -72,7 +72,7 @@
                                           justify-left))))
 
               (div (@ (class ,(mk-class '(flex flex-col gap-3))))
-                   (small (@ (class ,(mk-class '(font-sans text-stone-500
+                   (small (@ (class ,(mk-class '(font-sans text-onyx-700
                                                  dark:text-stone-300 text-md
                                                  font-light))))
                           ,(G_ "status"))
@@ -83,7 +83,7 @@
                         ,(p (assoc-ref ticket "ticket_status"))))
 
               (div (@ (class ,(mk-class '(flex flex-col gap-3))))
-                   (small (@ (class ,(mk-class '(font-sans text-stone-500
+                   (small (@ (class ,(mk-class '(font-sans text-onyx-700
                                                  dark:text-stone-400 text-md
                                                  font-light))))
                           ,(G_ "type"))
@@ -93,7 +93,7 @@
                                                        "ticket_type")))
                         ,(p (assoc-ref ticket "ticket_type")))))
 
-         (small (@ (class ,(mk-class '(font-sans text-stone-500
+         (small (@ (class ,(mk-class '(font-sans text-onyx-700
                                                  dark:text-stone-300 text-md
                                                  font-light))))
                 ,(G_ "description"))
@@ -145,7 +145,9 @@
                                    (assoc-ref ticket "human_id"))))
 
                  ,(icon-button #:icon 'pencil
-                               #:content (G_ "edit ticket")))
+                               #:content (G_ "edit ticket")
+                               #:icon-css '(text-md text-onyx-700
+                                              dark:text-stone-300)))
               (form (@ (enctype application/x-www-form-urlencoded)
                        (method POST)
                        (action ,(format #f "/tickets/~a/delete" project)))
@@ -359,8 +361,10 @@
                                                                       #:content
                                                                       (G_
                                                                        "kanban")
-                                                                      #:icon-css '(text-md text-onyx-700
-                                              dark:text-stone-300))))
+                                                                      #:icon-css '
+                                                                      (text-md
+                                                                       text-onyx-700
+                                                                       dark:text-stone-300))))
                                                 (a (@ (href ,(format #f
                                                               "/tickets/~a/new"
                                                               (assoc-ref
@@ -369,12 +373,13 @@
                                                    ,(icon-button #:icon 'plus
                                                                  #:content (G_
                                                                             "new ticket")
-                                                                 #:icon-css '(text-md text-onyx-700
-                                              dark:text-stone-300)))))
+                                                                 #:icon-css '(text-md
+                                                                              text-onyx-700
+                                                                              dark:text-stone-300)))))
                                       ,(render-if-nestring (lambda (x)
                                                              `(em (@ (class ,(mk-class '
                                                                               (text-sm
-                                                                               text-stone-600
+                                                                               text-onyx-700
                                                                                dark:text-stone-300))))
                                                                   ,x))
                                                            (assoc-ref

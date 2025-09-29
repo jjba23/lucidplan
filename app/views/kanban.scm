@@ -59,8 +59,9 @@
                    (a (@ (class ,(mk-class '(text-md no-underline)))
                          (href ,(format #f "/tickets/~a/id/~a" project
                                         (assoc-ref t "human_id"))))
-                      ((i (@ (class ,(mk-class '(ph ph-link text-onyx-500 dark:text-stone-500 hover:text-asparagus-500
-                                                     ))))
+                      ((i (@ (class ,(mk-class '(ph ph-link text-onyx-500
+                                                    dark:text-stone-500
+                                                    hover:text-asparagus-500))))
                           ""))))))))
 
 (define* (kanban-from-tickets G_
@@ -162,16 +163,18 @@
                                                 ,(icon-button #:icon 'scroll
                                                               #:content (G_
                                                                          "backlog")
-                                                              #:icon-css '(text-md text-onyx-700
-                                              dark:text-stone-300)))
+                                                              #:icon-css '(text-md
+                                                                           text-onyx-700
+                                                                           dark:text-stone-300)))
                                              (a (@ (href ,(format #f
                                                            "/tickets/~a/new"
                                                            project)))
                                                 ,(icon-button #:icon 'plus
                                                               #:content (G_
                                                                          "new ticket")
-                                                              #:icon-css '(text-md text-onyx-700
-                                              dark:text-stone-300)))))
+                                                              #:icon-css '(text-md
+                                                                           text-onyx-700
+                                                                           dark:text-stone-300)))))
 
                                    )))
                         (div (@ (class ,(mk-class '(flex flex-wrap my-8

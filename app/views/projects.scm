@@ -72,20 +72,28 @@
                                    (assoc-ref p "human_id"))))
                  ,(icon-button #:icon 'scroll
                                #:content (format #f "backlog: ~a"
-                                                 (assoc-ref p "title"))))
+                                                 (assoc-ref p "title"))
+                               #:icon-css '(text-md text-onyx-700
+                                                    dark:text-stone-300)))
               (a (@ (class ,(mk-class '(text-onyx-700 dark:text-stone-300)))
                     (href ,(format #f "/kanban/~a"
                                    (assoc-ref p "human_id"))))
                  ,(icon-button #:icon 'kanban
                                #:content (format #f "kanban: ~a"
-                                                 (assoc-ref p "title"))))
+                                                 (assoc-ref p "title"))
+                               #:icon-css '(text-md text-onyx-700
+                                                    dark:text-stone-300)))
               ,(render-if-nestring (lambda (x)
                                      `(a (@ (class ,(mk-class '(text-onyx-700
-                                                                dark:text-stone-300 no-underline)))
+                                                                dark:text-stone-300
+                                                                no-underline)))
                                             (href ,x))
                                          ,(icon-button #:icon 'link
                                                        #:content (G_
-                                                                  "view live"))))
+                                                                  "view live")
+                                                       #:icon-css '(text-md
+                                                                    text-onyx-700
+                                                                    dark:text-stone-300))))
                                    (uri-decode (if (assoc-ref p "url")
                                                    (format #f "~a"
                                                            (assoc-ref p "url"))
@@ -97,17 +105,22 @@
                                             (href ,x))
                                          ,(icon-button #:icon 'link
                                                        #:content (G_
-                                                                  "project code"))))
+                                                                  "project code")
+                                                       #:icon-css '(text-md
+                                                                    text-onyx-700
+                                                                    dark:text-stone-300))))
                                    (uri-decode (if (assoc-ref p "vcs_url")
                                                    (format #f "~a"
                                                            (assoc-ref p
                                                             "vcs_url")) ""))))
          (hr (@ (class ,(mk-class '(my-3)))))
-         (div (@ (class ,(mk-class '(flex flex-wrap flex-row gap-4))))
+         (div (@ (class ,(mk-class '(flex flex-wrap flex-row gap-4 py-4))))
               (a (@ (href ,(format #f "/projects/~a/edit"
                                    (assoc-ref p "human_id"))))
                  ,(icon-button #:icon 'pencil
-                               #:content (G_ "edit project")))
+                               #:content (G_ "edit project")
+                               #:icon-css '(text-md text-onyx-700
+                                                    dark:text-stone-300)))
               (form (@ (enctype "application/x-www-form-urlencoded")
                        (method "POST")
                        (action "/projects/delete"))
@@ -119,15 +132,15 @@
                                                                          flex-row
                                                                          gap-1))))
                                                   ,(icon #:type 'trash
-                                                         #:icon-css '(text-white
-                                                                      text-xl))
+                                                         #:icon-css '(text-md
+                                                                      text-stone-300))
                                                   ,(G_ "delete")))))
-         (small (@ (class ,(mk-class '(font-mono text-stone-600
-                                                 dark:text-stone-400))))
+         (small (@ (class ,(mk-class '(font-mono text-onyx-700
+                                                 dark:text-stone-500 text-sm))))
                 ,(format #f "~a"
                          (assoc-ref p "human_id")))
-         (small (@ (class ,(mk-class '(font-mono text-stone-600
-                                                 dark:text-stone-400 text-xs))))
+         (small (@ (class ,(mk-class '(font-mono text-onyx-700
+                                                 dark:text-stone-300 text-sm))))
                 ,(assoc-ref p "id")))))
 
 (define (render-project-list-item G_ p)
@@ -194,7 +207,7 @@
                              ,(icon-button #:icon 'plus
                                            #:content (G_ "new project")
                                            #:icon-css '(text-md text-onyx-700
-                                              dark:text-stone-300))))))))
+                                                        dark:text-stone-300))))))))
     (html-template G_
                    #:is-logged-in is-logged-in
                    #:body `((div (@ (class ,(mk-class '(px-4 py-4))))
