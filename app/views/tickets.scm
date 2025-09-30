@@ -195,6 +195,7 @@
                                                    font-bold
                                                    break-words
                                                    max-w-196
+                                                   leading-6
                                                    truncate))))
                   ,(org2html (assoc-ref ticket "title")))
 
