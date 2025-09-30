@@ -136,8 +136,7 @@
                                                       dark:text-stone-300)
                                     #:icon-css '(text-md text-onyx-700
                                                          dark:text-stone-300)))))
-            (a (@ (class ,(mk-class '(lowercase
-
+            (a (@ (class ,(mk-class '(lowercase no-underline
                                                 font-sans
                                                 font-medium
                                                 px-2

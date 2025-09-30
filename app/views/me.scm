@@ -55,7 +55,7 @@
                                                               my-4))))
                                   ,(em (G_ "my permissions (in database):"))
                                   ,(pre (assoc-ref user "permissions")
-                                        #:size '(text-xs)))
+                                        #:size '(text-sm)))
                              (div (@ (class ,(mk-class '(flex flex-row
                                                               flex-wrap
                                                               gap-2
@@ -67,7 +67,7 @@
                                   ,(pre (format #f "~s"
                                                 (assoc-ref token
                                                            'owner-permissions))
-                                        #:size '(text-xs)))
+                                        #:size '(text-sm)))
                              (div (@ (class ,(mk-class '(max-w-prose))))
                                   ,(em (G_
                                         "tip: if your session permissions don't match the DB consider logging out and logging in again"))))))
@@ -128,12 +128,12 @@
          (div (@ (class ,(mk-class '(flex flex-col gap-2))))
               ,(em (G_ "id"))
               ,(mono (assoc-ref u "id")
-                     #:size '(text-xs)))
+                     #:size '(text-sm)))
 
          (div (@ (class ,(mk-class '(flex flex-col gap-2))))
               ,(em (G_ "permissions"))
               ,(mono (assoc-ref u "permissions")
-                     #:size '(text-xs)))
+                     #:size '(text-sm)))
          (div (@ (class ,(mk-class '(flex flex-row gap-3))))
               (div (@ (class ,(mk-class '(flex flex-row gap-3 flex-wrap))))
                    (form (@ (method POST)
