@@ -46,7 +46,7 @@
                                                               my-4))))
                                   ,(em (G_ "my unique id:"))
                                   ,(mono (assoc-ref user "id")
-                                         #:size '(text-xs)))
+                                         #:size '(text-sm)))
                              (div (@ (class ,(mk-class '(flex flex-row
                                                               flex-wrap
                                                               gap-2

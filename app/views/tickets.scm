@@ -147,7 +147,7 @@
                  ,(icon-button #:icon 'pencil
                                #:content (G_ "edit ticket")
                                #:icon-css '(text-md text-onyx-700
-                                              dark:text-stone-300)))
+                                                    dark:text-stone-300)))
               (form (@ (enctype application/x-www-form-urlencoded)
                        (method POST)
                        (action ,(format #f "/tickets/~a/delete" project)))
