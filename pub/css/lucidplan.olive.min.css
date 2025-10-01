@@ -2580,6 +2580,154 @@ ol, ul {list-style:none;}
 .rounded-3xl {border-radius:1.28rem;}
 .rounded-4xl {border-radius:1.44rem;}
 .rounded-5xl {border-radius:1.60rem;}
+.rounded-tl-1 {border-start-start-radius:0.16rem;}
+.rounded-tl-2 {border-start-start-radius:0.32rem;}
+.rounded-tl-3 {border-start-start-radius:0.48rem;}
+.rounded-tl-4 {border-start-start-radius:0.64rem;}
+.rounded-tl-5 {border-start-start-radius:0.80rem;}
+.rounded-tl-6 {border-start-start-radius:0.96rem;}
+.rounded-tl-7 {border-start-start-radius:1.12rem;}
+.rounded-tl-8 {border-start-start-radius:1.28rem;}
+.rounded-tl-9 {border-start-start-radius:1.44rem;}
+.rounded-tl-10 {border-start-start-radius:1.60rem;}
+.rounded-tl-12 {border-start-start-radius:1.92rem;}
+.rounded-tl-14 {border-start-start-radius:2.24rem;}
+.rounded-tl-16 {border-start-start-radius:2.56rem;}
+.rounded-tl-20 {border-start-start-radius:3.20rem;}
+.rounded-tl-24 {border-start-start-radius:3.84rem;}
+.rounded-tl-28 {border-start-start-radius:4.48rem;}
+.rounded-tl-32 {border-start-start-radius:5.12rem;}
+.rounded-tl-48 {border-start-start-radius:7.68rem;}
+.rounded-tl-64 {border-start-start-radius:10.24rem;}
+.rounded-tl-72 {border-start-start-radius:11.52rem;}
+.rounded-tl-90 {border-start-start-radius:14.40rem;}
+.rounded-tl-96 {border-start-start-radius:15.36rem;}
+.rounded-tl-100 {border-start-start-radius:16.00rem;}
+.rounded-tl-128 {border-start-start-radius:20.48rem;}
+.rounded-tl-196 {border-start-start-radius:31.36rem;}
+.rounded-tl-256 {border-start-start-radius:40.96rem;}
+.rounded-tl-512 {border-start-start-radius:81.92rem;}
+.rounded-tl-2xs {border-start-start-radius:0.16rem;}
+.rounded-tl-xs {border-start-start-radius:0.32rem;}
+.rounded-tl-sm {border-start-start-radius:0.48rem;}
+.rounded-tl-md {border-start-start-radius:0.64rem;}
+.rounded-tl-lg {border-start-start-radius:0.80rem;}
+.rounded-tl-xl {border-start-start-radius:0.96rem;}
+.rounded-tl-2xl {border-start-start-radius:1.12rem;}
+.rounded-tl-3xl {border-start-start-radius:1.28rem;}
+.rounded-tl-4xl {border-start-start-radius:1.44rem;}
+.rounded-tl-5xl {border-start-start-radius:1.60rem;}
+.rounded-tr-1 {border-start-end-radius:0.16rem;}
+.rounded-tr-2 {border-start-end-radius:0.32rem;}
+.rounded-tr-3 {border-start-end-radius:0.48rem;}
+.rounded-tr-4 {border-start-end-radius:0.64rem;}
+.rounded-tr-5 {border-start-end-radius:0.80rem;}
+.rounded-tr-6 {border-start-end-radius:0.96rem;}
+.rounded-tr-7 {border-start-end-radius:1.12rem;}
+.rounded-tr-8 {border-start-end-radius:1.28rem;}
+.rounded-tr-9 {border-start-end-radius:1.44rem;}
+.rounded-tr-10 {border-start-end-radius:1.60rem;}
+.rounded-tr-12 {border-start-end-radius:1.92rem;}
+.rounded-tr-14 {border-start-end-radius:2.24rem;}
+.rounded-tr-16 {border-start-end-radius:2.56rem;}
+.rounded-tr-20 {border-start-end-radius:3.20rem;}
+.rounded-tr-24 {border-start-end-radius:3.84rem;}
+.rounded-tr-28 {border-start-end-radius:4.48rem;}
+.rounded-tr-32 {border-start-end-radius:5.12rem;}
+.rounded-tr-48 {border-start-end-radius:7.68rem;}
+.rounded-tr-64 {border-start-end-radius:10.24rem;}
+.rounded-tr-72 {border-start-end-radius:11.52rem;}
+.rounded-tr-90 {border-start-end-radius:14.40rem;}
+.rounded-tr-96 {border-start-end-radius:15.36rem;}
+.rounded-tr-100 {border-start-end-radius:16.00rem;}
+.rounded-tr-128 {border-start-end-radius:20.48rem;}
+.rounded-tr-196 {border-start-end-radius:31.36rem;}
+.rounded-tr-256 {border-start-end-radius:40.96rem;}
+.rounded-tr-512 {border-start-end-radius:81.92rem;}
+.rounded-tr-2xs {border-start-end-radius:0.16rem;}
+.rounded-tr-xs {border-start-end-radius:0.32rem;}
+.rounded-tr-sm {border-start-end-radius:0.48rem;}
+.rounded-tr-md {border-start-end-radius:0.64rem;}
+.rounded-tr-lg {border-start-end-radius:0.80rem;}
+.rounded-tr-xl {border-start-end-radius:0.96rem;}
+.rounded-tr-2xl {border-start-end-radius:1.12rem;}
+.rounded-tr-3xl {border-start-end-radius:1.28rem;}
+.rounded-tr-4xl {border-start-end-radius:1.44rem;}
+.rounded-tr-5xl {border-start-end-radius:1.60rem;}
+.rounded-bl-1 {border-end-start-radius:0.16rem;}
+.rounded-bl-2 {border-end-start-radius:0.32rem;}
+.rounded-bl-3 {border-end-start-radius:0.48rem;}
+.rounded-bl-4 {border-end-start-radius:0.64rem;}
+.rounded-bl-5 {border-end-start-radius:0.80rem;}
+.rounded-bl-6 {border-end-start-radius:0.96rem;}
+.rounded-bl-7 {border-end-start-radius:1.12rem;}
+.rounded-bl-8 {border-end-start-radius:1.28rem;}
+.rounded-bl-9 {border-end-start-radius:1.44rem;}
+.rounded-bl-10 {border-end-start-radius:1.60rem;}
+.rounded-bl-12 {border-end-start-radius:1.92rem;}
+.rounded-bl-14 {border-end-start-radius:2.24rem;}
+.rounded-bl-16 {border-end-start-radius:2.56rem;}
+.rounded-bl-20 {border-end-start-radius:3.20rem;}
+.rounded-bl-24 {border-end-start-radius:3.84rem;}
+.rounded-bl-28 {border-end-start-radius:4.48rem;}
+.rounded-bl-32 {border-end-start-radius:5.12rem;}
+.rounded-bl-48 {border-end-start-radius:7.68rem;}
+.rounded-bl-64 {border-end-start-radius:10.24rem;}
+.rounded-bl-72 {border-end-start-radius:11.52rem;}
+.rounded-bl-90 {border-end-start-radius:14.40rem;}
+.rounded-bl-96 {border-end-start-radius:15.36rem;}
+.rounded-bl-100 {border-end-start-radius:16.00rem;}
+.rounded-bl-128 {border-end-start-radius:20.48rem;}
+.rounded-bl-196 {border-end-start-radius:31.36rem;}
+.rounded-bl-256 {border-end-start-radius:40.96rem;}
+.rounded-bl-512 {border-end-start-radius:81.92rem;}
+.rounded-bl-2xs {border-end-start-radius:0.16rem;}
+.rounded-bl-xs {border-end-start-radius:0.32rem;}
+.rounded-bl-sm {border-end-start-radius:0.48rem;}
+.rounded-bl-md {border-end-start-radius:0.64rem;}
+.rounded-bl-lg {border-end-start-radius:0.80rem;}
+.rounded-bl-xl {border-end-start-radius:0.96rem;}
+.rounded-bl-2xl {border-end-start-radius:1.12rem;}
+.rounded-bl-3xl {border-end-start-radius:1.28rem;}
+.rounded-bl-4xl {border-end-start-radius:1.44rem;}
+.rounded-bl-5xl {border-end-start-radius:1.60rem;}
+.rounded-br-1 {border-end-end-radius:0.16rem;}
+.rounded-br-2 {border-end-end-radius:0.32rem;}
+.rounded-br-3 {border-end-end-radius:0.48rem;}
+.rounded-br-4 {border-end-end-radius:0.64rem;}
+.rounded-br-5 {border-end-end-radius:0.80rem;}
+.rounded-br-6 {border-end-end-radius:0.96rem;}
+.rounded-br-7 {border-end-end-radius:1.12rem;}
+.rounded-br-8 {border-end-end-radius:1.28rem;}
+.rounded-br-9 {border-end-end-radius:1.44rem;}
+.rounded-br-10 {border-end-end-radius:1.60rem;}
+.rounded-br-12 {border-end-end-radius:1.92rem;}
+.rounded-br-14 {border-end-end-radius:2.24rem;}
+.rounded-br-16 {border-end-end-radius:2.56rem;}
+.rounded-br-20 {border-end-end-radius:3.20rem;}
+.rounded-br-24 {border-end-end-radius:3.84rem;}
+.rounded-br-28 {border-end-end-radius:4.48rem;}
+.rounded-br-32 {border-end-end-radius:5.12rem;}
+.rounded-br-48 {border-end-end-radius:7.68rem;}
+.rounded-br-64 {border-end-end-radius:10.24rem;}
+.rounded-br-72 {border-end-end-radius:11.52rem;}
+.rounded-br-90 {border-end-end-radius:14.40rem;}
+.rounded-br-96 {border-end-end-radius:15.36rem;}
+.rounded-br-100 {border-end-end-radius:16.00rem;}
+.rounded-br-128 {border-end-end-radius:20.48rem;}
+.rounded-br-196 {border-end-end-radius:31.36rem;}
+.rounded-br-256 {border-end-end-radius:40.96rem;}
+.rounded-br-512 {border-end-end-radius:81.92rem;}
+.rounded-br-2xs {border-end-end-radius:0.16rem;}
+.rounded-br-xs {border-end-end-radius:0.32rem;}
+.rounded-br-sm {border-end-end-radius:0.48rem;}
+.rounded-br-md {border-end-end-radius:0.64rem;}
+.rounded-br-lg {border-end-end-radius:0.80rem;}
+.rounded-br-xl {border-end-end-radius:0.96rem;}
+.rounded-br-2xl {border-end-end-radius:1.12rem;}
+.rounded-br-3xl {border-end-end-radius:1.28rem;}
+.rounded-br-4xl {border-end-end-radius:1.44rem;}
+.rounded-br-5xl {border-end-end-radius:1.60rem;}
 .snap-start {scroll-snap-align:start;}
 .snap-end {scroll-snap-align:end;}
 .snap-center {scroll-snap-align:center;}
@@ -2661,96 +2809,6 @@ ol, ul {list-style:none;}
 .bg-floral-white-500 {background:oklch(0.9819 0.0164 91.55 / 1);}
 .bg-floral-white-700 {background:oklch(0.9319 0.0164 91.55 / 1);}
 .bg-floral-white-900 {background:oklch(0.8819 0.0164 91.55 / 1);}
-.bg-spiced-terracotta-100\/1 {background:oklch(0.7277 0.1081 53.34 / 0.01);}
-.bg-spiced-terracotta-300\/1 {background:oklch(0.6777 0.1081 53.34 / 0.01);}
-.bg-spiced-terracotta-500\/1 {background:oklch(0.6277 0.1081 53.34 / 0.01);}
-.bg-spiced-terracotta-700\/1 {background:oklch(0.5777 0.1081 53.34 / 0.01);}
-.bg-spiced-terracotta-900\/1 {background:oklch(0.5277 0.1081 53.34 / 0.01);}
-.bg-spiced-terracotta-100\/5 {background:oklch(0.7277 0.1081 53.34 / 0.05);}
-.bg-spiced-terracotta-300\/5 {background:oklch(0.6777 0.1081 53.34 / 0.05);}
-.bg-spiced-terracotta-500\/5 {background:oklch(0.6277 0.1081 53.34 / 0.05);}
-.bg-spiced-terracotta-700\/5 {background:oklch(0.5777 0.1081 53.34 / 0.05);}
-.bg-spiced-terracotta-900\/5 {background:oklch(0.5277 0.1081 53.34 / 0.05);}
-.bg-spiced-terracotta-100\/10 {background:oklch(0.7277 0.1081 53.34 / 0.1);}
-.bg-spiced-terracotta-300\/10 {background:oklch(0.6777 0.1081 53.34 / 0.1);}
-.bg-spiced-terracotta-500\/10 {background:oklch(0.6277 0.1081 53.34 / 0.1);}
-.bg-spiced-terracotta-700\/10 {background:oklch(0.5777 0.1081 53.34 / 0.1);}
-.bg-spiced-terracotta-900\/10 {background:oklch(0.5277 0.1081 53.34 / 0.1);}
-.bg-spiced-terracotta-100\/25 {background:oklch(0.7277 0.1081 53.34 / 0.2);}
-.bg-spiced-terracotta-300\/25 {background:oklch(0.6777 0.1081 53.34 / 0.2);}
-.bg-spiced-terracotta-500\/25 {background:oklch(0.6277 0.1081 53.34 / 0.2);}
-.bg-spiced-terracotta-700\/25 {background:oklch(0.5777 0.1081 53.34 / 0.2);}
-.bg-spiced-terracotta-900\/25 {background:oklch(0.5277 0.1081 53.34 / 0.2);}
-.bg-spiced-terracotta-100\/50 {background:oklch(0.7277 0.1081 53.34 / 0.5);}
-.bg-spiced-terracotta-300\/50 {background:oklch(0.6777 0.1081 53.34 / 0.5);}
-.bg-spiced-terracotta-500\/50 {background:oklch(0.6277 0.1081 53.34 / 0.5);}
-.bg-spiced-terracotta-700\/50 {background:oklch(0.5777 0.1081 53.34 / 0.5);}
-.bg-spiced-terracotta-900\/50 {background:oklch(0.5277 0.1081 53.34 / 0.5);}
-.bg-spiced-terracotta-100\/75 {background:oklch(0.7277 0.1081 53.34 / 0.7);}
-.bg-spiced-terracotta-300\/75 {background:oklch(0.6777 0.1081 53.34 / 0.7);}
-.bg-spiced-terracotta-500\/75 {background:oklch(0.6277 0.1081 53.34 / 0.7);}
-.bg-spiced-terracotta-700\/75 {background:oklch(0.5777 0.1081 53.34 / 0.7);}
-.bg-spiced-terracotta-900\/75 {background:oklch(0.5277 0.1081 53.34 / 0.7);}
-.bg-spiced-terracotta-100\/90 {background:oklch(0.7277 0.1081 53.34 / 0.9);}
-.bg-spiced-terracotta-300\/90 {background:oklch(0.6777 0.1081 53.34 / 0.9);}
-.bg-spiced-terracotta-500\/90 {background:oklch(0.6277 0.1081 53.34 / 0.9);}
-.bg-spiced-terracotta-700\/90 {background:oklch(0.5777 0.1081 53.34 / 0.9);}
-.bg-spiced-terracotta-900\/90 {background:oklch(0.5277 0.1081 53.34 / 0.9);}
-.bg-spiced-terracotta-100\/95 {background:oklch(0.7277 0.1081 53.34 / 0.95);}
-.bg-spiced-terracotta-300\/95 {background:oklch(0.6777 0.1081 53.34 / 0.95);}
-.bg-spiced-terracotta-500\/95 {background:oklch(0.6277 0.1081 53.34 / 0.95);}
-.bg-spiced-terracotta-700\/95 {background:oklch(0.5777 0.1081 53.34 / 0.95);}
-.bg-spiced-terracotta-900\/95 {background:oklch(0.5277 0.1081 53.34 / 0.95);}
-.bg-spiced-terracotta-100 {background:oklch(0.7277 0.1081 53.34 / 1);}
-.bg-spiced-terracotta-300 {background:oklch(0.6777 0.1081 53.34 / 1);}
-.bg-spiced-terracotta-500 {background:oklch(0.6277 0.1081 53.34 / 1);}
-.bg-spiced-terracotta-700 {background:oklch(0.5777 0.1081 53.34 / 1);}
-.bg-spiced-terracotta-900 {background:oklch(0.5277 0.1081 53.34 / 1);}
-.bg-papaya-whip-100\/1 {background:oklch(1 0.0384 83.83 / 0.01);}
-.bg-papaya-whip-300\/1 {background:oklch(1 0.0384 83.83 / 0.01);}
-.bg-papaya-whip-500\/1 {background:oklch(0.9622 0.0384 83.83 / 0.01);}
-.bg-papaya-whip-700\/1 {background:oklch(0.9122 0.0384 83.83 / 0.01);}
-.bg-papaya-whip-900\/1 {background:oklch(0.8622 0.0384 83.83 / 0.01);}
-.bg-papaya-whip-100\/5 {background:oklch(1 0.0384 83.83 / 0.05);}
-.bg-papaya-whip-300\/5 {background:oklch(1 0.0384 83.83 / 0.05);}
-.bg-papaya-whip-500\/5 {background:oklch(0.9622 0.0384 83.83 / 0.05);}
-.bg-papaya-whip-700\/5 {background:oklch(0.9122 0.0384 83.83 / 0.05);}
-.bg-papaya-whip-900\/5 {background:oklch(0.8622 0.0384 83.83 / 0.05);}
-.bg-papaya-whip-100\/10 {background:oklch(1 0.0384 83.83 / 0.1);}
-.bg-papaya-whip-300\/10 {background:oklch(1 0.0384 83.83 / 0.1);}
-.bg-papaya-whip-500\/10 {background:oklch(0.9622 0.0384 83.83 / 0.1);}
-.bg-papaya-whip-700\/10 {background:oklch(0.9122 0.0384 83.83 / 0.1);}
-.bg-papaya-whip-900\/10 {background:oklch(0.8622 0.0384 83.83 / 0.1);}
-.bg-papaya-whip-100\/25 {background:oklch(1 0.0384 83.83 / 0.2);}
-.bg-papaya-whip-300\/25 {background:oklch(1 0.0384 83.83 / 0.2);}
-.bg-papaya-whip-500\/25 {background:oklch(0.9622 0.0384 83.83 / 0.2);}
-.bg-papaya-whip-700\/25 {background:oklch(0.9122 0.0384 83.83 / 0.2);}
-.bg-papaya-whip-900\/25 {background:oklch(0.8622 0.0384 83.83 / 0.2);}
-.bg-papaya-whip-100\/50 {background:oklch(1 0.0384 83.83 / 0.5);}
-.bg-papaya-whip-300\/50 {background:oklch(1 0.0384 83.83 / 0.5);}
-.bg-papaya-whip-500\/50 {background:oklch(0.9622 0.0384 83.83 / 0.5);}
-.bg-papaya-whip-700\/50 {background:oklch(0.9122 0.0384 83.83 / 0.5);}
-.bg-papaya-whip-900\/50 {background:oklch(0.8622 0.0384 83.83 / 0.5);}
-.bg-papaya-whip-100\/75 {background:oklch(1 0.0384 83.83 / 0.7);}
-.bg-papaya-whip-300\/75 {background:oklch(1 0.0384 83.83 / 0.7);}
-.bg-papaya-whip-500\/75 {background:oklch(0.9622 0.0384 83.83 / 0.7);}
-.bg-papaya-whip-700\/75 {background:oklch(0.9122 0.0384 83.83 / 0.7);}
-.bg-papaya-whip-900\/75 {background:oklch(0.8622 0.0384 83.83 / 0.7);}
-.bg-papaya-whip-100\/90 {background:oklch(1 0.0384 83.83 / 0.9);}
-.bg-papaya-whip-300\/90 {background:oklch(1 0.0384 83.83 / 0.9);}
-.bg-papaya-whip-500\/90 {background:oklch(0.9622 0.0384 83.83 / 0.9);}
-.bg-papaya-whip-700\/90 {background:oklch(0.9122 0.0384 83.83 / 0.9);}
-.bg-papaya-whip-900\/90 {background:oklch(0.8622 0.0384 83.83 / 0.9);}
-.bg-papaya-whip-100\/95 {background:oklch(1 0.0384 83.83 / 0.95);}
-.bg-papaya-whip-300\/95 {background:oklch(1 0.0384 83.83 / 0.95);}
-.bg-papaya-whip-500\/95 {background:oklch(0.9622 0.0384 83.83 / 0.95);}
-.bg-papaya-whip-700\/95 {background:oklch(0.9122 0.0384 83.83 / 0.95);}
-.bg-papaya-whip-900\/95 {background:oklch(0.8622 0.0384 83.83 / 0.95);}
-.bg-papaya-whip-100 {background:oklch(1 0.0384 83.83 / 1);}
-.bg-papaya-whip-300 {background:oklch(1 0.0384 83.83 / 1);}
-.bg-papaya-whip-500 {background:oklch(0.9622 0.0384 83.83 / 1);}
-.bg-papaya-whip-700 {background:oklch(0.9122 0.0384 83.83 / 1);}
-.bg-papaya-whip-900 {background:oklch(0.8622 0.0384 83.83 / 1);}
 .bg-onyx-100\/1 {background:oklch(0.4588 0.0044 247.95 / 0.01);}
 .bg-onyx-300\/1 {background:oklch(0.4088 0.0044 247.95 / 0.01);}
 .bg-onyx-500\/1 {background:oklch(0.3588 0.0044 247.95 / 0.01);}
@@ -3066,96 +3124,6 @@ ol, ul {list-style:none;}
 .text-floral-white-500 {color:oklch(0.9819 0.0164 91.55 / 1);}
 .text-floral-white-700 {color:oklch(0.9319 0.0164 91.55 / 1);}
 .text-floral-white-900 {color:oklch(0.8819 0.0164 91.55 / 1);}
-.text-spiced-terracotta-100\/1 {color:oklch(0.7277 0.1081 53.34 / 0.01);}
-.text-spiced-terracotta-300\/1 {color:oklch(0.6777 0.1081 53.34 / 0.01);}
-.text-spiced-terracotta-500\/1 {color:oklch(0.6277 0.1081 53.34 / 0.01);}
-.text-spiced-terracotta-700\/1 {color:oklch(0.5777 0.1081 53.34 / 0.01);}
-.text-spiced-terracotta-900\/1 {color:oklch(0.5277 0.1081 53.34 / 0.01);}
-.text-spiced-terracotta-100\/5 {color:oklch(0.7277 0.1081 53.34 / 0.05);}
-.text-spiced-terracotta-300\/5 {color:oklch(0.6777 0.1081 53.34 / 0.05);}
-.text-spiced-terracotta-500\/5 {color:oklch(0.6277 0.1081 53.34 / 0.05);}
-.text-spiced-terracotta-700\/5 {color:oklch(0.5777 0.1081 53.34 / 0.05);}
-.text-spiced-terracotta-900\/5 {color:oklch(0.5277 0.1081 53.34 / 0.05);}
-.text-spiced-terracotta-100\/10 {color:oklch(0.7277 0.1081 53.34 / 0.1);}
-.text-spiced-terracotta-300\/10 {color:oklch(0.6777 0.1081 53.34 / 0.1);}
-.text-spiced-terracotta-500\/10 {color:oklch(0.6277 0.1081 53.34 / 0.1);}
-.text-spiced-terracotta-700\/10 {color:oklch(0.5777 0.1081 53.34 / 0.1);}
-.text-spiced-terracotta-900\/10 {color:oklch(0.5277 0.1081 53.34 / 0.1);}
-.text-spiced-terracotta-100\/25 {color:oklch(0.7277 0.1081 53.34 / 0.2);}
-.text-spiced-terracotta-300\/25 {color:oklch(0.6777 0.1081 53.34 / 0.2);}
-.text-spiced-terracotta-500\/25 {color:oklch(0.6277 0.1081 53.34 / 0.2);}
-.text-spiced-terracotta-700\/25 {color:oklch(0.5777 0.1081 53.34 / 0.2);}
-.text-spiced-terracotta-900\/25 {color:oklch(0.5277 0.1081 53.34 / 0.2);}
-.text-spiced-terracotta-100\/50 {color:oklch(0.7277 0.1081 53.34 / 0.5);}
-.text-spiced-terracotta-300\/50 {color:oklch(0.6777 0.1081 53.34 / 0.5);}
-.text-spiced-terracotta-500\/50 {color:oklch(0.6277 0.1081 53.34 / 0.5);}
-.text-spiced-terracotta-700\/50 {color:oklch(0.5777 0.1081 53.34 / 0.5);}
-.text-spiced-terracotta-900\/50 {color:oklch(0.5277 0.1081 53.34 / 0.5);}
-.text-spiced-terracotta-100\/75 {color:oklch(0.7277 0.1081 53.34 / 0.7);}
-.text-spiced-terracotta-300\/75 {color:oklch(0.6777 0.1081 53.34 / 0.7);}
-.text-spiced-terracotta-500\/75 {color:oklch(0.6277 0.1081 53.34 / 0.7);}
-.text-spiced-terracotta-700\/75 {color:oklch(0.5777 0.1081 53.34 / 0.7);}
-.text-spiced-terracotta-900\/75 {color:oklch(0.5277 0.1081 53.34 / 0.7);}
-.text-spiced-terracotta-100\/90 {color:oklch(0.7277 0.1081 53.34 / 0.9);}
-.text-spiced-terracotta-300\/90 {color:oklch(0.6777 0.1081 53.34 / 0.9);}
-.text-spiced-terracotta-500\/90 {color:oklch(0.6277 0.1081 53.34 / 0.9);}
-.text-spiced-terracotta-700\/90 {color:oklch(0.5777 0.1081 53.34 / 0.9);}
-.text-spiced-terracotta-900\/90 {color:oklch(0.5277 0.1081 53.34 / 0.9);}
-.text-spiced-terracotta-100\/95 {color:oklch(0.7277 0.1081 53.34 / 0.95);}
-.text-spiced-terracotta-300\/95 {color:oklch(0.6777 0.1081 53.34 / 0.95);}
-.text-spiced-terracotta-500\/95 {color:oklch(0.6277 0.1081 53.34 / 0.95);}
-.text-spiced-terracotta-700\/95 {color:oklch(0.5777 0.1081 53.34 / 0.95);}
-.text-spiced-terracotta-900\/95 {color:oklch(0.5277 0.1081 53.34 / 0.95);}
-.text-spiced-terracotta-100 {color:oklch(0.7277 0.1081 53.34 / 1);}
-.text-spiced-terracotta-300 {color:oklch(0.6777 0.1081 53.34 / 1);}
-.text-spiced-terracotta-500 {color:oklch(0.6277 0.1081 53.34 / 1);}
-.text-spiced-terracotta-700 {color:oklch(0.5777 0.1081 53.34 / 1);}
-.text-spiced-terracotta-900 {color:oklch(0.5277 0.1081 53.34 / 1);}
-.text-papaya-whip-100\/1 {color:oklch(1 0.0384 83.83 / 0.01);}
-.text-papaya-whip-300\/1 {color:oklch(1 0.0384 83.83 / 0.01);}
-.text-papaya-whip-500\/1 {color:oklch(0.9622 0.0384 83.83 / 0.01);}
-.text-papaya-whip-700\/1 {color:oklch(0.9122 0.0384 83.83 / 0.01);}
-.text-papaya-whip-900\/1 {color:oklch(0.8622 0.0384 83.83 / 0.01);}
-.text-papaya-whip-100\/5 {color:oklch(1 0.0384 83.83 / 0.05);}
-.text-papaya-whip-300\/5 {color:oklch(1 0.0384 83.83 / 0.05);}
-.text-papaya-whip-500\/5 {color:oklch(0.9622 0.0384 83.83 / 0.05);}
-.text-papaya-whip-700\/5 {color:oklch(0.9122 0.0384 83.83 / 0.05);}
-.text-papaya-whip-900\/5 {color:oklch(0.8622 0.0384 83.83 / 0.05);}
-.text-papaya-whip-100\/10 {color:oklch(1 0.0384 83.83 / 0.1);}
-.text-papaya-whip-300\/10 {color:oklch(1 0.0384 83.83 / 0.1);}
-.text-papaya-whip-500\/10 {color:oklch(0.9622 0.0384 83.83 / 0.1);}
-.text-papaya-whip-700\/10 {color:oklch(0.9122 0.0384 83.83 / 0.1);}
-.text-papaya-whip-900\/10 {color:oklch(0.8622 0.0384 83.83 / 0.1);}
-.text-papaya-whip-100\/25 {color:oklch(1 0.0384 83.83 / 0.2);}
-.text-papaya-whip-300\/25 {color:oklch(1 0.0384 83.83 / 0.2);}
-.text-papaya-whip-500\/25 {color:oklch(0.9622 0.0384 83.83 / 0.2);}
-.text-papaya-whip-700\/25 {color:oklch(0.9122 0.0384 83.83 / 0.2);}
-.text-papaya-whip-900\/25 {color:oklch(0.8622 0.0384 83.83 / 0.2);}
-.text-papaya-whip-100\/50 {color:oklch(1 0.0384 83.83 / 0.5);}
-.text-papaya-whip-300\/50 {color:oklch(1 0.0384 83.83 / 0.5);}
-.text-papaya-whip-500\/50 {color:oklch(0.9622 0.0384 83.83 / 0.5);}
-.text-papaya-whip-700\/50 {color:oklch(0.9122 0.0384 83.83 / 0.5);}
-.text-papaya-whip-900\/50 {color:oklch(0.8622 0.0384 83.83 / 0.5);}
-.text-papaya-whip-100\/75 {color:oklch(1 0.0384 83.83 / 0.7);}
-.text-papaya-whip-300\/75 {color:oklch(1 0.0384 83.83 / 0.7);}
-.text-papaya-whip-500\/75 {color:oklch(0.9622 0.0384 83.83 / 0.7);}
-.text-papaya-whip-700\/75 {color:oklch(0.9122 0.0384 83.83 / 0.7);}
-.text-papaya-whip-900\/75 {color:oklch(0.8622 0.0384 83.83 / 0.7);}
-.text-papaya-whip-100\/90 {color:oklch(1 0.0384 83.83 / 0.9);}
-.text-papaya-whip-300\/90 {color:oklch(1 0.0384 83.83 / 0.9);}
-.text-papaya-whip-500\/90 {color:oklch(0.9622 0.0384 83.83 / 0.9);}
-.text-papaya-whip-700\/90 {color:oklch(0.9122 0.0384 83.83 / 0.9);}
-.text-papaya-whip-900\/90 {color:oklch(0.8622 0.0384 83.83 / 0.9);}
-.text-papaya-whip-100\/95 {color:oklch(1 0.0384 83.83 / 0.95);}
-.text-papaya-whip-300\/95 {color:oklch(1 0.0384 83.83 / 0.95);}
-.text-papaya-whip-500\/95 {color:oklch(0.9622 0.0384 83.83 / 0.95);}
-.text-papaya-whip-700\/95 {color:oklch(0.9122 0.0384 83.83 / 0.95);}
-.text-papaya-whip-900\/95 {color:oklch(0.8622 0.0384 83.83 / 0.95);}
-.text-papaya-whip-100 {color:oklch(1 0.0384 83.83 / 1);}
-.text-papaya-whip-300 {color:oklch(1 0.0384 83.83 / 1);}
-.text-papaya-whip-500 {color:oklch(0.9622 0.0384 83.83 / 1);}
-.text-papaya-whip-700 {color:oklch(0.9122 0.0384 83.83 / 1);}
-.text-papaya-whip-900 {color:oklch(0.8622 0.0384 83.83 / 1);}
 .text-onyx-100\/1 {color:oklch(0.4588 0.0044 247.95 / 0.01);}
 .text-onyx-300\/1 {color:oklch(0.4088 0.0044 247.95 / 0.01);}
 .text-onyx-500\/1 {color:oklch(0.3588 0.0044 247.95 / 0.01);}
@@ -3471,96 +3439,6 @@ ol, ul {list-style:none;}
 .border-floral-white-500 {border-color:oklch(0.9819 0.0164 91.55 / 1);}
 .border-floral-white-700 {border-color:oklch(0.9319 0.0164 91.55 / 1);}
 .border-floral-white-900 {border-color:oklch(0.8819 0.0164 91.55 / 1);}
-.border-spiced-terracotta-100\/1 {border-color:oklch(0.7277 0.1081 53.34 / 0.01);}
-.border-spiced-terracotta-300\/1 {border-color:oklch(0.6777 0.1081 53.34 / 0.01);}
-.border-spiced-terracotta-500\/1 {border-color:oklch(0.6277 0.1081 53.34 / 0.01);}
-.border-spiced-terracotta-700\/1 {border-color:oklch(0.5777 0.1081 53.34 / 0.01);}
-.border-spiced-terracotta-900\/1 {border-color:oklch(0.5277 0.1081 53.34 / 0.01);}
-.border-spiced-terracotta-100\/5 {border-color:oklch(0.7277 0.1081 53.34 / 0.05);}
-.border-spiced-terracotta-300\/5 {border-color:oklch(0.6777 0.1081 53.34 / 0.05);}
-.border-spiced-terracotta-500\/5 {border-color:oklch(0.6277 0.1081 53.34 / 0.05);}
-.border-spiced-terracotta-700\/5 {border-color:oklch(0.5777 0.1081 53.34 / 0.05);}
-.border-spiced-terracotta-900\/5 {border-color:oklch(0.5277 0.1081 53.34 / 0.05);}
-.border-spiced-terracotta-100\/10 {border-color:oklch(0.7277 0.1081 53.34 / 0.1);}
-.border-spiced-terracotta-300\/10 {border-color:oklch(0.6777 0.1081 53.34 / 0.1);}
-.border-spiced-terracotta-500\/10 {border-color:oklch(0.6277 0.1081 53.34 / 0.1);}
-.border-spiced-terracotta-700\/10 {border-color:oklch(0.5777 0.1081 53.34 / 0.1);}
-.border-spiced-terracotta-900\/10 {border-color:oklch(0.5277 0.1081 53.34 / 0.1);}
-.border-spiced-terracotta-100\/25 {border-color:oklch(0.7277 0.1081 53.34 / 0.2);}
-.border-spiced-terracotta-300\/25 {border-color:oklch(0.6777 0.1081 53.34 / 0.2);}
-.border-spiced-terracotta-500\/25 {border-color:oklch(0.6277 0.1081 53.34 / 0.2);}
-.border-spiced-terracotta-700\/25 {border-color:oklch(0.5777 0.1081 53.34 / 0.2);}
-.border-spiced-terracotta-900\/25 {border-color:oklch(0.5277 0.1081 53.34 / 0.2);}
-.border-spiced-terracotta-100\/50 {border-color:oklch(0.7277 0.1081 53.34 / 0.5);}
-.border-spiced-terracotta-300\/50 {border-color:oklch(0.6777 0.1081 53.34 / 0.5);}
-.border-spiced-terracotta-500\/50 {border-color:oklch(0.6277 0.1081 53.34 / 0.5);}
-.border-spiced-terracotta-700\/50 {border-color:oklch(0.5777 0.1081 53.34 / 0.5);}
-.border-spiced-terracotta-900\/50 {border-color:oklch(0.5277 0.1081 53.34 / 0.5);}
-.border-spiced-terracotta-100\/75 {border-color:oklch(0.7277 0.1081 53.34 / 0.7);}
-.border-spiced-terracotta-300\/75 {border-color:oklch(0.6777 0.1081 53.34 / 0.7);}
-.border-spiced-terracotta-500\/75 {border-color:oklch(0.6277 0.1081 53.34 / 0.7);}
-.border-spiced-terracotta-700\/75 {border-color:oklch(0.5777 0.1081 53.34 / 0.7);}
-.border-spiced-terracotta-900\/75 {border-color:oklch(0.5277 0.1081 53.34 / 0.7);}
-.border-spiced-terracotta-100\/90 {border-color:oklch(0.7277 0.1081 53.34 / 0.9);}
-.border-spiced-terracotta-300\/90 {border-color:oklch(0.6777 0.1081 53.34 / 0.9);}
-.border-spiced-terracotta-500\/90 {border-color:oklch(0.6277 0.1081 53.34 / 0.9);}
-.border-spiced-terracotta-700\/90 {border-color:oklch(0.5777 0.1081 53.34 / 0.9);}
-.border-spiced-terracotta-900\/90 {border-color:oklch(0.5277 0.1081 53.34 / 0.9);}
-.border-spiced-terracotta-100\/95 {border-color:oklch(0.7277 0.1081 53.34 / 0.95);}
-.border-spiced-terracotta-300\/95 {border-color:oklch(0.6777 0.1081 53.34 / 0.95);}
-.border-spiced-terracotta-500\/95 {border-color:oklch(0.6277 0.1081 53.34 / 0.95);}
-.border-spiced-terracotta-700\/95 {border-color:oklch(0.5777 0.1081 53.34 / 0.95);}
-.border-spiced-terracotta-900\/95 {border-color:oklch(0.5277 0.1081 53.34 / 0.95);}
-.border-spiced-terracotta-100 {border-color:oklch(0.7277 0.1081 53.34 / 1);}
-.border-spiced-terracotta-300 {border-color:oklch(0.6777 0.1081 53.34 / 1);}
-.border-spiced-terracotta-500 {border-color:oklch(0.6277 0.1081 53.34 / 1);}
-.border-spiced-terracotta-700 {border-color:oklch(0.5777 0.1081 53.34 / 1);}
-.border-spiced-terracotta-900 {border-color:oklch(0.5277 0.1081 53.34 / 1);}
-.border-papaya-whip-100\/1 {border-color:oklch(1 0.0384 83.83 / 0.01);}
-.border-papaya-whip-300\/1 {border-color:oklch(1 0.0384 83.83 / 0.01);}
-.border-papaya-whip-500\/1 {border-color:oklch(0.9622 0.0384 83.83 / 0.01);}
-.border-papaya-whip-700\/1 {border-color:oklch(0.9122 0.0384 83.83 / 0.01);}
-.border-papaya-whip-900\/1 {border-color:oklch(0.8622 0.0384 83.83 / 0.01);}
-.border-papaya-whip-100\/5 {border-color:oklch(1 0.0384 83.83 / 0.05);}
-.border-papaya-whip-300\/5 {border-color:oklch(1 0.0384 83.83 / 0.05);}
-.border-papaya-whip-500\/5 {border-color:oklch(0.9622 0.0384 83.83 / 0.05);}
-.border-papaya-whip-700\/5 {border-color:oklch(0.9122 0.0384 83.83 / 0.05);}
-.border-papaya-whip-900\/5 {border-color:oklch(0.8622 0.0384 83.83 / 0.05);}
-.border-papaya-whip-100\/10 {border-color:oklch(1 0.0384 83.83 / 0.1);}
-.border-papaya-whip-300\/10 {border-color:oklch(1 0.0384 83.83 / 0.1);}
-.border-papaya-whip-500\/10 {border-color:oklch(0.9622 0.0384 83.83 / 0.1);}
-.border-papaya-whip-700\/10 {border-color:oklch(0.9122 0.0384 83.83 / 0.1);}
-.border-papaya-whip-900\/10 {border-color:oklch(0.8622 0.0384 83.83 / 0.1);}
-.border-papaya-whip-100\/25 {border-color:oklch(1 0.0384 83.83 / 0.2);}
-.border-papaya-whip-300\/25 {border-color:oklch(1 0.0384 83.83 / 0.2);}
-.border-papaya-whip-500\/25 {border-color:oklch(0.9622 0.0384 83.83 / 0.2);}
-.border-papaya-whip-700\/25 {border-color:oklch(0.9122 0.0384 83.83 / 0.2);}
-.border-papaya-whip-900\/25 {border-color:oklch(0.8622 0.0384 83.83 / 0.2);}
-.border-papaya-whip-100\/50 {border-color:oklch(1 0.0384 83.83 / 0.5);}
-.border-papaya-whip-300\/50 {border-color:oklch(1 0.0384 83.83 / 0.5);}
-.border-papaya-whip-500\/50 {border-color:oklch(0.9622 0.0384 83.83 / 0.5);}
-.border-papaya-whip-700\/50 {border-color:oklch(0.9122 0.0384 83.83 / 0.5);}
-.border-papaya-whip-900\/50 {border-color:oklch(0.8622 0.0384 83.83 / 0.5);}
-.border-papaya-whip-100\/75 {border-color:oklch(1 0.0384 83.83 / 0.7);}
-.border-papaya-whip-300\/75 {border-color:oklch(1 0.0384 83.83 / 0.7);}
-.border-papaya-whip-500\/75 {border-color:oklch(0.9622 0.0384 83.83 / 0.7);}
-.border-papaya-whip-700\/75 {border-color:oklch(0.9122 0.0384 83.83 / 0.7);}
-.border-papaya-whip-900\/75 {border-color:oklch(0.8622 0.0384 83.83 / 0.7);}
-.border-papaya-whip-100\/90 {border-color:oklch(1 0.0384 83.83 / 0.9);}
-.border-papaya-whip-300\/90 {border-color:oklch(1 0.0384 83.83 / 0.9);}
-.border-papaya-whip-500\/90 {border-color:oklch(0.9622 0.0384 83.83 / 0.9);}
-.border-papaya-whip-700\/90 {border-color:oklch(0.9122 0.0384 83.83 / 0.9);}
-.border-papaya-whip-900\/90 {border-color:oklch(0.8622 0.0384 83.83 / 0.9);}
-.border-papaya-whip-100\/95 {border-color:oklch(1 0.0384 83.83 / 0.95);}
-.border-papaya-whip-300\/95 {border-color:oklch(1 0.0384 83.83 / 0.95);}
-.border-papaya-whip-500\/95 {border-color:oklch(0.9622 0.0384 83.83 / 0.95);}
-.border-papaya-whip-700\/95 {border-color:oklch(0.9122 0.0384 83.83 / 0.95);}
-.border-papaya-whip-900\/95 {border-color:oklch(0.8622 0.0384 83.83 / 0.95);}
-.border-papaya-whip-100 {border-color:oklch(1 0.0384 83.83 / 1);}
-.border-papaya-whip-300 {border-color:oklch(1 0.0384 83.83 / 1);}
-.border-papaya-whip-500 {border-color:oklch(0.9622 0.0384 83.83 / 1);}
-.border-papaya-whip-700 {border-color:oklch(0.9122 0.0384 83.83 / 1);}
-.border-papaya-whip-900 {border-color:oklch(0.8622 0.0384 83.83 / 1);}
 .border-onyx-100\/1 {border-color:oklch(0.4588 0.0044 247.95 / 0.01);}
 .border-onyx-300\/1 {border-color:oklch(0.4088 0.0044 247.95 / 0.01);}
 .border-onyx-500\/1 {border-color:oklch(0.3588 0.0044 247.95 / 0.01);}
@@ -3876,96 +3754,6 @@ ol, ul {list-style:none;}
 .decoration-floral-white-500 {text-decoration-color:oklch(0.9819 0.0164 91.55 / 1);}
 .decoration-floral-white-700 {text-decoration-color:oklch(0.9319 0.0164 91.55 / 1);}
 .decoration-floral-white-900 {text-decoration-color:oklch(0.8819 0.0164 91.55 / 1);}
-.decoration-spiced-terracotta-100\/1 {text-decoration-color:oklch(0.7277 0.1081 53.34 / 0.01);}
-.decoration-spiced-terracotta-300\/1 {text-decoration-color:oklch(0.6777 0.1081 53.34 / 0.01);}
-.decoration-spiced-terracotta-500\/1 {text-decoration-color:oklch(0.6277 0.1081 53.34 / 0.01);}
-.decoration-spiced-terracotta-700\/1 {text-decoration-color:oklch(0.5777 0.1081 53.34 / 0.01);}
-.decoration-spiced-terracotta-900\/1 {text-decoration-color:oklch(0.5277 0.1081 53.34 / 0.01);}
-.decoration-spiced-terracotta-100\/5 {text-decoration-color:oklch(0.7277 0.1081 53.34 / 0.05);}
-.decoration-spiced-terracotta-300\/5 {text-decoration-color:oklch(0.6777 0.1081 53.34 / 0.05);}
-.decoration-spiced-terracotta-500\/5 {text-decoration-color:oklch(0.6277 0.1081 53.34 / 0.05);}
-.decoration-spiced-terracotta-700\/5 {text-decoration-color:oklch(0.5777 0.1081 53.34 / 0.05);}
-.decoration-spiced-terracotta-900\/5 {text-decoration-color:oklch(0.5277 0.1081 53.34 / 0.05);}
-.decoration-spiced-terracotta-100\/10 {text-decoration-color:oklch(0.7277 0.1081 53.34 / 0.1);}
-.decoration-spiced-terracotta-300\/10 {text-decoration-color:oklch(0.6777 0.1081 53.34 / 0.1);}
-.decoration-spiced-terracotta-500\/10 {text-decoration-color:oklch(0.6277 0.1081 53.34 / 0.1);}
-.decoration-spiced-terracotta-700\/10 {text-decoration-color:oklch(0.5777 0.1081 53.34 / 0.1);}
-.decoration-spiced-terracotta-900\/10 {text-decoration-color:oklch(0.5277 0.1081 53.34 / 0.1);}
-.decoration-spiced-terracotta-100\/25 {text-decoration-color:oklch(0.7277 0.1081 53.34 / 0.2);}
-.decoration-spiced-terracotta-300\/25 {text-decoration-color:oklch(0.6777 0.1081 53.34 / 0.2);}
-.decoration-spiced-terracotta-500\/25 {text-decoration-color:oklch(0.6277 0.1081 53.34 / 0.2);}
-.decoration-spiced-terracotta-700\/25 {text-decoration-color:oklch(0.5777 0.1081 53.34 / 0.2);}
-.decoration-spiced-terracotta-900\/25 {text-decoration-color:oklch(0.5277 0.1081 53.34 / 0.2);}
-.decoration-spiced-terracotta-100\/50 {text-decoration-color:oklch(0.7277 0.1081 53.34 / 0.5);}
-.decoration-spiced-terracotta-300\/50 {text-decoration-color:oklch(0.6777 0.1081 53.34 / 0.5);}
-.decoration-spiced-terracotta-500\/50 {text-decoration-color:oklch(0.6277 0.1081 53.34 / 0.5);}
-.decoration-spiced-terracotta-700\/50 {text-decoration-color:oklch(0.5777 0.1081 53.34 / 0.5);}
-.decoration-spiced-terracotta-900\/50 {text-decoration-color:oklch(0.5277 0.1081 53.34 / 0.5);}
-.decoration-spiced-terracotta-100\/75 {text-decoration-color:oklch(0.7277 0.1081 53.34 / 0.7);}
-.decoration-spiced-terracotta-300\/75 {text-decoration-color:oklch(0.6777 0.1081 53.34 / 0.7);}
-.decoration-spiced-terracotta-500\/75 {text-decoration-color:oklch(0.6277 0.1081 53.34 / 0.7);}
-.decoration-spiced-terracotta-700\/75 {text-decoration-color:oklch(0.5777 0.1081 53.34 / 0.7);}
-.decoration-spiced-terracotta-900\/75 {text-decoration-color:oklch(0.5277 0.1081 53.34 / 0.7);}
-.decoration-spiced-terracotta-100\/90 {text-decoration-color:oklch(0.7277 0.1081 53.34 / 0.9);}
-.decoration-spiced-terracotta-300\/90 {text-decoration-color:oklch(0.6777 0.1081 53.34 / 0.9);}
-.decoration-spiced-terracotta-500\/90 {text-decoration-color:oklch(0.6277 0.1081 53.34 / 0.9);}
-.decoration-spiced-terracotta-700\/90 {text-decoration-color:oklch(0.5777 0.1081 53.34 / 0.9);}
-.decoration-spiced-terracotta-900\/90 {text-decoration-color:oklch(0.5277 0.1081 53.34 / 0.9);}
-.decoration-spiced-terracotta-100\/95 {text-decoration-color:oklch(0.7277 0.1081 53.34 / 0.95);}
-.decoration-spiced-terracotta-300\/95 {text-decoration-color:oklch(0.6777 0.1081 53.34 / 0.95);}
-.decoration-spiced-terracotta-500\/95 {text-decoration-color:oklch(0.6277 0.1081 53.34 / 0.95);}
-.decoration-spiced-terracotta-700\/95 {text-decoration-color:oklch(0.5777 0.1081 53.34 / 0.95);}
-.decoration-spiced-terracotta-900\/95 {text-decoration-color:oklch(0.5277 0.1081 53.34 / 0.95);}
-.decoration-spiced-terracotta-100 {text-decoration-color:oklch(0.7277 0.1081 53.34 / 1);}
-.decoration-spiced-terracotta-300 {text-decoration-color:oklch(0.6777 0.1081 53.34 / 1);}
-.decoration-spiced-terracotta-500 {text-decoration-color:oklch(0.6277 0.1081 53.34 / 1);}
-.decoration-spiced-terracotta-700 {text-decoration-color:oklch(0.5777 0.1081 53.34 / 1);}
-.decoration-spiced-terracotta-900 {text-decoration-color:oklch(0.5277 0.1081 53.34 / 1);}
-.decoration-papaya-whip-100\/1 {text-decoration-color:oklch(1 0.0384 83.83 / 0.01);}
-.decoration-papaya-whip-300\/1 {text-decoration-color:oklch(1 0.0384 83.83 / 0.01);}
-.decoration-papaya-whip-500\/1 {text-decoration-color:oklch(0.9622 0.0384 83.83 / 0.01);}
-.decoration-papaya-whip-700\/1 {text-decoration-color:oklch(0.9122 0.0384 83.83 / 0.01);}
-.decoration-papaya-whip-900\/1 {text-decoration-color:oklch(0.8622 0.0384 83.83 / 0.01);}
-.decoration-papaya-whip-100\/5 {text-decoration-color:oklch(1 0.0384 83.83 / 0.05);}
-.decoration-papaya-whip-300\/5 {text-decoration-color:oklch(1 0.0384 83.83 / 0.05);}
-.decoration-papaya-whip-500\/5 {text-decoration-color:oklch(0.9622 0.0384 83.83 / 0.05);}
-.decoration-papaya-whip-700\/5 {text-decoration-color:oklch(0.9122 0.0384 83.83 / 0.05);}
-.decoration-papaya-whip-900\/5 {text-decoration-color:oklch(0.8622 0.0384 83.83 / 0.05);}
-.decoration-papaya-whip-100\/10 {text-decoration-color:oklch(1 0.0384 83.83 / 0.1);}
-.decoration-papaya-whip-300\/10 {text-decoration-color:oklch(1 0.0384 83.83 / 0.1);}
-.decoration-papaya-whip-500\/10 {text-decoration-color:oklch(0.9622 0.0384 83.83 / 0.1);}
-.decoration-papaya-whip-700\/10 {text-decoration-color:oklch(0.9122 0.0384 83.83 / 0.1);}
-.decoration-papaya-whip-900\/10 {text-decoration-color:oklch(0.8622 0.0384 83.83 / 0.1);}
-.decoration-papaya-whip-100\/25 {text-decoration-color:oklch(1 0.0384 83.83 / 0.2);}
-.decoration-papaya-whip-300\/25 {text-decoration-color:oklch(1 0.0384 83.83 / 0.2);}
-.decoration-papaya-whip-500\/25 {text-decoration-color:oklch(0.9622 0.0384 83.83 / 0.2);}
-.decoration-papaya-whip-700\/25 {text-decoration-color:oklch(0.9122 0.0384 83.83 / 0.2);}
-.decoration-papaya-whip-900\/25 {text-decoration-color:oklch(0.8622 0.0384 83.83 / 0.2);}
-.decoration-papaya-whip-100\/50 {text-decoration-color:oklch(1 0.0384 83.83 / 0.5);}
-.decoration-papaya-whip-300\/50 {text-decoration-color:oklch(1 0.0384 83.83 / 0.5);}
-.decoration-papaya-whip-500\/50 {text-decoration-color:oklch(0.9622 0.0384 83.83 / 0.5);}
-.decoration-papaya-whip-700\/50 {text-decoration-color:oklch(0.9122 0.0384 83.83 / 0.5);}
-.decoration-papaya-whip-900\/50 {text-decoration-color:oklch(0.8622 0.0384 83.83 / 0.5);}
-.decoration-papaya-whip-100\/75 {text-decoration-color:oklch(1 0.0384 83.83 / 0.7);}
-.decoration-papaya-whip-300\/75 {text-decoration-color:oklch(1 0.0384 83.83 / 0.7);}
-.decoration-papaya-whip-500\/75 {text-decoration-color:oklch(0.9622 0.0384 83.83 / 0.7);}
-.decoration-papaya-whip-700\/75 {text-decoration-color:oklch(0.9122 0.0384 83.83 / 0.7);}
-.decoration-papaya-whip-900\/75 {text-decoration-color:oklch(0.8622 0.0384 83.83 / 0.7);}
-.decoration-papaya-whip-100\/90 {text-decoration-color:oklch(1 0.0384 83.83 / 0.9);}
-.decoration-papaya-whip-300\/90 {text-decoration-color:oklch(1 0.0384 83.83 / 0.9);}
-.decoration-papaya-whip-500\/90 {text-decoration-color:oklch(0.9622 0.0384 83.83 / 0.9);}
-.decoration-papaya-whip-700\/90 {text-decoration-color:oklch(0.9122 0.0384 83.83 / 0.9);}
-.decoration-papaya-whip-900\/90 {text-decoration-color:oklch(0.8622 0.0384 83.83 / 0.9);}
-.decoration-papaya-whip-100\/95 {text-decoration-color:oklch(1 0.0384 83.83 / 0.95);}
-.decoration-papaya-whip-300\/95 {text-decoration-color:oklch(1 0.0384 83.83 / 0.95);}
-.decoration-papaya-whip-500\/95 {text-decoration-color:oklch(0.9622 0.0384 83.83 / 0.95);}
-.decoration-papaya-whip-700\/95 {text-decoration-color:oklch(0.9122 0.0384 83.83 / 0.95);}
-.decoration-papaya-whip-900\/95 {text-decoration-color:oklch(0.8622 0.0384 83.83 / 0.95);}
-.decoration-papaya-whip-100 {text-decoration-color:oklch(1 0.0384 83.83 / 1);}
-.decoration-papaya-whip-300 {text-decoration-color:oklch(1 0.0384 83.83 / 1);}
-.decoration-papaya-whip-500 {text-decoration-color:oklch(0.9622 0.0384 83.83 / 1);}
-.decoration-papaya-whip-700 {text-decoration-color:oklch(0.9122 0.0384 83.83 / 1);}
-.decoration-papaya-whip-900 {text-decoration-color:oklch(0.8622 0.0384 83.83 / 1);}
 .decoration-onyx-100\/1 {text-decoration-color:oklch(0.4588 0.0044 247.95 / 0.01);}
 .decoration-onyx-300\/1 {text-decoration-color:oklch(0.4088 0.0044 247.95 / 0.01);}
 .decoration-onyx-500\/1 {text-decoration-color:oklch(0.3588 0.0044 247.95 / 0.01);}
@@ -4301,96 +4089,6 @@ ol, ul {list-style:none;}
 .hover\:bg-floral-white-500 {&:hover {background:oklch(0.9819 0.0164 91.55 / 1);}}
 .hover\:bg-floral-white-700 {&:hover {background:oklch(0.9319 0.0164 91.55 / 1);}}
 .hover\:bg-floral-white-900 {&:hover {background:oklch(0.8819 0.0164 91.55 / 1);}}
-.hover\:bg-spiced-terracotta-100\/1 {&:hover {background:oklch(0.7277 0.1081 53.34 / 0.01);}}
-.hover\:bg-spiced-terracotta-300\/1 {&:hover {background:oklch(0.6777 0.1081 53.34 / 0.01);}}
-.hover\:bg-spiced-terracotta-500\/1 {&:hover {background:oklch(0.6277 0.1081 53.34 / 0.01);}}
-.hover\:bg-spiced-terracotta-700\/1 {&:hover {background:oklch(0.5777 0.1081 53.34 / 0.01);}}
-.hover\:bg-spiced-terracotta-900\/1 {&:hover {background:oklch(0.5277 0.1081 53.34 / 0.01);}}
-.hover\:bg-spiced-terracotta-100\/5 {&:hover {background:oklch(0.7277 0.1081 53.34 / 0.05);}}
-.hover\:bg-spiced-terracotta-300\/5 {&:hover {background:oklch(0.6777 0.1081 53.34 / 0.05);}}
-.hover\:bg-spiced-terracotta-500\/5 {&:hover {background:oklch(0.6277 0.1081 53.34 / 0.05);}}
-.hover\:bg-spiced-terracotta-700\/5 {&:hover {background:oklch(0.5777 0.1081 53.34 / 0.05);}}
-.hover\:bg-spiced-terracotta-900\/5 {&:hover {background:oklch(0.5277 0.1081 53.34 / 0.05);}}
-.hover\:bg-spiced-terracotta-100\/10 {&:hover {background:oklch(0.7277 0.1081 53.34 / 0.1);}}
-.hover\:bg-spiced-terracotta-300\/10 {&:hover {background:oklch(0.6777 0.1081 53.34 / 0.1);}}
-.hover\:bg-spiced-terracotta-500\/10 {&:hover {background:oklch(0.6277 0.1081 53.34 / 0.1);}}
-.hover\:bg-spiced-terracotta-700\/10 {&:hover {background:oklch(0.5777 0.1081 53.34 / 0.1);}}
-.hover\:bg-spiced-terracotta-900\/10 {&:hover {background:oklch(0.5277 0.1081 53.34 / 0.1);}}
-.hover\:bg-spiced-terracotta-100\/25 {&:hover {background:oklch(0.7277 0.1081 53.34 / 0.2);}}
-.hover\:bg-spiced-terracotta-300\/25 {&:hover {background:oklch(0.6777 0.1081 53.34 / 0.2);}}
-.hover\:bg-spiced-terracotta-500\/25 {&:hover {background:oklch(0.6277 0.1081 53.34 / 0.2);}}
-.hover\:bg-spiced-terracotta-700\/25 {&:hover {background:oklch(0.5777 0.1081 53.34 / 0.2);}}
-.hover\:bg-spiced-terracotta-900\/25 {&:hover {background:oklch(0.5277 0.1081 53.34 / 0.2);}}
-.hover\:bg-spiced-terracotta-100\/50 {&:hover {background:oklch(0.7277 0.1081 53.34 / 0.5);}}
-.hover\:bg-spiced-terracotta-300\/50 {&:hover {background:oklch(0.6777 0.1081 53.34 / 0.5);}}
-.hover\:bg-spiced-terracotta-500\/50 {&:hover {background:oklch(0.6277 0.1081 53.34 / 0.5);}}
-.hover\:bg-spiced-terracotta-700\/50 {&:hover {background:oklch(0.5777 0.1081 53.34 / 0.5);}}
-.hover\:bg-spiced-terracotta-900\/50 {&:hover {background:oklch(0.5277 0.1081 53.34 / 0.5);}}
-.hover\:bg-spiced-terracotta-100\/75 {&:hover {background:oklch(0.7277 0.1081 53.34 / 0.7);}}
-.hover\:bg-spiced-terracotta-300\/75 {&:hover {background:oklch(0.6777 0.1081 53.34 / 0.7);}}
-.hover\:bg-spiced-terracotta-500\/75 {&:hover {background:oklch(0.6277 0.1081 53.34 / 0.7);}}
-.hover\:bg-spiced-terracotta-700\/75 {&:hover {background:oklch(0.5777 0.1081 53.34 / 0.7);}}
-.hover\:bg-spiced-terracotta-900\/75 {&:hover {background:oklch(0.5277 0.1081 53.34 / 0.7);}}
-.hover\:bg-spiced-terracotta-100\/90 {&:hover {background:oklch(0.7277 0.1081 53.34 / 0.9);}}
-.hover\:bg-spiced-terracotta-300\/90 {&:hover {background:oklch(0.6777 0.1081 53.34 / 0.9);}}
-.hover\:bg-spiced-terracotta-500\/90 {&:hover {background:oklch(0.6277 0.1081 53.34 / 0.9);}}
-.hover\:bg-spiced-terracotta-700\/90 {&:hover {background:oklch(0.5777 0.1081 53.34 / 0.9);}}
-.hover\:bg-spiced-terracotta-900\/90 {&:hover {background:oklch(0.5277 0.1081 53.34 / 0.9);}}
-.hover\:bg-spiced-terracotta-100\/95 {&:hover {background:oklch(0.7277 0.1081 53.34 / 0.95);}}
-.hover\:bg-spiced-terracotta-300\/95 {&:hover {background:oklch(0.6777 0.1081 53.34 / 0.95);}}
-.hover\:bg-spiced-terracotta-500\/95 {&:hover {background:oklch(0.6277 0.1081 53.34 / 0.95);}}
-.hover\:bg-spiced-terracotta-700\/95 {&:hover {background:oklch(0.5777 0.1081 53.34 / 0.95);}}
-.hover\:bg-spiced-terracotta-900\/95 {&:hover {background:oklch(0.5277 0.1081 53.34 / 0.95);}}
-.hover\:bg-spiced-terracotta-100 {&:hover {background:oklch(0.7277 0.1081 53.34 / 1);}}
-.hover\:bg-spiced-terracotta-300 {&:hover {background:oklch(0.6777 0.1081 53.34 / 1);}}
-.hover\:bg-spiced-terracotta-500 {&:hover {background:oklch(0.6277 0.1081 53.34 / 1);}}
-.hover\:bg-spiced-terracotta-700 {&:hover {background:oklch(0.5777 0.1081 53.34 / 1);}}
-.hover\:bg-spiced-terracotta-900 {&:hover {background:oklch(0.5277 0.1081 53.34 / 1);}}
-.hover\:bg-papaya-whip-100\/1 {&:hover {background:oklch(1 0.0384 83.83 / 0.01);}}
-.hover\:bg-papaya-whip-300\/1 {&:hover {background:oklch(1 0.0384 83.83 / 0.01);}}
-.hover\:bg-papaya-whip-500\/1 {&:hover {background:oklch(0.9622 0.0384 83.83 / 0.01);}}
-.hover\:bg-papaya-whip-700\/1 {&:hover {background:oklch(0.9122 0.0384 83.83 / 0.01);}}
-.hover\:bg-papaya-whip-900\/1 {&:hover {background:oklch(0.8622 0.0384 83.83 / 0.01);}}
-.hover\:bg-papaya-whip-100\/5 {&:hover {background:oklch(1 0.0384 83.83 / 0.05);}}
-.hover\:bg-papaya-whip-300\/5 {&:hover {background:oklch(1 0.0384 83.83 / 0.05);}}
-.hover\:bg-papaya-whip-500\/5 {&:hover {background:oklch(0.9622 0.0384 83.83 / 0.05);}}
-.hover\:bg-papaya-whip-700\/5 {&:hover {background:oklch(0.9122 0.0384 83.83 / 0.05);}}
-.hover\:bg-papaya-whip-900\/5 {&:hover {background:oklch(0.8622 0.0384 83.83 / 0.05);}}
-.hover\:bg-papaya-whip-100\/10 {&:hover {background:oklch(1 0.0384 83.83 / 0.1);}}
-.hover\:bg-papaya-whip-300\/10 {&:hover {background:oklch(1 0.0384 83.83 / 0.1);}}
-.hover\:bg-papaya-whip-500\/10 {&:hover {background:oklch(0.9622 0.0384 83.83 / 0.1);}}
-.hover\:bg-papaya-whip-700\/10 {&:hover {background:oklch(0.9122 0.0384 83.83 / 0.1);}}
-.hover\:bg-papaya-whip-900\/10 {&:hover {background:oklch(0.8622 0.0384 83.83 / 0.1);}}
-.hover\:bg-papaya-whip-100\/25 {&:hover {background:oklch(1 0.0384 83.83 / 0.2);}}
-.hover\:bg-papaya-whip-300\/25 {&:hover {background:oklch(1 0.0384 83.83 / 0.2);}}
-.hover\:bg-papaya-whip-500\/25 {&:hover {background:oklch(0.9622 0.0384 83.83 / 0.2);}}
-.hover\:bg-papaya-whip-700\/25 {&:hover {background:oklch(0.9122 0.0384 83.83 / 0.2);}}
-.hover\:bg-papaya-whip-900\/25 {&:hover {background:oklch(0.8622 0.0384 83.83 / 0.2);}}
-.hover\:bg-papaya-whip-100\/50 {&:hover {background:oklch(1 0.0384 83.83 / 0.5);}}
-.hover\:bg-papaya-whip-300\/50 {&:hover {background:oklch(1 0.0384 83.83 / 0.5);}}
-.hover\:bg-papaya-whip-500\/50 {&:hover {background:oklch(0.9622 0.0384 83.83 / 0.5);}}
-.hover\:bg-papaya-whip-700\/50 {&:hover {background:oklch(0.9122 0.0384 83.83 / 0.5);}}
-.hover\:bg-papaya-whip-900\/50 {&:hover {background:oklch(0.8622 0.0384 83.83 / 0.5);}}
-.hover\:bg-papaya-whip-100\/75 {&:hover {background:oklch(1 0.0384 83.83 / 0.7);}}
-.hover\:bg-papaya-whip-300\/75 {&:hover {background:oklch(1 0.0384 83.83 / 0.7);}}
-.hover\:bg-papaya-whip-500\/75 {&:hover {background:oklch(0.9622 0.0384 83.83 / 0.7);}}
-.hover\:bg-papaya-whip-700\/75 {&:hover {background:oklch(0.9122 0.0384 83.83 / 0.7);}}
-.hover\:bg-papaya-whip-900\/75 {&:hover {background:oklch(0.8622 0.0384 83.83 / 0.7);}}
-.hover\:bg-papaya-whip-100\/90 {&:hover {background:oklch(1 0.0384 83.83 / 0.9);}}
-.hover\:bg-papaya-whip-300\/90 {&:hover {background:oklch(1 0.0384 83.83 / 0.9);}}
-.hover\:bg-papaya-whip-500\/90 {&:hover {background:oklch(0.9622 0.0384 83.83 / 0.9);}}
-.hover\:bg-papaya-whip-700\/90 {&:hover {background:oklch(0.9122 0.0384 83.83 / 0.9);}}
-.hover\:bg-papaya-whip-900\/90 {&:hover {background:oklch(0.8622 0.0384 83.83 / 0.9);}}
-.hover\:bg-papaya-whip-100\/95 {&:hover {background:oklch(1 0.0384 83.83 / 0.95);}}
-.hover\:bg-papaya-whip-300\/95 {&:hover {background:oklch(1 0.0384 83.83 / 0.95);}}
-.hover\:bg-papaya-whip-500\/95 {&:hover {background:oklch(0.9622 0.0384 83.83 / 0.95);}}
-.hover\:bg-papaya-whip-700\/95 {&:hover {background:oklch(0.9122 0.0384 83.83 / 0.95);}}
-.hover\:bg-papaya-whip-900\/95 {&:hover {background:oklch(0.8622 0.0384 83.83 / 0.95);}}
-.hover\:bg-papaya-whip-100 {&:hover {background:oklch(1 0.0384 83.83 / 1);}}
-.hover\:bg-papaya-whip-300 {&:hover {background:oklch(1 0.0384 83.83 / 1);}}
-.hover\:bg-papaya-whip-500 {&:hover {background:oklch(0.9622 0.0384 83.83 / 1);}}
-.hover\:bg-papaya-whip-700 {&:hover {background:oklch(0.9122 0.0384 83.83 / 1);}}
-.hover\:bg-papaya-whip-900 {&:hover {background:oklch(0.8622 0.0384 83.83 / 1);}}
 .hover\:bg-onyx-100\/1 {&:hover {background:oklch(0.4588 0.0044 247.95 / 0.01);}}
 .hover\:bg-onyx-300\/1 {&:hover {background:oklch(0.4088 0.0044 247.95 / 0.01);}}
 .hover\:bg-onyx-500\/1 {&:hover {background:oklch(0.3588 0.0044 247.95 / 0.01);}}
@@ -4706,96 +4404,6 @@ ol, ul {list-style:none;}
 .hover\:text-floral-white-500 {&:hover {color:oklch(0.9819 0.0164 91.55 / 1);}}
 .hover\:text-floral-white-700 {&:hover {color:oklch(0.9319 0.0164 91.55 / 1);}}
 .hover\:text-floral-white-900 {&:hover {color:oklch(0.8819 0.0164 91.55 / 1);}}
-.hover\:text-spiced-terracotta-100\/1 {&:hover {color:oklch(0.7277 0.1081 53.34 / 0.01);}}
-.hover\:text-spiced-terracotta-300\/1 {&:hover {color:oklch(0.6777 0.1081 53.34 / 0.01);}}
-.hover\:text-spiced-terracotta-500\/1 {&:hover {color:oklch(0.6277 0.1081 53.34 / 0.01);}}
-.hover\:text-spiced-terracotta-700\/1 {&:hover {color:oklch(0.5777 0.1081 53.34 / 0.01);}}
-.hover\:text-spiced-terracotta-900\/1 {&:hover {color:oklch(0.5277 0.1081 53.34 / 0.01);}}
-.hover\:text-spiced-terracotta-100\/5 {&:hover {color:oklch(0.7277 0.1081 53.34 / 0.05);}}
-.hover\:text-spiced-terracotta-300\/5 {&:hover {color:oklch(0.6777 0.1081 53.34 / 0.05);}}
-.hover\:text-spiced-terracotta-500\/5 {&:hover {color:oklch(0.6277 0.1081 53.34 / 0.05);}}
-.hover\:text-spiced-terracotta-700\/5 {&:hover {color:oklch(0.5777 0.1081 53.34 / 0.05);}}
-.hover\:text-spiced-terracotta-900\/5 {&:hover {color:oklch(0.5277 0.1081 53.34 / 0.05);}}
-.hover\:text-spiced-terracotta-100\/10 {&:hover {color:oklch(0.7277 0.1081 53.34 / 0.1);}}
-.hover\:text-spiced-terracotta-300\/10 {&:hover {color:oklch(0.6777 0.1081 53.34 / 0.1);}}
-.hover\:text-spiced-terracotta-500\/10 {&:hover {color:oklch(0.6277 0.1081 53.34 / 0.1);}}
-.hover\:text-spiced-terracotta-700\/10 {&:hover {color:oklch(0.5777 0.1081 53.34 / 0.1);}}
-.hover\:text-spiced-terracotta-900\/10 {&:hover {color:oklch(0.5277 0.1081 53.34 / 0.1);}}
-.hover\:text-spiced-terracotta-100\/25 {&:hover {color:oklch(0.7277 0.1081 53.34 / 0.2);}}
-.hover\:text-spiced-terracotta-300\/25 {&:hover {color:oklch(0.6777 0.1081 53.34 / 0.2);}}
-.hover\:text-spiced-terracotta-500\/25 {&:hover {color:oklch(0.6277 0.1081 53.34 / 0.2);}}
-.hover\:text-spiced-terracotta-700\/25 {&:hover {color:oklch(0.5777 0.1081 53.34 / 0.2);}}
-.hover\:text-spiced-terracotta-900\/25 {&:hover {color:oklch(0.5277 0.1081 53.34 / 0.2);}}
-.hover\:text-spiced-terracotta-100\/50 {&:hover {color:oklch(0.7277 0.1081 53.34 / 0.5);}}
-.hover\:text-spiced-terracotta-300\/50 {&:hover {color:oklch(0.6777 0.1081 53.34 / 0.5);}}
-.hover\:text-spiced-terracotta-500\/50 {&:hover {color:oklch(0.6277 0.1081 53.34 / 0.5);}}
-.hover\:text-spiced-terracotta-700\/50 {&:hover {color:oklch(0.5777 0.1081 53.34 / 0.5);}}
-.hover\:text-spiced-terracotta-900\/50 {&:hover {color:oklch(0.5277 0.1081 53.34 / 0.5);}}
-.hover\:text-spiced-terracotta-100\/75 {&:hover {color:oklch(0.7277 0.1081 53.34 / 0.7);}}
-.hover\:text-spiced-terracotta-300\/75 {&:hover {color:oklch(0.6777 0.1081 53.34 / 0.7);}}
-.hover\:text-spiced-terracotta-500\/75 {&:hover {color:oklch(0.6277 0.1081 53.34 / 0.7);}}
-.hover\:text-spiced-terracotta-700\/75 {&:hover {color:oklch(0.5777 0.1081 53.34 / 0.7);}}
-.hover\:text-spiced-terracotta-900\/75 {&:hover {color:oklch(0.5277 0.1081 53.34 / 0.7);}}
-.hover\:text-spiced-terracotta-100\/90 {&:hover {color:oklch(0.7277 0.1081 53.34 / 0.9);}}
-.hover\:text-spiced-terracotta-300\/90 {&:hover {color:oklch(0.6777 0.1081 53.34 / 0.9);}}
-.hover\:text-spiced-terracotta-500\/90 {&:hover {color:oklch(0.6277 0.1081 53.34 / 0.9);}}
-.hover\:text-spiced-terracotta-700\/90 {&:hover {color:oklch(0.5777 0.1081 53.34 / 0.9);}}
-.hover\:text-spiced-terracotta-900\/90 {&:hover {color:oklch(0.5277 0.1081 53.34 / 0.9);}}
-.hover\:text-spiced-terracotta-100\/95 {&:hover {color:oklch(0.7277 0.1081 53.34 / 0.95);}}
-.hover\:text-spiced-terracotta-300\/95 {&:hover {color:oklch(0.6777 0.1081 53.34 / 0.95);}}
-.hover\:text-spiced-terracotta-500\/95 {&:hover {color:oklch(0.6277 0.1081 53.34 / 0.95);}}
-.hover\:text-spiced-terracotta-700\/95 {&:hover {color:oklch(0.5777 0.1081 53.34 / 0.95);}}
-.hover\:text-spiced-terracotta-900\/95 {&:hover {color:oklch(0.5277 0.1081 53.34 / 0.95);}}
-.hover\:text-spiced-terracotta-100 {&:hover {color:oklch(0.7277 0.1081 53.34 / 1);}}
-.hover\:text-spiced-terracotta-300 {&:hover {color:oklch(0.6777 0.1081 53.34 / 1);}}
-.hover\:text-spiced-terracotta-500 {&:hover {color:oklch(0.6277 0.1081 53.34 / 1);}}
-.hover\:text-spiced-terracotta-700 {&:hover {color:oklch(0.5777 0.1081 53.34 / 1);}}
-.hover\:text-spiced-terracotta-900 {&:hover {color:oklch(0.5277 0.1081 53.34 / 1);}}
-.hover\:text-papaya-whip-100\/1 {&:hover {color:oklch(1 0.0384 83.83 / 0.01);}}
-.hover\:text-papaya-whip-300\/1 {&:hover {color:oklch(1 0.0384 83.83 / 0.01);}}
-.hover\:text-papaya-whip-500\/1 {&:hover {color:oklch(0.9622 0.0384 83.83 / 0.01);}}
-.hover\:text-papaya-whip-700\/1 {&:hover {color:oklch(0.9122 0.0384 83.83 / 0.01);}}
-.hover\:text-papaya-whip-900\/1 {&:hover {color:oklch(0.8622 0.0384 83.83 / 0.01);}}
-.hover\:text-papaya-whip-100\/5 {&:hover {color:oklch(1 0.0384 83.83 / 0.05);}}
-.hover\:text-papaya-whip-300\/5 {&:hover {color:oklch(1 0.0384 83.83 / 0.05);}}
-.hover\:text-papaya-whip-500\/5 {&:hover {color:oklch(0.9622 0.0384 83.83 / 0.05);}}
-.hover\:text-papaya-whip-700\/5 {&:hover {color:oklch(0.9122 0.0384 83.83 / 0.05);}}
-.hover\:text-papaya-whip-900\/5 {&:hover {color:oklch(0.8622 0.0384 83.83 / 0.05);}}
-.hover\:text-papaya-whip-100\/10 {&:hover {color:oklch(1 0.0384 83.83 / 0.1);}}
-.hover\:text-papaya-whip-300\/10 {&:hover {color:oklch(1 0.0384 83.83 / 0.1);}}
-.hover\:text-papaya-whip-500\/10 {&:hover {color:oklch(0.9622 0.0384 83.83 / 0.1);}}
-.hover\:text-papaya-whip-700\/10 {&:hover {color:oklch(0.9122 0.0384 83.83 / 0.1);}}
-.hover\:text-papaya-whip-900\/10 {&:hover {color:oklch(0.8622 0.0384 83.83 / 0.1);}}
-.hover\:text-papaya-whip-100\/25 {&:hover {color:oklch(1 0.0384 83.83 / 0.2);}}
-.hover\:text-papaya-whip-300\/25 {&:hover {color:oklch(1 0.0384 83.83 / 0.2);}}
-.hover\:text-papaya-whip-500\/25 {&:hover {color:oklch(0.9622 0.0384 83.83 / 0.2);}}
-.hover\:text-papaya-whip-700\/25 {&:hover {color:oklch(0.9122 0.0384 83.83 / 0.2);}}
-.hover\:text-papaya-whip-900\/25 {&:hover {color:oklch(0.8622 0.0384 83.83 / 0.2);}}
-.hover\:text-papaya-whip-100\/50 {&:hover {color:oklch(1 0.0384 83.83 / 0.5);}}
-.hover\:text-papaya-whip-300\/50 {&:hover {color:oklch(1 0.0384 83.83 / 0.5);}}
-.hover\:text-papaya-whip-500\/50 {&:hover {color:oklch(0.9622 0.0384 83.83 / 0.5);}}
-.hover\:text-papaya-whip-700\/50 {&:hover {color:oklch(0.9122 0.0384 83.83 / 0.5);}}
-.hover\:text-papaya-whip-900\/50 {&:hover {color:oklch(0.8622 0.0384 83.83 / 0.5);}}
-.hover\:text-papaya-whip-100\/75 {&:hover {color:oklch(1 0.0384 83.83 / 0.7);}}
-.hover\:text-papaya-whip-300\/75 {&:hover {color:oklch(1 0.0384 83.83 / 0.7);}}
-.hover\:text-papaya-whip-500\/75 {&:hover {color:oklch(0.9622 0.0384 83.83 / 0.7);}}
-.hover\:text-papaya-whip-700\/75 {&:hover {color:oklch(0.9122 0.0384 83.83 / 0.7);}}
-.hover\:text-papaya-whip-900\/75 {&:hover {color:oklch(0.8622 0.0384 83.83 / 0.7);}}
-.hover\:text-papaya-whip-100\/90 {&:hover {color:oklch(1 0.0384 83.83 / 0.9);}}
-.hover\:text-papaya-whip-300\/90 {&:hover {color:oklch(1 0.0384 83.83 / 0.9);}}
-.hover\:text-papaya-whip-500\/90 {&:hover {color:oklch(0.9622 0.0384 83.83 / 0.9);}}
-.hover\:text-papaya-whip-700\/90 {&:hover {color:oklch(0.9122 0.0384 83.83 / 0.9);}}
-.hover\:text-papaya-whip-900\/90 {&:hover {color:oklch(0.8622 0.0384 83.83 / 0.9);}}
-.hover\:text-papaya-whip-100\/95 {&:hover {color:oklch(1 0.0384 83.83 / 0.95);}}
-.hover\:text-papaya-whip-300\/95 {&:hover {color:oklch(1 0.0384 83.83 / 0.95);}}
-.hover\:text-papaya-whip-500\/95 {&:hover {color:oklch(0.9622 0.0384 83.83 / 0.95);}}
-.hover\:text-papaya-whip-700\/95 {&:hover {color:oklch(0.9122 0.0384 83.83 / 0.95);}}
-.hover\:text-papaya-whip-900\/95 {&:hover {color:oklch(0.8622 0.0384 83.83 / 0.95);}}
-.hover\:text-papaya-whip-100 {&:hover {color:oklch(1 0.0384 83.83 / 1);}}
-.hover\:text-papaya-whip-300 {&:hover {color:oklch(1 0.0384 83.83 / 1);}}
-.hover\:text-papaya-whip-500 {&:hover {color:oklch(0.9622 0.0384 83.83 / 1);}}
-.hover\:text-papaya-whip-700 {&:hover {color:oklch(0.9122 0.0384 83.83 / 1);}}
-.hover\:text-papaya-whip-900 {&:hover {color:oklch(0.8622 0.0384 83.83 / 1);}}
 .hover\:text-onyx-100\/1 {&:hover {color:oklch(0.4588 0.0044 247.95 / 0.01);}}
 .hover\:text-onyx-300\/1 {&:hover {color:oklch(0.4088 0.0044 247.95 / 0.01);}}
 .hover\:text-onyx-500\/1 {&:hover {color:oklch(0.3588 0.0044 247.95 / 0.01);}}
@@ -5111,96 +4719,6 @@ ol, ul {list-style:none;}
 .hover\:border-floral-white-500 {&:hover {border-color:oklch(0.9819 0.0164 91.55 / 1);}}
 .hover\:border-floral-white-700 {&:hover {border-color:oklch(0.9319 0.0164 91.55 / 1);}}
 .hover\:border-floral-white-900 {&:hover {border-color:oklch(0.8819 0.0164 91.55 / 1);}}
-.hover\:border-spiced-terracotta-100\/1 {&:hover {border-color:oklch(0.7277 0.1081 53.34 / 0.01);}}
-.hover\:border-spiced-terracotta-300\/1 {&:hover {border-color:oklch(0.6777 0.1081 53.34 / 0.01);}}
-.hover\:border-spiced-terracotta-500\/1 {&:hover {border-color:oklch(0.6277 0.1081 53.34 / 0.01);}}
-.hover\:border-spiced-terracotta-700\/1 {&:hover {border-color:oklch(0.5777 0.1081 53.34 / 0.01);}}
-.hover\:border-spiced-terracotta-900\/1 {&:hover {border-color:oklch(0.5277 0.1081 53.34 / 0.01);}}
-.hover\:border-spiced-terracotta-100\/5 {&:hover {border-color:oklch(0.7277 0.1081 53.34 / 0.05);}}
-.hover\:border-spiced-terracotta-300\/5 {&:hover {border-color:oklch(0.6777 0.1081 53.34 / 0.05);}}
-.hover\:border-spiced-terracotta-500\/5 {&:hover {border-color:oklch(0.6277 0.1081 53.34 / 0.05);}}
-.hover\:border-spiced-terracotta-700\/5 {&:hover {border-color:oklch(0.5777 0.1081 53.34 / 0.05);}}
-.hover\:border-spiced-terracotta-900\/5 {&:hover {border-color:oklch(0.5277 0.1081 53.34 / 0.05);}}
-.hover\:border-spiced-terracotta-100\/10 {&:hover {border-color:oklch(0.7277 0.1081 53.34 / 0.1);}}
-.hover\:border-spiced-terracotta-300\/10 {&:hover {border-color:oklch(0.6777 0.1081 53.34 / 0.1);}}
-.hover\:border-spiced-terracotta-500\/10 {&:hover {border-color:oklch(0.6277 0.1081 53.34 / 0.1);}}
-.hover\:border-spiced-terracotta-700\/10 {&:hover {border-color:oklch(0.5777 0.1081 53.34 / 0.1);}}
-.hover\:border-spiced-terracotta-900\/10 {&:hover {border-color:oklch(0.5277 0.1081 53.34 / 0.1);}}
-.hover\:border-spiced-terracotta-100\/25 {&:hover {border-color:oklch(0.7277 0.1081 53.34 / 0.2);}}
-.hover\:border-spiced-terracotta-300\/25 {&:hover {border-color:oklch(0.6777 0.1081 53.34 / 0.2);}}
-.hover\:border-spiced-terracotta-500\/25 {&:hover {border-color:oklch(0.6277 0.1081 53.34 / 0.2);}}
-.hover\:border-spiced-terracotta-700\/25 {&:hover {border-color:oklch(0.5777 0.1081 53.34 / 0.2);}}
-.hover\:border-spiced-terracotta-900\/25 {&:hover {border-color:oklch(0.5277 0.1081 53.34 / 0.2);}}
-.hover\:border-spiced-terracotta-100\/50 {&:hover {border-color:oklch(0.7277 0.1081 53.34 / 0.5);}}
-.hover\:border-spiced-terracotta-300\/50 {&:hover {border-color:oklch(0.6777 0.1081 53.34 / 0.5);}}
-.hover\:border-spiced-terracotta-500\/50 {&:hover {border-color:oklch(0.6277 0.1081 53.34 / 0.5);}}
-.hover\:border-spiced-terracotta-700\/50 {&:hover {border-color:oklch(0.5777 0.1081 53.34 / 0.5);}}
-.hover\:border-spiced-terracotta-900\/50 {&:hover {border-color:oklch(0.5277 0.1081 53.34 / 0.5);}}
-.hover\:border-spiced-terracotta-100\/75 {&:hover {border-color:oklch(0.7277 0.1081 53.34 / 0.7);}}
-.hover\:border-spiced-terracotta-300\/75 {&:hover {border-color:oklch(0.6777 0.1081 53.34 / 0.7);}}
-.hover\:border-spiced-terracotta-500\/75 {&:hover {border-color:oklch(0.6277 0.1081 53.34 / 0.7);}}
-.hover\:border-spiced-terracotta-700\/75 {&:hover {border-color:oklch(0.5777 0.1081 53.34 / 0.7);}}
-.hover\:border-spiced-terracotta-900\/75 {&:hover {border-color:oklch(0.5277 0.1081 53.34 / 0.7);}}
-.hover\:border-spiced-terracotta-100\/90 {&:hover {border-color:oklch(0.7277 0.1081 53.34 / 0.9);}}
-.hover\:border-spiced-terracotta-300\/90 {&:hover {border-color:oklch(0.6777 0.1081 53.34 / 0.9);}}
-.hover\:border-spiced-terracotta-500\/90 {&:hover {border-color:oklch(0.6277 0.1081 53.34 / 0.9);}}
-.hover\:border-spiced-terracotta-700\/90 {&:hover {border-color:oklch(0.5777 0.1081 53.34 / 0.9);}}
-.hover\:border-spiced-terracotta-900\/90 {&:hover {border-color:oklch(0.5277 0.1081 53.34 / 0.9);}}
-.hover\:border-spiced-terracotta-100\/95 {&:hover {border-color:oklch(0.7277 0.1081 53.34 / 0.95);}}
-.hover\:border-spiced-terracotta-300\/95 {&:hover {border-color:oklch(0.6777 0.1081 53.34 / 0.95);}}
-.hover\:border-spiced-terracotta-500\/95 {&:hover {border-color:oklch(0.6277 0.1081 53.34 / 0.95);}}
-.hover\:border-spiced-terracotta-700\/95 {&:hover {border-color:oklch(0.5777 0.1081 53.34 / 0.95);}}
-.hover\:border-spiced-terracotta-900\/95 {&:hover {border-color:oklch(0.5277 0.1081 53.34 / 0.95);}}
-.hover\:border-spiced-terracotta-100 {&:hover {border-color:oklch(0.7277 0.1081 53.34 / 1);}}
-.hover\:border-spiced-terracotta-300 {&:hover {border-color:oklch(0.6777 0.1081 53.34 / 1);}}
-.hover\:border-spiced-terracotta-500 {&:hover {border-color:oklch(0.6277 0.1081 53.34 / 1);}}
-.hover\:border-spiced-terracotta-700 {&:hover {border-color:oklch(0.5777 0.1081 53.34 / 1);}}
-.hover\:border-spiced-terracotta-900 {&:hover {border-color:oklch(0.5277 0.1081 53.34 / 1);}}
-.hover\:border-papaya-whip-100\/1 {&:hover {border-color:oklch(1 0.0384 83.83 / 0.01);}}
-.hover\:border-papaya-whip-300\/1 {&:hover {border-color:oklch(1 0.0384 83.83 / 0.01);}}
-.hover\:border-papaya-whip-500\/1 {&:hover {border-color:oklch(0.9622 0.0384 83.83 / 0.01);}}
-.hover\:border-papaya-whip-700\/1 {&:hover {border-color:oklch(0.9122 0.0384 83.83 / 0.01);}}
-.hover\:border-papaya-whip-900\/1 {&:hover {border-color:oklch(0.8622 0.0384 83.83 / 0.01);}}
-.hover\:border-papaya-whip-100\/5 {&:hover {border-color:oklch(1 0.0384 83.83 / 0.05);}}
-.hover\:border-papaya-whip-300\/5 {&:hover {border-color:oklch(1 0.0384 83.83 / 0.05);}}
-.hover\:border-papaya-whip-500\/5 {&:hover {border-color:oklch(0.9622 0.0384 83.83 / 0.05);}}
-.hover\:border-papaya-whip-700\/5 {&:hover {border-color:oklch(0.9122 0.0384 83.83 / 0.05);}}
-.hover\:border-papaya-whip-900\/5 {&:hover {border-color:oklch(0.8622 0.0384 83.83 / 0.05);}}
-.hover\:border-papaya-whip-100\/10 {&:hover {border-color:oklch(1 0.0384 83.83 / 0.1);}}
-.hover\:border-papaya-whip-300\/10 {&:hover {border-color:oklch(1 0.0384 83.83 / 0.1);}}
-.hover\:border-papaya-whip-500\/10 {&:hover {border-color:oklch(0.9622 0.0384 83.83 / 0.1);}}
-.hover\:border-papaya-whip-700\/10 {&:hover {border-color:oklch(0.9122 0.0384 83.83 / 0.1);}}
-.hover\:border-papaya-whip-900\/10 {&:hover {border-color:oklch(0.8622 0.0384 83.83 / 0.1);}}
-.hover\:border-papaya-whip-100\/25 {&:hover {border-color:oklch(1 0.0384 83.83 / 0.2);}}
-.hover\:border-papaya-whip-300\/25 {&:hover {border-color:oklch(1 0.0384 83.83 / 0.2);}}
-.hover\:border-papaya-whip-500\/25 {&:hover {border-color:oklch(0.9622 0.0384 83.83 / 0.2);}}
-.hover\:border-papaya-whip-700\/25 {&:hover {border-color:oklch(0.9122 0.0384 83.83 / 0.2);}}
-.hover\:border-papaya-whip-900\/25 {&:hover {border-color:oklch(0.8622 0.0384 83.83 / 0.2);}}
-.hover\:border-papaya-whip-100\/50 {&:hover {border-color:oklch(1 0.0384 83.83 / 0.5);}}
-.hover\:border-papaya-whip-300\/50 {&:hover {border-color:oklch(1 0.0384 83.83 / 0.5);}}
-.hover\:border-papaya-whip-500\/50 {&:hover {border-color:oklch(0.9622 0.0384 83.83 / 0.5);}}
-.hover\:border-papaya-whip-700\/50 {&:hover {border-color:oklch(0.9122 0.0384 83.83 / 0.5);}}
-.hover\:border-papaya-whip-900\/50 {&:hover {border-color:oklch(0.8622 0.0384 83.83 / 0.5);}}
-.hover\:border-papaya-whip-100\/75 {&:hover {border-color:oklch(1 0.0384 83.83 / 0.7);}}
-.hover\:border-papaya-whip-300\/75 {&:hover {border-color:oklch(1 0.0384 83.83 / 0.7);}}
-.hover\:border-papaya-whip-500\/75 {&:hover {border-color:oklch(0.9622 0.0384 83.83 / 0.7);}}
-.hover\:border-papaya-whip-700\/75 {&:hover {border-color:oklch(0.9122 0.0384 83.83 / 0.7);}}
-.hover\:border-papaya-whip-900\/75 {&:hover {border-color:oklch(0.8622 0.0384 83.83 / 0.7);}}
-.hover\:border-papaya-whip-100\/90 {&:hover {border-color:oklch(1 0.0384 83.83 / 0.9);}}
-.hover\:border-papaya-whip-300\/90 {&:hover {border-color:oklch(1 0.0384 83.83 / 0.9);}}
-.hover\:border-papaya-whip-500\/90 {&:hover {border-color:oklch(0.9622 0.0384 83.83 / 0.9);}}
-.hover\:border-papaya-whip-700\/90 {&:hover {border-color:oklch(0.9122 0.0384 83.83 / 0.9);}}
-.hover\:border-papaya-whip-900\/90 {&:hover {border-color:oklch(0.8622 0.0384 83.83 / 0.9);}}
-.hover\:border-papaya-whip-100\/95 {&:hover {border-color:oklch(1 0.0384 83.83 / 0.95);}}
-.hover\:border-papaya-whip-300\/95 {&:hover {border-color:oklch(1 0.0384 83.83 / 0.95);}}
-.hover\:border-papaya-whip-500\/95 {&:hover {border-color:oklch(0.9622 0.0384 83.83 / 0.95);}}
-.hover\:border-papaya-whip-700\/95 {&:hover {border-color:oklch(0.9122 0.0384 83.83 / 0.95);}}
-.hover\:border-papaya-whip-900\/95 {&:hover {border-color:oklch(0.8622 0.0384 83.83 / 0.95);}}
-.hover\:border-papaya-whip-100 {&:hover {border-color:oklch(1 0.0384 83.83 / 1);}}
-.hover\:border-papaya-whip-300 {&:hover {border-color:oklch(1 0.0384 83.83 / 1);}}
-.hover\:border-papaya-whip-500 {&:hover {border-color:oklch(0.9622 0.0384 83.83 / 1);}}
-.hover\:border-papaya-whip-700 {&:hover {border-color:oklch(0.9122 0.0384 83.83 / 1);}}
-.hover\:border-papaya-whip-900 {&:hover {border-color:oklch(0.8622 0.0384 83.83 / 1);}}
 .hover\:border-onyx-100\/1 {&:hover {border-color:oklch(0.4588 0.0044 247.95 / 0.01);}}
 .hover\:border-onyx-300\/1 {&:hover {border-color:oklch(0.4088 0.0044 247.95 / 0.01);}}
 .hover\:border-onyx-500\/1 {&:hover {border-color:oklch(0.3588 0.0044 247.95 / 0.01);}}
@@ -5516,96 +5034,6 @@ ol, ul {list-style:none;}
 .hover\:decoration-floral-white-500 {&:hover {text-decoration-color:oklch(0.9819 0.0164 91.55 / 1);}}
 .hover\:decoration-floral-white-700 {&:hover {text-decoration-color:oklch(0.9319 0.0164 91.55 / 1);}}
 .hover\:decoration-floral-white-900 {&:hover {text-decoration-color:oklch(0.8819 0.0164 91.55 / 1);}}
-.hover\:decoration-spiced-terracotta-100\/1 {&:hover {text-decoration-color:oklch(0.7277 0.1081 53.34 / 0.01);}}
-.hover\:decoration-spiced-terracotta-300\/1 {&:hover {text-decoration-color:oklch(0.6777 0.1081 53.34 / 0.01);}}
-.hover\:decoration-spiced-terracotta-500\/1 {&:hover {text-decoration-color:oklch(0.6277 0.1081 53.34 / 0.01);}}
-.hover\:decoration-spiced-terracotta-700\/1 {&:hover {text-decoration-color:oklch(0.5777 0.1081 53.34 / 0.01);}}
-.hover\:decoration-spiced-terracotta-900\/1 {&:hover {text-decoration-color:oklch(0.5277 0.1081 53.34 / 0.01);}}
-.hover\:decoration-spiced-terracotta-100\/5 {&:hover {text-decoration-color:oklch(0.7277 0.1081 53.34 / 0.05);}}
-.hover\:decoration-spiced-terracotta-300\/5 {&:hover {text-decoration-color:oklch(0.6777 0.1081 53.34 / 0.05);}}
-.hover\:decoration-spiced-terracotta-500\/5 {&:hover {text-decoration-color:oklch(0.6277 0.1081 53.34 / 0.05);}}
-.hover\:decoration-spiced-terracotta-700\/5 {&:hover {text-decoration-color:oklch(0.5777 0.1081 53.34 / 0.05);}}
-.hover\:decoration-spiced-terracotta-900\/5 {&:hover {text-decoration-color:oklch(0.5277 0.1081 53.34 / 0.05);}}
-.hover\:decoration-spiced-terracotta-100\/10 {&:hover {text-decoration-color:oklch(0.7277 0.1081 53.34 / 0.1);}}
-.hover\:decoration-spiced-terracotta-300\/10 {&:hover {text-decoration-color:oklch(0.6777 0.1081 53.34 / 0.1);}}
-.hover\:decoration-spiced-terracotta-500\/10 {&:hover {text-decoration-color:oklch(0.6277 0.1081 53.34 / 0.1);}}
-.hover\:decoration-spiced-terracotta-700\/10 {&:hover {text-decoration-color:oklch(0.5777 0.1081 53.34 / 0.1);}}
-.hover\:decoration-spiced-terracotta-900\/10 {&:hover {text-decoration-color:oklch(0.5277 0.1081 53.34 / 0.1);}}
-.hover\:decoration-spiced-terracotta-100\/25 {&:hover {text-decoration-color:oklch(0.7277 0.1081 53.34 / 0.2);}}
-.hover\:decoration-spiced-terracotta-300\/25 {&:hover {text-decoration-color:oklch(0.6777 0.1081 53.34 / 0.2);}}
-.hover\:decoration-spiced-terracotta-500\/25 {&:hover {text-decoration-color:oklch(0.6277 0.1081 53.34 / 0.2);}}
-.hover\:decoration-spiced-terracotta-700\/25 {&:hover {text-decoration-color:oklch(0.5777 0.1081 53.34 / 0.2);}}
-.hover\:decoration-spiced-terracotta-900\/25 {&:hover {text-decoration-color:oklch(0.5277 0.1081 53.34 / 0.2);}}
-.hover\:decoration-spiced-terracotta-100\/50 {&:hover {text-decoration-color:oklch(0.7277 0.1081 53.34 / 0.5);}}
-.hover\:decoration-spiced-terracotta-300\/50 {&:hover {text-decoration-color:oklch(0.6777 0.1081 53.34 / 0.5);}}
-.hover\:decoration-spiced-terracotta-500\/50 {&:hover {text-decoration-color:oklch(0.6277 0.1081 53.34 / 0.5);}}
-.hover\:decoration-spiced-terracotta-700\/50 {&:hover {text-decoration-color:oklch(0.5777 0.1081 53.34 / 0.5);}}
-.hover\:decoration-spiced-terracotta-900\/50 {&:hover {text-decoration-color:oklch(0.5277 0.1081 53.34 / 0.5);}}
-.hover\:decoration-spiced-terracotta-100\/75 {&:hover {text-decoration-color:oklch(0.7277 0.1081 53.34 / 0.7);}}
-.hover\:decoration-spiced-terracotta-300\/75 {&:hover {text-decoration-color:oklch(0.6777 0.1081 53.34 / 0.7);}}
-.hover\:decoration-spiced-terracotta-500\/75 {&:hover {text-decoration-color:oklch(0.6277 0.1081 53.34 / 0.7);}}
-.hover\:decoration-spiced-terracotta-700\/75 {&:hover {text-decoration-color:oklch(0.5777 0.1081 53.34 / 0.7);}}
-.hover\:decoration-spiced-terracotta-900\/75 {&:hover {text-decoration-color:oklch(0.5277 0.1081 53.34 / 0.7);}}
-.hover\:decoration-spiced-terracotta-100\/90 {&:hover {text-decoration-color:oklch(0.7277 0.1081 53.34 / 0.9);}}
-.hover\:decoration-spiced-terracotta-300\/90 {&:hover {text-decoration-color:oklch(0.6777 0.1081 53.34 / 0.9);}}
-.hover\:decoration-spiced-terracotta-500\/90 {&:hover {text-decoration-color:oklch(0.6277 0.1081 53.34 / 0.9);}}
-.hover\:decoration-spiced-terracotta-700\/90 {&:hover {text-decoration-color:oklch(0.5777 0.1081 53.34 / 0.9);}}
-.hover\:decoration-spiced-terracotta-900\/90 {&:hover {text-decoration-color:oklch(0.5277 0.1081 53.34 / 0.9);}}
-.hover\:decoration-spiced-terracotta-100\/95 {&:hover {text-decoration-color:oklch(0.7277 0.1081 53.34 / 0.95);}}
-.hover\:decoration-spiced-terracotta-300\/95 {&:hover {text-decoration-color:oklch(0.6777 0.1081 53.34 / 0.95);}}
-.hover\:decoration-spiced-terracotta-500\/95 {&:hover {text-decoration-color:oklch(0.6277 0.1081 53.34 / 0.95);}}
-.hover\:decoration-spiced-terracotta-700\/95 {&:hover {text-decoration-color:oklch(0.5777 0.1081 53.34 / 0.95);}}
-.hover\:decoration-spiced-terracotta-900\/95 {&:hover {text-decoration-color:oklch(0.5277 0.1081 53.34 / 0.95);}}
-.hover\:decoration-spiced-terracotta-100 {&:hover {text-decoration-color:oklch(0.7277 0.1081 53.34 / 1);}}
-.hover\:decoration-spiced-terracotta-300 {&:hover {text-decoration-color:oklch(0.6777 0.1081 53.34 / 1);}}
-.hover\:decoration-spiced-terracotta-500 {&:hover {text-decoration-color:oklch(0.6277 0.1081 53.34 / 1);}}
-.hover\:decoration-spiced-terracotta-700 {&:hover {text-decoration-color:oklch(0.5777 0.1081 53.34 / 1);}}
-.hover\:decoration-spiced-terracotta-900 {&:hover {text-decoration-color:oklch(0.5277 0.1081 53.34 / 1);}}
-.hover\:decoration-papaya-whip-100\/1 {&:hover {text-decoration-color:oklch(1 0.0384 83.83 / 0.01);}}
-.hover\:decoration-papaya-whip-300\/1 {&:hover {text-decoration-color:oklch(1 0.0384 83.83 / 0.01);}}
-.hover\:decoration-papaya-whip-500\/1 {&:hover {text-decoration-color:oklch(0.9622 0.0384 83.83 / 0.01);}}
-.hover\:decoration-papaya-whip-700\/1 {&:hover {text-decoration-color:oklch(0.9122 0.0384 83.83 / 0.01);}}
-.hover\:decoration-papaya-whip-900\/1 {&:hover {text-decoration-color:oklch(0.8622 0.0384 83.83 / 0.01);}}
-.hover\:decoration-papaya-whip-100\/5 {&:hover {text-decoration-color:oklch(1 0.0384 83.83 / 0.05);}}
-.hover\:decoration-papaya-whip-300\/5 {&:hover {text-decoration-color:oklch(1 0.0384 83.83 / 0.05);}}
-.hover\:decoration-papaya-whip-500\/5 {&:hover {text-decoration-color:oklch(0.9622 0.0384 83.83 / 0.05);}}
-.hover\:decoration-papaya-whip-700\/5 {&:hover {text-decoration-color:oklch(0.9122 0.0384 83.83 / 0.05);}}
-.hover\:decoration-papaya-whip-900\/5 {&:hover {text-decoration-color:oklch(0.8622 0.0384 83.83 / 0.05);}}
-.hover\:decoration-papaya-whip-100\/10 {&:hover {text-decoration-color:oklch(1 0.0384 83.83 / 0.1);}}
-.hover\:decoration-papaya-whip-300\/10 {&:hover {text-decoration-color:oklch(1 0.0384 83.83 / 0.1);}}
-.hover\:decoration-papaya-whip-500\/10 {&:hover {text-decoration-color:oklch(0.9622 0.0384 83.83 / 0.1);}}
-.hover\:decoration-papaya-whip-700\/10 {&:hover {text-decoration-color:oklch(0.9122 0.0384 83.83 / 0.1);}}
-.hover\:decoration-papaya-whip-900\/10 {&:hover {text-decoration-color:oklch(0.8622 0.0384 83.83 / 0.1);}}
-.hover\:decoration-papaya-whip-100\/25 {&:hover {text-decoration-color:oklch(1 0.0384 83.83 / 0.2);}}
-.hover\:decoration-papaya-whip-300\/25 {&:hover {text-decoration-color:oklch(1 0.0384 83.83 / 0.2);}}
-.hover\:decoration-papaya-whip-500\/25 {&:hover {text-decoration-color:oklch(0.9622 0.0384 83.83 / 0.2);}}
-.hover\:decoration-papaya-whip-700\/25 {&:hover {text-decoration-color:oklch(0.9122 0.0384 83.83 / 0.2);}}
-.hover\:decoration-papaya-whip-900\/25 {&:hover {text-decoration-color:oklch(0.8622 0.0384 83.83 / 0.2);}}
-.hover\:decoration-papaya-whip-100\/50 {&:hover {text-decoration-color:oklch(1 0.0384 83.83 / 0.5);}}
-.hover\:decoration-papaya-whip-300\/50 {&:hover {text-decoration-color:oklch(1 0.0384 83.83 / 0.5);}}
-.hover\:decoration-papaya-whip-500\/50 {&:hover {text-decoration-color:oklch(0.9622 0.0384 83.83 / 0.5);}}
-.hover\:decoration-papaya-whip-700\/50 {&:hover {text-decoration-color:oklch(0.9122 0.0384 83.83 / 0.5);}}
-.hover\:decoration-papaya-whip-900\/50 {&:hover {text-decoration-color:oklch(0.8622 0.0384 83.83 / 0.5);}}
-.hover\:decoration-papaya-whip-100\/75 {&:hover {text-decoration-color:oklch(1 0.0384 83.83 / 0.7);}}
-.hover\:decoration-papaya-whip-300\/75 {&:hover {text-decoration-color:oklch(1 0.0384 83.83 / 0.7);}}
-.hover\:decoration-papaya-whip-500\/75 {&:hover {text-decoration-color:oklch(0.9622 0.0384 83.83 / 0.7);}}
-.hover\:decoration-papaya-whip-700\/75 {&:hover {text-decoration-color:oklch(0.9122 0.0384 83.83 / 0.7);}}
-.hover\:decoration-papaya-whip-900\/75 {&:hover {text-decoration-color:oklch(0.8622 0.0384 83.83 / 0.7);}}
-.hover\:decoration-papaya-whip-100\/90 {&:hover {text-decoration-color:oklch(1 0.0384 83.83 / 0.9);}}
-.hover\:decoration-papaya-whip-300\/90 {&:hover {text-decoration-color:oklch(1 0.0384 83.83 / 0.9);}}
-.hover\:decoration-papaya-whip-500\/90 {&:hover {text-decoration-color:oklch(0.9622 0.0384 83.83 / 0.9);}}
-.hover\:decoration-papaya-whip-700\/90 {&:hover {text-decoration-color:oklch(0.9122 0.0384 83.83 / 0.9);}}
-.hover\:decoration-papaya-whip-900\/90 {&:hover {text-decoration-color:oklch(0.8622 0.0384 83.83 / 0.9);}}
-.hover\:decoration-papaya-whip-100\/95 {&:hover {text-decoration-color:oklch(1 0.0384 83.83 / 0.95);}}
-.hover\:decoration-papaya-whip-300\/95 {&:hover {text-decoration-color:oklch(1 0.0384 83.83 / 0.95);}}
-.hover\:decoration-papaya-whip-500\/95 {&:hover {text-decoration-color:oklch(0.9622 0.0384 83.83 / 0.95);}}
-.hover\:decoration-papaya-whip-700\/95 {&:hover {text-decoration-color:oklch(0.9122 0.0384 83.83 / 0.95);}}
-.hover\:decoration-papaya-whip-900\/95 {&:hover {text-decoration-color:oklch(0.8622 0.0384 83.83 / 0.95);}}
-.hover\:decoration-papaya-whip-100 {&:hover {text-decoration-color:oklch(1 0.0384 83.83 / 1);}}
-.hover\:decoration-papaya-whip-300 {&:hover {text-decoration-color:oklch(1 0.0384 83.83 / 1);}}
-.hover\:decoration-papaya-whip-500 {&:hover {text-decoration-color:oklch(0.9622 0.0384 83.83 / 1);}}
-.hover\:decoration-papaya-whip-700 {&:hover {text-decoration-color:oklch(0.9122 0.0384 83.83 / 1);}}
-.hover\:decoration-papaya-whip-900 {&:hover {text-decoration-color:oklch(0.8622 0.0384 83.83 / 1);}}
 .hover\:decoration-onyx-100\/1 {&:hover {text-decoration-color:oklch(0.4588 0.0044 247.95 / 0.01);}}
 .hover\:decoration-onyx-300\/1 {&:hover {text-decoration-color:oklch(0.4088 0.0044 247.95 / 0.01);}}
 .hover\:decoration-onyx-500\/1 {&:hover {text-decoration-color:oklch(0.3588 0.0044 247.95 / 0.01);}}
@@ -26909,6 +26337,154 @@ ol, ul {list-style:none;}
 .sm\:rounded-3xl {border-radius:1.28rem;}
 .sm\:rounded-4xl {border-radius:1.44rem;}
 .sm\:rounded-5xl {border-radius:1.60rem;}
+.sm\:rounded-tl-1 {border-start-start-radius:0.16rem;}
+.sm\:rounded-tl-2 {border-start-start-radius:0.32rem;}
+.sm\:rounded-tl-3 {border-start-start-radius:0.48rem;}
+.sm\:rounded-tl-4 {border-start-start-radius:0.64rem;}
+.sm\:rounded-tl-5 {border-start-start-radius:0.80rem;}
+.sm\:rounded-tl-6 {border-start-start-radius:0.96rem;}
+.sm\:rounded-tl-7 {border-start-start-radius:1.12rem;}
+.sm\:rounded-tl-8 {border-start-start-radius:1.28rem;}
+.sm\:rounded-tl-9 {border-start-start-radius:1.44rem;}
+.sm\:rounded-tl-10 {border-start-start-radius:1.60rem;}
+.sm\:rounded-tl-12 {border-start-start-radius:1.92rem;}
+.sm\:rounded-tl-14 {border-start-start-radius:2.24rem;}
+.sm\:rounded-tl-16 {border-start-start-radius:2.56rem;}
+.sm\:rounded-tl-20 {border-start-start-radius:3.20rem;}
+.sm\:rounded-tl-24 {border-start-start-radius:3.84rem;}
+.sm\:rounded-tl-28 {border-start-start-radius:4.48rem;}
+.sm\:rounded-tl-32 {border-start-start-radius:5.12rem;}
+.sm\:rounded-tl-48 {border-start-start-radius:7.68rem;}
+.sm\:rounded-tl-64 {border-start-start-radius:10.24rem;}
+.sm\:rounded-tl-72 {border-start-start-radius:11.52rem;}
+.sm\:rounded-tl-90 {border-start-start-radius:14.40rem;}
+.sm\:rounded-tl-96 {border-start-start-radius:15.36rem;}
+.sm\:rounded-tl-100 {border-start-start-radius:16.00rem;}
+.sm\:rounded-tl-128 {border-start-start-radius:20.48rem;}
+.sm\:rounded-tl-196 {border-start-start-radius:31.36rem;}
+.sm\:rounded-tl-256 {border-start-start-radius:40.96rem;}
+.sm\:rounded-tl-512 {border-start-start-radius:81.92rem;}
+.sm\:rounded-tl-2xs {border-start-start-radius:0.16rem;}
+.sm\:rounded-tl-xs {border-start-start-radius:0.32rem;}
+.sm\:rounded-tl-sm {border-start-start-radius:0.48rem;}
+.sm\:rounded-tl-md {border-start-start-radius:0.64rem;}
+.sm\:rounded-tl-lg {border-start-start-radius:0.80rem;}
+.sm\:rounded-tl-xl {border-start-start-radius:0.96rem;}
+.sm\:rounded-tl-2xl {border-start-start-radius:1.12rem;}
+.sm\:rounded-tl-3xl {border-start-start-radius:1.28rem;}
+.sm\:rounded-tl-4xl {border-start-start-radius:1.44rem;}
+.sm\:rounded-tl-5xl {border-start-start-radius:1.60rem;}
+.sm\:rounded-tr-1 {border-start-end-radius:0.16rem;}
+.sm\:rounded-tr-2 {border-start-end-radius:0.32rem;}
+.sm\:rounded-tr-3 {border-start-end-radius:0.48rem;}
+.sm\:rounded-tr-4 {border-start-end-radius:0.64rem;}
+.sm\:rounded-tr-5 {border-start-end-radius:0.80rem;}
+.sm\:rounded-tr-6 {border-start-end-radius:0.96rem;}
+.sm\:rounded-tr-7 {border-start-end-radius:1.12rem;}
+.sm\:rounded-tr-8 {border-start-end-radius:1.28rem;}
+.sm\:rounded-tr-9 {border-start-end-radius:1.44rem;}
+.sm\:rounded-tr-10 {border-start-end-radius:1.60rem;}
+.sm\:rounded-tr-12 {border-start-end-radius:1.92rem;}
+.sm\:rounded-tr-14 {border-start-end-radius:2.24rem;}
+.sm\:rounded-tr-16 {border-start-end-radius:2.56rem;}
+.sm\:rounded-tr-20 {border-start-end-radius:3.20rem;}
+.sm\:rounded-tr-24 {border-start-end-radius:3.84rem;}
+.sm\:rounded-tr-28 {border-start-end-radius:4.48rem;}
+.sm\:rounded-tr-32 {border-start-end-radius:5.12rem;}
+.sm\:rounded-tr-48 {border-start-end-radius:7.68rem;}
+.sm\:rounded-tr-64 {border-start-end-radius:10.24rem;}
+.sm\:rounded-tr-72 {border-start-end-radius:11.52rem;}
+.sm\:rounded-tr-90 {border-start-end-radius:14.40rem;}
+.sm\:rounded-tr-96 {border-start-end-radius:15.36rem;}
+.sm\:rounded-tr-100 {border-start-end-radius:16.00rem;}
+.sm\:rounded-tr-128 {border-start-end-radius:20.48rem;}
+.sm\:rounded-tr-196 {border-start-end-radius:31.36rem;}
+.sm\:rounded-tr-256 {border-start-end-radius:40.96rem;}
+.sm\:rounded-tr-512 {border-start-end-radius:81.92rem;}
+.sm\:rounded-tr-2xs {border-start-end-radius:0.16rem;}
+.sm\:rounded-tr-xs {border-start-end-radius:0.32rem;}
+.sm\:rounded-tr-sm {border-start-end-radius:0.48rem;}
+.sm\:rounded-tr-md {border-start-end-radius:0.64rem;}
+.sm\:rounded-tr-lg {border-start-end-radius:0.80rem;}
+.sm\:rounded-tr-xl {border-start-end-radius:0.96rem;}
+.sm\:rounded-tr-2xl {border-start-end-radius:1.12rem;}
+.sm\:rounded-tr-3xl {border-start-end-radius:1.28rem;}
+.sm\:rounded-tr-4xl {border-start-end-radius:1.44rem;}
+.sm\:rounded-tr-5xl {border-start-end-radius:1.60rem;}
+.sm\:rounded-bl-1 {border-end-start-radius:0.16rem;}
+.sm\:rounded-bl-2 {border-end-start-radius:0.32rem;}
+.sm\:rounded-bl-3 {border-end-start-radius:0.48rem;}
+.sm\:rounded-bl-4 {border-end-start-radius:0.64rem;}
+.sm\:rounded-bl-5 {border-end-start-radius:0.80rem;}
+.sm\:rounded-bl-6 {border-end-start-radius:0.96rem;}
+.sm\:rounded-bl-7 {border-end-start-radius:1.12rem;}
+.sm\:rounded-bl-8 {border-end-start-radius:1.28rem;}
+.sm\:rounded-bl-9 {border-end-start-radius:1.44rem;}
+.sm\:rounded-bl-10 {border-end-start-radius:1.60rem;}
+.sm\:rounded-bl-12 {border-end-start-radius:1.92rem;}
+.sm\:rounded-bl-14 {border-end-start-radius:2.24rem;}
+.sm\:rounded-bl-16 {border-end-start-radius:2.56rem;}
+.sm\:rounded-bl-20 {border-end-start-radius:3.20rem;}
+.sm\:rounded-bl-24 {border-end-start-radius:3.84rem;}
+.sm\:rounded-bl-28 {border-end-start-radius:4.48rem;}
+.sm\:rounded-bl-32 {border-end-start-radius:5.12rem;}
+.sm\:rounded-bl-48 {border-end-start-radius:7.68rem;}
+.sm\:rounded-bl-64 {border-end-start-radius:10.24rem;}
+.sm\:rounded-bl-72 {border-end-start-radius:11.52rem;}
+.sm\:rounded-bl-90 {border-end-start-radius:14.40rem;}
+.sm\:rounded-bl-96 {border-end-start-radius:15.36rem;}
+.sm\:rounded-bl-100 {border-end-start-radius:16.00rem;}
+.sm\:rounded-bl-128 {border-end-start-radius:20.48rem;}
+.sm\:rounded-bl-196 {border-end-start-radius:31.36rem;}
+.sm\:rounded-bl-256 {border-end-start-radius:40.96rem;}
+.sm\:rounded-bl-512 {border-end-start-radius:81.92rem;}
+.sm\:rounded-bl-2xs {border-end-start-radius:0.16rem;}
+.sm\:rounded-bl-xs {border-end-start-radius:0.32rem;}
+.sm\:rounded-bl-sm {border-end-start-radius:0.48rem;}
+.sm\:rounded-bl-md {border-end-start-radius:0.64rem;}
+.sm\:rounded-bl-lg {border-end-start-radius:0.80rem;}
+.sm\:rounded-bl-xl {border-end-start-radius:0.96rem;}
+.sm\:rounded-bl-2xl {border-end-start-radius:1.12rem;}
+.sm\:rounded-bl-3xl {border-end-start-radius:1.28rem;}
+.sm\:rounded-bl-4xl {border-end-start-radius:1.44rem;}
+.sm\:rounded-bl-5xl {border-end-start-radius:1.60rem;}
+.sm\:rounded-br-1 {border-end-end-radius:0.16rem;}
+.sm\:rounded-br-2 {border-end-end-radius:0.32rem;}
+.sm\:rounded-br-3 {border-end-end-radius:0.48rem;}
+.sm\:rounded-br-4 {border-end-end-radius:0.64rem;}
+.sm\:rounded-br-5 {border-end-end-radius:0.80rem;}
+.sm\:rounded-br-6 {border-end-end-radius:0.96rem;}
+.sm\:rounded-br-7 {border-end-end-radius:1.12rem;}
+.sm\:rounded-br-8 {border-end-end-radius:1.28rem;}
+.sm\:rounded-br-9 {border-end-end-radius:1.44rem;}
+.sm\:rounded-br-10 {border-end-end-radius:1.60rem;}
+.sm\:rounded-br-12 {border-end-end-radius:1.92rem;}
+.sm\:rounded-br-14 {border-end-end-radius:2.24rem;}
+.sm\:rounded-br-16 {border-end-end-radius:2.56rem;}
+.sm\:rounded-br-20 {border-end-end-radius:3.20rem;}
+.sm\:rounded-br-24 {border-end-end-radius:3.84rem;}
+.sm\:rounded-br-28 {border-end-end-radius:4.48rem;}
+.sm\:rounded-br-32 {border-end-end-radius:5.12rem;}
+.sm\:rounded-br-48 {border-end-end-radius:7.68rem;}
+.sm\:rounded-br-64 {border-end-end-radius:10.24rem;}
+.sm\:rounded-br-72 {border-end-end-radius:11.52rem;}
+.sm\:rounded-br-90 {border-end-end-radius:14.40rem;}
+.sm\:rounded-br-96 {border-end-end-radius:15.36rem;}
+.sm\:rounded-br-100 {border-end-end-radius:16.00rem;}
+.sm\:rounded-br-128 {border-end-end-radius:20.48rem;}
+.sm\:rounded-br-196 {border-end-end-radius:31.36rem;}
+.sm\:rounded-br-256 {border-end-end-radius:40.96rem;}
+.sm\:rounded-br-512 {border-end-end-radius:81.92rem;}
+.sm\:rounded-br-2xs {border-end-end-radius:0.16rem;}
+.sm\:rounded-br-xs {border-end-end-radius:0.32rem;}
+.sm\:rounded-br-sm {border-end-end-radius:0.48rem;}
+.sm\:rounded-br-md {border-end-end-radius:0.64rem;}
+.sm\:rounded-br-lg {border-end-end-radius:0.80rem;}
+.sm\:rounded-br-xl {border-end-end-radius:0.96rem;}
+.sm\:rounded-br-2xl {border-end-end-radius:1.12rem;}
+.sm\:rounded-br-3xl {border-end-end-radius:1.28rem;}
+.sm\:rounded-br-4xl {border-end-end-radius:1.44rem;}
+.sm\:rounded-br-5xl {border-end-end-radius:1.60rem;}
 .sm\:snap-start {scroll-snap-align:start;}
 .sm\:snap-end {scroll-snap-align:end;}
 .sm\:snap-center {scroll-snap-align:center;}
@@ -29192,6 +28768,154 @@ ol, ul {list-style:none;}
 .md\:rounded-3xl {border-radius:1.28rem;}
 .md\:rounded-4xl {border-radius:1.44rem;}
 .md\:rounded-5xl {border-radius:1.60rem;}
+.md\:rounded-tl-1 {border-start-start-radius:0.16rem;}
+.md\:rounded-tl-2 {border-start-start-radius:0.32rem;}
+.md\:rounded-tl-3 {border-start-start-radius:0.48rem;}
+.md\:rounded-tl-4 {border-start-start-radius:0.64rem;}
+.md\:rounded-tl-5 {border-start-start-radius:0.80rem;}
+.md\:rounded-tl-6 {border-start-start-radius:0.96rem;}
+.md\:rounded-tl-7 {border-start-start-radius:1.12rem;}
+.md\:rounded-tl-8 {border-start-start-radius:1.28rem;}
+.md\:rounded-tl-9 {border-start-start-radius:1.44rem;}
+.md\:rounded-tl-10 {border-start-start-radius:1.60rem;}
+.md\:rounded-tl-12 {border-start-start-radius:1.92rem;}
+.md\:rounded-tl-14 {border-start-start-radius:2.24rem;}
+.md\:rounded-tl-16 {border-start-start-radius:2.56rem;}
+.md\:rounded-tl-20 {border-start-start-radius:3.20rem;}
+.md\:rounded-tl-24 {border-start-start-radius:3.84rem;}
+.md\:rounded-tl-28 {border-start-start-radius:4.48rem;}
+.md\:rounded-tl-32 {border-start-start-radius:5.12rem;}
+.md\:rounded-tl-48 {border-start-start-radius:7.68rem;}
+.md\:rounded-tl-64 {border-start-start-radius:10.24rem;}
+.md\:rounded-tl-72 {border-start-start-radius:11.52rem;}
+.md\:rounded-tl-90 {border-start-start-radius:14.40rem;}
+.md\:rounded-tl-96 {border-start-start-radius:15.36rem;}
+.md\:rounded-tl-100 {border-start-start-radius:16.00rem;}
+.md\:rounded-tl-128 {border-start-start-radius:20.48rem;}
+.md\:rounded-tl-196 {border-start-start-radius:31.36rem;}
+.md\:rounded-tl-256 {border-start-start-radius:40.96rem;}
+.md\:rounded-tl-512 {border-start-start-radius:81.92rem;}
+.md\:rounded-tl-2xs {border-start-start-radius:0.16rem;}
+.md\:rounded-tl-xs {border-start-start-radius:0.32rem;}
+.md\:rounded-tl-sm {border-start-start-radius:0.48rem;}
+.md\:rounded-tl-md {border-start-start-radius:0.64rem;}
+.md\:rounded-tl-lg {border-start-start-radius:0.80rem;}
+.md\:rounded-tl-xl {border-start-start-radius:0.96rem;}
+.md\:rounded-tl-2xl {border-start-start-radius:1.12rem;}
+.md\:rounded-tl-3xl {border-start-start-radius:1.28rem;}
+.md\:rounded-tl-4xl {border-start-start-radius:1.44rem;}
+.md\:rounded-tl-5xl {border-start-start-radius:1.60rem;}
+.md\:rounded-tr-1 {border-start-end-radius:0.16rem;}
+.md\:rounded-tr-2 {border-start-end-radius:0.32rem;}
+.md\:rounded-tr-3 {border-start-end-radius:0.48rem;}
+.md\:rounded-tr-4 {border-start-end-radius:0.64rem;}
+.md\:rounded-tr-5 {border-start-end-radius:0.80rem;}
+.md\:rounded-tr-6 {border-start-end-radius:0.96rem;}
+.md\:rounded-tr-7 {border-start-end-radius:1.12rem;}
+.md\:rounded-tr-8 {border-start-end-radius:1.28rem;}
+.md\:rounded-tr-9 {border-start-end-radius:1.44rem;}
+.md\:rounded-tr-10 {border-start-end-radius:1.60rem;}
+.md\:rounded-tr-12 {border-start-end-radius:1.92rem;}
+.md\:rounded-tr-14 {border-start-end-radius:2.24rem;}
+.md\:rounded-tr-16 {border-start-end-radius:2.56rem;}
+.md\:rounded-tr-20 {border-start-end-radius:3.20rem;}
+.md\:rounded-tr-24 {border-start-end-radius:3.84rem;}
+.md\:rounded-tr-28 {border-start-end-radius:4.48rem;}
+.md\:rounded-tr-32 {border-start-end-radius:5.12rem;}
+.md\:rounded-tr-48 {border-start-end-radius:7.68rem;}
+.md\:rounded-tr-64 {border-start-end-radius:10.24rem;}
+.md\:rounded-tr-72 {border-start-end-radius:11.52rem;}
+.md\:rounded-tr-90 {border-start-end-radius:14.40rem;}
+.md\:rounded-tr-96 {border-start-end-radius:15.36rem;}
+.md\:rounded-tr-100 {border-start-end-radius:16.00rem;}
+.md\:rounded-tr-128 {border-start-end-radius:20.48rem;}
+.md\:rounded-tr-196 {border-start-end-radius:31.36rem;}
+.md\:rounded-tr-256 {border-start-end-radius:40.96rem;}
+.md\:rounded-tr-512 {border-start-end-radius:81.92rem;}
+.md\:rounded-tr-2xs {border-start-end-radius:0.16rem;}
+.md\:rounded-tr-xs {border-start-end-radius:0.32rem;}
+.md\:rounded-tr-sm {border-start-end-radius:0.48rem;}
+.md\:rounded-tr-md {border-start-end-radius:0.64rem;}
+.md\:rounded-tr-lg {border-start-end-radius:0.80rem;}
+.md\:rounded-tr-xl {border-start-end-radius:0.96rem;}
+.md\:rounded-tr-2xl {border-start-end-radius:1.12rem;}
+.md\:rounded-tr-3xl {border-start-end-radius:1.28rem;}
+.md\:rounded-tr-4xl {border-start-end-radius:1.44rem;}
+.md\:rounded-tr-5xl {border-start-end-radius:1.60rem;}
+.md\:rounded-bl-1 {border-end-start-radius:0.16rem;}
+.md\:rounded-bl-2 {border-end-start-radius:0.32rem;}
+.md\:rounded-bl-3 {border-end-start-radius:0.48rem;}
+.md\:rounded-bl-4 {border-end-start-radius:0.64rem;}
+.md\:rounded-bl-5 {border-end-start-radius:0.80rem;}
+.md\:rounded-bl-6 {border-end-start-radius:0.96rem;}
+.md\:rounded-bl-7 {border-end-start-radius:1.12rem;}
+.md\:rounded-bl-8 {border-end-start-radius:1.28rem;}
+.md\:rounded-bl-9 {border-end-start-radius:1.44rem;}
+.md\:rounded-bl-10 {border-end-start-radius:1.60rem;}
+.md\:rounded-bl-12 {border-end-start-radius:1.92rem;}
+.md\:rounded-bl-14 {border-end-start-radius:2.24rem;}
+.md\:rounded-bl-16 {border-end-start-radius:2.56rem;}
+.md\:rounded-bl-20 {border-end-start-radius:3.20rem;}
+.md\:rounded-bl-24 {border-end-start-radius:3.84rem;}
+.md\:rounded-bl-28 {border-end-start-radius:4.48rem;}
+.md\:rounded-bl-32 {border-end-start-radius:5.12rem;}
+.md\:rounded-bl-48 {border-end-start-radius:7.68rem;}
+.md\:rounded-bl-64 {border-end-start-radius:10.24rem;}
+.md\:rounded-bl-72 {border-end-start-radius:11.52rem;}
+.md\:rounded-bl-90 {border-end-start-radius:14.40rem;}
+.md\:rounded-bl-96 {border-end-start-radius:15.36rem;}
+.md\:rounded-bl-100 {border-end-start-radius:16.00rem;}
+.md\:rounded-bl-128 {border-end-start-radius:20.48rem;}
+.md\:rounded-bl-196 {border-end-start-radius:31.36rem;}
+.md\:rounded-bl-256 {border-end-start-radius:40.96rem;}
+.md\:rounded-bl-512 {border-end-start-radius:81.92rem;}
+.md\:rounded-bl-2xs {border-end-start-radius:0.16rem;}
+.md\:rounded-bl-xs {border-end-start-radius:0.32rem;}
+.md\:rounded-bl-sm {border-end-start-radius:0.48rem;}
+.md\:rounded-bl-md {border-end-start-radius:0.64rem;}
+.md\:rounded-bl-lg {border-end-start-radius:0.80rem;}
+.md\:rounded-bl-xl {border-end-start-radius:0.96rem;}
+.md\:rounded-bl-2xl {border-end-start-radius:1.12rem;}
+.md\:rounded-bl-3xl {border-end-start-radius:1.28rem;}
+.md\:rounded-bl-4xl {border-end-start-radius:1.44rem;}
+.md\:rounded-bl-5xl {border-end-start-radius:1.60rem;}
+.md\:rounded-br-1 {border-end-end-radius:0.16rem;}
+.md\:rounded-br-2 {border-end-end-radius:0.32rem;}
+.md\:rounded-br-3 {border-end-end-radius:0.48rem;}
+.md\:rounded-br-4 {border-end-end-radius:0.64rem;}
+.md\:rounded-br-5 {border-end-end-radius:0.80rem;}
+.md\:rounded-br-6 {border-end-end-radius:0.96rem;}
+.md\:rounded-br-7 {border-end-end-radius:1.12rem;}
+.md\:rounded-br-8 {border-end-end-radius:1.28rem;}
+.md\:rounded-br-9 {border-end-end-radius:1.44rem;}
+.md\:rounded-br-10 {border-end-end-radius:1.60rem;}
+.md\:rounded-br-12 {border-end-end-radius:1.92rem;}
+.md\:rounded-br-14 {border-end-end-radius:2.24rem;}
+.md\:rounded-br-16 {border-end-end-radius:2.56rem;}
+.md\:rounded-br-20 {border-end-end-radius:3.20rem;}
+.md\:rounded-br-24 {border-end-end-radius:3.84rem;}
+.md\:rounded-br-28 {border-end-end-radius:4.48rem;}
+.md\:rounded-br-32 {border-end-end-radius:5.12rem;}
+.md\:rounded-br-48 {border-end-end-radius:7.68rem;}
+.md\:rounded-br-64 {border-end-end-radius:10.24rem;}
+.md\:rounded-br-72 {border-end-end-radius:11.52rem;}
+.md\:rounded-br-90 {border-end-end-radius:14.40rem;}
+.md\:rounded-br-96 {border-end-end-radius:15.36rem;}
+.md\:rounded-br-100 {border-end-end-radius:16.00rem;}
+.md\:rounded-br-128 {border-end-end-radius:20.48rem;}
+.md\:rounded-br-196 {border-end-end-radius:31.36rem;}
+.md\:rounded-br-256 {border-end-end-radius:40.96rem;}
+.md\:rounded-br-512 {border-end-end-radius:81.92rem;}
+.md\:rounded-br-2xs {border-end-end-radius:0.16rem;}
+.md\:rounded-br-xs {border-end-end-radius:0.32rem;}
+.md\:rounded-br-sm {border-end-end-radius:0.48rem;}
+.md\:rounded-br-md {border-end-end-radius:0.64rem;}
+.md\:rounded-br-lg {border-end-end-radius:0.80rem;}
+.md\:rounded-br-xl {border-end-end-radius:0.96rem;}
+.md\:rounded-br-2xl {border-end-end-radius:1.12rem;}
+.md\:rounded-br-3xl {border-end-end-radius:1.28rem;}
+.md\:rounded-br-4xl {border-end-end-radius:1.44rem;}
+.md\:rounded-br-5xl {border-end-end-radius:1.60rem;}
 .md\:snap-start {scroll-snap-align:start;}
 .md\:snap-end {scroll-snap-align:end;}
 .md\:snap-center {scroll-snap-align:center;}
@@ -31475,6 +31199,154 @@ ol, ul {list-style:none;}
 .lg\:rounded-3xl {border-radius:1.28rem;}
 .lg\:rounded-4xl {border-radius:1.44rem;}
 .lg\:rounded-5xl {border-radius:1.60rem;}
+.lg\:rounded-tl-1 {border-start-start-radius:0.16rem;}
+.lg\:rounded-tl-2 {border-start-start-radius:0.32rem;}
+.lg\:rounded-tl-3 {border-start-start-radius:0.48rem;}
+.lg\:rounded-tl-4 {border-start-start-radius:0.64rem;}
+.lg\:rounded-tl-5 {border-start-start-radius:0.80rem;}
+.lg\:rounded-tl-6 {border-start-start-radius:0.96rem;}
+.lg\:rounded-tl-7 {border-start-start-radius:1.12rem;}
+.lg\:rounded-tl-8 {border-start-start-radius:1.28rem;}
+.lg\:rounded-tl-9 {border-start-start-radius:1.44rem;}
+.lg\:rounded-tl-10 {border-start-start-radius:1.60rem;}
+.lg\:rounded-tl-12 {border-start-start-radius:1.92rem;}
+.lg\:rounded-tl-14 {border-start-start-radius:2.24rem;}
+.lg\:rounded-tl-16 {border-start-start-radius:2.56rem;}
+.lg\:rounded-tl-20 {border-start-start-radius:3.20rem;}
+.lg\:rounded-tl-24 {border-start-start-radius:3.84rem;}
+.lg\:rounded-tl-28 {border-start-start-radius:4.48rem;}
+.lg\:rounded-tl-32 {border-start-start-radius:5.12rem;}
+.lg\:rounded-tl-48 {border-start-start-radius:7.68rem;}
+.lg\:rounded-tl-64 {border-start-start-radius:10.24rem;}
+.lg\:rounded-tl-72 {border-start-start-radius:11.52rem;}
+.lg\:rounded-tl-90 {border-start-start-radius:14.40rem;}
+.lg\:rounded-tl-96 {border-start-start-radius:15.36rem;}
+.lg\:rounded-tl-100 {border-start-start-radius:16.00rem;}
+.lg\:rounded-tl-128 {border-start-start-radius:20.48rem;}
+.lg\:rounded-tl-196 {border-start-start-radius:31.36rem;}
+.lg\:rounded-tl-256 {border-start-start-radius:40.96rem;}
+.lg\:rounded-tl-512 {border-start-start-radius:81.92rem;}
+.lg\:rounded-tl-2xs {border-start-start-radius:0.16rem;}
+.lg\:rounded-tl-xs {border-start-start-radius:0.32rem;}
+.lg\:rounded-tl-sm {border-start-start-radius:0.48rem;}
+.lg\:rounded-tl-md {border-start-start-radius:0.64rem;}
+.lg\:rounded-tl-lg {border-start-start-radius:0.80rem;}
+.lg\:rounded-tl-xl {border-start-start-radius:0.96rem;}
+.lg\:rounded-tl-2xl {border-start-start-radius:1.12rem;}
+.lg\:rounded-tl-3xl {border-start-start-radius:1.28rem;}
+.lg\:rounded-tl-4xl {border-start-start-radius:1.44rem;}
+.lg\:rounded-tl-5xl {border-start-start-radius:1.60rem;}
+.lg\:rounded-tr-1 {border-start-end-radius:0.16rem;}
+.lg\:rounded-tr-2 {border-start-end-radius:0.32rem;}
+.lg\:rounded-tr-3 {border-start-end-radius:0.48rem;}
+.lg\:rounded-tr-4 {border-start-end-radius:0.64rem;}
+.lg\:rounded-tr-5 {border-start-end-radius:0.80rem;}
+.lg\:rounded-tr-6 {border-start-end-radius:0.96rem;}
+.lg\:rounded-tr-7 {border-start-end-radius:1.12rem;}
+.lg\:rounded-tr-8 {border-start-end-radius:1.28rem;}
+.lg\:rounded-tr-9 {border-start-end-radius:1.44rem;}
+.lg\:rounded-tr-10 {border-start-end-radius:1.60rem;}
+.lg\:rounded-tr-12 {border-start-end-radius:1.92rem;}
+.lg\:rounded-tr-14 {border-start-end-radius:2.24rem;}
+.lg\:rounded-tr-16 {border-start-end-radius:2.56rem;}
+.lg\:rounded-tr-20 {border-start-end-radius:3.20rem;}
+.lg\:rounded-tr-24 {border-start-end-radius:3.84rem;}
+.lg\:rounded-tr-28 {border-start-end-radius:4.48rem;}
+.lg\:rounded-tr-32 {border-start-end-radius:5.12rem;}
+.lg\:rounded-tr-48 {border-start-end-radius:7.68rem;}
+.lg\:rounded-tr-64 {border-start-end-radius:10.24rem;}
+.lg\:rounded-tr-72 {border-start-end-radius:11.52rem;}
+.lg\:rounded-tr-90 {border-start-end-radius:14.40rem;}
+.lg\:rounded-tr-96 {border-start-end-radius:15.36rem;}
+.lg\:rounded-tr-100 {border-start-end-radius:16.00rem;}
+.lg\:rounded-tr-128 {border-start-end-radius:20.48rem;}
+.lg\:rounded-tr-196 {border-start-end-radius:31.36rem;}
+.lg\:rounded-tr-256 {border-start-end-radius:40.96rem;}
+.lg\:rounded-tr-512 {border-start-end-radius:81.92rem;}
+.lg\:rounded-tr-2xs {border-start-end-radius:0.16rem;}
+.lg\:rounded-tr-xs {border-start-end-radius:0.32rem;}
+.lg\:rounded-tr-sm {border-start-end-radius:0.48rem;}
+.lg\:rounded-tr-md {border-start-end-radius:0.64rem;}
+.lg\:rounded-tr-lg {border-start-end-radius:0.80rem;}
+.lg\:rounded-tr-xl {border-start-end-radius:0.96rem;}
+.lg\:rounded-tr-2xl {border-start-end-radius:1.12rem;}
+.lg\:rounded-tr-3xl {border-start-end-radius:1.28rem;}
+.lg\:rounded-tr-4xl {border-start-end-radius:1.44rem;}
+.lg\:rounded-tr-5xl {border-start-end-radius:1.60rem;}
+.lg\:rounded-bl-1 {border-end-start-radius:0.16rem;}
+.lg\:rounded-bl-2 {border-end-start-radius:0.32rem;}
+.lg\:rounded-bl-3 {border-end-start-radius:0.48rem;}
+.lg\:rounded-bl-4 {border-end-start-radius:0.64rem;}
+.lg\:rounded-bl-5 {border-end-start-radius:0.80rem;}
+.lg\:rounded-bl-6 {border-end-start-radius:0.96rem;}
+.lg\:rounded-bl-7 {border-end-start-radius:1.12rem;}
+.lg\:rounded-bl-8 {border-end-start-radius:1.28rem;}
+.lg\:rounded-bl-9 {border-end-start-radius:1.44rem;}
+.lg\:rounded-bl-10 {border-end-start-radius:1.60rem;}
+.lg\:rounded-bl-12 {border-end-start-radius:1.92rem;}
+.lg\:rounded-bl-14 {border-end-start-radius:2.24rem;}
+.lg\:rounded-bl-16 {border-end-start-radius:2.56rem;}
+.lg\:rounded-bl-20 {border-end-start-radius:3.20rem;}
+.lg\:rounded-bl-24 {border-end-start-radius:3.84rem;}
+.lg\:rounded-bl-28 {border-end-start-radius:4.48rem;}
+.lg\:rounded-bl-32 {border-end-start-radius:5.12rem;}
+.lg\:rounded-bl-48 {border-end-start-radius:7.68rem;}
+.lg\:rounded-bl-64 {border-end-start-radius:10.24rem;}
+.lg\:rounded-bl-72 {border-end-start-radius:11.52rem;}
+.lg\:rounded-bl-90 {border-end-start-radius:14.40rem;}
+.lg\:rounded-bl-96 {border-end-start-radius:15.36rem;}
+.lg\:rounded-bl-100 {border-end-start-radius:16.00rem;}
+.lg\:rounded-bl-128 {border-end-start-radius:20.48rem;}
+.lg\:rounded-bl-196 {border-end-start-radius:31.36rem;}
+.lg\:rounded-bl-256 {border-end-start-radius:40.96rem;}
+.lg\:rounded-bl-512 {border-end-start-radius:81.92rem;}
+.lg\:rounded-bl-2xs {border-end-start-radius:0.16rem;}
+.lg\:rounded-bl-xs {border-end-start-radius:0.32rem;}
+.lg\:rounded-bl-sm {border-end-start-radius:0.48rem;}
+.lg\:rounded-bl-md {border-end-start-radius:0.64rem;}
+.lg\:rounded-bl-lg {border-end-start-radius:0.80rem;}
+.lg\:rounded-bl-xl {border-end-start-radius:0.96rem;}
+.lg\:rounded-bl-2xl {border-end-start-radius:1.12rem;}
+.lg\:rounded-bl-3xl {border-end-start-radius:1.28rem;}
+.lg\:rounded-bl-4xl {border-end-start-radius:1.44rem;}
+.lg\:rounded-bl-5xl {border-end-start-radius:1.60rem;}
+.lg\:rounded-br-1 {border-end-end-radius:0.16rem;}
+.lg\:rounded-br-2 {border-end-end-radius:0.32rem;}
+.lg\:rounded-br-3 {border-end-end-radius:0.48rem;}
+.lg\:rounded-br-4 {border-end-end-radius:0.64rem;}
+.lg\:rounded-br-5 {border-end-end-radius:0.80rem;}
+.lg\:rounded-br-6 {border-end-end-radius:0.96rem;}
+.lg\:rounded-br-7 {border-end-end-radius:1.12rem;}
+.lg\:rounded-br-8 {border-end-end-radius:1.28rem;}
+.lg\:rounded-br-9 {border-end-end-radius:1.44rem;}
+.lg\:rounded-br-10 {border-end-end-radius:1.60rem;}
+.lg\:rounded-br-12 {border-end-end-radius:1.92rem;}
+.lg\:rounded-br-14 {border-end-end-radius:2.24rem;}
+.lg\:rounded-br-16 {border-end-end-radius:2.56rem;}
+.lg\:rounded-br-20 {border-end-end-radius:3.20rem;}
+.lg\:rounded-br-24 {border-end-end-radius:3.84rem;}
+.lg\:rounded-br-28 {border-end-end-radius:4.48rem;}
+.lg\:rounded-br-32 {border-end-end-radius:5.12rem;}
+.lg\:rounded-br-48 {border-end-end-radius:7.68rem;}
+.lg\:rounded-br-64 {border-end-end-radius:10.24rem;}
+.lg\:rounded-br-72 {border-end-end-radius:11.52rem;}
+.lg\:rounded-br-90 {border-end-end-radius:14.40rem;}
+.lg\:rounded-br-96 {border-end-end-radius:15.36rem;}
+.lg\:rounded-br-100 {border-end-end-radius:16.00rem;}
+.lg\:rounded-br-128 {border-end-end-radius:20.48rem;}
+.lg\:rounded-br-196 {border-end-end-radius:31.36rem;}
+.lg\:rounded-br-256 {border-end-end-radius:40.96rem;}
+.lg\:rounded-br-512 {border-end-end-radius:81.92rem;}
+.lg\:rounded-br-2xs {border-end-end-radius:0.16rem;}
+.lg\:rounded-br-xs {border-end-end-radius:0.32rem;}
+.lg\:rounded-br-sm {border-end-end-radius:0.48rem;}
+.lg\:rounded-br-md {border-end-end-radius:0.64rem;}
+.lg\:rounded-br-lg {border-end-end-radius:0.80rem;}
+.lg\:rounded-br-xl {border-end-end-radius:0.96rem;}
+.lg\:rounded-br-2xl {border-end-end-radius:1.12rem;}
+.lg\:rounded-br-3xl {border-end-end-radius:1.28rem;}
+.lg\:rounded-br-4xl {border-end-end-radius:1.44rem;}
+.lg\:rounded-br-5xl {border-end-end-radius:1.60rem;}
 .lg\:snap-start {scroll-snap-align:start;}
 .lg\:snap-end {scroll-snap-align:end;}
 .lg\:snap-center {scroll-snap-align:center;}
@@ -33758,6 +33630,154 @@ ol, ul {list-style:none;}
 .xl\:rounded-3xl {border-radius:1.28rem;}
 .xl\:rounded-4xl {border-radius:1.44rem;}
 .xl\:rounded-5xl {border-radius:1.60rem;}
+.xl\:rounded-tl-1 {border-start-start-radius:0.16rem;}
+.xl\:rounded-tl-2 {border-start-start-radius:0.32rem;}
+.xl\:rounded-tl-3 {border-start-start-radius:0.48rem;}
+.xl\:rounded-tl-4 {border-start-start-radius:0.64rem;}
+.xl\:rounded-tl-5 {border-start-start-radius:0.80rem;}
+.xl\:rounded-tl-6 {border-start-start-radius:0.96rem;}
+.xl\:rounded-tl-7 {border-start-start-radius:1.12rem;}
+.xl\:rounded-tl-8 {border-start-start-radius:1.28rem;}
+.xl\:rounded-tl-9 {border-start-start-radius:1.44rem;}
+.xl\:rounded-tl-10 {border-start-start-radius:1.60rem;}
+.xl\:rounded-tl-12 {border-start-start-radius:1.92rem;}
+.xl\:rounded-tl-14 {border-start-start-radius:2.24rem;}
+.xl\:rounded-tl-16 {border-start-start-radius:2.56rem;}
+.xl\:rounded-tl-20 {border-start-start-radius:3.20rem;}
+.xl\:rounded-tl-24 {border-start-start-radius:3.84rem;}
+.xl\:rounded-tl-28 {border-start-start-radius:4.48rem;}
+.xl\:rounded-tl-32 {border-start-start-radius:5.12rem;}
+.xl\:rounded-tl-48 {border-start-start-radius:7.68rem;}
+.xl\:rounded-tl-64 {border-start-start-radius:10.24rem;}
+.xl\:rounded-tl-72 {border-start-start-radius:11.52rem;}
+.xl\:rounded-tl-90 {border-start-start-radius:14.40rem;}
+.xl\:rounded-tl-96 {border-start-start-radius:15.36rem;}
+.xl\:rounded-tl-100 {border-start-start-radius:16.00rem;}
+.xl\:rounded-tl-128 {border-start-start-radius:20.48rem;}
+.xl\:rounded-tl-196 {border-start-start-radius:31.36rem;}
+.xl\:rounded-tl-256 {border-start-start-radius:40.96rem;}
+.xl\:rounded-tl-512 {border-start-start-radius:81.92rem;}
+.xl\:rounded-tl-2xs {border-start-start-radius:0.16rem;}
+.xl\:rounded-tl-xs {border-start-start-radius:0.32rem;}
+.xl\:rounded-tl-sm {border-start-start-radius:0.48rem;}
+.xl\:rounded-tl-md {border-start-start-radius:0.64rem;}
+.xl\:rounded-tl-lg {border-start-start-radius:0.80rem;}
+.xl\:rounded-tl-xl {border-start-start-radius:0.96rem;}
+.xl\:rounded-tl-2xl {border-start-start-radius:1.12rem;}
+.xl\:rounded-tl-3xl {border-start-start-radius:1.28rem;}
+.xl\:rounded-tl-4xl {border-start-start-radius:1.44rem;}
+.xl\:rounded-tl-5xl {border-start-start-radius:1.60rem;}
+.xl\:rounded-tr-1 {border-start-end-radius:0.16rem;}
+.xl\:rounded-tr-2 {border-start-end-radius:0.32rem;}
+.xl\:rounded-tr-3 {border-start-end-radius:0.48rem;}
+.xl\:rounded-tr-4 {border-start-end-radius:0.64rem;}
+.xl\:rounded-tr-5 {border-start-end-radius:0.80rem;}
+.xl\:rounded-tr-6 {border-start-end-radius:0.96rem;}
+.xl\:rounded-tr-7 {border-start-end-radius:1.12rem;}
+.xl\:rounded-tr-8 {border-start-end-radius:1.28rem;}
+.xl\:rounded-tr-9 {border-start-end-radius:1.44rem;}
+.xl\:rounded-tr-10 {border-start-end-radius:1.60rem;}
+.xl\:rounded-tr-12 {border-start-end-radius:1.92rem;}
+.xl\:rounded-tr-14 {border-start-end-radius:2.24rem;}
+.xl\:rounded-tr-16 {border-start-end-radius:2.56rem;}
+.xl\:rounded-tr-20 {border-start-end-radius:3.20rem;}
+.xl\:rounded-tr-24 {border-start-end-radius:3.84rem;}
+.xl\:rounded-tr-28 {border-start-end-radius:4.48rem;}
+.xl\:rounded-tr-32 {border-start-end-radius:5.12rem;}
+.xl\:rounded-tr-48 {border-start-end-radius:7.68rem;}
+.xl\:rounded-tr-64 {border-start-end-radius:10.24rem;}
+.xl\:rounded-tr-72 {border-start-end-radius:11.52rem;}
+.xl\:rounded-tr-90 {border-start-end-radius:14.40rem;}
+.xl\:rounded-tr-96 {border-start-end-radius:15.36rem;}
+.xl\:rounded-tr-100 {border-start-end-radius:16.00rem;}
+.xl\:rounded-tr-128 {border-start-end-radius:20.48rem;}
+.xl\:rounded-tr-196 {border-start-end-radius:31.36rem;}
+.xl\:rounded-tr-256 {border-start-end-radius:40.96rem;}
+.xl\:rounded-tr-512 {border-start-end-radius:81.92rem;}
+.xl\:rounded-tr-2xs {border-start-end-radius:0.16rem;}
+.xl\:rounded-tr-xs {border-start-end-radius:0.32rem;}
+.xl\:rounded-tr-sm {border-start-end-radius:0.48rem;}
+.xl\:rounded-tr-md {border-start-end-radius:0.64rem;}
+.xl\:rounded-tr-lg {border-start-end-radius:0.80rem;}
+.xl\:rounded-tr-xl {border-start-end-radius:0.96rem;}
+.xl\:rounded-tr-2xl {border-start-end-radius:1.12rem;}
+.xl\:rounded-tr-3xl {border-start-end-radius:1.28rem;}
+.xl\:rounded-tr-4xl {border-start-end-radius:1.44rem;}
+.xl\:rounded-tr-5xl {border-start-end-radius:1.60rem;}
+.xl\:rounded-bl-1 {border-end-start-radius:0.16rem;}
+.xl\:rounded-bl-2 {border-end-start-radius:0.32rem;}
+.xl\:rounded-bl-3 {border-end-start-radius:0.48rem;}
+.xl\:rounded-bl-4 {border-end-start-radius:0.64rem;}
+.xl\:rounded-bl-5 {border-end-start-radius:0.80rem;}
+.xl\:rounded-bl-6 {border-end-start-radius:0.96rem;}
+.xl\:rounded-bl-7 {border-end-start-radius:1.12rem;}
+.xl\:rounded-bl-8 {border-end-start-radius:1.28rem;}
+.xl\:rounded-bl-9 {border-end-start-radius:1.44rem;}
+.xl\:rounded-bl-10 {border-end-start-radius:1.60rem;}
+.xl\:rounded-bl-12 {border-end-start-radius:1.92rem;}
+.xl\:rounded-bl-14 {border-end-start-radius:2.24rem;}
+.xl\:rounded-bl-16 {border-end-start-radius:2.56rem;}
+.xl\:rounded-bl-20 {border-end-start-radius:3.20rem;}
+.xl\:rounded-bl-24 {border-end-start-radius:3.84rem;}
+.xl\:rounded-bl-28 {border-end-start-radius:4.48rem;}
+.xl\:rounded-bl-32 {border-end-start-radius:5.12rem;}
+.xl\:rounded-bl-48 {border-end-start-radius:7.68rem;}
+.xl\:rounded-bl-64 {border-end-start-radius:10.24rem;}
+.xl\:rounded-bl-72 {border-end-start-radius:11.52rem;}
+.xl\:rounded-bl-90 {border-end-start-radius:14.40rem;}
+.xl\:rounded-bl-96 {border-end-start-radius:15.36rem;}
+.xl\:rounded-bl-100 {border-end-start-radius:16.00rem;}
+.xl\:rounded-bl-128 {border-end-start-radius:20.48rem;}
+.xl\:rounded-bl-196 {border-end-start-radius:31.36rem;}
+.xl\:rounded-bl-256 {border-end-start-radius:40.96rem;}
+.xl\:rounded-bl-512 {border-end-start-radius:81.92rem;}
+.xl\:rounded-bl-2xs {border-end-start-radius:0.16rem;}
+.xl\:rounded-bl-xs {border-end-start-radius:0.32rem;}
+.xl\:rounded-bl-sm {border-end-start-radius:0.48rem;}
+.xl\:rounded-bl-md {border-end-start-radius:0.64rem;}
+.xl\:rounded-bl-lg {border-end-start-radius:0.80rem;}
+.xl\:rounded-bl-xl {border-end-start-radius:0.96rem;}
+.xl\:rounded-bl-2xl {border-end-start-radius:1.12rem;}
+.xl\:rounded-bl-3xl {border-end-start-radius:1.28rem;}
+.xl\:rounded-bl-4xl {border-end-start-radius:1.44rem;}
+.xl\:rounded-bl-5xl {border-end-start-radius:1.60rem;}
+.xl\:rounded-br-1 {border-end-end-radius:0.16rem;}
+.xl\:rounded-br-2 {border-end-end-radius:0.32rem;}
+.xl\:rounded-br-3 {border-end-end-radius:0.48rem;}
+.xl\:rounded-br-4 {border-end-end-radius:0.64rem;}
+.xl\:rounded-br-5 {border-end-end-radius:0.80rem;}
+.xl\:rounded-br-6 {border-end-end-radius:0.96rem;}
+.xl\:rounded-br-7 {border-end-end-radius:1.12rem;}
+.xl\:rounded-br-8 {border-end-end-radius:1.28rem;}
+.xl\:rounded-br-9 {border-end-end-radius:1.44rem;}
+.xl\:rounded-br-10 {border-end-end-radius:1.60rem;}
+.xl\:rounded-br-12 {border-end-end-radius:1.92rem;}
+.xl\:rounded-br-14 {border-end-end-radius:2.24rem;}
+.xl\:rounded-br-16 {border-end-end-radius:2.56rem;}
+.xl\:rounded-br-20 {border-end-end-radius:3.20rem;}
+.xl\:rounded-br-24 {border-end-end-radius:3.84rem;}
+.xl\:rounded-br-28 {border-end-end-radius:4.48rem;}
+.xl\:rounded-br-32 {border-end-end-radius:5.12rem;}
+.xl\:rounded-br-48 {border-end-end-radius:7.68rem;}
+.xl\:rounded-br-64 {border-end-end-radius:10.24rem;}
+.xl\:rounded-br-72 {border-end-end-radius:11.52rem;}
+.xl\:rounded-br-90 {border-end-end-radius:14.40rem;}
+.xl\:rounded-br-96 {border-end-end-radius:15.36rem;}
+.xl\:rounded-br-100 {border-end-end-radius:16.00rem;}
+.xl\:rounded-br-128 {border-end-end-radius:20.48rem;}
+.xl\:rounded-br-196 {border-end-end-radius:31.36rem;}
+.xl\:rounded-br-256 {border-end-end-radius:40.96rem;}
+.xl\:rounded-br-512 {border-end-end-radius:81.92rem;}
+.xl\:rounded-br-2xs {border-end-end-radius:0.16rem;}
+.xl\:rounded-br-xs {border-end-end-radius:0.32rem;}
+.xl\:rounded-br-sm {border-end-end-radius:0.48rem;}
+.xl\:rounded-br-md {border-end-end-radius:0.64rem;}
+.xl\:rounded-br-lg {border-end-end-radius:0.80rem;}
+.xl\:rounded-br-xl {border-end-end-radius:0.96rem;}
+.xl\:rounded-br-2xl {border-end-end-radius:1.12rem;}
+.xl\:rounded-br-3xl {border-end-end-radius:1.28rem;}
+.xl\:rounded-br-4xl {border-end-end-radius:1.44rem;}
+.xl\:rounded-br-5xl {border-end-end-radius:1.60rem;}
 .xl\:snap-start {scroll-snap-align:start;}
 .xl\:snap-end {scroll-snap-align:end;}
 .xl\:snap-center {scroll-snap-align:center;}
