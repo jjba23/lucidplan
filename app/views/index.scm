@@ -53,34 +53,48 @@
                                 ,(em (G_
                                       "free and open project management for everyone"))
                                 ((div (@ (class ,(mk-class '(flex flex-row
-                                                                  flex-wrap
-                                                                  gap-8 my-8))))
-                                      (div (@ (class ,(mk-class '(bg-stone-300
-                                                                  dark:bg-onyx-700
-                                                                  rounded-2xl
-                                                                  p-4
-                                                                  shadow-md
-                                                                  flex
+                                                             flex-wrap
+                                                             w-screen
+                                                             gap-3
+                                                             py-8
+                                                             justify-center
+                                                             items-center
+                                                             align-center))))
+                                      (div (@ (class ,(mk-class '(flex
                                                                   flex-col
-                                                                  gap-3))))
-                                           ,(p (G_
-                                                "Take control of your projects with LucidPlan, the open and flexible project management solution built for teams of every shape and size."))
-                                           ,(p (G_
-                                                "We believe powerful tools shouldn't be complicated or restricted. LucidPlan is designed to simplify workflows and make project management accessible to everyone.")))
+                                                                  gap-4
+                                                                  max-w-128))))
+                                           (div (@ (class ,(mk-class '(bg-stone-300
+                                                                       dark:bg-onyx-700
+                                                                       rounded-2xl
+                                                                       p-4
+                                                                       shadow-md
+                                                                       flex
+                                                                       flex-col
+                                                                       gap-3))))
+                                                ,(p (G_
+                                                     "Take control of your projects with LucidPlan, the open and flexible project management solution built for teams of every shape and size.")
+                                                    #:weight '(font-light))
+                                                ,(p (G_
+                                                     "We believe powerful tools shouldn't be complicated or restricted. LucidPlan is designed to simplify workflows and make project management accessible to everyone.")
+                                                    #:weight '(font-light)))
+                                           (div (@ (class ,(mk-class '(max-w-prose
+                                                                       bg-stone-300
+                                                                       dark:bg-onyx-700
+                                                                       rounded-2xl
+                                                                       p-4
+                                                                       shadow-md
+                                                                       flex
+                                                                       flex-col
+                                                                       gap-3))))
+                                                ,(p (G_
+                                                     "Discover how our fast-paced, no-nonsense workflows and deep customizability support Agile methodologies effectively.")
+                                                    #:weight '(font-light))
+                                                ,(p (G_
+                                                     "Built with the power of Lisp (Guile Scheme), LucidPlan offers a responsive and adaptable experience unlike those frustrating proprietary systems you might be used to.")
+                                                    #:weight '(font-light))))
+
                                       (div ,project-logo)
-                                      (div (@ (class ,(mk-class '(max-w-prose
-                                                                  bg-stone-300
-                                                                  dark:bg-onyx-700
-                                                                  rounded-2xl
-                                                                  p-4
-                                                                  shadow-md
-                                                                  flex
-                                                                  flex-col
-                                                                  gap-3))))
-                                           ,(p (G_
-                                                "Discover how our fast-paced, no-nonsense workflows and deep customizability support Agile methodologies effectively."))
-                                           ,(p (G_
-                                                "Built with the power of Lisp (Guile Scheme), LucidPlan offers a responsive and adaptable experience unlike those frustrating proprietary systems you might be used to.")))
 
                                       ))))))
 

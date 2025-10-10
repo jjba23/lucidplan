@@ -236,38 +236,39 @@
 (define-public (emoji-for-ticket-status ticket-status)
   (cond
     ((equal? "todo" ticket-status)
-     `((i (@ (class ,(mk-class '(ph ph-anchor text-stone-600
+     `((i (@ (class ,(mk-class '(ph ph-anchor text-onyx-300
                                     dark:text-stone-300 text-xl)))) "")))
     ((equal? "work-in-progress" ticket-status)
-     `((i (@ (class ,(mk-class '(ph ph-gear-fine text-stone-600 text-xl)))) "")))
+     `((i (@ (class ,(mk-class '(ph ph-gear-fine text-onyx-300
+                                    dark:text-stone-300 text-xl)))) "")))
     ((equal? "in-review" ticket-status)
-     `((i (@ (class ,(mk-class '(ph ph-list-magnifying-glass text-stone-600
+     `((i (@ (class ,(mk-class '(ph ph-list-magnifying-glass text-onyx-300
                                     dark:text-stone-300 text-xl)))) "")))
     ((equal? "done" ticket-status)
-     `((i (@ (class ,(mk-class '(ph ph-check text-stone-600
-                                    dark:text-stone-300 text-xl)))) "")))
+     `((i (@ (class ,(mk-class '(ph ph-check text-onyx-300 dark:text-stone-300
+                                    text-xl)))) "")))
     ((equal? "rejected" ticket-status)
-     `((i (@ (class ,(mk-class '(ph ph-x text-stone-600 dark:text-stone-300
+     `((i (@ (class ,(mk-class '(ph ph-x text-onyx-300 dark:text-stone-300
                                     text-xl)))) "")))
     (else "")))
 
 (define-public (emoji-for-ticket-type ticket-type)
   (cond
     ((equal? "task" ticket-type)
-     `((i (@ (class ,(mk-class '(ph ph-gear-fine text-stone-600
+     `((i (@ (class ,(mk-class '(ph ph-gear-fine text-onyx-300
                                     dark:text-stone-300 text-xl)))) "")))
     ((equal? "bug" ticket-type)
-     `((i (@ (class ,(mk-class '(ph ph-bug text-stone-600 dark:text-stone-300
+     `((i (@ (class ,(mk-class '(ph ph-bug text-onyx-300 dark:text-stone-300
                                     text-xl)))) "")))
     ((equal? "story" ticket-type)
-     `((i (@ (class ,(mk-class '(ph ph-book-open-text text-stone-600
+     `((i (@ (class ,(mk-class '(ph ph-book-open-text text-onyx-300
                                     dark:text-stone-300 text-xl)))) "")))
     ((equal? "spike" ticket-type)
-     `((i (@ (class ,(mk-class '(ph ph-flask text-stone-600
-                                    dark:text-stone-300 text-xl)))) "")))
+     `((i (@ (class ,(mk-class '(ph ph-flask text-onyx-300 dark:text-stone-300
+                                    text-xl)))) "")))
     ((equal? "time-box" ticket-type)
-     `((i (@ (class ,(mk-class '(ph ph-clock text-stone-600
-                                    dark:text-stone-300 text-xl)))) "")))
+     `((i (@ (class ,(mk-class '(ph ph-clock text-onyx-300 dark:text-stone-300
+                                    text-xl)))) "")))
     (else "")))
 
 (begin
