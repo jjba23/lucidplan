@@ -189,8 +189,8 @@
                                             ,(assoc-ref p "title"))) proj))))))
     `(,doctype-html (html (@ (lang en))
                           (head (title "LucidPlan")
-                                ,hygguile-recommended-meta
-                                ,hygguile-recommended-resources
+                                ,(hygguile-recommended-meta)
+                                ,(hygguile-recommended-resources)
                                 (link (@ (rel "shortcut icon")
                                          (href "/favicon.ico")
                                          (type "image/x-icon")) "")
