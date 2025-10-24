@@ -54,7 +54,7 @@
                                       "free and open project management for everyone"))
                                 ((div (@ (class ,(mk-class '(flex flex-row
                                                              flex-wrap
-                                                             w-screen
+                                                             w-full
                                                              gap-3
                                                              py-8
                                                              justify-center

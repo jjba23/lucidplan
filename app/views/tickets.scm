@@ -381,6 +381,7 @@
                                                              `(em (@ (class ,(mk-class '
                                                                               (text-sm
                                                                                text-onyx-700
+                                                                               font-sans
                                                                                dark:text-stone-300))))
                                                                   ,x))
                                                            (assoc-ref
@@ -391,6 +392,7 @@
                                                                          (text-stone-600
                                                                           dark:text-stone-300
                                                                           text-sm
+                                                                          font-sans
                                                                           cursor-pointer))))
                                                              ,(G_
                                                                "backlog options"))

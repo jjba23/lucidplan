@@ -80,9 +80,8 @@
                                         dark:bg-onyx-700
                                         items-center
                                         justify-left
-                                        w-screen
                                         shadow-lg))))
-            (div (@ (class ,(mk-class '(px-4 py-1 w-screen md:w-48))))
+            (div (@ (class ,(mk-class '(px-4 py-1 w-full md:w-48))))
                  (a (@ (href "/")
                        (class ,(mk-class '(flex flex-row gap-2 items-center
                                                 no-underline
