@@ -196,6 +196,6 @@ user sessions on the web or authenticating API calls.")
                           watchexec
                           guile-orgwebalchemy
                           sqlite
-                          emacs
+                          emacs-no-x
                           guile-dbd-sqlite3))
 
