@@ -215,7 +215,8 @@
                                 (script ,(assoc-ref asset-library
                                                     "pub/js/tickets.js")))
                           (body (@ (class ,(mk-class '(bg-stone-100
-                                                       dark:bg-onyx-900))))
+                                                       dark:bg-onyx-900
+                                                       font-sans))))
                                 ,notification-tray
                                 ,(with-footer #:main `((div (@ (class ,(mk-class '
                                                                         (flex
