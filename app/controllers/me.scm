@@ -137,7 +137,7 @@
                                 'postfields
                                 (string->utf8 (scm->json-string body)))
               (curl-easy-setopt handle
-                                'verbose #f)
+                                'verbose #t)
               (curl-easy-setopt handle
                                 'use-ssl 1)
               (curl-easy-setopt handle
