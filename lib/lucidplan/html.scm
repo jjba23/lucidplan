@@ -66,14 +66,14 @@
                                                 cursor-pointer font-light)))
                             (onclick
                              "window.scrollTo({ top: 0, behavior: 'smooth' })"))
-                         "⬆️ back to the top")))
-            (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
-                                             align-center items-center))))
-                 ,(em "version:")
-                 ,(mono (format #f "~a"
-                                (get-short-commit-sha))
-                        #:size '(text-sm)
-                        #:weight '(font-light))))))
+                         "⬆️ back to the top"))
+                 (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
+                                                  align-center items-center))))
+                      ,(em "version:")
+                      ,(mono (format #f "~a"
+                                     (get-short-commit-sha))
+                             #:size '(text-sm)
+                             #:weight '(font-light)))))))
 
 (begin
   (define* (html-template G_
