@@ -56,7 +56,17 @@
                  ,(a "https://jointhefreeworld.org/manuals/lucidplan/"
                      #:size '(text-sm)))
             ,(em (G_ "Copyright © Josep Bigorra  &lt;jjbigorra@gmail.com&gt;"))
-
+            (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-8
+                                             align-center items-center))))
+                 (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
+                                                  align-center items-center))))
+                      (a (@ (href "javascript:void(0)")
+                            (class ,(mk-class '(no-underline text-onyx-500
+                                                dark:text-stone-300
+                                                cursor-pointer font-light)))
+                            (onclick
+                             "window.scrollTo({ top: 0, behavior: 'smooth' })"))
+                         "⬆️ back to the top")))
             (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
                                              align-center items-center))))
                  ,(em "version:")
