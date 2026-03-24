@@ -322,7 +322,8 @@
                                                        (filter
                                                         only-rejected-tickets-filter
                                                         tickets))))
-                                      '()))))
+                                      '())))
+         (fallback-no-ticket-list `(,(p (G_ "Wow.. it's really empty here")))))
     (html-template G_
                    #:is-logged-in is-logged-in
                    #:body `(div (@ (class ,(mk-class '(px-4 py-4))))
@@ -466,7 +467,16 @@
                                                                         "show rejected?"))))))
 
                                       ,search-param-components
-                                      ,ticket-list
+                                      ,(cond
+                                         ((nil? ticket-list)
+                                          fallback-no-ticket-list)
+                                         ((and (nil? (filter
+                                                      only-active-tickets-filter
+                                                      ticket-list))
+                                               (not (or with-done
+                                                        with-rejected)))
+                                          fallback-no-ticket-list)
+                                         (else ticket-list))
                                       ,done-ticket-list
                                       ,rejected-ticket-list)))
                    #:proj projects)))

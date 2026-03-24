@@ -4,3 +4,4 @@ tmp/*
 *.log
 en-GB.html
 env.scm
+.nrepl-port
