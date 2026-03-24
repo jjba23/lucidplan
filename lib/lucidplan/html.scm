@@ -48,12 +48,14 @@
             (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
                                              align-center items-center))))
                  ,(em (G_ "find the source code here"))
-                 ,(a "https://codeberg.org/jjba23/lucidplan"
+                 ,(a "codeberg.org/jjba23/lucidplan"
+                     #:href "https://codeberg.org/jjba23/lucidplan"
                      #:size '(text-sm)))
             (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
                                              align-center items-center))))
                  ,(em (G_ "find the manual here"))
-                 ,(a "https://jointhefreeworld.org/manuals/lucidplan/"
+                 ,(a "jointhefreeworld.org/manuals/lucidplan/"
+                     #:href "https://jointhefreeworld.org/manuals/lucidplan/"
                      #:size '(text-sm)))
             ,(em (G_ "Copyright © Josep Bigorra  &lt;jjbigorra@gmail.com&gt;"))
             (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-8
@@ -67,8 +69,12 @@
                             (onclick
                              "window.scrollTo({ top: 0, behavior: 'smooth' })"))
                          "⬆️ back to the top"))
-                 (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
-                                                  align-center items-center))))
+                 (div (@ (class ,(mk-class '(flex flex-row
+                                                  flex-wrap
+                                                  gap-2
+                                                  align-center
+                                                  justify-center
+                                                  items-center))))
                       ,(em "version:")
                       ,(mono (format #f "~a"
                                      (get-short-commit-sha))
