@@ -92,27 +92,25 @@
                                         flex-wrap
                                         gap-3
                                         p-3
-                                        bg-stone-300
-                                        dark:bg-onyx-700
+                                        bg-asparagus-500/90
+                                        dark:bg-asparagus-900/50
                                         items-center
                                         justify-left
-                                        shadow-lg))))
+                                        shadow-2xl))))
             (div (@ (class ,(mk-class '(px-4 py-1 w-full md:w-48))))
                  (a (@ (href "/")
                        (class ,(mk-class '(flex flex-row gap-2 items-center
-                                                no-underline
-                                                hover:text-asparagus-700))))
+                                                no-underline))))
                     ,(h4 (list (icon #:type 'scroll
-                                     #:icon-css '(text-xl text-onyx-300
+                                     #:icon-css '(text-xl text-stone-300
                                                   dark:text-stone-300
-                                                  hover:text-asparagus-700
-                                                  hover:dark:text-teal-300))
+                                                  hover:text-white
+                                                  hover:dark:text-white))
                                "&nbsp;"
-                               `(span (@ (class ,(mk-class '(hover:text-asparagus-700))))
-                                      ,(G_ "LucidPlan")))
-                         #:color '(text-onyx-300 dark:text-stone-300
-                                                 hover:text-teal-700
-                                                 hover:dark:text-teak-300)
+                               `(span ,(G_ "LucidPlan")))
+                         #:color '(text-stone-300 dark:text-stone-300
+                                                  hover:text-white
+                                                  hover:dark:text-white)
                          #:size '(text-xl))))
             ,(if (not is-logged-in)
                  `((a (@ (class ,(mk-class '(lowercase font-sans font-medium
@@ -186,7 +184,7 @@
             ,(if (nil? proj)
                  '()
                  `((select (@ (onchange "window.location.href=this.value;")
-                              (class ,(mk-class '(text-md text-onyx-900
+                              (class ,(mk-class '(text-md text-stone-100
                                                           dark:text-stone-100
                                                           bg-transparent
                                                           font-medium
