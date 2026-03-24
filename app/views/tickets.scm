@@ -296,7 +296,8 @@
                                         (h2 (@ (class ,(mk-class '(text-lg
                                                                    font-sans
                                                                    font-black
-                                                                   text-stone-600
+                                                                   text-onyx-700
+                                                                   dark:text-stone-300
                                                                    flex
                                                                    flex-row
                                                                    gap-2
@@ -325,7 +326,8 @@
                                             (h2 (@ (class ,(mk-class '(text-lg
                                                                        font-sans
                                                                        font-black
-                                                                       text-stone-600
+                                                                       text-onyx-700
+                                                                       dark:text-stone-300
                                                                        flex
                                                                        flex-row
                                                                        gap-2
