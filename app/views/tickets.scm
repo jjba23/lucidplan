@@ -538,125 +538,91 @@
                            (is-edit #f)
                            (projects '())
                            (is-logged-in #f))
-  (define form_
-    `((div (form (@ (enctype "application/x-www-form-urlencoded")
-                    (method POST)
-                    (action ,action))
+  
+  (let* ( ; Consolidate Reusable CSS Classes
+          (form-face (mk-class '(flex flex-col gap-8)))
+         (field-face (mk-class '(max-w-128)))
+         (label-face (mk-class '(text-onyx-700 dark:text-stone-300)))
 
-                 (div (@ (class ,(mk-class '(flex flex-col gap-8))))
+         ;;  Format Data Safely
+         (safe-title (html-unescape title))
+         (safe-desc (html-unescape description))
+         (safe-prio (or priority 0)) ;Scheme idiom: if priority is #f, use 0
+         
+         ;; Dynamically generate dropdown options using `map`
+         (status-opts (map (lambda (opt)
+                             (glyph-option #:value (car opt)
+                                           #:glyph (emoji-for-ticket-status (car
+                                                                             opt))
+                                           #:content (G_ (cadr opt))
+                                           #:selected-value ticket-status))
+                           '(("todo" "To-do")
+                             ("work-in-progress" "Work in Progress")
+                             ("in-review" "In Review")
+                             ("done" "Done")
+                             ("rejected" "Rejected"))))
 
-                      ,(input #:label (G_ "title")
-                              #:name "title"
-                              #:value (html-unescape title)
-                              #:required #t)
-                      (div (@ (class ,(mk-class '(max-w-128))))
-                           (label (@ (class ,(mk-class '(text-onyx-700
-                                                         dark:text-stone-300))))
-                                  ,(G_ "status"))
-                           (div ,(select #:name 'ticket-status
-                                         #:on-change ""
-                                         #:options (list (glyph-option #:value
-                                                          "todo"
-                                                          #:glyph (emoji-for-ticket-status
-                                                                   "todo")
-                                                          #:content (G_
-                                                                     "To-do")
-                                                          #:selected-value
-                                                          ticket-status)
-                                                         (glyph-option #:value
-                                                          "work-in-progress"
-                                                          #:glyph (emoji-for-ticket-status
-                                                                   "work-in-progress")
-                                                          #:content (G_
-                                                                     "Work in Progress")
-                                                          #:selected-value
-                                                          ticket-status)
-                                                         (glyph-option #:value
-                                                          "in-review"
-                                                          #:glyph (emoji-for-ticket-status
-                                                                   "in-review")
-                                                          #:content (G_
-                                                                     "In Review")
-                                                          #:selected-value
-                                                          ticket-status)
-                                                         (glyph-option #:value
-                                                          "done"
-                                                          #:glyph (emoji-for-ticket-status
-                                                                   "done")
-                                                          #:content (G_ "Done")
-                                                          #:selected-value
-                                                          ticket-status)
-                                                         (glyph-option #:value
-                                                          "rejected"
-                                                          #:glyph (emoji-for-ticket-status
-                                                                   "rejected")
-                                                          #:content (G_
-                                                                     "Rejected")
-                                                          #:selected-value
-                                                          ticket-status))))
+         (type-opts (map (lambda (opt)
+                           (glyph-option #:value (car opt)
+                                         #:glyph (emoji-for-ticket-type (car
+                                                                         opt))
+                                         #:content (G_ (cadr opt))
+                                         #:selected-value ticket-type))
+                         '(("task" "Task")
+                           ("bug" "Bug")
+                           ("story" "Story")
+                           ("spike" "Spike")
+                           ("time-box" "Time Box"))))
 
-                           )
-                      (div (@ (class ,(mk-class '(max-w-128))))
-                           (label (@ (class ,(mk-class '(text-onyx-700
-                                                         dark:text-stone-300))))
-                                  ,(G_ "type"))
-                           (div ,(select #:name 'ticket-type
-                                         #:on-change ""
-                                         #:options (list (glyph-option #:value
-                                                          "task"
-                                                          #:glyph (emoji-for-ticket-type
-                                                                   "task")
-                                                          #:content (G_ "Task")
-                                                          #:selected-value
-                                                          ticket-type)
-                                                         (glyph-option #:value
-                                                          "bug"
-                                                          #:glyph (emoji-for-ticket-type
-                                                                   "bug")
-                                                          #:content (G_ "Bug")
-                                                          #:selected-value
-                                                          ticket-type)
-                                                         (glyph-option #:value
-                                                          "story"
-                                                          #:glyph (emoji-for-ticket-type
-                                                                   "story")
-                                                          #:content (G_
-                                                                     "Story")
-                                                          #:selected-value
-                                                          ticket-type)
-                                                         (glyph-option #:value
-                                                          "spike"
-                                                          #:glyph (emoji-for-ticket-type
-                                                                   "spike")
-                                                          #:content (G_
-                                                                     "Spike")
-                                                          #:selected-value
-                                                          ticket-type)
-                                                         (glyph-option #:value
-                                                          "time-box"
-                                                          #:glyph (emoji-for-ticket-type
-                                                                   "time-box")
-                                                          #:content (G_
-                                                                     "Time Box")
-                                                          #:selected-value
-                                                          ticket-type)))))
-                      (div (@ (class ,(mk-class '(max-w-128))))
-                           ,(input #:label (G_ "priority")
-                                   #:name "priority"
-                                   #:required #f
-                                   #:type 'number
-                                   #:value (if (not priority) 0 priority)))
+         ;; Build the Form SXML
+         (form-sxml `(form (@ (enctype "application/x-www-form-urlencoded")
+                              (method POST)
+                              (action ,action))
 
-                      ,(textarea #:label (G_ "description")
-                                 #:name "description"
-                                 #:required #f
-                                 #:value (html-unescape description))
+                           (div (@ (class ,form-face))
 
-                      (div ,(submit-button (G_ "submit"))))))))
+                                ;; Title
+                                ,(input #:label (G_ "title")
+                                        #:name "title"
+                                        #:value safe-title
+                                        #:required #t)
 
-  (html-template G_
-                 #:is-logged-in is-logged-in
-                 #:body `((div (@ (class ,(mk-class '(px-4 py-4))))
-                               (div ,form_)))
-                 #:proj projects))
+                                ;; Status
+                                (div (@ (class ,field-face))
+                                     (label (@ (class ,label-face))
+                                            ,(G_ "status"))
+                                     (div ,(select #:name 'ticket-status
+                                                   #:on-change ""
+                                                   #:options status-opts)))
 
+                                ;; Type
+                                (div (@ (class ,field-face))
+                                     (label (@ (class ,label-face))
+                                            ,(G_ "type"))
+                                     (div ,(select #:name 'ticket-type
+                                                   #:on-change ""
+                                                   #:options type-opts)))
+
+                                ;; Priority
+                                (div (@ (class ,field-face))
+                                     ,(input #:label (G_ "priority")
+                                             #:name "priority"
+                                             #:required #f
+                                             #:type 'number
+                                             #:value safe-prio))
+
+                                ;; Description
+                                ,(textarea #:label (G_ "description")
+                                           #:name "description"
+                                           #:required #f
+                                           #:value safe-desc)
+
+                                ;; Submit Button
+                                (div ,(submit-button (G_ "submit")))))))
+    
+    ;; Render final template
+    (html-template G_
+                   #:is-logged-in is-logged-in
+                   #:body `((div (@ (class ,(mk-class '(px-4 py-4))))
+                                 ,form-sxml))
+                   #:proj projects)))
