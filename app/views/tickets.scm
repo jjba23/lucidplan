@@ -45,61 +45,204 @@
                           html-new-ticket-form html-edit-ticket-form
                           html-ticket-form))
 
+(define (render-ticket G_ project ticket)
+  (let* ( ;Extract Ticket Data (No more repetitive assoc-ref lookups)
+          (id (assoc-ref ticket "id"))
+         (human-id (assoc-ref ticket "human_id"))
+         (title (assoc-ref ticket "title"))
+         (status (assoc-ref ticket "ticket_status"))
+         (type (assoc-ref ticket "ticket_type"))
+         (desc (assoc-ref ticket "description"))
+         (priority (assoc-ref ticket "priority"))
 
+         ;; Consolidate Reusable CSS Classes
+         (card-face (mk-class '(flex flex-col
+                                     gap-2
+                                     px-6
+                                     py-10
+                                     bg-stone-100
+                                     dark:bg-onyx-900
+                                     rounded-2xl
+                                     dark:border-onyx-100/75
+                                     border-stone-300/75
+                                     shadow-md
+                                     border-2)))
+         (label-face (mk-class '(font-sans text-onyx-700 dark:text-stone-300
+                                           text-md font-light)))
+         (val-face (mk-class '(font-sans text-onyx-700 dark:text-stone-300
+                                         text-md ml-4)))
+
+         ;; Pre-calculate URLs and JS callbacks
+         (toggle-js (format #f
+                     "document.getElementById('details-~a').toggleAttribute('hidden')"
+                     id))
+         (edit-url (format #f "/tickets/~a/id/~a/edit" project human-id))
+         (delete-url (format #f "/tickets/~a/delete" project)))
+    
+    ;; Render the clean SXML
+    `((div (@ (class ,card-face))
+
+           ;; Header
+           (div (@ (class ,(mk-class '(flex flex-row justify-between))))
+                ,(h4 (org2html title))
+                (div (@ (class ,(mk-class '(flex justify-right))))
+                     (span (@ (class ,(mk-class '(cursor-pointer)))
+                              (onclick ,toggle-js))
+                           ,(icon #:type 'x
+                                  #:icon-css '(text-onyx-700
+                                               dark:text-stone-300 text-xl)))))
+
+           ;; Meta Info (Status & Type)
+           (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-8
+                                            justify-left))))
+
+                ;; Status
+                (div (@ (class ,(mk-class '(flex flex-col gap-3))))
+                     (small (@ (class ,label-face))
+                            ,(G_ "status"))
+                     (div (@ (class ,(mk-class '(flex gap-2 items-center))))
+                          (span (@ (class ,(mk-class '(text-2xl))))
+                                ,(emoji-for-ticket-status status))
+                          ,(p status)))
+
+                ;; Type
+                (div (@ (class ,(mk-class '(flex flex-col gap-3))))
+                     (small (@ (class ,label-face))
+                            ,(G_ "type"))
+                     (div (@ (class ,(mk-class '(ml-4 flex gap-2 items-center))))
+                          (span (@ (class ,(mk-class '(text-2xl))))
+                                ,(emoji-for-ticket-type type))
+                          ,(p type))))
+
+           ;; Description
+           (small (@ (class ,label-face))
+                  ,(G_ "description"))
+           (span (@ (class ,(mk-class '(text-md py-3
+                                                text-onyx-700
+                                                dark:text-stone-300
+                                                font-medium
+                                                font-sans
+                                                max-w-prose
+                                                whitespace-pre-wrap
+                                                ml-4))))
+                 ,(org2html desc))
+
+           ,(hr)
+
+           ;; Ticket Details
+           (small (@ (class ,label-face))
+                  ,(G_ "human id"))
+           (small (@ (class ,val-face))
+                  ,(format #f "~a-~s" project human-id))
+
+           (small (@ (class ,label-face))
+                  ,(G_ "priority"))
+           (small (@ (class ,val-face))
+                  ,priority)
+
+           (small (@ (class ,label-face))
+                  ,(G_ "id"))
+           (small (@ (class ,val-face))
+                  ,id)
+
+           ,(hr)
+
+           ;; Action Buttons
+           (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-4))))
+                (a (@ (href ,edit-url))
+                   ,(icon-button #:icon 'pencil
+                                 #:content (G_ "edit ticket")
+                                 #:icon-css '(text-md text-onyx-700
+                                                      dark:text-stone-300)))
+                (form (@ (enctype application/x-www-form-urlencoded)
+                         (method POST)
+                         (action ,delete-url))
+                      (input (@ (hidden "")
+                                (name id)
+                                (value ,id)))
+                      ,(danger-submit-button `(span (@ (class ,(mk-class '(items-center
+                                                                           flex
+                                                                           flex-row
+                                                                           gap-1))))
+                                                    (,(icon #:type 'trash
+                                                            #:icon-css '(text-stone-300
+                                                                         dark:text-stone-300
+                                                                         text-lg)))
+                                                    ,(G_ "delete")))))))))
 
 (define (render-ticket-listitem G_ project ticket ticket-id-to-human-id)
-  `((div (@ (class ,(mk-class '(flex flex-col gap-2)))
-            (id ,(format #f "listitem-~a"
-                         (assoc-ref ticket "id"))))
-         (div (@ (onclick ,(format #f
-                            "document.getElementById('details-~a').toggleAttribute('hidden')"
-                            (assoc-ref ticket "id")))
-                 (class ,(mk-class '(flex flex-row
-                                          gap-4
-                                          items-center
-                                          justify-left
-                                          bg-stone-300/75
-                                          dark:bg-onyx-700
-                                          dark:border-onyx-100/75
-                                          border-stone-300/75
-                                          shadow-md
-                                          border-2
-                                          py-2
-                                          px-4
-                                          shadow
-                                          cursor-pointer
-                                          rounded-xl))))
-              ,(emoji-for-ticket-type (assoc-ref ticket "ticket_type"))
-              (h5 (@ (class ,(mk-class '(font-sans text-onyx-700
-                                                   dark:text-stone-300
-                                                   text-md
-                                                   font-bold
-                                                   break-words
-                                                   max-w-196
-                                                   leading-6
-                                                   truncate))))
-                  ,(org2html (assoc-ref ticket "title")))
+  (let* ( ;Extract Ticket Data
+          (id (assoc-ref ticket "id"))
+         (human-id (assoc-ref ticket "human_id"))
+         (title (assoc-ref ticket "title"))
+         (type (assoc-ref ticket "ticket_type"))
 
-              (div (a (@ (class ,(mk-class '(flex flex-row
-                                                  flex-wrap
-                                                  gap-2
-                                                  items-center
-                                                  justify-start
-                                                  no-underline)))
-                         (href ,(format #f "/tickets/~a/id/~a" project
-                                        (assoc-ref ticket "human_id"))))
-                      ,(icon #:type 'link
-                             #:icon-css '(text-md text-onyx-700
-                                          dark:text-stone-300
-                                          hover:text-asparagus-500
-                                          hover:dark:text-asparagus-300)))))
-         (div (@ (id ,(format #f "details-~a"
-                              (assoc-ref ticket "id")))
-                 (class "ml-4")
-                 (hidden ""))
-              ,(render-ticket G_ project ticket)))
+         ;; Pre-calculate IDs, URLs, and JS
+         (item-id (format #f "listitem-~a" id))
+         (details-id (format #f "details-~a" id))
+         ;; We can reuse the details-id variable directly in the toggle JS!
+         (toggle-js (format #f
+                     "document.getElementById('~a').toggleAttribute('hidden')"
+                     details-id))
+         (ticket-url (format #f "/tickets/~a/id/~a" project human-id))
+
+         ;; Consolidate CSS Classes
+         (wrapper-face (mk-class '(flex flex-col gap-2)))
+         (header-face (mk-class '(flex flex-row
+                                       gap-4
+                                       items-center
+                                       justify-left
+                                       bg-stone-300/75
+                                       dark:bg-onyx-700
+                                       dark:border-onyx-100/75
+                                       border-stone-300/75
+                                       shadow-md
+                                       border-2
+                                       py-2
+                                       px-4
+                                       shadow
+                                       cursor-pointer
+                                       rounded-xl)))
+         (title-face (mk-class '(font-sans text-onyx-700
+                                           dark:text-stone-300
+                                           text-md
+                                           font-bold
+                                           break-words
+                                           max-w-196
+                                           leading-6
+                                           truncate)))
+         (link-face (mk-class '(flex flex-row
+                                     flex-wrap
+                                     gap-2
+                                     items-center
+                                     justify-start
+                                     no-underline))))
     
-    ))
+    ;; Render the clean SXML
+    `((div (@ (class ,wrapper-face)
+              (id ,item-id))
+
+           ;; Clickable Header Row
+           (div (@ (onclick ,toggle-js)
+                   (class ,header-face))
+                ,(emoji-for-ticket-type type)
+                (h5 (@ (class ,title-face))
+                    ,(org2html title))
+
+                ;; Direct Link Icon
+                (div (a (@ (class ,link-face)
+                           (href ,ticket-url))
+                        ,(icon #:type 'link
+                               #:icon-css '(text-md text-onyx-700
+                                            dark:text-stone-300
+                                            hover:text-asparagus-500
+                                            hover:dark:text-asparagus-300)))))
+
+           ;; Expandable Details Container
+           (div (@ (id ,details-id)
+                   (class "ml-4")
+                   (hidden ""))
+                ,(render-ticket G_ project ticket))))))
 
 (define* (html-from-tickets G_
                             #:key is-logged-in
