@@ -619,7 +619,7 @@
 
                       ,(textarea #:label (G_ "description")
                                  #:name "description"
-                                 #:required #t
+                                 #:required #f
                                  #:value (html-unescape description))
 
                       (div ,(submit-button (G_ "submit"))))))))
