@@ -138,10 +138,7 @@
          (small (@ (class ,(mk-class '(font-mono text-onyx-700
                                                  dark:text-stone-500 text-sm))))
                 ,(format #f "~a"
-                         (assoc-ref p "human_id")))
-         (small (@ (class ,(mk-class '(font-mono text-onyx-700
-                                                 dark:text-stone-300 text-sm))))
-                ,(assoc-ref p "id")))))
+                         (assoc-ref p "human_id"))))))
 
 (define (render-project-list-item G_ p)
   `((div (@ (class ,(mk-class '(flex flex-row

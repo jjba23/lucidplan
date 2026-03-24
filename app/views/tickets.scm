@@ -141,11 +141,6 @@
            (small (@ (class ,val-face))
                   ,priority)
 
-           (small (@ (class ,label-face))
-                  ,(G_ "id"))
-           (small (@ (class ,val-face))
-                  ,id)
-
            ,(hr)
 
            ;; Action Buttons
