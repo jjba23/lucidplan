@@ -45,126 +45,7 @@
                           html-new-ticket-form html-edit-ticket-form
                           html-ticket-form))
 
-(define (render-ticket G_ project ticket)
-  `((div (@ (class ,(mk-class '(flex flex-col
-                                     gap-2
-                                     px-6
-                                     py-10
-                                     bg-stone-100
-                                     dark:bg-onyx-900
-                                     rounded-2xl
-                                     dark:border-onyx-100/75
-                                     border-stone-300/75
-                                     shadow-md
-                                     border-2))))
-         (div (@ (class ,(mk-class '(flex flex-row justify-between))))
-              ,(h4 (org2html (assoc-ref ticket "title")))
-              (div (@ (class ,(mk-class '(flex justify-right))))
-                   (span (@ (class ,(mk-class '(cursor-pointer)))
-                            (onclick ,(format #f
-                                       "document.getElementById('details-~a').toggleAttribute('hidden')"
-                                       (assoc-ref ticket "id"))))
-                         ,(icon #:type 'x
-                                #:icon-css '(text-onyx-700 dark:text-stone-300
-                                             text-xl)))))
 
-         (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-8
-                                          justify-left))))
-
-              (div (@ (class ,(mk-class '(flex flex-col gap-3))))
-                   (small (@ (class ,(mk-class '(font-sans text-onyx-700
-                                                 dark:text-stone-300 text-md
-                                                 font-light))))
-                          ,(G_ "status"))
-                   (div (@ (class ,(mk-class '(flex gap-2 items-center))))
-                        (span (@ (class ,(mk-class '(text-2xl))))
-                              ,(emoji-for-ticket-status (assoc-ref ticket
-                                                         "ticket_status")))
-                        ,(p (assoc-ref ticket "ticket_status"))))
-
-              (div (@ (class ,(mk-class '(flex flex-col gap-3))))
-                   (small (@ (class ,(mk-class '(font-sans text-onyx-700
-                                                 dark:text-stone-400 text-md
-                                                 font-light))))
-                          ,(G_ "type"))
-                   (div (@ (class ,(mk-class '(ml-4 flex gap-2 items-center))))
-                        (span (@ (class ,(mk-class '(text-2xl))))
-                              ,(emoji-for-ticket-type (assoc-ref ticket
-                                                       "ticket_type")))
-                        ,(p (assoc-ref ticket "ticket_type")))))
-
-         (small (@ (class ,(mk-class '(font-sans text-onyx-700
-                                                 dark:text-stone-300 text-md
-                                                 font-light))))
-                ,(G_ "description"))
-         (span (@ (class ,(mk-class '(text-md py-3
-                                              text-onyx-700
-                                              dark:text-stone-300
-                                              font-medium
-                                              font-sans
-                                              max-w-prose
-                                              whitespace-pre-wrap
-                                              ml-4))))
-               ,(org2html (assoc-ref ticket "description")))
-
-         ,(hr)
-
-         (small (@ (class ,(mk-class '(font-sans text-onyx-700
-                                                 dark:text-stone-300 text-md
-                                                 font-light))))
-                ,(G_ "human id"))
-         (small (@ (class ,(mk-class '(font-sans text-onyx-700
-                                                 dark:text-stone-300 text-md
-                                                 ml-4))))
-                ,(format #f "~a-~s" project
-                         (assoc-ref ticket "human_id")))
-
-         (small (@ (class ,(mk-class '(font-sans text-onyx-700
-                                                 dark:text-stone-300 text-md
-                                                 font-light))))
-                ,(G_ "priority"))
-
-         (small (@ (class ,(mk-class '(font-sans text-onyx-700
-                                                 dark:text-stone-300 text-md
-                                                 ml-4))))
-                ,(format #f "~a"
-                         (assoc-ref ticket "priority")))
-
-         (small (@ (class ,(mk-class '(font-sans text-onyx-700
-                                                 dark:text-stone-300 text-md
-                                                 font-light))))
-                ,(G_ "id"))
-         (small (@ (class ,(mk-class '(font-sans text-onyx-700
-                                                 dark:text-stone-300 text-md
-                                                 ml-4))))
-                ,(assoc-ref ticket "id"))
-
-         ,(hr)
-         (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-4))))
-              (a (@ (href ,(format #f "/tickets/~a/id/~a/edit" project
-                                   (assoc-ref ticket "human_id"))))
-
-                 ,(icon-button #:icon 'pencil
-                               #:content (G_ "edit ticket")
-                               #:icon-css '(text-md text-onyx-700
-                                                    dark:text-stone-300)))
-              (form (@ (enctype application/x-www-form-urlencoded)
-                       (method POST)
-                       (action ,(format #f "/tickets/~a/delete" project)))
-                    (input (@ (hidden "")
-                              (name id)
-                              (value ,(assoc-ref ticket "id"))))
-                    ,(danger-submit-button `(span (@ (class ,(mk-class '(items-center
-                                                                         flex
-                                                                         flex-row
-                                                                         gap-1))))
-                                                  (,(icon #:type 'trash
-                                                          #:icon-css '(text-stone-300
-                                                                       dark:text-stone-300
-                                                                       text-lg)))
-                                                  ,(G_ "delete")))))
-
-         )))
 
 (define (render-ticket-listitem G_ project ticket ticket-id-to-human-id)
   `((div (@ (class ,(mk-class '(flex flex-col gap-2)))
@@ -469,12 +350,6 @@
                                       ,search-param-components
                                       ,(cond
                                          ((nil? ticket-list)
-                                          fallback-no-ticket-list)
-                                         ((and (nil? (filter
-                                                      only-active-tickets-filter
-                                                      ticket-list))
-                                               (not (or with-done
-                                                        with-rejected)))
                                           fallback-no-ticket-list)
                                          (else ticket-list))
                                       ,done-ticket-list
