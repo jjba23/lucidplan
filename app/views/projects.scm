@@ -177,7 +177,7 @@
          (p (@ (class ,(mk-class '(font-sans text-stone-600
                                              dark:text-stone-500
                                              text-md
-                                             leading-6
+                                             leading-7
                                              max-w-196
                                              break-words
                                              truncate))))
@@ -303,7 +303,20 @@
                                                     #:name "description"
                                                     #:value (html-unescape
                                                              description)
-                                                    #:required #f)
+                                                    #:required #f
+                                                    #:textarea-css '(leading-7
+                                                                     p-4
+                                                                     rounded-xl
+                                                                     border-stone-700
+                                                                     dark:border-onyx-100
+                                                                     dark:text-stone-300
+                                                                     dark:bg-onyx-700/75
+                                                                     bg-stone-300/75
+                                                                     border-2
+                                                                     min-h-72
+                                                                     min-w-90
+                                                                     shadow-md
+                                                                     min-w-prose))
 
                                          (div ,(submit-button (G_ "submit"))))))
                  #:proj projects))

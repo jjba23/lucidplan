@@ -124,6 +124,7 @@
                                                 font-sans
                                                 max-w-prose
                                                 whitespace-pre-wrap
+                                                leading-7
                                                 ml-4))))
                  ,(org2html desc))
 
@@ -588,7 +589,19 @@
                                 ,(textarea #:label (G_ "description")
                                            #:name "description"
                                            #:required #f
-                                           #:value safe-desc)
+                                           #:value safe-desc
+                                           #:textarea-css '(leading-7 p-4
+                                                            rounded-xl
+                                                            border-stone-700
+                                                            dark:border-onyx-100
+                                                            dark:text-stone-300
+                                                            dark:bg-onyx-700/75
+                                                            bg-stone-300/75
+                                                            border-2
+                                                            min-h-72
+                                                            min-w-90
+                                                            shadow-md
+                                                            min-w-prose))
 
                                 ;; Submit Button
                                 (div ,(submit-button (G_ "submit")))))))

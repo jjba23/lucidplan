@@ -54,7 +54,8 @@
                    (div (@ (class ,(mk-class '(flex flex-row justify-left
                                                     items-center gap-2))))
                         ,(emoji-for-ticket-type (assoc-ref t "ticket_type"))
-                        ,(p (org2html (assoc-ref t "title"))))
+                        ,(p (org2html (assoc-ref t "title"))
+                            #:size '(text-md leading-7)))
 
                    (a (@ (class ,(mk-class '(text-md no-underline)))
                          (href ,(format #f "/tickets/~a/id/~a" project
