@@ -222,3 +222,6 @@ for higher concurrent writes to SQLite 3."
   ($ '("curl --output \"./pub/css/lucidplan.olive.min.css\""
        "\"https://codeberg.org/jjba23/olive-css/raw/branch/trunk/resources/css/lucidplan.olive.min.css\"")))
 
+(define (import-production-database)
+  "Import production env's database to local workspace via SSH/SCP"
+  ($ '("scp wolk-jjba:/etc/byggsteg/job-clone/lucidplan/trunk/lucidplan.db* .")))

@@ -18,5 +18,6 @@
                                    (#:maxlen 2048))
                       (created_at date-field
                                   (#:not-null))
-                      (updated_at date-field))
+                      (updated_at date-field)
+                      (deleted_at date-field))
 

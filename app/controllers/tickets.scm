@@ -204,10 +204,11 @@
         (define (do-delete)
           (let* ((body (alist-from-url-encoded-body (rc-body rc)))
                  (id (assoc-ref body "id")))
-            
-            ($ticket 'mod
-                     'row-delete
-                     (where #:id id))
+            (DB-query (DB-open rc)
+                      (->sql update
+                             'ticket set
+                             `((deleted_at ,(current-time)))
+                             (where #:id id)))
 
             (redirect-to rc
                          (string->uri (format #f "~a/tickets/~a"
