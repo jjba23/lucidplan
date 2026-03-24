@@ -11,7 +11,7 @@
                       (title char-field
                              (#:not-null #:maxlen 512))
                       (description char-field
-                                   (#:not-null #:maxlen 4096))
+                                   (#:maxlen 4096))
                       (ticket_status char-field
                                      (#:not-null #:maxlen 256))
                       (ticket_type char-field
