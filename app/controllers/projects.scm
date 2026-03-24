@@ -44,12 +44,12 @@
                                                    ((equal? #f user-search)
                                                     (->sql select * from
                                                      'project
-                                                     " ORDER BY title ASC"))
+                                                     " WHERE deleted_at IS NULL ORDER BY title ASC"))
                                                    (else (->sql select * from
                                                                 'project
                                                                 (format #f
                                                                         (string-join '
-                                                                         (" WHERE title LIKE '%~a%' OR description LIKE '%~a%' "
+                                                                         (" WHERE deleted_at IS NULL AND (title LIKE '%~a%' OR description LIKE '%~a%') "
                                                                           " ORDER BY title ASC ")
                                                                          " ")
                                                                         (html-escape

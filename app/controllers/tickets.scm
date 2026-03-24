@@ -128,7 +128,7 @@
                                                        (->sql select * from
                                                               'ticket
                                                               (format #f
-                                                               " WHERE project_id = '~a' ORDER BY ~a ~a"
+                                                               " WHERE project_id = '~a' AND deleted_at IS NULL ORDER BY ~a ~a"
                                                                project-id
                                                                (car query-sort)
                                                                (cadr
@@ -138,7 +138,7 @@
                                                                    'ticket
                                                                    (format #f
                                                                     (string-join '
-                                                                     (" WHERE project_id = '~a' "
+                                                                     (" WHERE project_id = '~a' AND deleted_at IS NULL "
                                                                       " AND (title LIKE '%~a%' OR description LIKE '%~a%') "
                                                                       " ORDER BY ~a ~a ")
                                                                      " ")
