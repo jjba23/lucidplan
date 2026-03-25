@@ -45,7 +45,7 @@
                           html-new-ticket-form html-edit-ticket-form
                           html-ticket-form))
 
-(define (render-ticket G_ project ticket)
+(define* (render-ticket G_ project ticket #:key (assignee #f))
   (let* ( ;Extract Ticket Data (No more repetitive assoc-ref lookups)
           (id (assoc-ref ticket "id"))
          (human-id (assoc-ref ticket "human_id"))
@@ -53,7 +53,7 @@
          (status (assoc-ref ticket "ticket_status"))
          (type (assoc-ref ticket "ticket_type"))
          (desc (assoc-ref ticket "description"))
-         (priority (assoc-ref ticket "priority"))
+         (priority (assoc-ref ticket "priority"))         
 
          ;; Consolidate Reusable CSS Classes
          (card-face (mk-class '(flex flex-col
@@ -136,10 +136,19 @@
            (small (@ (class ,val-face))
                   ,(format #f "~a-~s" project human-id))
 
-           (small (@ (class ,label-face))
-                  ,(G_ "priority"))
-           (small (@ (class ,val-face))
-                  ,priority)
+           ,(if (and (not (nil? priority)) (> priority 0))
+                `((small (@ (class ,label-face))
+                         ,(G_ "priority"))
+                  (small (@ (class ,val-face))
+                         ,(format #f "~a" priority)))
+                '())
+
+            ,(if (not (nil? assignee))
+                `((small (@ (class ,label-face))
+                         ,(G_ "assignee"))
+                  (small (@ (class ,val-face))
+                         ,(format #f "~a" assignee)))
+                '())
 
            ,(hr)
 
@@ -166,7 +175,7 @@
                                                                          text-lg)))
                                                     ,(G_ "delete")))))))))
 
-(define (render-ticket-listitem G_ project ticket ticket-id-to-human-id)
+(define (render-ticket-listitem G_ project ticket ticket-id-to-human-id ticket-assignee user-names)
   (let* ( ;Extract Ticket Data
           (id (assoc-ref ticket "id"))
          (human-id (assoc-ref ticket "human_id"))
@@ -238,7 +247,7 @@
            (div (@ (id ,details-id)
                    (class "ml-4")
                    (hidden ""))
-                ,(render-ticket G_ project ticket))))))
+                ,(render-ticket G_ project ticket #:assignee (assoc-ref user-names (assoc-ref ticket-assignee id))))))))
 
 (define* (html-from-tickets G_
                             #:key is-logged-in
@@ -247,6 +256,8 @@
                             project-details
                             tickets
                             ticket-id-to-human-id
+                            user-names
+                            ticket-assignee
                             with-done
                             with-rejected
                             search-query)
@@ -305,7 +316,7 @@
                                 (class ,(mk-class '(flex flex-col gap-2))))
                              ,(map (lambda (t)
                                      (render-ticket-listitem G_ proj-human-id
-                                      t ticket-id-to-human-id)) active-tickets))))
+                                      t ticket-id-to-human-id ticket-assignee user-names)) active-tickets))))
 
          (done-ticket-list (if with-done
                                `(div (@ (id lucidplan-done-tickets-list)
@@ -327,7 +338,7 @@
                                           ,(map (lambda (t)
                                                   (render-ticket-listitem G_
                                                    proj-human-id t
-                                                   ticket-id-to-human-id))
+                                                   ticket-id-to-human-id ticket-assignee user-names))
                                                 done-tickets)))
                                '()))
 
@@ -354,7 +365,8 @@
                                               ,(map (lambda (t)
                                                       (render-ticket-listitem
                                                        G_ proj-human-id t
-                                                       ticket-id-to-human-id))
+                                                       ticket-id-to-human-id
+                                                       ticket-assignee user-names))
                                                     rejected-tickets)))
                                    '()))
 
@@ -482,6 +494,7 @@
                                 #:key projects
                                 project
                                 t
+                                assignee
                                 is-logged-in)
   (html-ticket-form G_
                     #:is-logged-in is-logged-in
@@ -491,6 +504,7 @@
                     #:description (assoc-ref t "description")
                     #:ticket-type (assoc-ref t "ticket_type")
                     #:ticket-status (assoc-ref t "ticket_status")
+                    #:assignee assignee
                     #:priority (assoc-ref t "priority")
                     #:action (format #f "/tickets/~a/id/~a/edit" project
                                      (assoc-ref t "human_id"))
@@ -503,6 +517,7 @@
                            (ticket-status "")
                            (ticket-type "")
                            (priority 0)
+                           (assignee "")
                            (action "")
                            (is-edit #f)
                            (projects '())
@@ -516,7 +531,7 @@
          ;; Format Data Safely
          (safe-title (html-unescape title))
          (safe-desc (html-unescape description))
-         (safe-prio (or priority 0)) ;Scheme idiom: if priority is #f, use 0
+         (safe-prio (or priority 0)) 
          
          ;; Dynamically generate dropdown options using `map`
          (status-opts (map (lambda (opt)
@@ -582,11 +597,10 @@
 
                                 ;; Assignee
                                 ,(if is-edit
-                                     `((div
-                                        ,(input #:label (G_ "assignee")
-                                        #:name "assignee"
-                                        #:value ""
-                                        #:required #f)))
+                                     `((div ,(input #:label (G_ "assignee")
+                                                    #:name "assignee"
+                                                    #:value assignee
+                                                    #:required #f)))
                                      '())
 
                                 ;; Description

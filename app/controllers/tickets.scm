@@ -26,6 +26,7 @@
         (lucidplan html)
         (lucidplan domain)
         (app models ticket)
+        (app models user)        
         (app models ticket_assignee)
         (artanis security nss)
         (app models project))
@@ -169,7 +170,18 @@
                                                      #:condition (where
                                                                   #:project_id
                                                                   project-id)
-                                                     #:order-by '(human_id asc)))))
+                                                     #:order-by '(human_id asc))))
+                (user-names (map (lambda (t)
+                                   `(,(assoc-ref t "id") unquote
+                                     (assoc-ref t "username")))
+                                 ($user 'get
+                                        #:columns '(id username))))
+                (ticket-assignee (map (lambda (t)
+                                        `(,(assoc-ref t "ticket_id") unquote
+                                          (assoc-ref t "user_id")))
+                                      ($ticket_assignee 'get
+                                                        #:columns '(ticket_id
+                                                                    user_id)))))
            
            (response-emit (:mime rc
                                  (html-from-tickets (:i18n rc)
@@ -179,6 +191,9 @@
                                                     #:projects proj
                                                     #:project-details
                                                     project-details
+                                                    #:ticket-assignee
+                                                    ticket-assignee
+                                                    #:user-names user-names
                                                     #:tickets tickets
                                                     #:ticket-id-to-human-id
                                                     ticket-id-to-human-id
@@ -278,13 +293,22 @@
                 (t (car ($ticket 'get
                                  #:ret 'top
                                  #:condition (where #:human_id (params rc
-                                                                "human-id"))))))
+                                                                "human-id")))))
+                (assignee-data ($ticket_assignee 'get
+                                                 #:ret 'top
+                                                 #:condition (where
+                                                                    #:ticket_id
+                                                                    (assoc-ref
+                                                                     t "id"))))
+                (assignee (if (nil? assignee-data) ""
+                              (assoc-ref (car assignee-data) "user_id"))))
            (response-emit (:mime rc
                                  (html-edit-ticket-form (:i18n rc)
                                                         #:projects proj
                                                         #:project (params rc
                                                                    "project")
                                                         #:t t
+                                                        #:assignee assignee
                                                         #:is-logged-in (:cookies-value
                                                                         rc
                                                                         "x-bewaking-lucidplan"))))))
@@ -313,10 +337,11 @@
                                (priority ,priority)
                                (updated_at ,(current-time)))
                              (where #:human_id (params rc "human-id"))))
-
-            ($ticket_assignee 'set
-                              #:ticket_id ticket-id
-                              #:user_id (assoc-ref body "assignee"))
+            (DB-query (DB-open rc)
+                      (format #f
+                       "INSERT INTO ticket_assignee (user_id, ticket_id)
+                        VALUES ('~a', '~a') ON CONFLICT(ticket_id) DO UPDATE SET user_id = excluded.user_id"
+                       (assoc-ref body "assignee") ticket-id))
 
             (redirect-to rc
                          (string->uri (format #f "~a/tickets/~a"
