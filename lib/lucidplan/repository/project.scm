@@ -19,9 +19,11 @@
   #:declarative? #t
   #:use-module (srfi srfi-9)
   #:use-module (lucidplan prelude)
+  #:use-module (kracht prelude)
   #:use-module (artanis db)
   #:export (project-repository make-sqlite-project-repository
-                               project-repository? get-active-projects get-active-project-by-human-id))
+                               project-repository? get-active-projects
+                               get-active-project-by-human-id))
 
 ;; -- Record definition ---
 (define-record-type project-repository
@@ -36,28 +38,47 @@
   (apply (repo-get-active-projects repo)
          '()))
 
-(define (get-active-project-by-human-id repo)
+(define (get-active-project-by-human-id repo human-id)
   (apply (repo-get-active-project-by-human-id repo)
-         '()))
+         (list human-id)))
 
 ;; --- SQLite implementation ---
 (define (make-sqlite-project-repository rc)
+  (define project-columns
+    (string-join (map symbol->string
+                      '(id human_id
+                           title
+                           url
+                           vcs_url
+                           description
+                           created_at
+                           updated_at
+                           deleted_at)) ", "))
+
   (define (get-active-projects)
-    (let* ((query
-            "SELECT id, human_id, title, url, vcs_url, description,
-                          created_at, updated_at, deleted_at
-                   FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC")
+    (let* ((query (format #f
+                   "SELECT ~a
+                   FROM project WHERE deleted_at IS NULL
+                   ORDER BY human_id ASC"
+                   project-columns))
+           (_ (log-info "get-active-projects query:\n\t~a\n" query))
            (rows (DB-get-all-rows (DB-query (DB-open rc) query)))
-           (_ (write rows)))
+           (_ (log-info "get-active-projects rows:\n~a\n" rows)))
       rows))
 
-  (define (get-active-project-by-human-id)
-    (let* ((query
-            "SELECT id, human_id, title, url, vcs_url, description,
-                          created_at, updated_at, deleted_at
-                   FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC")
+  (define (get-active-project-by-human-id human-id)
+    (let* ((query (format #f
+                   "SELECT ~a
+                   FROM project WHERE deleted_at IS NULL AND human_id = '~a'
+                   LIMIT 1"
+                   project-columns human-id))
+           (_ (log-info "get-active-project-by-human-id query:
+	~a
+" query))
            (rows (DB-get-all-rows (DB-query (DB-open rc) query)))
-           (_ (write rows)))
-      rows))
+           (_ (log-info "get-active-project-by-human-id row:\n~a\n"
+                        (car rows))))
+      (if (nil? rows) #f
+          (car rows))))
 
   (make-project-repository get-active-projects get-active-project-by-human-id))

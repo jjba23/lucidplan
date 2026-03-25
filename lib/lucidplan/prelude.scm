@@ -17,5 +17,7 @@
 
 (define-module (lucidplan prelude)
   #:declarative? #t
-  #:export ())
+  #:export (log-debug))
+
+
 

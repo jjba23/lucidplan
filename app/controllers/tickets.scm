@@ -33,15 +33,10 @@
         (app models project)
         (hygguile hygguile))
 
-(define (project-id-from-human-id rc project)
-  (let ((p (DB-get-all-rows (DB-query (DB-open rc)
-                                      (format #f
-                                       "SELECT * FROM project WHERE human_id = '~a' AND deleted_at IS NULL LIMIT 1"
-                                       project)))))
-    (cond
-      ((null? p)
-       "")
-      (else (assoc-ref (car p) "id")))))
+(define (project-id-from-human-id rc human-id)
+  (let* ((project-repo (make-sqlite-project-repository rc))
+        (p (get-active-project-by-human-id project-repo human-id)))
+    (assoc-ref p "id")))
 
 (define (ticket-id-from-human-id human-id)
   (let ((p ($ticket 'get
