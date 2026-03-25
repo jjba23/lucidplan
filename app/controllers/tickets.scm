@@ -26,7 +26,7 @@
         (lucidplan html)
         (lucidplan domain)
         (app models ticket)
-        (app models user)        
+        (app models user)
         (app models ticket_assignee)
         (artanis security nss)
         (app models project))
@@ -365,7 +365,19 @@
                 (t (car ($ticket 'get
                                  #:ret 'top
                                  #:condition (where #:human_id (params rc
-                                                                "human-id"))))))
+                                                                "human-id")))))
+                (user-names (map (lambda (t)
+                                   `(,(assoc-ref t "id") unquote
+                                     (assoc-ref t "username")))
+                                 ($user 'get
+                                        #:columns '(id username))))
+                (ticket-assignee ($ticket_assignee 'get
+                                                   #:ret 'top
+                                                   #:columns '(user_id)
+                                                   #:condition (where
+                                                                      #:ticket_id
+                                                                      (assoc-ref
+                                                                       t "id")))))
            (response-emit (:mime rc
                                  (html-template (:i18n rc)
                                                 #:is-logged-in (:cookies-value
@@ -374,6 +386,18 @@
                                                 #:body `(div (@ (class "p-2"))
                                                              ,(render-ticket (:i18n
                                                                               rc)
-                                                               (params rc
-                                                                "project") t)))))))
+                                                               #:project (params
+                                                                          rc
+                                                                          "project")
+                                                               #:ticket t
+                                                               #:assignee (if (not
+                                                                               (nil?
+                                                                                ticket-assignee))
+                                                                              (assoc-ref
+                                                                               user-names
+                                                                               (assoc-ref
+                                                                                (car
+                                                                                 ticket-assignee)
+                                                                                "user_id"))
+                                                                              #f))))))))
        (get-single)))
