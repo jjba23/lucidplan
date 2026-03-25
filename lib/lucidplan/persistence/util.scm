@@ -22,16 +22,21 @@
   #:use-module (lucidplan prelude)
   #:use-module (kracht prelude)
   #:use-module (artanis db)
-  #:export (to-column-string db-row-sexp to-col from-col alist?))
+  #:export (symbols->sql-columns-list sql-row->scheme-alist
+                                      symbol->sql-column
+                                      sql-column->symbol
+                                      alist?
+                                      value->sql-literal
+                                      pair->sql-assignment))
 
-(define (to-col x)
+(define (symbol->sql-column x)
   (string-replace-substring (symbol->string x) "-" "_"))
 
-(define (from-col x)
+(define (sql-column->symbol x)
   (string->symbol (string-replace-substring x "_" "-")))
 
-(define (to-column-string xs)
-  (string-join (map to-col xs) ", "))
+(define (symbols->sql-columns-list xs)
+  (string-join (map symbol->sql-column xs) ", "))
 
 (define (alist? obj)
   (cond
@@ -43,10 +48,38 @@
      #f)
     (else (alist? (cdr obj)))))
 
-(define (db-row-sexp xs)
+(define (sql-row->scheme-alist xs)
   (cond
     ((alist? xs)
      (map (lambda (pair)
-            (cons (from-col (car pair))
+            (cons (sql-column->symbol (car pair))
                   (cdr pair))) xs))
     (else xs)))
+
+(define (pair->sql-assignment a)
+  (cond
+    ((number? (cdr a))
+     (format #f "~a = ~a"
+             (symbol->sql-column (car a))
+             (cdr a)))
+    ((eq? #t
+          (cdr a))
+     (format #f "~a = 1"
+             (symbol->sql-column (car a))))
+    ((eq? #f
+          (cdr a))
+     (format #f "~a = 0"
+             (symbol->sql-column (car a))))
+    (else (format #f "~a = '~a'"
+                  (symbol->sql-column (car a))
+                  (cdr a)))))
+
+(define (value->sql-literal a)
+  (cond
+    ((number? a)
+     (format #f "~a" a))
+    ((eq? #t a)
+     "1")
+    ((eq? #f a)
+     "0")
+    (else (format #f "'~a'" a))))

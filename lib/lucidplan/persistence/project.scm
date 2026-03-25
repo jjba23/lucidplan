@@ -89,11 +89,12 @@
                    "SELECT ~a
                    FROM project WHERE deleted_at IS NULL
                    ORDER BY human_id ASC"
-                   (to-column-string project-columns)))
+                   (symbols->sql-columns-list project-columns)))
            (_ (log-info "get-active-projects query:\n\t~a\n" query))
-           (rows (map db-row-sexp
+           (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query (DB-open rc) query))))
-           (_ (log-info "get-active-projects rows:\n~a\n" rows)))
+           (_ (log-info "get-active-projects rows: ~a\n"
+                        (length rows))))
       rows))
 
   (define (search-active-projects q)
@@ -102,49 +103,44 @@
                    FROM project WHERE deleted_at IS NULL
                    AND (title LIKE '%~a%' OR description LIKE '%~a%')
                    ORDER BY human_id ASC"
-                   (to-column-string project-columns) q q))
+                   (symbols->sql-columns-list project-columns) q q))
            (_ (log-info "search-active-projects query:\n\t~a\n" query))
-           (rows (map db-row-sexp
+           (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query (DB-open rc) query))))
-           (_ (log-info "search-active-projects rows:\n~a\n" rows)))
+           (_ (log-info "search-active-projects rows: ~a\n"
+                        (length rows))))
       rows))
 
   (define (get-active-project-by-human-id human-id)
     (let* ((query (format #f
-                   "SELECT ~a
-                   FROM project WHERE deleted_at IS NULL AND human_id = '~a'
-                   LIMIT 1"
-                   (to-column-string project-columns) human-id))
+                   "SELECT ~a FROM project
+                    WHERE deleted_at IS NULL AND human_id = '~a'
+                    LIMIT 1"
+                   (symbols->sql-columns-list project-columns) human-id))
            (_ (log-info "get-active-project-by-human-id query:
 	~a
 " query))
-           (rows (map db-row-sexp
+           (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query (DB-open rc) query))))
-           (_ (log-info "get-active-project-by-human-id row:\n~a\n"
-                        (car rows))))
+           (_ (log-info "get-active-project-by-human-id rows: ~a\n"
+                        (length rows))))
       (if (nil? rows) #f
           (car rows))))
 
   (define (update-project-by-human-id human-id attrs)
-    (let* ((query (format #f "UPDATE project SET
-                   ~a
-                   WHERE human_id = '~a'"
-                          (string-join (map (lambda (a)
-                                              (format #f "~a = '~a'"
-                                                      (to-col (car a))
-                                                      (cdr a))) attrs) ", ")
+    (let* ((query (format #f "UPDATE project SET ~a WHERE human_id = '~a'"
+                          (string-join (map pair->sql-assignment attrs) ", ")
                           human-id))
            (_ (log-info "update-project-by-human-id query:\n\t~a\n" query)))
       (DB-query (DB-open rc) query)))
 
   (define (insert-project attrs)
-    (let* ((query (format #f "INSERT INTO project (~a)
-                   VALUES (~a)"
-                          (to-column-string project-insert-columns)
-                          (string-join (map (lambda (c)
-                                              (format #f "'~a'"
-                                                      (assq-ref attrs c)))
-                                            project-insert-columns) ", ")))
+    (let* ((vals (map (lambda (x)
+                        (value->sql-literal (assq-ref attrs x)))
+                      project-insert-columns))
+           (query (format #f "INSERT INTO project (~a) VALUES (~a)"
+                          (symbols->sql-columns-list project-insert-columns)
+                          (string-join vals ", ")))
            (_ (log-info "insert-project query:\n\t~a\n" query)))
       (DB-query (DB-open rc) query)))
 
