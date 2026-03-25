@@ -49,8 +49,8 @@
      (lambda (rc)
        (define (do-get)
          (:mime rc
-                ($project 'get
-                          #:order-by '(human_id asc))))
+                (DB-get-all-rows (DB-query (DB-open rc)
+                                  "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC"))))
        (bewaking-api-endpoint #:token-name 'x-bewaking-lucidplan
                               #:needed-permissions '()
                               #:rc rc

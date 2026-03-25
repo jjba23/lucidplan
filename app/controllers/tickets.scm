@@ -32,10 +32,11 @@
         (app models project)
         (hygguile hygguile))
 
-(define (project-id-from-human-id project)
-  (let ((p ($project 'get
-                     #:ret 'top
-                     #:condition (where #:human_id project))))
+(define (project-id-from-human-id rc project)
+  (let ((p (DB-get-all-rows (DB-query (DB-open rc)
+                                      (format #f
+                                       "SELECT * FROM project WHERE human_id = '~a' AND deleted_at IS NULL LIMIT 1"
+                                       project)))))
     (cond
       ((null? p)
        "")
@@ -82,7 +83,8 @@
                                             "lucidplan-ticket-sort")))
                               (:cookies-value rc "lucidplan-ticket-sort"))
                              (else "last-edited-at-desc")))
-                (project-id (project-id-from-human-id (params rc "project")))
+                (project-id (project-id-from-human-id rc
+                                                      (params rc "project")))
                 (with-done (cond
                              ((not (equal? #f
                                            (get-from-qstr rc "with-done")))
@@ -126,8 +128,8 @@
                                   (equal? (:cookies-value rc
                                            "lucidplan-show-rejected") "true"))
                                  (else #f)))
-                (proj ($project 'get
-                                #:order-by '(human_id asc)))
+                (proj (DB-get-all-rows (DB-query (DB-open rc)
+                                        "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC")))
                 (query-sort (entity-sort-from-query user-sort))
                 (project-details (car ($project 'get
                                                 #:ret 'top
@@ -250,7 +252,8 @@
                  (ticket-type (assoc-ref body "ticket-type"))
                  (description (html-escape (assoc-ref body "description")))
                  (priority (string->number (assoc-ref body "priority")))
-                 (project-id (project-id-from-human-id (params rc "project")))
+                 (project-id (project-id-from-human-id rc
+                                                       (params rc "project")))
                  (new-uuid (string-replace-substring (generate-string-uuid)
                                                      "\n" "")))
             
@@ -281,8 +284,8 @@
      #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
        (define (get-edit)
-         (let* ((proj ($project 'get
-                                #:order-by '(title asc)))
+         (let* ((proj (DB-get-all-rows (DB-query (DB-open rc)
+                                        "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC")))
                 (t (car ($ticket 'get
                                  #:ret 'top
                                  #:condition (where #:human_id (params rc
@@ -353,8 +356,8 @@
      #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
        (define (get-single)
-         (let* ((proj ($project 'get
-                                #:order-by '(human_id asc)))
+         (let* ((proj (DB-get-all-rows (DB-query (DB-open rc)
+                                        "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC")))
                 (t (car ($ticket 'get
                                  #:ret 'top
                                  #:condition (where #:human_id (params rc
