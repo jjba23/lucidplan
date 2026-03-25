@@ -29,9 +29,10 @@
         (app models project))
 
 (define (project-id-from-human-id project)
-  (let ((p ($project 'get
-                     #:ret 'top
-                     #:condition (where #:human_id project))))
+  (let ((p (DB-get-all-rows (DB-query (DB-open rc)
+                                      (format #f
+                                       "SELECT * FROM project WHERE human_id = '~a' deleted_at IS NULL LIMIT 1"
+                                       project)))))
     (cond
       ((null? p)
        "")
@@ -44,8 +45,8 @@
      (lambda (rc)
        (define (get)
          (let* ((project-id (project-id-from-human-id (params rc "project")))
-                (proj ($project 'get
-                                #:order-by '(human_id asc)))
+                (proj (DB-get-all-rows (DB-query (DB-open rc)
+                                        "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC")))
                 (user-sort (cond
                              ((not (equal? #f
                                            (get-from-qstr rc "sort")))

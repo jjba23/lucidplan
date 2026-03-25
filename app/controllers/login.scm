@@ -90,8 +90,8 @@
      #:i18n '(cookie "lang")
      #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
-       (let* ((proj ($project 'get
-                              #:order-by '(human_id asc))))
+       (let* ((proj (DB-get-all-rows (DB-query (DB-open rc)
+                                        "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC"))))
          (begin
            (:cookies-set! rc
                           'x-bewaking-lucidplan "x-bewaking-lucidplan" "")

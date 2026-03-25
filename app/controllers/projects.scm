@@ -76,10 +76,10 @@
                                                       #:is-logged-in (:cookies-value
                                                                       rc
                                                                       "x-bewaking-lucidplan")
-                                                      #:projects ($project 'get
-                                                                           #:order-by '
-                                                                           (human_id
-                                                                            asc))))))
+                                                      #:projects (DB-get-all-rows
+                                                                  (DB-query (DB-open
+                                                                             rc)
+                                                                   "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC"))))))
        (get-new)))
 
 (post "/projects/delete"
@@ -153,10 +153,11 @@
                                                          #:is-logged-in (:cookies-value
                                                                          rc
                                                                          "x-bewaking-lucidplan")
-                                                         #:projects ($project 'get
-                                                                              #:order-by '
-                                                                              (human_id
-                                                                               asc))
+                                                         #:projects (DB-get-all-rows
+                                                                     (DB-query
+                                                                      (DB-open
+                                                                       rc)
+                                                                      "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC"))
                                                          #:project p)))))
 
        (get-edit)))
