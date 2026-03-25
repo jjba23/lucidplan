@@ -15,29 +15,49 @@
 ;; You should have received a copy of the GNU Affero General Public License
 ;; along with lucidplan.  If not, see <https://www.gnu.org/licenses/>.
 
-(define-module (lucidplan persistence project)
+(define-module (lucidplan repository project)
   #:declarative? #t
   #:use-module (srfi srfi-9)
   #:use-module (lucidplan prelude)
   #:use-module (artanis db)
   #:export (project-repository make-sqlite-project-repository
-                               project-repository? get-all-active-projects))
+                               project-repository? get-active-projects get-active-project-by-human-id))
 
+;; -- Record definition ---
 (define-record-type project-repository
-  (make-project-repository get-all-active-proc) project-repository?
-  (get-all-active-proc repo-get-all-active-projects))
+  (make-project-repository get-active-projects-proc
+                           get-active-project-by-human-id-proc)
+  project-repository?
+  (get-active-projects-proc repo-get-active-projects)
+  (get-active-project-by-human-id-proc repo-get-active-project-by-human-id))
 
-(define (get-all-active-projects repo)
-  (apply (repo-get-all-active-projects repo)
+;; --- DSL and wrappers ---
+(define (get-active-projects repo)
+  (apply (repo-get-active-projects repo)
          '()))
 
+(define (get-active-project-by-human-id repo)
+  (apply (repo-get-active-project-by-human-id repo)
+         '()))
+
+;; --- SQLite implementation ---
 (define (make-sqlite-project-repository rc)
-  (define (get-all-active)
+  (define (get-active-projects)
     (let* ((query
             "SELECT id, human_id, title, url, vcs_url, description,
                           created_at, updated_at, deleted_at
                    FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC")
-           (rows (DB-get-all-rows (DB-query (DB-open rc) query))))
+           (rows (DB-get-all-rows (DB-query (DB-open rc) query)))
+           (_ (write rows)))
       rows))
 
-  (make-project-repository get-all-active))
+  (define (get-active-project-by-human-id)
+    (let* ((query
+            "SELECT id, human_id, title, url, vcs_url, description,
+                          created_at, updated_at, deleted_at
+                   FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC")
+           (rows (DB-get-all-rows (DB-query (DB-open rc) query)))
+           (_ (write rows)))
+      rows))
+
+  (make-project-repository get-active-projects get-active-project-by-human-id))

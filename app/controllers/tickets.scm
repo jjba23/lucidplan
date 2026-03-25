@@ -29,7 +29,7 @@
         (app models user)
         (app models ticket_assignee)
         (artanis security nss)
-        (lucidplan persistence project)
+        (lucidplan repository project)
         (app models project)
         (hygguile hygguile))
 
@@ -130,7 +130,7 @@
                                            "lucidplan-show-rejected") "true"))
                                  (else #f)))
                 (project-repo (make-sqlite-project-repository rc))
-                (proj (get-all-active-projects project-repo))
+                (proj (get-active-projects project-repo))
                 (query-sort (entity-sort-from-query user-sort))
                 (project-details (car ($project 'get
                                                 #:ret 'top
@@ -286,7 +286,7 @@
      (lambda (rc)
        (define (get-edit)
          (let* ((project-repo (make-sqlite-project-repository rc))
-                (proj (get-all-active-projects project-repo))
+                (proj (get-active-projects project-repo))
                 (t (car ($ticket 'get
                                  #:ret 'top
                                  #:condition (where #:human_id (params rc
