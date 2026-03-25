@@ -24,7 +24,7 @@
         (uuid generate)
         (artanis security nss)
         (web uri)
-        (app models project)
+        (lucidplan repository project)
         (app views projects))
 
 (get "/projects"
@@ -71,15 +71,14 @@
      #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
        (define (get-new)
-         (response-emit (:mime rc
-                               (html-new-project-form (:i18n rc)
-                                                      #:is-logged-in (:cookies-value
-                                                                      rc
-                                                                      "x-bewaking-lucidplan")
-                                                      #:projects (DB-get-all-rows
-                                                                  (DB-query (DB-open
-                                                                             rc)
-                                                                   "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC"))))))
+         (let* ((project-repo (make-sqlite-project-repository rc)))
+           (response-emit (:mime rc
+                                 (html-new-project-form (:i18n rc)
+                                                        #:is-logged-in (:cookies-value
+                                                                        rc
+                                                                        "x-bewaking-lucidplan")
+                                                        #:projects (get-active-projects
+                                                                    project-repo))))))
        (get-new)))
 
 (post "/projects/delete"
@@ -144,20 +143,16 @@
      #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
        (define (get-edit)
-         (let* ((p (car ($project 'get
-                                  #:ret 'top
-                                  #:condition (where #:human_id (params rc
-                                                                 "human-id"))))))
+         (let* ((project-repo (make-sqlite-project-repository rc))
+                (p (get-active-project-by-human-id project-repo
+                                                   (params rc "human-id"))))
            (response-emit (:mime rc
                                  (html-edit-project-form (:i18n rc)
                                                          #:is-logged-in (:cookies-value
                                                                          rc
                                                                          "x-bewaking-lucidplan")
-                                                         #:projects (DB-get-all-rows
-                                                                     (DB-query
-                                                                      (DB-open
-                                                                       rc)
-                                                                      "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC"))
+                                                         #:projects (get-active-projects
+                                                                     project-repo)
                                                          #:project p)))))
 
        (get-edit)))

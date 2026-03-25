@@ -242,23 +242,31 @@
                                  #:key projects project is-logged-in)
   (html-project-form G_
                      #:is-logged-in is-logged-in
-                     #:title (assoc-ref project "title")
+                     #:title (assq-ref project
+                                       'title)
                      #:human-id (format #f "~a"
-                                        (assoc-ref project "human_id"))
-                     #:url (if (assoc-ref project "url")
+                                        (assq-ref project
+                                                  'human-id))
+                     #:url (if (assq-ref project
+                                         'url)
                                (format #f "~a"
-                                       (assoc-ref project "url")) "")
-                     #:vcs-url (if (assoc-ref project "vcs_url")
+                                       (assq-ref project
+                                                 'url)) "")
+                     #:vcs-url (if (assq-ref project
+                                             'vcs-url)
                                    (format #f "~a"
-                                           (assoc-ref project "vcs_url")) "")
-                     #:description (if (assoc-ref project "description")
+                                           (assq-ref project
+                                                     'vcs-url)) "")
+                     #:description (if (assq-ref project
+                                                 'description)
                                        (html-unescape (format #f "~a"
-                                                              (assoc-ref
+                                                              (assq-ref
                                                                project
-                                                               "description")))
+                                                               'description)))
                                        "")
                      #:action (format #f "/projects/~a/edit"
-                                      (assoc-ref project "human_id"))
+                                      (assq-ref project
+                                                'human-id))
                      #:projects projects))
 
 (define* (html-project-form G_

@@ -271,9 +271,9 @@
                             with-rejected
                             search-query)
   (let* ( ;Core Data
-          (proj-human-id (assoc-ref project-details "human_id"))
-         (proj-title (assoc-ref project-details "title"))
-         (proj-desc (assoc-ref project-details "description"))
+          (proj-human-id (assoc-ref project-details 'human-id))
+         (proj-title (assoc-ref project-details 'title))
+         (proj-desc (assoc-ref project-details 'description))
 
          ;; CSS Faces
          (header-face (mk-class '(flex flex-row gap-2 items-center)))

@@ -21,6 +21,7 @@
   #:use-module (lucidplan prelude)
   #:use-module (kracht prelude)
   #:use-module (artanis db)
+  #:use-module (lucidplan repository util)
   #:export (project-repository make-sqlite-project-repository
                                project-repository? get-active-projects
                                get-active-project-by-human-id))
@@ -45,15 +46,14 @@
 ;; --- SQLite implementation ---
 (define (make-sqlite-project-repository rc)
   (define project-columns
-    (string-join (map symbol->string
-                      '(id human_id
+    (to-column-string '(id human-id
                            title
                            url
-                           vcs_url
+                           vcs-url
                            description
-                           created_at
-                           updated_at
-                           deleted_at)) ", "))
+                           created-at
+                           updated-at
+                           deleted-at)))
 
   (define (get-active-projects)
     (let* ((query (format #f
@@ -62,7 +62,7 @@
                    ORDER BY human_id ASC"
                    project-columns))
            (_ (log-info "get-active-projects query:\n\t~a\n" query))
-           (rows (DB-get-all-rows (DB-query (DB-open rc) query)))
+           (rows (map db-row-sexp (DB-get-all-rows (DB-query (DB-open rc) query))))
            (_ (log-info "get-active-projects rows:\n~a\n" rows)))
       rows))
 
@@ -75,7 +75,7 @@
            (_ (log-info "get-active-project-by-human-id query:
 	~a
 " query))
-           (rows (DB-get-all-rows (DB-query (DB-open rc) query)))
+           (rows (map db-row-sexp (DB-get-all-rows (DB-query (DB-open rc) query))))
            (_ (log-info "get-active-project-by-human-id row:\n~a\n"
                         (car rows))))
       (if (nil? rows) #f

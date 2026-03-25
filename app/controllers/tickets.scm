@@ -35,7 +35,7 @@
 (define (project-id-from-human-id rc human-id)
   (let* ((project-repo (make-sqlite-project-repository rc))
          (p (get-active-project-by-human-id project-repo human-id)))
-    (assoc-ref p "id")))
+    (assq-ref p 'id)))
 
 (define (ticket-id-from-human-id human-id)
   (let ((p ($ticket 'get
