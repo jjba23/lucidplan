@@ -16,23 +16,27 @@
 ;; along with lucidplan.  If not, see <https://www.gnu.org/licenses/>.
 
 (define-module (lucidplan persistence project)
+  #:declarative? #t
   #:use-module (srfi srfi-9)
   #:use-module (artanis db)
-  #:export (project-repository make-project-repository
-                               make-sqlite-project-repository
+  #:export (project-repository make-sqlite-project-repository
                                project-repository? get-all-active-projects))
 
 (define-record-type project-repository
-  (make-project-repository repo-get-all-active-projects) project-repository?
-  (repo-get-all-active-projects get-all-active-projects))
+  (make-project-repository get-all-active-proc) project-repository?
+  (get-all-active-proc repo-get-all-active-projects))
+
+(define (get-all-active-projects repo)
+  (apply (repo-get-all-active-projects repo)
+         '()))
 
 (define (make-sqlite-project-repository rc)
-  (define (sqlite-get-all-active-projects rc)
-    (lambda ()
-      (DB-get-all-rows (DB-query (DB-open rc)
-                        "SELECT id, human_id, title, url, vcs_url, description,
-                       created_at, updated_at, deleted_at
-                       FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC"))))
-  (make-project-repository (sqlite-get-all-active-projects rc)))
+  (define (get-all-active)
+    (let* ((query
+            "SELECT id, human_id, title, url, vcs_url, description,
+                          created_at, updated_at, deleted_at
+                   FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC")
+           (rows (DB-get-all-rows (DB-query (DB-open rc) query))))
+      rows))
 
-
+  (make-project-repository get-all-active))

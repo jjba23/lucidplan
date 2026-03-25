@@ -130,7 +130,7 @@
                                            "lucidplan-show-rejected") "true"))
                                  (else #f)))
                 (project-repo (make-sqlite-project-repository rc))
-                (proj (apply (get-all-active-projects project-repo) '()))
+                (proj (get-all-active-projects project-repo))
                 (query-sort (entity-sort-from-query user-sort))
                 (project-details (car ($project 'get
                                                 #:ret 'top
@@ -285,8 +285,8 @@
      #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
        (define (get-edit)
-         (let* ((proj (DB-get-all-rows (DB-query (DB-open rc)
-                                        "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC")))
+         (let* ((project-repo (make-sqlite-project-repository rc))
+                (proj (get-all-active-projects project-repo))
                 (t (car ($ticket 'get
                                  #:ret 'top
                                  #:condition (where #:human_id (params rc
