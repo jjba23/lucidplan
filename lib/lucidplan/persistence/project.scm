@@ -18,6 +18,7 @@
 (define-module (lucidplan persistence project)
   #:declarative? #t
   #:use-module (srfi srfi-9)
+  #:use-module (lucidplan prelude)
   #:use-module (artanis db)
   #:export (project-repository make-sqlite-project-repository
                                project-repository? get-all-active-projects))
