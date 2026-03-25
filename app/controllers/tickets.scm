@@ -29,6 +29,7 @@
         (app models user)
         (app models ticket_assignee)
         (artanis security nss)
+        (lucidplan persistence project)
         (app models project)
         (hygguile hygguile))
 
@@ -128,8 +129,8 @@
                                   (equal? (:cookies-value rc
                                            "lucidplan-show-rejected") "true"))
                                  (else #f)))
-                (proj (DB-get-all-rows (DB-query (DB-open rc)
-                                        "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC")))
+                (project-repo (make-sqlite-project-repository rc))
+                (proj (apply (get-all-active-projects project-repo) '()))
                 (query-sort (entity-sort-from-query user-sort))
                 (project-details (car ($project 'get
                                                 #:ret 'top
