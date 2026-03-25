@@ -580,6 +580,15 @@
                                              #:type 'number
                                              #:value safe-prio))
 
+                                ;; Assignee
+                                ,(if is-edit
+                                     `((div
+                                        ,(input #:label (G_ "assignee")
+                                        #:name "assignee"
+                                        #:value ""
+                                        #:required #f)))
+                                     '())
+
                                 ;; Description
                                 ,(textarea #:label (G_ "description")
                                            #:name "description"

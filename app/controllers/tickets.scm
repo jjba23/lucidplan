@@ -26,6 +26,7 @@
         (lucidplan html)
         (lucidplan domain)
         (app models ticket)
+        (app models ticket_assignee)
         (artanis security nss)
         (app models project))
 
@@ -33,6 +34,15 @@
   (let ((p ($project 'get
                      #:ret 'top
                      #:condition (where #:human_id project))))
+    (cond
+      ((null? p)
+       "")
+      (else (assoc-ref (car p) "id")))))
+
+(define (ticket-id-from-human-id human-id)
+  (let ((p ($ticket 'get
+                    #:ret 'top
+                    #:condition (where #:human_id human-id))))
     (cond
       ((null? p)
        "")
@@ -290,7 +300,8 @@
                  (description (html-escape (assoc-ref body "description")))
                  (ticket-status (assoc-ref body "ticket-status"))
                  (priority (string->number (assoc-ref body "priority")))
-                 (ticket-type (assoc-ref body "ticket-type")))
+                 (ticket-type (assoc-ref body "ticket-type"))
+                 (ticket-id (ticket-id-from-human-id (params rc "human-id"))))
             
             (DB-query (DB-open rc)
                       (->sql update
@@ -302,6 +313,10 @@
                                (priority ,priority)
                                (updated_at ,(current-time)))
                              (where #:human_id (params rc "human-id"))))
+
+            ($ticket_assignee 'set
+                              #:ticket_id ticket-id
+                              #:user_id (assoc-ref body "assignee"))
 
             (redirect-to rc
                          (string->uri (format #f "~a/tickets/~a"
