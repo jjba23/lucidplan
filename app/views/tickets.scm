@@ -45,15 +45,17 @@
                           html-new-ticket-form html-edit-ticket-form
                           html-ticket-form))
 
-(define* (render-ticket G_ project ticket #:key (assignee #f))
-  (let* ( ;Extract Ticket Data (No more repetitive assoc-ref lookups)
+(define* (render-ticket G_
+                        #:key project ticket
+                        (assignee #f))
+  (let* ( ;Extract Ticket Data
           (id (assoc-ref ticket "id"))
          (human-id (assoc-ref ticket "human_id"))
          (title (assoc-ref ticket "title"))
          (status (assoc-ref ticket "ticket_status"))
          (type (assoc-ref ticket "ticket_type"))
          (desc (assoc-ref ticket "description"))
-         (priority (assoc-ref ticket "priority"))         
+         (priority (assoc-ref ticket "priority"))
 
          ;; Consolidate Reusable CSS Classes
          (card-face (mk-class '(flex flex-col
@@ -136,14 +138,15 @@
            (small (@ (class ,val-face))
                   ,(format #f "~a-~s" project human-id))
 
-           ,(if (and (not (nil? priority)) (> priority 0))
+           ,(if (and (not (nil? priority))
+                     (> priority 0))
                 `((small (@ (class ,label-face))
                          ,(G_ "priority"))
                   (small (@ (class ,val-face))
                          ,(format #f "~a" priority)))
                 '())
 
-            ,(if (not (nil? assignee))
+           ,(if (not (nil? assignee))
                 `((small (@ (class ,label-face))
                          ,(G_ "assignee"))
                   (small (@ (class ,val-face))
@@ -175,7 +178,12 @@
                                                                          text-lg)))
                                                     ,(G_ "delete")))))))))
 
-(define (render-ticket-listitem G_ project ticket ticket-id-to-human-id ticket-assignee user-names)
+(define* (render-ticket-listitem G_
+                                 #:key project
+                                 ticket
+                                 ticket-id-to-human-id
+                                 ticket-assignee
+                                 user-names)
   (let* ( ;Extract Ticket Data
           (id (assoc-ref ticket "id"))
          (human-id (assoc-ref ticket "human_id"))
@@ -247,7 +255,12 @@
            (div (@ (id ,details-id)
                    (class "ml-4")
                    (hidden ""))
-                ,(render-ticket G_ project ticket #:assignee (assoc-ref user-names (assoc-ref ticket-assignee id))))))))
+                ,(render-ticket G_
+                                #:project project
+                                #:ticket ticket
+                                #:assignee (assoc-ref user-names
+                                                      (assoc-ref
+                                                       ticket-assignee id))))))))
 
 (define* (html-from-tickets G_
                             #:key is-logged-in
@@ -315,8 +328,13 @@
                                 (ondragover "allowDrop(event)")
                                 (class ,(mk-class '(flex flex-col gap-2))))
                              ,(map (lambda (t)
-                                     (render-ticket-listitem G_ proj-human-id
-                                      t ticket-id-to-human-id ticket-assignee user-names)) active-tickets))))
+                                     (render-ticket-listitem G_
+                                      #:project proj-human-id
+                                      #:ticket t
+                                      #:ticket-id-to-human-id
+                                      ticket-id-to-human-id
+                                      #:ticket-assignee ticket-assignee
+                                      #:user-names user-names)) active-tickets))))
 
          (done-ticket-list (if with-done
                                `(div (@ (id lucidplan-done-tickets-list)
@@ -337,8 +355,13 @@
                                                                  gap-2))))
                                           ,(map (lambda (t)
                                                   (render-ticket-listitem G_
-                                                   proj-human-id t
-                                                   ticket-id-to-human-id ticket-assignee user-names))
+                                                   #:project proj-human-id
+                                                   #:ticket t
+                                                   #:ticket-id-to-human-id
+                                                   ticket-id-to-human-id
+                                                   #:ticket-assignee
+                                                   ticket-assignee
+                                                   #:user-names user-names))
                                                 done-tickets)))
                                '()))
 
@@ -364,9 +387,14 @@
                                                                      gap-2))))
                                               ,(map (lambda (t)
                                                       (render-ticket-listitem
-                                                       G_ proj-human-id t
+                                                       G_
+                                                       #:project proj-human-id
+                                                       #:ticket t
+                                                       #:ticket-id-to-human-id
                                                        ticket-id-to-human-id
-                                                       ticket-assignee user-names))
+                                                       #:ticket-assignee
+                                                       ticket-assignee
+                                                       #:user-names user-names))
                                                     rejected-tickets)))
                                    '()))
 
@@ -531,8 +559,8 @@
          ;; Format Data Safely
          (safe-title (html-unescape title))
          (safe-desc (html-unescape description))
-         (safe-prio (or priority 0)) 
-         
+         (safe-prio (or priority 0))
+
          ;; Dynamically generate dropdown options using `map`
          (status-opts (map (lambda (opt)
                              (glyph-option #:value (car opt)
