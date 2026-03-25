@@ -24,15 +24,17 @@
   #:use-module (lucidplan repository util)
   #:export (project-repository make-sqlite-project-repository
                                project-repository? get-active-projects
-                               get-active-project-by-human-id))
+                               get-active-project-by-human-id update-project-by-human-id))
 
 ;; -- Record definition ---
 (define-record-type project-repository
   (make-project-repository get-active-projects-proc
-                           get-active-project-by-human-id-proc)
+                           get-active-project-by-human-id-proc
+                           update-project-by-human-id-proc)
   project-repository?
   (get-active-projects-proc repo-get-active-projects)
-  (get-active-project-by-human-id-proc repo-get-active-project-by-human-id))
+  (get-active-project-by-human-id-proc repo-get-active-project-by-human-id)
+  (update-project-by-human-id-proc repo-update-project-by-human-id))
 
 ;; --- DSL and wrappers ---
 (define (get-active-projects repo)
@@ -42,6 +44,10 @@
 (define (get-active-project-by-human-id repo human-id)
   (apply (repo-get-active-project-by-human-id repo)
          (list human-id)))
+
+(define (update-project-by-human-id repo human-id attrs)
+  (apply (repo-update-project-by-human-id repo)
+         (list human-id attrs)))
 
 ;; --- SQLite implementation ---
 (define (make-sqlite-project-repository rc)
@@ -62,7 +68,8 @@
                    ORDER BY human_id ASC"
                    project-columns))
            (_ (log-info "get-active-projects query:\n\t~a\n" query))
-           (rows (map db-row-sexp (DB-get-all-rows (DB-query (DB-open rc) query))))
+           (rows (map db-row-sexp
+                      (DB-get-all-rows (DB-query (DB-open rc) query))))
            (_ (log-info "get-active-projects rows:\n~a\n" rows)))
       rows))
 
@@ -75,10 +82,24 @@
            (_ (log-info "get-active-project-by-human-id query:
 	~a
 " query))
-           (rows (map db-row-sexp (DB-get-all-rows (DB-query (DB-open rc) query))))
+           (rows (map db-row-sexp
+                      (DB-get-all-rows (DB-query (DB-open rc) query))))
            (_ (log-info "get-active-project-by-human-id row:\n~a\n"
                         (car rows))))
       (if (nil? rows) #f
           (car rows))))
 
-  (make-project-repository get-active-projects get-active-project-by-human-id))
+  (define (update-project-by-human-id human-id attrs)
+    (let* ((query (format #f "UPDATE project SET
+                   ~a
+                   WHERE human_id = '~a'"
+                          (string-join (map (lambda (a)
+                                              (format #f "~a = '~a'"
+                                                      (to-col (car a))
+                                                      (cadr a))) attrs) ", ")
+                          human-id))
+           (_ (log-info "update-project-by-human-id query:\n\t~a\n" query)))
+      (DB-query (DB-open rc) query)))
+
+  (make-project-repository get-active-projects get-active-project-by-human-id
+                           update-project-by-human-id))

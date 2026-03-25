@@ -167,18 +167,16 @@
                  (description (html-escape (assoc-ref body "description")))
                  (url (uri-encode (assoc-ref body "url")))
                  (vcs-url (uri-encode (assoc-ref body "vcs-url")))
-                 (human-id (assoc-ref body "human-id")))
-            
-            (DB-query (DB-open rc)
-                      (->sql update
-                             'project set
-                             `((human_id ,human-id)
-                               (url ,url)
-                               (vcs_url ,vcs-url)
-                               (description ,description)
-                               (title ,title)
-                               (updated_at ,(current-time)))
-                             (where #:human_id (params rc "human-id"))))
+                 (human-id (assoc-ref body "human-id"))
+                 (project-repo (make-sqlite-project-repository rc)))
+            (update-project-by-human-id project-repo
+                                        (params rc "human-id")
+                                        `((human-id ,human-id)
+                                          (url ,url)
+                                          (vcs-url ,vcs-url)
+                                          (description ,description)
+                                          (title ,title)
+                                          (updated-at ,(current-time))))
 
             (redirect-to rc
                          (string->uri (format #f "~a/projects"

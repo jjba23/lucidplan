@@ -22,12 +22,16 @@
   #:use-module (lucidplan prelude)
   #:use-module (kracht prelude)
   #:use-module (artanis db)
-  #:export (to-column-string db-row-sexp))
+  #:export (to-column-string db-row-sexp to-col from-col alist?))
+
+(define (to-col x)
+  (string-replace-substring (symbol->string x) "-" "_"))
+
+(define (from-col x)
+  (string->symbol (string-replace-substring x "_" "-")))
 
 (define (to-column-string xs)
-  (string-join (map (lambda (x)
-                      (string-replace-substring (symbol->string x) "-" "_"))
-                    xs) ", "))
+  (string-join (map to-col xs) ", "))
 
 (define (alist? obj)
   (cond
@@ -43,6 +47,6 @@
   (cond
     ((alist? xs)
      (map (lambda (pair)
-            (cons (string->symbol (string-replace-substring (car pair) "_" "-"))
+            (cons (from-col (car pair))
                   (cdr pair))) xs))
     (else xs)))
