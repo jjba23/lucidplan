@@ -130,8 +130,6 @@
                                                 ml-4))))
                  ,(org2html desc))
 
-           ,(hr)
-
            ;; Ticket Details
            (small (@ (class ,label-face))
                   ,(G_ "human id"))
@@ -153,10 +151,8 @@
                          ,(format #f "~a" assignee)))
                 '())
 
-           ,(hr)
-
            ;; Action Buttons
-           (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-4))))
+           (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-4 py-3))))
                 (a (@ (href ,edit-url))
                    ,(icon-button #:icon 'pencil
                                  #:content (G_ "edit ticket")

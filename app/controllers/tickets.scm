@@ -29,7 +29,8 @@
         (app models user)
         (app models ticket_assignee)
         (artanis security nss)
-        (app models project))
+        (app models project)
+        (hygguile hygguile))
 
 (define (project-id-from-human-id project)
   (let ((p ($project 'get
@@ -136,32 +137,24 @@
                 (tickets (DB-get-all-rows (DB-query (DB-open rc)
                                                     (cond
                                                       ((equal? #f user-search)
-                                                       (->sql select * from
-                                                              'ticket
-                                                              (format #f
-                                                               " WHERE project_id = '~a' AND deleted_at IS NULL ORDER BY ~a ~a"
-                                                               project-id
-                                                               (car query-sort)
-                                                               (cadr
-                                                                query-sort))))
-                                                      (else (->sql select *
-                                                                   from
-                                                                   'ticket
-                                                                   (format #f
-                                                                    (string-join '
-                                                                     (" WHERE project_id = '~a' AND deleted_at IS NULL "
-                                                                      " AND (title LIKE '%~a%' OR description LIKE '%~a%') "
-                                                                      " ORDER BY ~a ~a ")
-                                                                     " ")
-                                                                    project-id
-                                                                    (html-escape
-                                                                     user-search)
-                                                                    (html-escape
-                                                                     user-search)
-                                                                    (car
-                                                                     query-sort)
-                                                                    (cadr
-                                                                     query-sort))))))))
+                                                       (format #f
+                                                        "SELECT * FROM ticket WHERE project_id = '~a' AND deleted_at IS NULL ORDER BY ~a ~a"
+                                                        project-id
+                                                        (car query-sort)
+                                                        (cadr query-sort)))
+                                                      (else (format #f
+                                                             (string-join '("SELECT * FROM ticket"
+                                                                            " WHERE project_id = '~a' AND deleted_at IS NULL "
+                                                                            " AND (title LIKE '%~a%' OR description LIKE '%~a%') "
+                                                                            " ORDER BY ~a ~a ")
+                                                                          " ")
+                                                             project-id
+                                                             (html-escape
+                                                              user-search)
+                                                             (html-escape
+                                                              user-search)
+                                                             (car query-sort)
+                                                             (cadr query-sort)))))))
                 (ticket-id-to-human-id (map (lambda (t)
                                               `(,(assoc-ref t "id") unquote
                                                 (assoc-ref t "human_id")))
@@ -383,21 +376,38 @@
                                                 #:is-logged-in (:cookies-value
                                                                 rc
                                                                 "x-bewaking-lucidplan")
-                                                #:body `(div (@ (class "p-2"))
-                                                             ,(render-ticket (:i18n
-                                                                              rc)
-                                                               #:project (params
-                                                                          rc
-                                                                          "project")
-                                                               #:ticket t
-                                                               #:assignee (if (not
-                                                                               (nil?
-                                                                                ticket-assignee))
-                                                                              (assoc-ref
-                                                                               user-names
-                                                                               (assoc-ref
-                                                                                (car
-                                                                                 ticket-assignee)
-                                                                                "user_id"))
-                                                                              #f))))))))
+                                                #:body `(,(a (format #f
+                                                              "← back to backlog: ~a"
+                                                              (params rc
+                                                               "project"))
+                                                             #:size '(text-md
+                                                                      px-2)
+                                                             #:href (format #f
+                                                                            "/tickets/~a"
+
+                                                                            (params
+                                                                             rc
+                                                                             "project")))
+                                                         (div (@ (class ,(mk-class '
+                                                                          (p-2))))
+
+                                                              ,(render-ticket (:i18n
+                                                                               rc)
+                                                                #:project (params
+                                                                           rc
+                                                                           "project")
+                                                                #:ticket t
+                                                                #:assignee (if
+                                                                            (not
+                                                                             (nil?
+                                                                              ticket-assignee))
+
+                                                                            (assoc-ref
+                                                                             user-names
+
+                                                                             (assoc-ref
+                                                                              (car
+                                                                               ticket-assignee)
+                                                                              "user_id"))
+                                                                            #f)))))))))
        (get-single)))

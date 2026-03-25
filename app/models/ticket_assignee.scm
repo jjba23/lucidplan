@@ -5,5 +5,5 @@
                       (ticket_id char-field
                                  (#:primary-key #:not-null #:maxlen 36))
                       (user_id char-field
-                                 (#:not-null #:maxlen 36)))
+                               (#:not-null #:maxlen 36)))
 
