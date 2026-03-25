@@ -30,12 +30,11 @@
         (app models ticket_assignee)
         (artanis security nss)
         (lucidplan repository project)
-        (app models project)
         (hygguile hygguile))
 
 (define (project-id-from-human-id rc human-id)
   (let* ((project-repo (make-sqlite-project-repository rc))
-        (p (get-active-project-by-human-id project-repo human-id)))
+         (p (get-active-project-by-human-id project-repo human-id)))
     (assoc-ref p "id")))
 
 (define (ticket-id-from-human-id human-id)
@@ -127,11 +126,8 @@
                 (project-repo (make-sqlite-project-repository rc))
                 (proj (get-active-projects project-repo))
                 (query-sort (entity-sort-from-query user-sort))
-                (project-details (car ($project 'get
-                                                #:ret 'top
-                                                #:condition (where #:human_id (params
-                                                                               rc
-                                                                               "project")))))
+                (project-details (get-active-project-by-human-id project-repo (params rc
+                                                                  "project")))
                 (tickets (DB-get-all-rows (DB-query (DB-open rc)
                                                     (cond
                                                       ((equal? #f user-search)
@@ -200,17 +196,16 @@
      #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
        (define (get-new)
-         (response-emit (:mime rc
-                               (html-new-ticket-form (:i18n rc)
-                                                     #:is-logged-in (:cookies-value
-                                                                     rc
-                                                                     "x-bewaking-lucidplan")
-                                                     #:projects ($project 'get
-                                                                          #:order-by '
-                                                                          (human_id
-                                                                           asc))
-                                                     #:project (params rc
-                                                                "project")))))
+         (let* ((project-repo (make-sqlite-project-repository rc)))
+           (response-emit (:mime rc
+                                 (html-new-ticket-form (:i18n rc)
+                                                       #:is-logged-in (:cookies-value
+                                                                       rc
+                                                                       "x-bewaking-lucidplan")
+                                                       #:projects (get-active-projects
+                                                                   project-repo)
+                                                       #:project (params rc
+                                                                  "project"))))))
        (get-new)))
 
 (post "/tickets/:project/delete"
