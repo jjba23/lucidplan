@@ -15,13 +15,13 @@
 ;; You should have received a copy of the GNU Affero General Public License
 ;; along with lucidplan.  If not, see <https://www.gnu.org/licenses/>.
 
-(define-module (lucidplan repository project)
+(define-module (lucidplan persistence project)
   #:declarative? #t
   #:use-module (srfi srfi-9)
   #:use-module (lucidplan prelude)
   #:use-module (kracht prelude)
   #:use-module (artanis db)
-  #:use-module (lucidplan repository util)
+  #:use-module (lucidplan persistence util)
   #:export (project-repository make-sqlite-project-repository
                                project-repository?
                                get-active-projects

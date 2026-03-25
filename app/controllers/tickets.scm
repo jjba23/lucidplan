@@ -29,7 +29,7 @@
         (app models user)
         (app models ticket_assignee)
         (artanis security nss)
-        (lucidplan repository project)
+        (lucidplan persistence project)
         (hygguile hygguile))
 
 (define (project-id-from-human-id rc human-id)
