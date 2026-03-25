@@ -17,15 +17,15 @@
 
 (define-artanis-controller projects)
 
-(import (lucidplan auth)
-        (web uri)
+(import (app views projects)
+        (artanis security nss)
         (ice-9 string-fun)
         (kracht prelude)
-        (uuid generate)
-        (artanis security nss)
-        (web uri)
+        (lucidplan auth)
         (lucidplan repository project)
-        (app views projects))
+        (uuid generate)
+        (web uri)
+        (web uri))
 
 (get "/projects"
      #:mime 'xml
@@ -39,23 +39,12 @@
                                         (get-from-qstr rc "search"))
                                 #f)
                                (else (html-escape (get-from-qstr rc "search")))))
-                (proj (DB-get-all-rows (DB-query (DB-open rc)
-                                                 (cond
-                                                   ((equal? #f user-search)
-                                                    (->sql select * from
-                                                     'project
-                                                     " WHERE deleted_at IS NULL ORDER BY title ASC"))
-                                                   (else (->sql select * from
-                                                                'project
-                                                                (format #f
-                                                                        (string-join '
-                                                                         (" WHERE deleted_at IS NULL AND (title LIKE '%~a%' OR description LIKE '%~a%') "
-                                                                          " ORDER BY title ASC ")
-                                                                         " ")
-                                                                        (html-escape
-                                                                         user-search)
-                                                                        (html-escape
-                                                                         user-search)))))))))
+                (project-repo (make-sqlite-project-repository rc))
+                (proj (cond
+                        ((nil? user-search)
+                         (get-active-projects project-repo))
+                        (else (search-active-projects project-repo
+                                                      (html-escape user-search))))))
            (response-emit (:mime rc
                                  (html-from-projects (:i18n rc)
                                                      #:projects proj
@@ -116,17 +105,18 @@
                  (vcs-url (uri-encode (assoc-ref body "vcs-url")))
                  (human-id (assoc-ref body "human-id"))
                  (new-uuid (string-replace-substring (generate-string-uuid)
-                                                     "\n" "")))
+                                                     "\n" ""))
+                 (project-repo (make-sqlite-project-repository rc)))
             
-            ($project 'set
-                      #:id new-uuid
-                      #:human_id human-id
-                      #:title title
-                      #:description description
-                      #:url url
-                      #:vcs_url vcs-url
-                      #:created_at (current-time))
-
+            (insert-project project-repo
+                            `((id unquote new-uuid)
+                              (human-id unquote human-id)
+                              (title unquote title)
+                              (description unquote description)
+                              (url unquote url)
+                              (vcs-url unquote vcs-url)
+                              (created-at unquote
+                                          (current-time))))
             (redirect-to rc
                          (string->uri (format #f "~a/projects"
                                               (current-myhost)))
@@ -171,12 +161,13 @@
                  (project-repo (make-sqlite-project-repository rc)))
             (update-project-by-human-id project-repo
                                         (params rc "human-id")
-                                        `((human-id ,human-id)
-                                          (url ,url)
-                                          (vcs-url ,vcs-url)
-                                          (description ,description)
-                                          (title ,title)
-                                          (updated-at ,(current-time))))
+                                        `((human-id unquote human-id)
+                                          (url unquote url)
+                                          (vcs-url unquote vcs-url)
+                                          (description unquote description)
+                                          (title unquote title)
+                                          (updated-at unquote
+                                                      (current-time))))
 
             (redirect-to rc
                          (string->uri (format #f "~a/projects"
@@ -187,4 +178,3 @@
                            #:rc rc
                            #:happy-flow do-edit
                            #:unhappy-flow back-to-login)))
-
