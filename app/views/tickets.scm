@@ -49,13 +49,13 @@
                         #:key project ticket
                         (assignee #f))
   (let* ( ;Extract Ticket Data
-          (id (assoc-ref ticket "id"))
-         (human-id (assoc-ref ticket "human_id"))
-         (title (assoc-ref ticket "title"))
-         (status (assoc-ref ticket "ticket_status"))
-         (type (assoc-ref ticket "ticket_type"))
-         (desc (assoc-ref ticket "description"))
-         (priority (assoc-ref ticket "priority"))
+          (id (assq-ref ticket 'id))
+         (human-id (assq-ref ticket 'human-id))
+         (title (assq-ref ticket 'title))
+         (status (assq-ref ticket 'ticket-status))
+         (type (assq-ref ticket 'ticket-type))
+         (desc (assq-ref ticket 'description))
+         (priority (assq-ref ticket 'priority))
 
          ;; Consolidate Reusable CSS Classes
          (card-face (mk-class '(flex flex-col
@@ -181,10 +181,10 @@
                                  ticket-assignee
                                  user-names)
   (let* ( ;Extract Ticket Data
-          (id (assoc-ref ticket "id"))
-         (human-id (assoc-ref ticket "human_id"))
-         (title (assoc-ref ticket "title"))
-         (type (assoc-ref ticket "ticket_type"))
+          (id (assq-ref ticket 'id))
+         (human-id (assq-ref ticket 'human-id))
+         (title (assq-ref ticket 'title))
+         (type (assq-ref ticket 'ticket-type))
 
          ;; Pre-calculate IDs, URLs, and JS
          (item-id (format #f "listitem-~a" id))
@@ -271,9 +271,9 @@
                             with-rejected
                             search-query)
   (let* ( ;Core Data
-          (proj-human-id (assoc-ref project-details 'human-id))
-         (proj-title (assoc-ref project-details 'title))
-         (proj-desc (assoc-ref project-details 'description))
+          (proj-human-id (assq-ref project-details 'human-id))
+         (proj-title (assq-ref project-details 'title))
+         (proj-desc (assq-ref project-details 'description))
 
          ;; CSS Faces
          (header-face (mk-class '(flex flex-row gap-2 items-center)))
@@ -524,14 +524,14 @@
                     #:is-logged-in is-logged-in
                     #:project project
                     #:is-edit #t
-                    #:title (assoc-ref t "title")
-                    #:description (assoc-ref t "description")
-                    #:ticket-type (assoc-ref t "ticket_type")
-                    #:ticket-status (assoc-ref t "ticket_status")
+                    #:title (assq-ref t 'title)
+                    #:description (assq-ref t 'description)
+                    #:ticket-type (assq-ref t 'ticket-type)
+                    #:ticket-status (assq-ref t 'ticket-status)
                     #:assignee assignee
-                    #:priority (assoc-ref t "priority")
+                    #:priority (assq-ref t 'priority)
                     #:action (format #f "/tickets/~a/id/~a/edit" project
-                                     (assoc-ref t "human_id"))
+                                     (assq-ref t 'human-id))
                     #:projects projects))
 
 (define* (html-ticket-form G_

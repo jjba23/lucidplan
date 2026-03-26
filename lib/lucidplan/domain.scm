@@ -19,15 +19,15 @@
   #:use-module (ice-9 string-fun))
 
 (define-public (only-active-tickets-filter ticket)
-  (or (equal? (assoc-ref ticket "ticket_status") "todo")
-      (equal? (assoc-ref ticket "ticket_status") "work-in-progress")
-      (equal? (assoc-ref ticket "ticket_status") "in-review")))
+  (or (equal? (assq-ref ticket 'ticket-status) "todo")
+      (equal? (assq-ref ticket 'ticket-status) "work-in-progress")
+      (equal? (assq-ref ticket 'ticket-status) "in-review")))
 
 (define-public (only-done-tickets-filter ticket)
-  (equal? (assoc-ref ticket "ticket_status") "done"))
+  (equal? (assq-ref ticket 'ticket-status) "done"))
 
 (define-public (only-rejected-tickets-filter ticket)
-  (equal? (assoc-ref ticket "ticket_status") "rejected"))
+  (equal? (assq-ref ticket 'ticket-status) "rejected"))
 
 (define-public (entity-sort-from-query user-sort)
   (cond

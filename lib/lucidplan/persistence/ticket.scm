@@ -26,7 +26,7 @@
                                ticket-repository?
                                get-active-tickets
                                search-active-tickets
-                               get-active-ticket-by-human-id
+                               get-active-ticket-by-project-id-and-human-id
                                update-ticket-by-human-id
                                insert-ticket))
 
@@ -34,27 +34,27 @@
 (define-record-type ticket-repository
   (make-ticket-repository get-active-tickets-proc
                            search-active-tickets-proc
-                           get-active-ticket-by-human-id-proc
+                           get-active-ticket-by-project-id-and-human-id-proc
                            update-ticket-by-human-id-proc insert-ticket-proc)
   ticket-repository?
   (get-active-tickets-proc repo-get-active-tickets)
   (search-active-tickets-proc repo-search-active-tickets)
-  (get-active-ticket-by-human-id-proc repo-get-active-ticket-by-human-id)
+  (get-active-ticket-by-project-id-and-human-id-proc repo-get-active-ticket-by-project-id-and-human-id)
   (update-ticket-by-human-id-proc repo-update-ticket-by-human-id)
   (insert-ticket-proc repo-insert-ticket))
 
 ;; --- DSL and wrappers ---
-(define (get-active-tickets repo)
+(define (get-active-tickets repo project-id sort)
   (apply (repo-get-active-tickets repo)
-         '()))
+         (list project-id sort)))
 
-(define (search-active-tickets repo q)
+(define (search-active-tickets repo project-id q sort)
   (apply (repo-search-active-tickets repo)
-         (list q)))
+         (list project-id q sort)))
 
-(define (get-active-ticket-by-human-id repo human-id)
-  (apply (repo-get-active-ticket-by-human-id repo)
-         (list human-id)))
+(define (get-active-ticket-by-project-id-and-human-id repo project-id human-id)
+  (apply (repo-get-active-ticket-by-project-id-and-human-id repo)
+         (list project-id human-id)))
 
 (define (update-ticket-by-human-id repo human-id attrs)
   (apply (repo-update-ticket-by-human-id repo)
@@ -89,12 +89,13 @@
          created-at
          priority))
 
-  (define (get-active-tickets)
+  (define (get-active-tickets project-id sort)
     (let* ((query (format #f
                    "SELECT ~a
                    FROM ticket WHERE deleted_at IS NULL
-                   ORDER BY human_id ASC"
-                   (symbols->sql-columns-list ticket-columns)))
+                   AND project_id = '~a'
+                   ORDER BY ~a"
+                   (symbols->sql-columns-list ticket-columns) project-id sort))
            (_ (log-info "get-active-tickets query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query (DB-open rc) query))))
@@ -102,13 +103,14 @@
                         (length rows))))
       rows))
 
-  (define (search-active-tickets q)
+  (define (search-active-tickets project-id q sort)
     (let* ((query (format #f
                    "SELECT ~a
                    FROM ticket WHERE deleted_at IS NULL
+                   AND project_id = '~a'
                    AND (title LIKE '%~a%' OR description LIKE '%~a%')
-                   ORDER BY human_id ASC"
-                   (symbols->sql-columns-list ticket-columns) q q))
+                   ORDER BY ~a"
+                   (symbols->sql-columns-list ticket-columns) project-id q q sort))
            (_ (log-info "search-active-tickets query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query (DB-open rc) query))))
@@ -116,18 +118,18 @@
                         (length rows))))
       rows))
 
-  (define (get-active-ticket-by-human-id human-id)
+  (define (get-active-ticket-by-project-id-and-human-id project-id human-id)
     (let* ((query (format #f
                    "SELECT ~a FROM ticket
-                    WHERE deleted_at IS NULL AND human_id = '~a'
+                    WHERE deleted_at IS NULL AND project_id = '~a' AND human_id = '~a'
                     LIMIT 1"
-                   (symbols->sql-columns-list ticket-columns) human-id))
-           (_ (log-info "get-active-ticket-by-human-id query:
+                   (symbols->sql-columns-list ticket-columns) project-id human-id))
+           (_ (log-info "get-active-ticket-by-project-id-and-human-id query:
 	~a
 " query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query (DB-open rc) query))))
-           (_ (log-info "get-active-ticket-by-human-id rows: ~a\n"
+           (_ (log-info "get-active-ticket-by-project-id-and-human-id rows: ~a\n"
                         (length rows))))
       (if (nil? rows) #f
           (car rows))))
@@ -150,5 +152,5 @@
       (DB-query (DB-open rc) query)))
 
   (make-ticket-repository get-active-tickets search-active-tickets
-                           get-active-ticket-by-human-id
+                           get-active-ticket-by-project-id-and-human-id
                            update-ticket-by-human-id insert-ticket))

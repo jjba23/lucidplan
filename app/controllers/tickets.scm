@@ -42,7 +42,7 @@
 
 (define (ticket-id-from-human-id rc human-id)
   (let* ((ticket-repo (make-sqlite-ticket-repository rc))
-        (t (get-active-ticket-by-human-id ticket-repo human-id)))
+         (t (get-active-ticket-by-human-id ticket-repo human-id)))
     (assq-ref t
               'id)))
 
@@ -125,40 +125,35 @@
                                  (else #f)))
                 (project-repo (make-sqlite-project-repository rc))
                 (user-repo (make-sqlite-user-repository rc))
+                (ticket-repo (make-sqlite-ticket-repository rc))
                 (proj (get-active-projects project-repo))
                 (query-sort (entity-sort-from-query user-sort))
                 (project-details (get-active-project-by-human-id project-repo
                                                                  (params rc
                                                                   "project")))
-                (tickets (DB-get-all-rows (DB-query (DB-open rc)
-                                                    (cond
-                                                      ((equal? #f user-search)
-                                                       (format #f
-                                                        "SELECT * FROM ticket WHERE project_id = '~a' AND deleted_at IS NULL ORDER BY ~a ~a"
-                                                        project-id
-                                                        (car query-sort)
-                                                        (cadr query-sort)))
-                                                      (else (format #f
-                                                             (string-join '("SELECT * FROM ticket"
-                                                                            " WHERE project_id = '~a' AND deleted_at IS NULL "
-                                                                            " AND (title LIKE '%~a%' OR description LIKE '%~a%') "
-                                                                            " ORDER BY ~a ~a ")
-                                                                          " ")
-                                                             project-id
-                                                             (html-escape
-                                                              user-search)
-                                                             (html-escape
-                                                              user-search)
-                                                             (car query-sort)
-                                                             (cadr query-sort)))))))
+                (my-sort (format #f "~a ~a"
+                                 (car query-sort)
+                                 (cadr query-sort)))
+                (tickets (cond
+                           ((eq? #f user-search)
+                            (get-active-tickets ticket-repo
+                                                (assq-ref project-details
+                                                          'id) my-sort))
+                           (else (search-active-tickets ticket-repo
+                                                        (params rc "project")
+                                                        (html-escape
+                                                         user-search) my-sort))))
                 (ticket-id-to-human-id (map (lambda (t)
-                                              `(,(assoc-ref t "id") unquote
-                                                (assoc-ref t "human_id")))
-                                            tickets))
+                                              `(,(assq-ref t
+                                                           'id) unquote
+                                                (assq-ref t
+                                                          'human-id))) tickets))
                 (user-names (get-id-to-username user-repo))
                 (ticket-assignee (map (lambda (t)
-                                        `(,(assoc-ref t "ticket_id") unquote
-                                          (assoc-ref t "user_id")))
+                                        `(,(assq-ref t
+                                                     'ticket-id) unquote
+                                          (assq-ref t
+                                                    'user-id)))
                                       ($ticket_assignee 'get
                                                         #:columns '(ticket_id
                                                                     user_id)))))
@@ -270,16 +265,23 @@
        (define (get-edit)
          (let* ((project-repo (make-sqlite-project-repository rc))
                 (proj (get-active-projects project-repo))
-                (t (car ($ticket 'get
-                                 #:ret 'top
-                                 #:condition (where #:human_id (params rc
-                                                                "human-id")))))
+                (project-details (get-active-project-by-human-id project-repo
+                                                                 (params rc
+                                                                  "project")))
+                (ticket-repo (make-sqlite-ticket-repository rc))
+                (t (get-active-ticket-by-project-id-and-human-id ticket-repo
+                                                                 (assq-ref
+                                                                  project-details
+                                                                  'id)
+                                                                 (params rc
+                                                                  "human-id")))
                 (assignee-data ($ticket_assignee 'get
                                                  #:ret 'top
                                                  #:condition (where
                                                                     #:ticket_id
-                                                                    (assoc-ref
-                                                                     t "id"))))
+                                                                    (assq-ref
+                                                                     t
+                                                                     'id))))
                 (assignee (if (nil? assignee-data) ""
                               (assoc-ref (car assignee-data) "user_id"))))
            (response-emit (:mime rc
@@ -305,7 +307,8 @@
                  (ticket-status (assoc-ref body "ticket-status"))
                  (priority (string->number (assoc-ref body "priority")))
                  (ticket-type (assoc-ref body "ticket-type"))
-                 (ticket-id (ticket-id-from-human-id rc (params rc "human-id"))))
+                 (ticket-id (ticket-id-from-human-id rc
+                                                     (params rc "human-id"))))
             
             (DB-query (DB-open rc)
                       (->sql update
@@ -342,22 +345,26 @@
        (define (get-single)
          (let* ((project-repo (make-sqlite-project-repository rc))
                 (proj (get-active-projects project-repo))
-                (t (car ($ticket 'get
-                                 #:ret 'top
-                                 #:condition (where #:human_id (params rc
-                                                                "human-id")))))
-                (user-names (map (lambda (t)
-                                   `(,(assoc-ref t "id") unquote
-                                     (assoc-ref t "username")))
-                                 ($user 'get
-                                        #:columns '(id username))))
+                (user-repo (make-sqlite-user-repository rc))
+                (ticket-repo (make-sqlite-ticket-repository rc))
+                (project-details (get-active-project-by-human-id project-repo
+                                                                 (params rc
+                                                                  "project")))
+                (t (get-active-ticket-by-project-id-and-human-id ticket-repo
+                                                                 (assq-ref
+                                                                  project-details
+                                                                  'id)
+                                                                 (params rc
+                                                                  "human-id")))
+                (user-names (get-id-to-username user-repo))
                 (ticket-assignee ($ticket_assignee 'get
                                                    #:ret 'top
                                                    #:columns '(user_id)
                                                    #:condition (where
                                                                       #:ticket_id
-                                                                      (assoc-ref
-                                                                       t "id")))))
+                                                                      (assq-ref
+                                                                       t
+                                                                       'id)))))
            (response-emit (:mime rc
                                  (html-template (:i18n rc)
                                                 #:is-logged-in (:cookies-value
