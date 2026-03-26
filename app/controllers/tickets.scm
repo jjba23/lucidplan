@@ -30,18 +30,21 @@
         (app models ticket_assignee)
         (artanis security nss)
         (lucidplan persistence project)
-                (lucidplan persistence ticket)
+        (lucidplan persistence ticket)
+        (lucidplan persistence user)
         (hygguile hygguile))
 
 (define (project-id-from-human-id rc human-id)
   (let* ((project-repo (make-sqlite-project-repository rc))
          (p (get-active-project-by-human-id project-repo human-id)))
-    (assq-ref p 'id)))
+    (assq-ref p
+              'id)))
 
-(define (ticket-id-from-human-id human-id)
-  (let ((ticket-repo (make-sqlite-ticket-repository rc))
+(define (ticket-id-from-human-id rc human-id)
+  (let* ((ticket-repo (make-sqlite-ticket-repository rc))
         (t (get-active-ticket-by-human-id ticket-repo human-id)))
-    (assq-ref t 'id)))
+    (assq-ref t
+              'id)))
 
 (get "/tickets/:project"
      #:mime 'xml
@@ -121,9 +124,11 @@
                                            "lucidplan-show-rejected") "true"))
                                  (else #f)))
                 (project-repo (make-sqlite-project-repository rc))
+                (user-repo (make-sqlite-user-repository rc))
                 (proj (get-active-projects project-repo))
                 (query-sort (entity-sort-from-query user-sort))
-                (project-details (get-active-project-by-human-id project-repo (params rc
+                (project-details (get-active-project-by-human-id project-repo
+                                                                 (params rc
                                                                   "project")))
                 (tickets (DB-get-all-rows (DB-query (DB-open rc)
                                                     (cond
@@ -150,11 +155,7 @@
                                               `(,(assoc-ref t "id") unquote
                                                 (assoc-ref t "human_id")))
                                             tickets))
-                (user-names (map (lambda (t)
-                                   `(,(assoc-ref t "id") unquote
-                                     (assoc-ref t "username")))
-                                 ($user 'get
-                                        #:columns '(id username))))
+                (user-names (get-id-to-username user-repo))
                 (ticket-assignee (map (lambda (t)
                                         `(,(assoc-ref t "ticket_id") unquote
                                           (assoc-ref t "user_id")))
@@ -304,7 +305,7 @@
                  (ticket-status (assoc-ref body "ticket-status"))
                  (priority (string->number (assoc-ref body "priority")))
                  (ticket-type (assoc-ref body "ticket-type"))
-                 (ticket-id (ticket-id-from-human-id (params rc "human-id"))))
+                 (ticket-id (ticket-id-from-human-id rc (params rc "human-id"))))
             
             (DB-query (DB-open rc)
                       (->sql update
