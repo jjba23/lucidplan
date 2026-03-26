@@ -30,6 +30,7 @@
         (app models ticket_assignee)
         (artanis security nss)
         (lucidplan persistence project)
+                (lucidplan persistence ticket)
         (hygguile hygguile))
 
 (define (project-id-from-human-id rc human-id)
@@ -38,13 +39,9 @@
     (assq-ref p 'id)))
 
 (define (ticket-id-from-human-id human-id)
-  (let ((p ($ticket 'get
-                    #:ret 'top
-                    #:condition (where #:human_id human-id))))
-    (cond
-      ((null? p)
-       "")
-      (else (assoc-ref (car p) "id")))))
+  (let ((ticket-repo (make-sqlite-ticket-repository rc))
+        (t (get-active-ticket-by-human-id ticket-repo human-id)))
+    (assq-ref t 'id)))
 
 (get "/tickets/:project"
      #:mime 'xml
@@ -152,12 +149,7 @@
                 (ticket-id-to-human-id (map (lambda (t)
                                               `(,(assoc-ref t "id") unquote
                                                 (assoc-ref t "human_id")))
-                                            ($ticket 'get
-                                                     #:columns '(id human_id)
-                                                     #:condition (where
-                                                                  #:project_id
-                                                                  project-id)
-                                                     #:order-by '(human_id asc))))
+                                            tickets))
                 (user-names (map (lambda (t)
                                    `(,(assoc-ref t "id") unquote
                                      (assoc-ref t "username")))
@@ -347,8 +339,8 @@
      #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
        (define (get-single)
-         (let* ((proj (DB-get-all-rows (DB-query (DB-open rc)
-                                        "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC")))
+         (let* ((project-repo (make-sqlite-project-repository rc))
+                (proj (get-active-projects project-repo))
                 (t (car ($ticket 'get
                                  #:ret 'top
                                  #:condition (where #:human_id (params rc
