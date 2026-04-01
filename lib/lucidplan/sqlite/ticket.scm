@@ -22,15 +22,14 @@
   #:use-module (kracht prelude)
   #:use-module (artanis db)
   #:use-module (lucidplan sqlite util)
-    #:use-module (lucidplan domain ticket)
-  #:export ( make-sqlite-ticket-repository
-                              ))
+  #:use-module (lucidplan domain ticket)
+  #:export (make-sqlite-ticket-repository))
 
 ;; --- SQLite implementation ---
 (define (make-sqlite-ticket-repository rc)
   (define ticket-columns
     '(id human-id
-         project-id         
+         project-id
          title
          ticket-status
          ticket-type
@@ -38,12 +37,11 @@
          created-at
          updated-at
          deleted-at
-         priority
-         ))
+         priority))
 
   (define ticket-insert-columns
     '(id human-id
-         project-id         
+         project-id
          title
          ticket-status
          ticket-type
@@ -72,7 +70,11 @@
                    AND project_id = '~a'
                    AND (title LIKE '%~a%' OR description LIKE '%~a%')
                    ORDER BY ~a"
-                   (symbols->sql-columns-list ticket-columns) project-id q q sort))
+                   (symbols->sql-columns-list ticket-columns)
+                   project-id
+                   q
+                   q
+                   sort))
            (_ (log-info "search-active-tickets query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query (DB-open rc) query))))
@@ -85,14 +87,17 @@
                    "SELECT ~a FROM ticket
                     WHERE deleted_at IS NULL AND project_id = '~a' AND human_id = '~a'
                     LIMIT 1"
-                   (symbols->sql-columns-list ticket-columns) project-id human-id))
+                   (symbols->sql-columns-list ticket-columns) project-id
+                   human-id))
            (_ (log-info "get-active-ticket-by-project-id-and-human-id query:
 	~a
-" query))
+"
+                        query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query (DB-open rc) query))))
-           (_ (log-info "get-active-ticket-by-project-id-and-human-id rows: ~a\n"
-                        (length rows))))
+           (_ (log-info "get-active-ticket-by-project-id-and-human-id rows: ~a
+"
+               (length rows))))
       (if (nil? rows) #f
           (car rows))))
 
@@ -113,6 +118,10 @@
            (_ (log-info "insert-ticket query:\n\t~a\n" query)))
       (DB-query (DB-open rc) query)))
 
-  (make-ticket-repository get-active-tickets search-active-tickets
-                           get-active-ticket-by-project-id-and-human-id
-                           update-ticket-by-human-id insert-ticket))
+  (mk-ticket-repository #:get-active-tickets-proc get-active-tickets
+                        #:search-active-tickets-proc search-active-tickets
+                        #:get-active-ticket-by-project-id-and-human-id-proc
+                        get-active-ticket-by-project-id-and-human-id
+                        #:update-ticket-by-human-id-proc
+                        update-ticket-by-human-id
+                        #:insert-ticket-proc insert-ticket))

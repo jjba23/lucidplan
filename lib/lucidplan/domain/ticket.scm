@@ -22,26 +22,34 @@
   #:use-module (kracht prelude)
   #:use-module (artanis db)
   #:use-module (lucidplan sqlite util)
-  #:export (ticket-repository 
-                               ticket-repository?
-                               get-active-tickets
-                               search-active-tickets
-                               get-active-ticket-by-project-id-and-human-id
-                               update-ticket-by-human-id
-                               insert-ticket))
+  #:export (ticket-repository ticket-repository?
+                              get-active-tickets
+                              search-active-tickets
+                              get-active-ticket-by-project-id-and-human-id
+                              update-ticket-by-human-id
+                              mk-ticket-repository
+                              insert-ticket))
 
 ;; -- Record definition ---
 (define-record-type ticket-repository
-  (make-ticket-repository get-active-tickets-proc
-                           search-active-tickets-proc
-                           get-active-ticket-by-project-id-and-human-id-proc
-                           update-ticket-by-human-id-proc insert-ticket-proc)
+  (make-ticket-repository get-active-tickets-proc search-active-tickets-proc
+                          get-active-ticket-by-project-id-and-human-id-proc
+                          update-ticket-by-human-id-proc insert-ticket-proc)
   ticket-repository?
   (get-active-tickets-proc repo-get-active-tickets)
   (search-active-tickets-proc repo-search-active-tickets)
-  (get-active-ticket-by-project-id-and-human-id-proc repo-get-active-ticket-by-project-id-and-human-id)
+  (get-active-ticket-by-project-id-and-human-id-proc
+   repo-get-active-ticket-by-project-id-and-human-id)
   (update-ticket-by-human-id-proc repo-update-ticket-by-human-id)
   (insert-ticket-proc repo-insert-ticket))
+
+(define* (mk-ticket-repository #:key get-active-tickets-proc
+         search-active-tickets-proc
+         get-active-ticket-by-project-id-and-human-id-proc
+         update-ticket-by-human-id-proc insert-ticket-proc)
+  (make-ticket-repository get-active-tickets-proc search-active-tickets-proc
+                          get-active-ticket-by-project-id-and-human-id-proc
+                          update-ticket-by-human-id-proc insert-ticket-proc))
 
 ;; --- DSL and wrappers ---
 (define (get-active-tickets repo project-id sort)

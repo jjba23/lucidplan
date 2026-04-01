@@ -26,6 +26,7 @@
         (lucidplan env)
         (kracht prelude)
         (lucidplan sqlite user)
+        (lucidplan domain user)
         (app views login))
 
 (get "/login"

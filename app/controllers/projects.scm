@@ -23,6 +23,7 @@
         (kracht prelude)
         (lucidplan auth)
         (lucidplan sqlite project)
+        (lucidplan domain project)
         (uuid generate)
         (web uri)
         (web uri))

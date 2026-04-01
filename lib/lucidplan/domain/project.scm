@@ -25,7 +25,7 @@
                                search-active-projects
                                get-active-project-by-human-id
                                update-project-by-human-id
-                               make-project-repository
+                               mk-project-repository
                                insert-project))
 
 
@@ -42,6 +42,14 @@
   (update-project-by-human-id-proc repo-update-project-by-human-id)
   (insert-project-proc repo-insert-project))
 
+(define* (mk-project-repository #:key get-active-projects-proc
+                           search-active-projects-proc
+                           get-active-project-by-human-id-proc
+                           update-project-by-human-id-proc insert-project-proc)
+  (make-project-repository get-active-projects-proc
+                           search-active-projects-proc
+                           get-active-project-by-human-id-proc
+                           update-project-by-human-id-proc insert-project-proc))
 ;; --- eDSL and wrappers ---
 (define (get-active-projects repo)
   (apply (repo-get-active-projects repo)

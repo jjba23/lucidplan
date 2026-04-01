@@ -21,6 +21,7 @@
         (web uri)
         (ice-9 string-fun)
         (lucidplan sqlite project)
+        (lucidplan domain project)
         (app views index))
 
 (get "/"

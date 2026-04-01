@@ -27,7 +27,7 @@
         (lucidplan domain)
         (app models ticket_assignee)
         (artanis security nss)
-                (lucidplan domain project)
+        (lucidplan domain project)
         (lucidplan domain ticket)
         (lucidplan domain user)
         (lucidplan sqlite project)

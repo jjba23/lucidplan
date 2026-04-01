@@ -22,9 +22,8 @@
   #:use-module (kracht prelude)
   #:use-module (artanis db)
   #:use-module (lucidplan sqlite util)
-    #:use-module (lucidplan domain user)
+  #:use-module (lucidplan domain user)
   #:export (make-sqlite-user-repository))
-
 
 ;; --- SQLite implementation ---
 (define (make-sqlite-user-repository rc)
@@ -59,4 +58,5 @@
       (if (null? rows) #f
           (car rows))))
 
-  (make-user-repository get-id-to-username get-user-by-email))
+  (mk-user-repository #:get-id-to-username-proc get-id-to-username
+                      #:get-user-by-email-proc get-user-by-email))

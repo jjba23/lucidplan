@@ -25,6 +25,8 @@
         (lucidplan domain)
         (lucidplan sqlite ticket)
         (lucidplan sqlite project)
+        (lucidplan domain ticket)
+        (lucidplan domain project)
         (kracht prelude)
         (artanis security nss))
 

@@ -20,8 +20,8 @@
   #:use-module (srfi srfi-9)
   #:use-module (lucidplan prelude)
   #:use-module (kracht prelude)
-  #:export (user-repository  user-repository?
-                            get-id-to-username get-user-by-email))
+  #:export (user-repository user-repository? get-id-to-username
+                            get-user-by-email mk-user-repository))
 
 ;; -- Record definition ---
 (define-record-type user-repository
@@ -29,6 +29,10 @@
   user-repository?
   (get-id-to-username-proc repo-get-id-to-username)
   (get-user-by-email-proc repo-get-user-by-email))
+
+(define* (mk-user-repository #:key get-id-to-username-proc
+                            get-user-by-email-proc)
+  (make-user-repository get-id-to-username-proc get-user-by-email-proc))
 
 ;; --- DSL and wrappers ---
 (define (get-id-to-username repo)

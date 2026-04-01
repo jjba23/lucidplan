@@ -25,7 +25,6 @@
   #:use-module (lucidplan domain project)
   #:export (make-sqlite-project-repository))
 
-
 ;; --- SQLite implementation ---
 (define (make-sqlite-project-repository rc)
   (define project-columns
@@ -106,6 +105,10 @@
            (_ (log-info "insert-project query:\n\t~a\n" query)))
       (DB-query (DB-open rc) query)))
 
-  (make-project-repository get-active-projects search-active-projects
-                           get-active-project-by-human-id
-                           update-project-by-human-id insert-project))
+  (mk-project-repository #:get-active-projects-proc get-active-projects
+                         #:search-active-projects-proc search-active-projects
+                         #:get-active-project-by-human-id-proc
+                         get-active-project-by-human-id
+                         #:update-project-by-human-id-proc
+                         update-project-by-human-id
+                         #:insert-project-proc insert-project))
