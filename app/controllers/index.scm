@@ -20,7 +20,7 @@
 (import (lucidplan html)
         (web uri)
         (ice-9 string-fun)
-        (app models project)
+        (lucidplan persistence project)
         (app views index))
 
 (get "/"
@@ -28,8 +28,8 @@
      #:i18n '(cookie "lang")
      #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
-       (let* ((proj (DB-get-all-rows (DB-query (DB-open rc)
-                                        "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC"))))
+       (let* ((project-repo (make-sqlite-project-repository rc))
+              (proj (get-active-projects project-repo)))
          (response-emit (:mime rc
                                (welcome-page (:i18n rc)
                                              #:projects proj

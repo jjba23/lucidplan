@@ -26,7 +26,6 @@
         (lucidplan html)
         (lucidplan domain)
         (app models ticket)
-        (app models user)
         (app models ticket_assignee)
         (artanis security nss)
         (lucidplan persistence project)
