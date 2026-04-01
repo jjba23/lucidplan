@@ -19,9 +19,6 @@
   #:declarative? #t
   #:use-module (srfi srfi-9)
   #:use-module (ice-9 string-fun)
-  #:use-module (lucidplan prelude)
-  #:use-module (kracht prelude)
-  #:use-module (artanis db)
   #:export (symbols->sql-columns-list sql-row->scheme-alist
                                       symbol->sql-column
                                       sql-column->symbol

@@ -23,17 +23,23 @@
   #:use-module (artanis db)
   #:use-module (lucidplan persistence util)
   #:export (user-repository make-sqlite-user-repository user-repository?
-                            get-id-to-username))
+                            get-id-to-username get-user-by-email))
 
 ;; -- Record definition ---
 (define-record-type user-repository
-  (make-user-repository get-id-to-username-proc) user-repository?
-  (get-id-to-username-proc repo-get-id-to-username))
+  (make-user-repository get-id-to-username-proc get-user-by-email-proc)
+  user-repository?
+  (get-id-to-username-proc repo-get-id-to-username)
+  (get-user-by-email-proc repo-get-user-by-email))
 
 ;; --- DSL and wrappers ---
 (define (get-id-to-username repo)
   (apply (repo-get-id-to-username repo)
          '()))
+
+(define (get-user-by-email repo email)
+  (apply (repo-get-user-by-email repo)
+         (list email)))
 
 ;; --- SQLite implementation ---
 (define (make-sqlite-user-repository rc)
@@ -57,4 +63,18 @@
                         (length mapped-rows))))
       mapped-rows))
 
-  (make-user-repository get-id-to-username))
+  (define (get-user-by-email email)
+    (let* ((query (format #f "SELECT ~a
+                   FROM user WHERE email = ~a
+                   LIMIT 1"
+                          (symbols->sql-columns-list user-columns)
+                          (value->sql-literal email)))
+           (_ (log-info "get-user-by-email query:\n\t~a\n" query))
+           (rows (map sql-row->scheme-alist
+                      (DB-get-all-rows (DB-query (DB-open rc) query))))
+           (_ (log-info "get-user-by-email rows: ~a\n"
+                        (length rows))))
+      (if (nil? rows) #f
+          (car rows))))
+
+  (make-user-repository get-id-to-username get-user-by-email))
