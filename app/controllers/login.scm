@@ -26,7 +26,6 @@
         (lucidplan env)
         (kracht prelude)
         (lucidplan persistence user)
-        (app models project)
         (app views login))
 
 (get "/login"
@@ -63,8 +62,10 @@
           
           (cond
             ((equal? (string->sha-256 (string-append password
-                                                     (assq-ref u 'salt)))
-                     (assq-ref u 'password))
+                                                     (assq-ref u
+                                                               'salt)))
+                     (assq-ref u
+                               'password))
              (begin
                (:cookies-set! rc
                               'x-bewaking-lucidplan "x-bewaking-lucidplan" t)
@@ -91,19 +92,17 @@
      #:i18n '(cookie "lang")
      #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
-       (let* ((proj (DB-get-all-rows (DB-query (DB-open rc)
-                                      "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC"))))
-         (begin
-           (:cookies-set! rc
-                          'x-bewaking-lucidplan "x-bewaking-lucidplan" "")
-           (:cookies-setattr! rc
-                              'x-bewaking-lucidplan
-                              #:expires 1
-                              #:path "/"
-                              #:secure #t
-                              #:http-only #t)
+       (begin
+         (:cookies-set! rc
+                        'x-bewaking-lucidplan "x-bewaking-lucidplan" "")
+         (:cookies-setattr! rc
+                            'x-bewaking-lucidplan
+                            #:expires 1
+                            #:path "/"
+                            #:secure #t
+                            #:http-only #t)
 
-           (redirect-to rc
-                        (string->uri (format #f "~a/"
-                                             (current-myhost)))
-                        #:status 302)))))
+         (redirect-to rc
+                      (string->uri (format #f "~a/"
+                                           (current-myhost)))
+                      #:status 302))))
