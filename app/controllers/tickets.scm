@@ -25,7 +25,6 @@
         (uuid generate)
         (lucidplan html)
         (lucidplan domain)
-        (app models ticket)
         (app models ticket_assignee)
         (artanis security nss)
         (lucidplan persistence project)
@@ -39,9 +38,9 @@
     (assq-ref p
               'id)))
 
-(define (ticket-id-from-human-id rc human-id)
+(define (ticket-id-from-human-id rc project-id human-id)
   (let* ((ticket-repo (make-sqlite-ticket-repository rc))
-         (t (get-active-ticket-by-human-id ticket-repo human-id)))
+         (t (get-active-ticket-by-project-id-and-human-id ticket-repo project-id human-id)))
     (assq-ref t
               'id)))
 
@@ -307,6 +306,7 @@
                  (priority (string->number (assoc-ref body "priority")))
                  (ticket-type (assoc-ref body "ticket-type"))
                  (ticket-id (ticket-id-from-human-id rc
+                                                     (params rc "project")
                                                      (params rc "human-id"))))
             
             (DB-query (DB-open rc)
