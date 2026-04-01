@@ -51,7 +51,7 @@
                           get-active-ticket-by-project-id-and-human-id-proc
                           update-ticket-by-human-id-proc insert-ticket-proc))
 
-;; --- DSL and wrappers ---
+;; --- eDSL and wrappers ---
 (define (get-active-tickets repo project-id sort)
   (apply (repo-get-active-tickets repo)
          (list project-id sort)))

@@ -34,7 +34,7 @@
                             get-user-by-email-proc)
   (make-user-repository get-id-to-username-proc get-user-by-email-proc))
 
-;; --- DSL and wrappers ---
+;; --- eDSL and wrappers ---
 (define (get-id-to-username repo)
   (apply (repo-get-id-to-username repo)
          '()))
