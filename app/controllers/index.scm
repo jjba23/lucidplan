@@ -20,7 +20,7 @@
 (import (lucidplan html)
         (web uri)
         (ice-9 string-fun)
-        (lucidplan persistence project)
+        (lucidplan sqlite project)
         (app views index))
 
 (get "/"

@@ -21,8 +21,8 @@
   #:use-module (lucidplan prelude)
   #:use-module (kracht prelude)
   #:use-module (artanis db)
-  #:use-module (lucidplan persistence util)
-      #:use-module (lucidplan domain project)
+  #:use-module (lucidplan sqlite util)
+  #:use-module (lucidplan domain project)
   #:export (make-sqlite-project-repository))
 
 

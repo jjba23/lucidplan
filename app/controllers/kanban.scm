@@ -23,8 +23,8 @@
         (lucidplan auth)
         (kracht prelude)
         (lucidplan domain)
-        (lucidplan persistence ticket)
-        (lucidplan persistence project)
+        (lucidplan sqlite ticket)
+        (lucidplan sqlite project)
         (kracht prelude)
         (artanis security nss))
 

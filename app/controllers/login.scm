@@ -25,7 +25,7 @@
         (artanis security nss)
         (lucidplan env)
         (kracht prelude)
-        (lucidplan persistence user)
+        (lucidplan sqlite user)
         (app views login))
 
 (get "/login"

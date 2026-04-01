@@ -22,7 +22,7 @@
         (ice-9 string-fun)
         (kracht prelude)
         (lucidplan auth)
-        (lucidplan persistence project)
+        (lucidplan sqlite project)
         (uuid generate)
         (web uri)
         (web uri))

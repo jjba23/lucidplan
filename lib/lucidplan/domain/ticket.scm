@@ -21,7 +21,7 @@
   #:use-module (lucidplan prelude)
   #:use-module (kracht prelude)
   #:use-module (artanis db)
-  #:use-module (lucidplan persistence util)
+  #:use-module (lucidplan sqlite util)
   #:export (ticket-repository 
                                ticket-repository?
                                get-active-tickets

@@ -25,6 +25,7 @@
                                search-active-projects
                                get-active-project-by-human-id
                                update-project-by-human-id
+                               make-project-repository
                                insert-project))
 
 
