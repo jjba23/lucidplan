@@ -15,7 +15,7 @@
 ;; You should have received a copy of the GNU Affero General Public License
 ;; along with lucidplan.  If not, see <https://www.gnu.org/licenses/>.
 
-(define-module (lucidplan persistence util)
+(define-module (lucidplan sqlite util)
   #:declarative? #t
   #:use-module (srfi srfi-9)
   #:use-module (ice-9 string-fun)

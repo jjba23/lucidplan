@@ -280,7 +280,7 @@
                                                                     (assq-ref
                                                                      t
                                                                      'id))))
-                (assignee (if (nil? assignee-data) ""
+                (assignee (if (null? assignee-data) ""
                               (assoc-ref (car assignee-data) "user_id"))))
            (response-emit (:mime rc
                                  (html-edit-ticket-form (:i18n rc)
@@ -392,7 +392,7 @@
                                                                 #:ticket t
                                                                 #:assignee (if
                                                                             (not
-                                                                             (nil?
+                                                                             (null?
                                                                               ticket-assignee))
 
                                                                             (assoc-ref

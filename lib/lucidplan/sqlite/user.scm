@@ -15,31 +15,16 @@
 ;; You should have received a copy of the GNU Affero General Public License
 ;; along with lucidplan.  If not, see <https://www.gnu.org/licenses/>.
 
-(define-module (lucidplan persistence user)
+(define-module (lucidplan sqlite user)
   #:declarative? #t
   #:use-module (srfi srfi-9)
   #:use-module (lucidplan prelude)
   #:use-module (kracht prelude)
   #:use-module (artanis db)
   #:use-module (lucidplan persistence util)
-  #:export (user-repository make-sqlite-user-repository user-repository?
-                            get-id-to-username get-user-by-email))
+    #:use-module (lucidplan domain user)
+  #:export (make-sqlite-user-repository))
 
-;; -- Record definition ---
-(define-record-type user-repository
-  (make-user-repository get-id-to-username-proc get-user-by-email-proc)
-  user-repository?
-  (get-id-to-username-proc repo-get-id-to-username)
-  (get-user-by-email-proc repo-get-user-by-email))
-
-;; --- DSL and wrappers ---
-(define (get-id-to-username repo)
-  (apply (repo-get-id-to-username repo)
-         '()))
-
-(define (get-user-by-email repo email)
-  (apply (repo-get-user-by-email repo)
-         (list email)))
 
 ;; --- SQLite implementation ---
 (define (make-sqlite-user-repository rc)
@@ -47,8 +32,7 @@
     '(id username email password salt permissions))
 
   (define (get-id-to-username)
-    (let* ((query (format #f "SELECT ~a
-                   FROM user
+    (let* ((query (format #f "SELECT ~a FROM user
                    ORDER BY username ASC"
                           (symbols->sql-columns-list user-columns)))
            (_ (log-info "get-id-to-username query:\n\t~a\n" query))
@@ -64,9 +48,7 @@
       mapped-rows))
 
   (define (get-user-by-email email)
-    (let* ((query (format #f "SELECT ~a
-                   FROM user WHERE email = ~a
-                   LIMIT 1"
+    (let* ((query (format #f "SELECT ~a FROM user WHERE email = ~a LIMIT 1"
                           (symbols->sql-columns-list user-columns)
                           (value->sql-literal email)))
            (_ (log-info "get-user-by-email query:\n\t~a\n" query))
@@ -74,7 +56,7 @@
                       (DB-get-all-rows (DB-query (DB-open rc) query))))
            (_ (log-info "get-user-by-email rows: ~a\n"
                         (length rows))))
-      (if (nil? rows) #f
+      (if (null? rows) #f
           (car rows))))
 
   (make-user-repository get-id-to-username get-user-by-email))
