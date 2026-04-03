@@ -27,13 +27,16 @@
 
 ;; --- SQLite implementation ---
 (define (make-sqlite-ticket-assignee-repository rc)
-  (define user-columns
+  (define ticket-assignee-columns
+    '(project-id ticket-id user-id))
+
+  (define ticket-assignee-upsert-columns
     '(project-id ticket-id user-id))
 
   (define (get-ticket-assignee-by-project-id project-id)
     (let* ((query (format #f
                    "SELECT ~a FROM ticket_assignee WHERE project_id = ~a"
-                   (symbols->sql-columns-list user-columns)
+                   (symbols->sql-columns-list ticket-assignee-columns)
                    (value->sql-literal project-id)))
            (_ (log-info "get-ticket-assignee-by-project-id query:
 	~a
@@ -53,7 +56,7 @@
   (define (get-ticket-assignee-by-ticket-id ticket-id)
     (let* ((query (format #f
                    "SELECT ~a FROM ticket_assignee WHERE ticket_id = ~a LIMIT 1"
-                   (symbols->sql-columns-list user-columns)
+                   (symbols->sql-columns-list ticket-assignee-columns)
                    (value->sql-literal ticket-id)))
            (_ (log-info "get-ticket-assignee-by-ticket-id query:
 	~a
@@ -71,7 +74,21 @@
       (if (null? mapped-rows) #f
           (car mapped-rows))))
 
+  (define (upsert-ticket-assignee attrs)
+    (let* ((vals (map (lambda (x)
+                        (value->sql-literal (assq-ref attrs x)))
+                      ticket-assignee-upsert-columns))
+           (query (format #f
+                   "INSERT INTO ticket_assignee (~a)
+                        VALUES (~a) ON CONFLICT(ticket_id) DO UPDATE SET user_id = excluded.user_id"
+                   (symbols->sql-columns-list ticket-assignee-upsert-columns)
+                   (string-join vals ", ")))
+           (_ (log-info "upsert-ticket-assignee query:\n\t~a\n" query)))
+      (DB-query (DB-open rc) query)))
+
   (mk-ticket-assignee-repository #:get-ticket-assignee-by-project-id-proc
                                  get-ticket-assignee-by-project-id
                                  #:get-ticket-assignee-by-ticket-id-proc
-                                 get-ticket-assignee-by-ticket-id))
+                                 get-ticket-assignee-by-ticket-id
+                                 #:upsert-ticket-assignee-proc
+                                 upsert-ticket-assignee))

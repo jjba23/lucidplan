@@ -304,7 +304,8 @@
                  (ticket-type (assoc-ref body "ticket-type"))
                  (ticket-id (ticket-id-from-human-id rc
                                                      (params rc "project")
-                                                     (params rc "human-id"))))
+                                                     (params rc "human-id")))
+                 (ticket-assignee-repo (make-sqlite-ticket-assignee-repository rc)))
             
             (DB-query (DB-open rc)
                       (->sql update
@@ -316,12 +317,9 @@
                                (priority ,priority)
                                (updated_at ,(current-time)))
                              (where #:human_id (params rc "human-id"))))
-            (DB-query (DB-open rc)
-                      (format #f
-                       "INSERT INTO ticket_assignee (user_id, ticket_id)
-                        VALUES ('~a', '~a') ON CONFLICT(ticket_id) DO UPDATE SET user_id = excluded.user_id"
-                       (assoc-ref body "assignee") ticket-id))
-
+            (upsert-ticket-assignee ticket-assignee-repo `((project-id unquote (params rc "project"))
+                                                           (ticket-id unquote ticket-id)
+                                                           (user-id unquote (assoc-ref body "assignee"))))
             (redirect-to rc
                          (string->uri (format #f "~a/tickets/~a"
                                               (current-myhost)

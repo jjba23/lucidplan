@@ -23,21 +23,26 @@
   #:export (ticket-assignee-repository ticket-assignee-repository?
                                        get-ticket-assignee-by-project-id
                                        get-ticket-assignee-by-ticket-id
+                                       upsert-ticket-assignee
                                        mk-ticket-assignee-repository))
 
 ;; -- Record definition ---
 (define-record-type ticket-assignee-repository
   (make-ticket-assignee-repository get-ticket-assignee-by-project-id-proc
-                                   get-ticket-assignee-by-ticket-id-proc)
+                                   get-ticket-assignee-by-ticket-id-proc
+                                   upsert-ticket-assignee-proc)
   ticket-assignee-repository?
   (get-ticket-assignee-by-project-id-proc
    repo-get-ticket-assignee-by-project-id)
-  (get-ticket-assignee-by-ticket-id-proc repo-get-ticket-assignee-by-ticket-id))
+  (get-ticket-assignee-by-ticket-id-proc repo-get-ticket-assignee-by-ticket-id)
+  (upsert-ticket-assignee-proc repo-upsert-ticket-assignee))
 
 (define* (mk-user-repository #:key get-ticket-assignee-by-project-id-proc
-                             get-ticket-assignee-by-ticket-id-proc)
+                             get-ticket-assignee-by-ticket-id-proc
+                             upsert-ticket-assignee-proc)
   (make-ticket-assignee-repository get-ticket-assignee-by-project-id-proc
-                                   get-ticket-assignee-by-ticket-id-proc))
+                                   get-ticket-assignee-by-ticket-id-proc
+                                   upsert-ticket-assignee-proc))
 
 ;; --- eDSL and wrappers ---
 (define (get-ticket-assignee-by-project-id repo project-id)
@@ -47,3 +52,7 @@
 (define (get-ticket-assignee-by-ticket-id repo ticket-id)
   (apply (repo-get-ticket-assignee-by-ticket-id repo)
          (list ticket-id)))
+
+(define (upsert-ticket-assignee repo attrs)
+  (apply (repo-upsert-ticket-assignee repo)
+         (list attrs)))
