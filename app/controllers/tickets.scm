@@ -25,13 +25,14 @@
         (uuid generate)
         (lucidplan html)
         (lucidplan domain)
-        (app models ticket_assignee)
         (artanis security nss)
         (lucidplan domain project)
         (lucidplan domain ticket)
+        (lucidplan domain ticket-assignee)
         (lucidplan domain user)
         (lucidplan sqlite project)
         (lucidplan sqlite ticket)
+        (lucidplan sqlite ticket-assignee)
         (lucidplan sqlite user)
         (hygguile hygguile))
 
@@ -43,7 +44,8 @@
 
 (define (ticket-id-from-human-id rc project-id human-id)
   (let* ((ticket-repo (make-sqlite-ticket-repository rc))
-         (t (get-active-ticket-by-project-id-and-human-id ticket-repo project-id human-id)))
+         (t (get-active-ticket-by-project-id-and-human-id ticket-repo
+                                                          project-id human-id)))
     (assq-ref t
               'id)))
 
@@ -127,6 +129,8 @@
                 (project-repo (make-sqlite-project-repository rc))
                 (user-repo (make-sqlite-user-repository rc))
                 (ticket-repo (make-sqlite-ticket-repository rc))
+                (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
+                                       rc))
                 (proj (get-active-projects project-repo))
                 (query-sort (entity-sort-from-query user-sort))
                 (project-details (get-active-project-by-human-id project-repo
@@ -150,14 +154,9 @@
                                                 (assq-ref t
                                                           'human-id))) tickets))
                 (user-names (get-id-to-username user-repo))
-                (ticket-assignee (map (lambda (t)
-                                        `(,(assq-ref t
-                                                     'ticket-id) unquote
-                                          (assq-ref t
-                                                    'user-id)))
-                                      ($ticket_assignee 'get
-                                                        #:columns '(ticket_id
-                                                                    user_id)))))
+                (ticket-assignee (get-ticket-assignee-by-project-id
+                                  ticket-assignee-repo
+                                  (params rc "project"))))
            
            (response-emit (:mime rc
                                  (html-from-tickets (:i18n rc)
@@ -270,21 +269,16 @@
                                                                  (params rc
                                                                   "project")))
                 (ticket-repo (make-sqlite-ticket-repository rc))
+                (ticket-assignee-repo (make-sqlite-ticket-assignee-repository rc))
                 (t (get-active-ticket-by-project-id-and-human-id ticket-repo
                                                                  (assq-ref
                                                                   project-details
                                                                   'id)
                                                                  (params rc
                                                                   "human-id")))
-                (assignee-data ($ticket_assignee 'get
-                                                 #:ret 'top
-                                                 #:condition (where
-                                                                    #:ticket_id
-                                                                    (assq-ref
-                                                                     t
-                                                                     'id))))
+                (assignee-data (get-ticket-assignee-by-ticket-id ticket-assignee-repo (assq-ref t 'id)))
                 (assignee (if (null? assignee-data) ""
-                              (assoc-ref (car assignee-data) "user_id"))))
+                              (assq-ref assignee-data 'user-id))))
            (response-emit (:mime rc
                                  (html-edit-ticket-form (:i18n rc)
                                                         #:projects proj
@@ -349,6 +343,8 @@
                 (proj (get-active-projects project-repo))
                 (user-repo (make-sqlite-user-repository rc))
                 (ticket-repo (make-sqlite-ticket-repository rc))
+                (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
+                                       rc))
                 (project-details (get-active-project-by-human-id project-repo
                                                                  (params rc
                                                                   "project")))
@@ -359,14 +355,14 @@
                                                                  (params rc
                                                                   "human-id")))
                 (user-names (get-id-to-username user-repo))
-                (ticket-assignee ($ticket_assignee 'get
-                                                   #:ret 'top
-                                                   #:columns '(user_id)
-                                                   #:condition (where
-                                                                      #:ticket_id
-                                                                      (assq-ref
-                                                                       t
-                                                                       'id)))))
+                (ticket-assignee (get-ticket-assignee-by-ticket-id
+                                  ticket-assignee-repo
+                                  (assq-ref t
+                                            'id)))
+                (assignee-name (if (not (null? ticket-assignee))
+                                   (assoc-ref user-names
+                                              (assq-ref ticket-assignee
+                                                        'user-id)) #f)))
            (response-emit (:mime rc
                                  (html-template (:i18n rc)
                                                 #:is-logged-in (:cookies-value
@@ -393,17 +389,6 @@
                                                                            rc
                                                                            "project")
                                                                 #:ticket t
-                                                                #:assignee (if
-                                                                            (not
-                                                                             (null?
-                                                                              ticket-assignee))
-
-                                                                            (assoc-ref
-                                                                             user-names
-
-                                                                             (assoc-ref
-                                                                              (car
-                                                                               ticket-assignee)
-                                                                              "user_id"))
-                                                                            #f)))))))))
+                                                                #:assignee
+                                                                assignee-name))))))))
        (get-single)))
