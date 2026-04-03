@@ -269,16 +269,21 @@
                                                                  (params rc
                                                                   "project")))
                 (ticket-repo (make-sqlite-ticket-repository rc))
-                (ticket-assignee-repo (make-sqlite-ticket-assignee-repository rc))
+                (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
+                                       rc))
                 (t (get-active-ticket-by-project-id-and-human-id ticket-repo
                                                                  (assq-ref
                                                                   project-details
                                                                   'id)
                                                                  (params rc
                                                                   "human-id")))
-                (assignee-data (get-ticket-assignee-by-ticket-id ticket-assignee-repo (assq-ref t 'id)))
+                (assignee-data (get-ticket-assignee-by-ticket-id
+                                ticket-assignee-repo
+                                (assq-ref t
+                                          'id)))
                 (assignee (if (null? assignee-data) ""
-                              (assq-ref assignee-data 'user-id))))
+                              (assq-ref assignee-data
+                                        'user-id))))
            (response-emit (:mime rc
                                  (html-edit-ticket-form (:i18n rc)
                                                         #:projects proj
@@ -305,21 +310,23 @@
                  (ticket-id (ticket-id-from-human-id rc
                                                      (params rc "project")
                                                      (params rc "human-id")))
-                 (ticket-assignee-repo (make-sqlite-ticket-assignee-repository rc)))
+                 (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
+                                        rc)))
             
-            (DB-query (DB-open rc)
-                      (->sql update
-                             'ticket set
-                             `((ticket_status ,ticket-status)
-                               (ticket_type ,ticket-type)
-                               (description ,description)
-                               (title ,title)
-                               (priority ,priority)
-                               (updated_at ,(current-time)))
-                             (where #:human_id (params rc "human-id"))))
-            (upsert-ticket-assignee ticket-assignee-repo `((project-id unquote (params rc "project"))
-                                                           (ticket-id unquote ticket-id)
-                                                           (user-id unquote (assoc-ref body "assignee"))))
+            (update-ticket-by-human-id (params rc "human-id")
+                                       `((ticket-status unquote ticket-status)
+                                         (ticket-type unquote ticket-type)
+                                         (description unquote description)
+                                         (title unquote title)
+                                         (priority unquote priority)
+                                         (updated_at unquote
+                                                     (current-time))))
+            (upsert-ticket-assignee ticket-assignee-repo
+                                    `((project-id unquote
+                                                  (params rc "project"))
+                                      (ticket-id unquote ticket-id)
+                                      (user-id unquote
+                                               (assoc-ref body "assignee"))))
             (redirect-to rc
                          (string->uri (format #f "~a/tickets/~a"
                                               (current-myhost)
