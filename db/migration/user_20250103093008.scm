@@ -26,9 +26,6 @@
              ;; note: the ` is important due to Lisp quasi-quotation
              ;; so as to have it interpreted as a list of symbols
              #:permissions
-             "`(lucidplan:modify-permissions
-                                             lucidplan:ticket-create lucidplan:ticket-delete
-                                             lucidplan:project-create lucidplan:project-delete
-                                             lucidplan:user-create lucidplan:user-delete)")
+             "`(lucidplan:modify-permissions\n                                             lucidplan:ticket-create lucidplan:ticket-delete\n                                             lucidplan:project-create lucidplan:project-delete\n                                             lucidplan:user-create lucidplan:user-delete)")
             (display "done.\n"))
 

@@ -29,8 +29,7 @@
                             happy-flow
                             unhappy-flow
                             rc)
-  "Protect an HTTP endpoint with bewaking, preventing unauthorized access and
-executing either happy-flow-thunk or unhappy-flow-thunk."
+  "Protect an HTTP endpoint with bewaking, preventing unauthorized access and\nexecuting either happy-flow-thunk or unhappy-flow-thunk."
   (cond
     ((not (equal? #f
                   (:cookies-value rc
@@ -57,8 +56,7 @@ executing either happy-flow-thunk or unhappy-flow-thunk."
                                 happy-flow
                                 unhappy-flow
                                 rc)
-  "Protect an HTTP REST endpoint with bewaking, preventing unauthorized access and
-executing either happy-flow-thunk or unhappy-flow-thunk."
+  "Protect an HTTP REST endpoint with bewaking, preventing unauthorized access and\nexecuting either happy-flow-thunk or unhappy-flow-thunk."
   (cond
     ((not (equal? #f
                   (get-header rc token-name)))

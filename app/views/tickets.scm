@@ -49,13 +49,20 @@
                         #:key project ticket
                         (assignee #f))
   (let* ( ;Extract Ticket Data
-          (id (assq-ref ticket 'id))
-         (human-id (assq-ref ticket 'human-id))
-         (title (assq-ref ticket 'title))
-         (status (assq-ref ticket 'ticket-status))
-         (type (assq-ref ticket 'ticket-type))
-         (desc (assq-ref ticket 'description))
-         (priority (assq-ref ticket 'priority))
+          (id (assq-ref ticket
+                        'id))
+         (human-id (assq-ref ticket
+                             'human-id))
+         (title (assq-ref ticket
+                          'title))
+         (status (assq-ref ticket
+                           'ticket-status))
+         (type (assq-ref ticket
+                         'ticket-type))
+         (desc (assq-ref ticket
+                         'description))
+         (priority (assq-ref ticket
+                             'priority))
 
          ;; Consolidate Reusable CSS Classes
          (card-face (mk-class '(flex flex-col
@@ -73,12 +80,14 @@
                                            text-md font-light)))
          (val-face (mk-class '(font-sans text-onyx-700 dark:text-stone-300
                                          text-md ml-4)))
+         (mono-face (mk-class '(font-sans text-onyx-700 dark:text-stone-300
+                                          text-sm ml-4 font-mono)))
 
          ;; Pre-calculate URLs and JS callbacks
          (toggle-js (format #f
                      "document.getElementById('details-~a').toggleAttribute('hidden')"
                      id))
-         (edit-url (format #f "/tickets/~a/id/~a/edit" project human-id))
+         (edit-url (format #f "/tickets/~a/~a/edit" project human-id))
          (delete-url (format #f "/tickets/~a/delete" project)))
     
     ;; Render the clean SXML
@@ -95,7 +104,7 @@
                                                dark:text-stone-300 text-xl)))))
 
            ;; Meta Info (Status & Type)
-           (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-8
+           (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-6
                                             justify-left))))
 
                 ;; Status
@@ -117,23 +126,22 @@
                           ,(p type))))
 
            ;; Description
-           (small (@ (class ,label-face))
-                  ,(G_ "description"))
-           (span (@ (class ,(mk-class '(text-md py-3
-                                                text-onyx-700
-                                                dark:text-stone-300
-                                                font-medium
-                                                font-sans
-                                                max-w-prose
-                                                whitespace-pre-wrap
-                                                leading-7
-                                                ml-4))))
-                 ,(org2html desc))
+           ,(render-if-nestring (lambda (d)
+                                  `((small (@ (class ,label-face))
+                                           ,(G_ "description"))
+                                    (span (@ (class ,(mk-class '(text-md py-3
+                                                                 text-onyx-700
+                                                                 dark:text-stone-300
+                                                                 font-medium
+                                                                 font-sans
+                                                                 max-w-prose
+                                                                 whitespace-pre-wrap
+                                                                 leading-7
+                                                                 ml-4))))
+                                          ,(org2html d)))) desc)
 
            ;; Ticket Details
-           (small (@ (class ,label-face))
-                  ,(G_ "human id"))
-           (small (@ (class ,val-face))
+           (small (@ (class ,mono-face))
                   ,(format #f "~a-~s" project human-id))
 
            ,(if (and (not (nil? priority))
@@ -181,10 +189,14 @@
                                  ticket-assignee
                                  user-names)
   (let* ( ;Extract Ticket Data
-          (id (assq-ref ticket 'id))
-         (human-id (assq-ref ticket 'human-id))
-         (title (assq-ref ticket 'title))
-         (type (assq-ref ticket 'ticket-type))
+          (id (assq-ref ticket
+                        'id))
+         (human-id (assq-ref ticket
+                             'human-id))
+         (title (assq-ref ticket
+                          'title))
+         (type (assq-ref ticket
+                         'ticket-type))
 
          ;; Pre-calculate IDs, URLs, and JS
          (item-id (format #f "listitem-~a" id))
@@ -193,7 +205,7 @@
          (toggle-js (format #f
                      "document.getElementById('~a').toggleAttribute('hidden')"
                      details-id))
-         (ticket-url (format #f "/tickets/~a/id/~a" project human-id))
+         (ticket-url (format #f "/tickets/~a/~a" project human-id))
 
          ;; Consolidate CSS Classes
          (wrapper-face (mk-class '(flex flex-col gap-2)))
@@ -271,9 +283,12 @@
                             with-rejected
                             search-query)
   (let* ( ;Core Data
-          (proj-human-id (assq-ref project-details 'human-id))
-         (proj-title (assq-ref project-details 'title))
-         (proj-desc (assq-ref project-details 'description))
+          (proj-human-id (assq-ref project-details
+                                   'human-id))
+         (proj-title (assq-ref project-details
+                               'title))
+         (proj-desc (assq-ref project-details
+                              'description))
 
          ;; CSS Faces
          (header-face (mk-class '(flex flex-row gap-2 items-center)))
@@ -501,7 +516,7 @@
 
                                       ;; Sub-Components & Lists
                                       ,search-param-components
-                                      ,(if (null? active-tickets)
+                                      ,(if (nil? active-tickets)
                                            fallback-no-ticket-list ticket-list)
                                       ,done-ticket-list
                                       ,rejected-ticket-list))))))
@@ -524,14 +539,20 @@
                     #:is-logged-in is-logged-in
                     #:project project
                     #:is-edit #t
-                    #:title (assq-ref t 'title)
-                    #:description (assq-ref t 'description)
-                    #:ticket-type (assq-ref t 'ticket-type)
-                    #:ticket-status (assq-ref t 'ticket-status)
+                    #:title (assq-ref t
+                                      'title)
+                    #:description (assq-ref t
+                                            'description)
+                    #:ticket-type (assq-ref t
+                                            'ticket-type)
+                    #:ticket-status (assq-ref t
+                                              'ticket-status)
                     #:assignee assignee
-                    #:priority (assq-ref t 'priority)
-                    #:action (format #f "/tickets/~a/id/~a/edit" project
-                                     (assq-ref t 'human-id))
+                    #:priority (assq-ref t
+                                         'priority)
+                    #:action (format #f "/tickets/~a/~a/edit" project
+                                     (assq-ref t
+                                               'human-id))
                     #:projects projects))
 
 (define* (html-ticket-form G_
@@ -548,7 +569,7 @@
                            (is-logged-in #f))
   
   (let* ( ;Consolidate Reusable CSS Classes
-          (form-face (mk-class '(flex flex-col gap-8)))
+          (form-face (mk-class '(flex flex-col gap-6)))
          (field-face (mk-class '(max-w-128)))
          (label-face (mk-class '(text-onyx-700 dark:text-stone-300)))
 

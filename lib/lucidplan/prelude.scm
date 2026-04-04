@@ -19,5 +19,3 @@
   #:declarative? #t
   #:export (log-debug))
 
-
-

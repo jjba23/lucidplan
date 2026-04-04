@@ -31,8 +31,8 @@
     '(id username email password salt permissions))
 
   (define (get-id-to-username)
-    (let* ((query (format #f "SELECT ~a FROM user
-                   ORDER BY username ASC"
+    (let* ((query (format #f
+                          "SELECT ~a FROM user\n                   ORDER BY username ASC"
                           (symbols->sql-columns-list user-columns)))
            (_ (log-info "get-id-to-username query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
@@ -55,7 +55,7 @@
                       (DB-get-all-rows (DB-query (DB-open rc) query))))
            (_ (log-info "get-user-by-email rows: ~a\n"
                         (length rows))))
-      (if (null? rows) #f
+      (if (nil? rows) #f
           (car rows))))
 
   (mk-user-repository #:get-id-to-username-proc get-id-to-username

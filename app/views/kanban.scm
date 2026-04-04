@@ -60,7 +60,7 @@
                             #:size '(text-md leading-7)))
 
                    (a (@ (class ,(mk-class '(text-md no-underline)))
-                         (href ,(format #f "/tickets/~a/id/~a" project
+                         (href ,(format #f "/tickets/~a/~a" project
                                         (assq-ref t
                                                   'human-id))))
                       ((i (@ (class ,(mk-class '(ph ph-link text-onyx-500

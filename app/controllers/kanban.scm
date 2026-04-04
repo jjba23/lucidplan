@@ -30,24 +30,15 @@
         (kracht prelude)
         (artanis security nss))
 
-(define (project-id-from-human-id rc human-id)
-  (let* ((project-repo (make-sqlite-project-repository rc))
-         (p (get-active-project-by-human-id project-repo human-id)))
-    (cond
-      ((null? p)
-       "")
-      (else (assq-ref p
-                      'id)))))
-
 (get "/kanban/:project"
      #:mime 'xml
      #:i18n '(cookie "lang")
      #:cookies '(names x-bewaking-lucidplan lucidplan-ticket-sort)
      (lambda (rc)
        (define (get)
-         (let* ((project-id (project-id-from-human-id rc
+         (let* ((project-repo (make-sqlite-project-repository rc))
+                (project-id (project-id-from-human-id project-repo
                                                       (params rc "project")))
-                (project-repo (make-sqlite-project-repository rc))
                 (ticket-repo (make-sqlite-ticket-repository rc))
                 (proj (get-active-projects project-repo))
                 (user-sort (cond

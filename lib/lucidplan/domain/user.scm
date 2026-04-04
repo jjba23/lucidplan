@@ -31,7 +31,7 @@
   (get-user-by-email-proc repo-get-user-by-email))
 
 (define* (mk-user-repository #:key get-id-to-username-proc
-                            get-user-by-email-proc)
+                             get-user-by-email-proc)
   (make-user-repository get-id-to-username-proc get-user-by-email-proc))
 
 ;; --- eDSL and wrappers ---

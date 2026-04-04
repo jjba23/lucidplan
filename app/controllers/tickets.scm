@@ -142,8 +142,7 @@
                                                           'human-id))) tickets))
                 (user-names (get-id-to-username user-repo))
                 (ticket-assignee (get-ticket-assignee-by-project-id
-                                  ticket-assignee-repo
-                                  project-id)))
+                                  ticket-assignee-repo project-id)))
            
            (response-emit (:mime rc
                                  (html-from-tickets (:i18n rc)
@@ -213,6 +212,7 @@
       (lambda (rc)
         (define (do-new)
           (let* ((project-repo (make-sqlite-project-repository rc))
+                 (ticket-repo (make-sqlite-ticket-repository rc))
                  (body (alist-from-url-encoded-body (rc-body rc)))
                  (title (html-escape (assoc-ref body "title")))
                  (ticket-status (assoc-ref body "ticket-status"))
@@ -223,16 +223,16 @@
                                                        (params rc "project")))
                  (new-uuid (string-replace-substring (generate-string-uuid)
                                                      "\n" "")))
-            
-            ($ticket 'set
-                     #:id new-uuid
-                     #:project_id project-id
-                     #:title title
-                     #:ticket_status ticket-status
-                     #:ticket_type ticket-type
-                     #:priority priority
-                     #:description description
-                     #:created_at (current-time))
+            (insert-ticket ticket-repo
+                           `((id unquote new-uuid)
+                             (project-id unquote project-id)
+                             (title unquote title)
+                             (ticket-status unquote ticket-status)
+                             (ticket-type unquote ticket-type)
+                             (priority unquote priority)
+                             (description unquote description)
+                             (created-at unquote
+                                         (current-time))))
 
             (redirect-to rc
                          (string->uri (format #f "~a/tickets/~a"
@@ -245,7 +245,7 @@
                            #:happy-flow do-new
                            #:unhappy-flow back-to-login)))
 
-(get "/tickets/:project/id/:human-id/edit"
+(get "/tickets/:project/:human-id/edit"
      #:mime 'xml
      #:i18n '(cookie "lang")
      #:cookies '(names x-bewaking-lucidplan)
@@ -269,7 +269,8 @@
                                 ticket-assignee-repo
                                 (assq-ref t
                                           'id)))
-                (assignee (if (null? assignee-data) ""
+                (_ (write assignee-data))
+                (assignee (if (nil? assignee-data) ""
                               (assq-ref assignee-data
                                         'user-id))))
            (response-emit (:mime rc
@@ -284,7 +285,7 @@
                                                                         "x-bewaking-lucidplan"))))))
        (get-edit)))
 
-(post "/tickets/:project/id/:human-id/edit"
+(post "/tickets/:project/:human-id/edit"
       #:mime 'xml
       #:cookies '(names x-bewaking-lucidplan)
       (lambda (rc)
@@ -328,7 +329,7 @@
                            #:happy-flow do-edit
                            #:unhappy-flow back-to-login)))
 
-(get "/tickets/:project/id/:human-id"
+(get "/tickets/:project/:human-id"
      #:mime 'xml
      #:i18n '(cookie "lang")
      #:cookies '(names x-bewaking-lucidplan)
@@ -354,7 +355,7 @@
                                   ticket-assignee-repo
                                   (assq-ref t
                                             'id)))
-                (assignee-name (if (not (null? ticket-assignee))
+                (assignee-name (if (not (nil? ticket-assignee))
                                    (assoc-ref user-names
                                               (assq-ref ticket-assignee
                                                         'user-id)) #f)))

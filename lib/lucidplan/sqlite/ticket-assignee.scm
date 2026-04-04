@@ -38,9 +38,8 @@
                    "SELECT ~a FROM ticket_assignee WHERE project_id = ~a"
                    (symbols->sql-columns-list ticket-assignee-columns)
                    (value->sql-literal project-id)))
-           (_ (log-info "get-ticket-assignee-by-project-id query:
-	~a
-" query))
+           (_ (log-info "get-ticket-assignee-by-project-id query:\n\t~a\n"
+                        query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query (DB-open rc) query))))
            (mapped-rows (map (lambda (r)
@@ -48,8 +47,7 @@
                                                'ticket-id)
                                      (assq-ref r
                                                'user-id))) rows))
-           (_ (log-info "get-ticket-assignee-by-project-id mapped-rows: ~a
-"
+           (_ (log-info "get-ticket-assignee-by-project-id mapped-rows: ~a\n"
                         (length mapped-rows))))
       mapped-rows))
 
@@ -58,9 +56,8 @@
                    "SELECT ~a FROM ticket_assignee WHERE ticket_id = ~a LIMIT 1"
                    (symbols->sql-columns-list ticket-assignee-columns)
                    (value->sql-literal ticket-id)))
-           (_ (log-info "get-ticket-assignee-by-ticket-id query:
-	~a
-" query))
+           (_ (log-info "get-ticket-assignee-by-ticket-id query:\n\t~a\n"
+                        query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query (DB-open rc) query))))
            (mapped-rows (map (lambda (r)
@@ -68,10 +65,9 @@
                                                'ticket-id)
                                      (assq-ref r
                                                'user-id))) rows))
-           (_ (log-info "get-ticket-assignee-by-ticket-id mapped-rows: ~a
-"
+           (_ (log-info "get-ticket-assignee-by-ticket-id mapped-rows: ~a\n"
                         (length mapped-rows))))
-      (if (null? mapped-rows) #f
+      (if (nil? mapped-rows) #f
           (car mapped-rows))))
 
   (define (upsert-ticket-assignee attrs)
@@ -79,8 +75,7 @@
                         (value->sql-literal (assq-ref attrs x)))
                       ticket-assignee-upsert-columns))
            (query (format #f
-                   "INSERT INTO ticket_assignee (~a)
-                        VALUES (~a) ON CONFLICT(ticket_id) DO UPDATE SET user_id = excluded.user_id"
+                   "INSERT INTO ticket_assignee (~a)\n                        VALUES (~a) ON CONFLICT(ticket_id) DO UPDATE SET user_id = excluded.user_id"
                    (symbols->sql-columns-list ticket-assignee-upsert-columns)
                    (string-join vals ", ")))
            (_ (log-info "upsert-ticket-assignee query:\n\t~a\n" query)))

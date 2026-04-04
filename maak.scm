@@ -59,24 +59,13 @@
 ;; ====== Maak i18n abstractions ======
 
 (define (i18n-compile* lang)
-  "Compile the translation file (.po) into a machine-readable (.mo) format
-
-Args: lang represents the language code (e.g., en_US, nl_NL, etc.)
-
-Use msgfmt to compile the .po file into a .mo file for the specified language
-The output .mo file will be placed in the LC_MESSAGES directory under the language's folder."
+  "Compile the translation file (.po) into a machine-readable (.mo) format\n\nArgs: lang represents the language code (e.g., en_US, nl_NL, etc.)\n\nUse msgfmt to compile the .po file into a .mo file for the specified language\nThe output .mo file will be placed in the LC_MESSAGES directory under the language's folder."
   ($ (list (~ "msgfmt -v -o ~a/~a/LC_MESSAGES/~a.mo" i18n-dir lang
               i18n-textdomain)
            (~ "~a/~a/LC_MESSAGES/~a.po" i18n-dir lang i18n-textdomain))))
 
 (define (i18n-init* lang)
-  "Initialize a new translation file from a template (.pot) for a specific language.
-
-Args: lang represents the language code (e.g., en_US, nl_NL, etc.)
-
-Use msginit to generate a .po file from the .pot template for the specified language
-The -l option sets the language, and --no-translator means no translator is pre-filled in the .po file
-The generated .po file is placed in the LC_MESSAGES directory for the given language"
+  "Initialize a new translation file from a template (.pot) for a specific language.\n\nArgs: lang represents the language code (e.g., en_US, nl_NL, etc.)\n\nUse msginit to generate a .po file from the .pot template for the specified language\nThe -l option sets the language, and --no-translator means no translator is pre-filled in the .po file\nThe generated .po file is placed in the LC_MESSAGES directory for the given language"
   (mkdir-p (~ "~a/~a/LC_MESSAGES" i18n-dir lang))
   ($ (list (~ "msginit -l ~a.UTF8 -o" lang)
            (~ "~a/~a/LC_MESSAGES/~a.po" i18n-dir lang i18n-textdomain)
@@ -84,20 +73,13 @@ The generated .po file is placed in the LC_MESSAGES directory for the given lang
      #:verbose? #t))
 
 (define (i18n-merge* lang)
-  "Merge translation updates from the template (.pot) into an existing .po file.
-
-Args: lang represents the language code (e.g., en_US, nl_NL, etc.)
-
-Use msgmerge to update the specified language's .po file with new translations from the template (.pot)
-The -U flag updates the .po file in place
-This ensures the .po file stays up-to-date with the latest changes in the template"
+  "Merge translation updates from the template (.pot) into an existing .po file.\n\nArgs: lang represents the language code (e.g., en_US, nl_NL, etc.)\n\nUse msgmerge to update the specified language's .po file with new translations from the template (.pot)\nThe -U flag updates the .po file in place\nThis ensures the .po file stays up-to-date with the latest changes in the template"
   ($ (list "msgmerge -U"
            (~ "~a/~a/LC_MESSAGES/~a.po" i18n-dir lang i18n-textdomain)
            (~ "~a/~a.pot" i18n-dir i18n-textdomain))))
 
 (define* (i18n-extract* #:key (update? #t))
-  "Extract translatable strings from Scheme source files using xgettext.
-Args: update? represents whether we should update a template or create a new one."
+  "Extract translatable strings from Scheme source files using xgettext.\nArgs: update? represents whether we should update a template or create a new one."
   ($ (list (~ "xgettext --default-domain=~a" i18n-textdomain)
            (~ "--output=~a/~a.pot" i18n-dir i18n-textdomain)
            "--language=Scheme --keyword=G_"
@@ -181,8 +163,7 @@ Args: update? represents whether we should update a template or create a new one
   (time-machine-manifest-shell '("art work -c conf/production.conf")))
 
 (define (init-db)
-  "Initialize a new database and enable WAL mode
-for higher concurrent writes to SQLite 3."
+  "Initialize a new database and enable WAL mode\nfor higher concurrent writes to SQLite 3."
   (delete-file-recursively lucidplan-db)
   (delete-file-recursively (~ "~a-shm" lucidplan-db))
   (delete-file-recursively (~ "~a-wal" lucidplan-db))
