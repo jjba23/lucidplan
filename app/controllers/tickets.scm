@@ -36,19 +36,6 @@
         (lucidplan sqlite user)
         (hygguile hygguile))
 
-(define (project-id-from-human-id rc human-id)
-  (let* ((project-repo (make-sqlite-project-repository rc))
-         (p (get-active-project-by-human-id project-repo human-id)))
-    (assq-ref p
-              'id)))
-
-(define (ticket-id-from-human-id rc project-id human-id)
-  (let* ((ticket-repo (make-sqlite-ticket-repository rc))
-         (t (get-active-ticket-by-project-id-and-human-id ticket-repo
-                                                          project-id human-id)))
-    (assq-ref t
-              'id)))
-
 (get "/tickets/:project"
      #:mime 'xml
      #:i18n '(cookie "lang")
@@ -56,7 +43,12 @@
                        lucidplan-ticket-sort x-bewaking-lucidplan)
      (lambda (rc)
        (define (get)
-         (let* ((is-logged-in (:cookies-value rc "x-bewaking-lucidplan"))
+         (let* ((project-repo (make-sqlite-project-repository rc))
+                (user-repo (make-sqlite-user-repository rc))
+                (ticket-repo (make-sqlite-ticket-repository rc))
+                (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
+                                       rc))
+                (is-logged-in (:cookies-value rc "x-bewaking-lucidplan"))
                 (user-search (cond
                                ((equal? #f
                                         (get-from-qstr rc "search"))
@@ -81,7 +73,7 @@
                                             "lucidplan-ticket-sort")))
                               (:cookies-value rc "lucidplan-ticket-sort"))
                              (else "last-edited-at-desc")))
-                (project-id (project-id-from-human-id rc
+                (project-id (project-id-from-human-id project-repo
                                                       (params rc "project")))
                 (with-done (cond
                              ((not (equal? #f
@@ -126,11 +118,6 @@
                                   (equal? (:cookies-value rc
                                            "lucidplan-show-rejected") "true"))
                                  (else #f)))
-                (project-repo (make-sqlite-project-repository rc))
-                (user-repo (make-sqlite-user-repository rc))
-                (ticket-repo (make-sqlite-ticket-repository rc))
-                (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
-                                       rc))
                 (proj (get-active-projects project-repo))
                 (query-sort (entity-sort-from-query user-sort))
                 (project-details (get-active-project-by-human-id project-repo
@@ -156,7 +143,7 @@
                 (user-names (get-id-to-username user-repo))
                 (ticket-assignee (get-ticket-assignee-by-project-id
                                   ticket-assignee-repo
-                                  (project-id-from-human-id rc (params rc "project")))))
+                                  project-id)))
            
            (response-emit (:mime rc
                                  (html-from-tickets (:i18n rc)
@@ -225,13 +212,14 @@
       #:cookies '(names x-bewaking-lucidplan)
       (lambda (rc)
         (define (do-new)
-          (let* ((body (alist-from-url-encoded-body (rc-body rc)))
+          (let* ((project-repo (make-sqlite-project-repository rc))
+                 (body (alist-from-url-encoded-body (rc-body rc)))
                  (title (html-escape (assoc-ref body "title")))
                  (ticket-status (assoc-ref body "ticket-status"))
                  (ticket-type (assoc-ref body "ticket-type"))
                  (description (html-escape (assoc-ref body "description")))
                  (priority (string->number (assoc-ref body "priority")))
-                 (project-id (project-id-from-human-id rc
+                 (project-id (project-id-from-human-id project-repo
                                                        (params rc "project")))
                  (new-uuid (string-replace-substring (generate-string-uuid)
                                                      "\n" "")))
@@ -301,19 +289,21 @@
       #:cookies '(names x-bewaking-lucidplan)
       (lambda (rc)
         (define (do-edit)
-          (let* ((body (alist-from-url-encoded-body (rc-body rc)))
+          (let* ((ticket-repo (make-sqlite-ticket-repository rc))
+                 (body (alist-from-url-encoded-body (rc-body rc)))
                  (title (html-escape (assoc-ref body "title")))
                  (description (html-escape (assoc-ref body "description")))
                  (ticket-status (assoc-ref body "ticket-status"))
                  (priority (string->number (assoc-ref body "priority")))
                  (ticket-type (assoc-ref body "ticket-type"))
-                 (ticket-id (ticket-id-from-human-id rc
+                 (ticket-id (ticket-id-from-human-id ticket-repo
                                                      (params rc "project")
                                                      (params rc "human-id")))
                  (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
                                         rc)))
             
-            (update-ticket-by-human-id (params rc "human-id")
+            (update-ticket-by-human-id ticket-repo
+                                       (params rc "human-id")
                                        `((ticket-status unquote ticket-status)
                                          (ticket-type unquote ticket-type)
                                          (description unquote description)

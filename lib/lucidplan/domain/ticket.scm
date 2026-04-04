@@ -28,6 +28,7 @@
                               get-active-ticket-by-project-id-and-human-id
                               update-ticket-by-human-id
                               mk-ticket-repository
+                              ticket-id-from-human-id
                               insert-ticket))
 
 ;; -- Record definition ---
@@ -44,9 +45,10 @@
   (insert-ticket-proc repo-insert-ticket))
 
 (define* (mk-ticket-repository #:key get-active-tickets-proc
-         search-active-tickets-proc
-         get-active-ticket-by-project-id-and-human-id-proc
-         update-ticket-by-human-id-proc insert-ticket-proc)
+          search-active-tickets-proc
+          get-active-ticket-by-project-id-and-human-id-proc
+          update-ticket-by-human-id-proc
+          insert-ticket-proc)
   (make-ticket-repository get-active-tickets-proc search-active-tickets-proc
                           get-active-ticket-by-project-id-and-human-id-proc
                           update-ticket-by-human-id-proc insert-ticket-proc))
@@ -72,3 +74,8 @@
   (apply (repo-insert-ticket repo)
          (list attrs)))
 
+(define (ticket-id-from-human-id repo project-id human-id)
+  (let* ((t (get-active-ticket-by-project-id-and-human-id repo project-id
+                                                          human-id)))
+    (assq-ref t
+              'id)))

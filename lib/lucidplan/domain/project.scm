@@ -26,8 +26,8 @@
                                get-active-project-by-human-id
                                update-project-by-human-id
                                mk-project-repository
-                               insert-project))
-
+                               insert-project
+                               project-id-from-human-id))
 
 ;; -- Record definition ---
 (define-record-type project-repository
@@ -43,9 +43,10 @@
   (insert-project-proc repo-insert-project))
 
 (define* (mk-project-repository #:key get-active-projects-proc
-                           search-active-projects-proc
-                           get-active-project-by-human-id-proc
-                           update-project-by-human-id-proc insert-project-proc)
+                                search-active-projects-proc
+                                get-active-project-by-human-id-proc
+                                update-project-by-human-id-proc
+                                insert-project-proc)
   (make-project-repository get-active-projects-proc
                            search-active-projects-proc
                            get-active-project-by-human-id-proc
@@ -70,3 +71,8 @@
 (define (insert-project repo attrs)
   (apply (repo-insert-project repo)
          (list attrs)))
+
+(define (project-id-from-human-id repo human-id)
+  (let* ((p (get-active-project-by-human-id repo human-id)))
+    (assq-ref p
+              'id)))

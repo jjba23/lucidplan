@@ -22,9 +22,12 @@
         (bewaking bewaking)
         (ice-9 textual-ports)
         (artanis security nss)
-        (app models project)
-        (app models user)
-        (app models ticket))
+        (lucidplan domain project)
+        (lucidplan domain ticket)
+        (lucidplan domain user)
+        (lucidplan sqlite project)
+        (lucidplan sqlite ticket)
+        (lucidplan sqlite user))
 
 (get "/api/v1/tickets/:project"
      #:mime 'json
