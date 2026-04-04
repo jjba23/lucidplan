@@ -156,7 +156,7 @@
                 (user-names (get-id-to-username user-repo))
                 (ticket-assignee (get-ticket-assignee-by-project-id
                                   ticket-assignee-repo
-                                  (params rc "project"))))
+                                  (project-id-from-human-id rc (params rc "project")))))
            
            (response-emit (:mime rc
                                  (html-from-tickets (:i18n rc)

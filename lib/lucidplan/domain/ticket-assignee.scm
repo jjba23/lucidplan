@@ -37,7 +37,7 @@
   (get-ticket-assignee-by-ticket-id-proc repo-get-ticket-assignee-by-ticket-id)
   (upsert-ticket-assignee-proc repo-upsert-ticket-assignee))
 
-(define* (mk-user-repository #:key get-ticket-assignee-by-project-id-proc
+(define* (mk-ticket-assignee-repository #:key get-ticket-assignee-by-project-id-proc
                              get-ticket-assignee-by-ticket-id-proc
                              upsert-ticket-assignee-proc)
   (make-ticket-assignee-repository get-ticket-assignee-by-project-id-proc
