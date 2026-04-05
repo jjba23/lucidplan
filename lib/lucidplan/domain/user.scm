@@ -19,19 +19,28 @@
   #:declarative? #t
   #:use-module (srfi srfi-9)
   #:use-module (kracht prelude)
-  #:export (user-repository user-repository? get-id-to-username
-                            get-user-by-email mk-user-repository))
+  #:export (user-repository user-repository?
+                            get-id-to-username
+                            get-user-by-id
+                            get-active-users
+                            get-user-by-email
+                            mk-user-repository))
 
 ;; -- Record definition ---
 (define-record-type user-repository
-  (make-user-repository get-id-to-username-proc get-user-by-email-proc)
+  (make-user-repository get-id-to-username-proc get-user-by-email-proc
+                        get-user-by-id-proc get-active-users-proc)
   user-repository?
   (get-id-to-username-proc repo-get-id-to-username)
-  (get-user-by-email-proc repo-get-user-by-email))
+  (get-user-by-email-proc repo-get-user-by-email)
+  (get-user-by-id-proc repo-get-user-by-id)
+  (get-active-users-proc repo-get-active-users))
 
 (define* (mk-user-repository #:key get-id-to-username-proc
-                             get-user-by-email-proc)
-  (make-user-repository get-id-to-username-proc get-user-by-email-proc))
+                             get-user-by-email-proc get-user-by-id-proc
+                             get-active-users-proc)
+  (make-user-repository get-id-to-username-proc get-user-by-email-proc
+                        get-user-by-id-proc get-active-users-proc))
 
 ;; --- eDSL and wrappers ---
 (define (get-id-to-username repo)
@@ -41,3 +50,11 @@
 (define (get-user-by-email repo email)
   (apply (repo-get-user-by-email repo)
          (list email)))
+
+(define (get-user-by-id repo id)
+  (apply (repo-get-user-by-id repo)
+         (list id)))
+
+(define (get-active-users repo)
+  (apply (repo-get-active-users repo)
+         '()))

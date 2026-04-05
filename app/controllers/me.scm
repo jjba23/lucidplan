@@ -30,7 +30,10 @@
         (rnrs bytevectors)
         (json)
         (artanis security nss)
-        (app models project)
+        (lucidplan sqlite project)
+        (lucidplan domain project)
+        (lucidplan sqlite user)
+        (lucidplan domain user)
         (app models password_reset)
         (bewaking bewaking))
 
@@ -43,17 +46,17 @@
                                          "x-bewaking-lucidplan")
                                 #:encryption-key encryption-key
                                 #:signing-key signing-key))
-              (proj (DB-get-all-rows (DB-query (DB-open rc)
-                                      "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC")))
-              (user ($user 'get
-                           #:ret 'top
-                           #:condition (where #:id (assoc-ref t
-                                                              'owner-id)))))
+              (project-repo (make-sqlite-project-repository rc))
+              (user-repo (make-sqlite-user-repository rc))
+              (proj (get-active-projects project-repo))
+              (user (get-user-by-id user-repo
+                                    (assoc-ref t
+                                               'owner-id))))
          (catch #t
                 (lambda ()
                   (response-emit (:mime rc
                                         (me-page (:i18n rc)
-                                                 #:user (car user)
+                                                 #:user user
                                                  #:projects proj
                                                  #:token t
                                                  #:is-logged-in (:cookies-value
@@ -79,15 +82,10 @@
                                   #:encryption-key encryption-key
                                   #:signing-key signing-key))
                 
-                (proj (DB-get-all-rows (DB-query (DB-open rc)
-                                        "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC")))
-                (user ($user 'get
-                             #:ret 'top
-                             #:condition (where #:id (assoc-ref t
-                                                                'owner-id))))
-                (users ($user 'get
-                              #:ret 'all
-                              #:order-by '(username asc))))
+                (project-repo (make-sqlite-project-repository rc))
+                (proj (get-active-projects project-repo))
+                (user-repo (make-sqlite-user-repository rc))
+                (users (get-active-users user-repo)))
            (response-emit (:mime rc
                                  (users-page (:i18n rc)
                                              #:users users

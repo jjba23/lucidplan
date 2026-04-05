@@ -232,7 +232,5 @@ for higher concurrent writes to SQLite 3."
   ($ '("scp wolk-jjba:/etc/byggsteg/job-clone/lucidplan/trunk/env.scm .")))
 
 (define (local-login)
-  ($ '("http --form POST"
-       "http://localhost:50025/api/v1/login"
-       "email=jjbigorra@gmail.com"
-       "password=***")))
+  ($ '("http --form POST" "http://localhost:50025/api/v1/login"
+       "email=jjbigorra@gmail.com" "password=***")))

@@ -57,5 +57,30 @@
       (if (nil? rows) #f
           (car rows))))
 
+  (define (get-user-by-id id)
+    (let* ((query (format #f "SELECT ~a FROM user WHERE id = ~a LIMIT 1"
+                          (symbols->sql-columns-list user-columns)
+                          (value->sql-literal id)))
+           (_ (log-info "get-user-by-id query:\n\t~a\n" query))
+           (rows (map sql-row->scheme-alist
+                      (DB-get-all-rows (DB-query (DB-open rc) query))))
+           (_ (log-info "get-user-by-id rows: ~a\n"
+                        (length rows))))
+      (if (nil? rows) #f
+          (car rows))))
+
+  (define (get-active-users)
+    (let* ((query (format #f "SELECT ~a FROM user
+                   ORDER BY username ASC"
+                          (symbols->sql-columns-list user-columns)))
+           (_ (log-info "get-active-users query:\n\t~a\n" query))
+           (rows (map sql-row->scheme-alist
+                      (DB-get-all-rows (DB-query (DB-open rc) query))))
+           (_ (log-info "get-active-users rows: ~a\n"
+                        (length rows))))
+      rows))
+
   (mk-user-repository #:get-id-to-username-proc get-id-to-username
-                      #:get-user-by-email-proc get-user-by-email))
+                      #:get-user-by-email-proc get-user-by-email
+                      #:get-user-by-id-proc get-user-by-id
+                      #:get-active-users-proc get-active-users))
