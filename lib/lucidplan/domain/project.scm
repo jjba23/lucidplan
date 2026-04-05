@@ -18,7 +18,6 @@
 (define-module (lucidplan domain project)
   #:declarative? #t
   #:use-module (srfi srfi-9)
-  #:use-module (lucidplan prelude)
   #:use-module (kracht prelude)
   #:export (project-repository project-repository?
                                get-active-projects

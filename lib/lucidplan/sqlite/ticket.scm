@@ -18,7 +18,6 @@
 (define-module (lucidplan sqlite ticket)
   #:declarative? #t
   #:use-module (srfi srfi-9)
-  #:use-module (lucidplan prelude)
   #:use-module (kracht prelude)
   #:use-module (artanis db)
   #:use-module (lucidplan sqlite util)

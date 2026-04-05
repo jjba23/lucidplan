@@ -22,6 +22,7 @@
         (bewaking bewaking)
         (ice-9 textual-ports)
         (artanis security nss)
+        (lucidplan env)
         (lucidplan domain project)
         (lucidplan domain ticket)
         (lucidplan domain user)
@@ -42,8 +43,10 @@
                                                                   "project")))
                 (tickets (get-active-tickets ticket-repo
                                              (assq-ref project-details
-                                                       'id))))
-           (:mime rc tickets)))
+                                                       'id) "human_id ASC")))
+           (:mime rc
+                  `((data unquote
+                          (list->vector tickets))))))
        (bewaking-api-endpoint #:token-name 'x-bewaking-lucidplan
                               #:needed-permissions '()
                               #:rc rc
@@ -58,7 +61,9 @@
        (define (do-get)
          (let* ((project-repo (make-sqlite-project-repository rc))
                 (projects (get-active-projects project-repo)))
-           (:mime rc projects)))
+           (:mime rc
+                  `((data unquote
+                          (list->vector projects))))))
        (bewaking-api-endpoint #:token-name 'x-bewaking-lucidplan
                               #:needed-permissions '()
                               #:rc rc
@@ -71,31 +76,34 @@
         (let* ((body (alist-from-url-encoded-body (rc-body rc)))
                (email (assoc-ref body "email"))
                (password (assoc-ref body "password"))
-               (u ($user 'get
-                         #:ret 'top
-                         #:condition (where #:email email)))
+               (user-repo (make-sqlite-user-repository rc))
+               (u (get-user-by-email user-repo email))
                (get-owner-details (lambda ()
                                     `((id unquote
-                                          (assoc-ref (car u) "id"))
+                                          (assoc-ref u
+                                                     'id))
                                       (email unquote
-                                             (assoc-ref (car u) "email"))
+                                             (assoc-ref u
+                                                        'email))
                                       (name unquote
-                                            (assoc-ref (car u) "username"))
+                                            (assoc-ref u
+                                                       'username))
                                       (permissions unquote
-                                                   (eval-string (assoc-ref (car
-                                                                            u)
-                                                                 "permissions"))))))
+                                                   (eval-string (assoc-ref u
+                                                                           'permissions))))))
                (t (generate-token #:encryption-key encryption-key
                                   #:signing-key signing-key
                                   #:get-owner-details get-owner-details)))
           
           (cond
             ((equal? (string->sha-256 (string-append password
-                                                     (assoc-ref (car u) "salt")))
-                     (assoc-ref (car u) "password"))
+                                                     (assoc-ref u
+                                                                'salt)))
+                     (assoc-ref u
+                                'password))
              (response-emit ""
                             #:status 204
-                            #:headers `((x-bewaking-byggsteg unquote t))))
+                            #:headers `((x-bewaking-lucidplan unquote t))))
             (else (response-emit '((error . "invalid credentials, could not make token"))
                                  #:status 401
                                  #:headers '()))))))

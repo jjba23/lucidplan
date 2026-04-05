@@ -18,7 +18,6 @@
 (define-module (lucidplan domain ticket-assignee)
   #:declarative? #t
   #:use-module (srfi srfi-9)
-  #:use-module (lucidplan prelude)
   #:use-module (kracht prelude)
   #:export (ticket-assignee-repository ticket-assignee-repository?
                                        get-ticket-assignee-by-project-id
