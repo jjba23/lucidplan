@@ -35,10 +35,15 @@
      #:session #t
      (lambda (rc)
        (define (do-get)
-         (:mime rc
-                ($ticket 'get
-                         #:condition (where #:project_id (params rc "project"))
-                         #:order-by '(human_id asc))))
+         (let* ((project-repo (make-sqlite-project-repository rc))
+                (ticket-repo (make-sqlite-ticket-repository rc))
+                (project-details (get-active-project-by-human-id project-repo
+                                                                 (params rc
+                                                                  "project")))
+                (tickets (get-active-tickets ticket-repo
+                                             (assq-ref project-details
+                                                       'id))))
+           (:mime rc tickets)))
        (bewaking-api-endpoint #:token-name 'x-bewaking-lucidplan
                               #:needed-permissions '()
                               #:rc rc
@@ -51,9 +56,9 @@
      #:session #t
      (lambda (rc)
        (define (do-get)
-         (:mime rc
-                (DB-get-all-rows (DB-query (DB-open rc)
-                                  "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC"))))
+         (let* ((project-repo (make-sqlite-project-repository rc))
+                (projects (get-active-projects project-repo)))
+           (:mime rc projects)))
        (bewaking-api-endpoint #:token-name 'x-bewaking-lucidplan
                               #:needed-permissions '()
                               #:rc rc

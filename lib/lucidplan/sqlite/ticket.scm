@@ -51,7 +51,10 @@
 
   (define (get-active-tickets project-id sort)
     (let* ((query (format #f
-                   "SELECT ~a\n                   FROM ticket WHERE deleted_at IS NULL\n                   AND project_id = '~a'\n                   ORDER BY ~a"
+                   "SELECT ~a
+                   FROM ticket WHERE deleted_at IS NULL
+                   AND project_id = '~a'
+                   ORDER BY ~a"
                    (symbols->sql-columns-list ticket-columns) project-id sort))
            (_ (log-info "get-active-tickets query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
@@ -62,7 +65,11 @@
 
   (define (search-active-tickets project-id q sort)
     (let* ((query (format #f
-                   "SELECT ~a\n                   FROM ticket WHERE deleted_at IS NULL\n                   AND project_id = '~a'\n                   AND (title LIKE '%~a%' OR description LIKE '%~a%')\n                   ORDER BY ~a"
+                   "SELECT ~a
+                   FROM ticket WHERE deleted_at IS NULL
+                   AND project_id = '~a'
+                   AND (title LIKE '%~a%' OR description LIKE '%~a%')
+                   ORDER BY ~a"
                    (symbols->sql-columns-list ticket-columns)
                    project-id
                    q
@@ -77,16 +84,19 @@
 
   (define (get-active-ticket-by-project-id-and-human-id project-id human-id)
     (let* ((query (format #f
-                   "SELECT ~a FROM ticket\n                    WHERE deleted_at IS NULL AND project_id = '~a' AND human_id = '~a'\n                    LIMIT 1"
+                   "SELECT ~a FROM ticket
+                    WHERE deleted_at IS NULL AND project_id = '~a' AND human_id = '~a'
+                    LIMIT 1"
                    (symbols->sql-columns-list ticket-columns) project-id
                    human-id))
-           (_ (log-info
-                        "get-active-ticket-by-project-id-and-human-id query:\n\t~a\n"
+           (_ (log-info "get-active-ticket-by-project-id-and-human-id query:
+	~a
+"
                         query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query (DB-open rc) query))))
-           (_ (log-info
-               "get-active-ticket-by-project-id-and-human-id rows: ~a\n"
+           (_ (log-info "get-active-ticket-by-project-id-and-human-id rows: ~a
+"
                (length rows))))
       (if (nil? rows) #f
           (car rows))))

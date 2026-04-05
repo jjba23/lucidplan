@@ -47,7 +47,9 @@
 
   (define (get-active-projects)
     (let* ((query (format #f
-                   "SELECT ~a\n                   FROM project WHERE deleted_at IS NULL\n                   ORDER BY human_id ASC"
+                   "SELECT ~a
+                   FROM project WHERE deleted_at IS NULL
+                   ORDER BY human_id ASC"
                    (symbols->sql-columns-list project-columns)))
            (_ (log-info "get-active-projects query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
@@ -58,7 +60,10 @@
 
   (define (search-active-projects q)
     (let* ((query (format #f
-                   "SELECT ~a\n                   FROM project WHERE deleted_at IS NULL\n                   AND (title LIKE '%~a%' OR description LIKE '%~a%')\n                   ORDER BY human_id ASC"
+                   "SELECT ~a
+                   FROM project WHERE deleted_at IS NULL
+                   AND (title LIKE '%~a%' OR description LIKE '%~a%')
+                   ORDER BY human_id ASC"
                    (symbols->sql-columns-list project-columns) q q))
            (_ (log-info "search-active-projects query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
@@ -69,9 +74,13 @@
 
   (define (get-active-project-by-human-id human-id)
     (let* ((query (format #f
-                   "SELECT ~a FROM project\n                    WHERE deleted_at IS NULL AND human_id = '~a'\n                    LIMIT 1"
+                   "SELECT ~a FROM project
+                    WHERE deleted_at IS NULL AND human_id = '~a'
+                    LIMIT 1"
                    (symbols->sql-columns-list project-columns) human-id))
-           (_ (log-info "get-active-project-by-human-id query:\n\t~a\n" query))
+           (_ (log-info "get-active-project-by-human-id query:
+	~a
+" query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query (DB-open rc) query))))
            (_ (log-info "get-active-project-by-human-id rows: ~a\n"

@@ -46,15 +46,15 @@
   (package
     (name "guile-uuid")
     (version "0.9.0")
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url "https://codeberg.org/elb/guile-uuid.git")
-                    (commit (string-append "v" version))))
-              (file-name (git-file-name name version))
-              (sha256
-               (base32
-                "0g508aajkyi513wbhm1rhs03ilnb701lwlrvppkmc0vynydlk9ws"))))
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://codeberg.org/elb/guile-uuid.git")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0g508aajkyi513wbhm1rhs03ilnb701lwlrvppkmc0vynydlk9ws"))))
     (build-system guile-build-system)
     (native-inputs (list guile-3.0 guile-gcrypt))
     (home-page "https://codeberg.org/elb/guile-uuid")
@@ -70,19 +70,20 @@ between binary and hex-and-dash string UUIDs are included.")
   (package
     (name "guile-hygguile")
     (version "2.0.20")
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url "https://codeberg.org/jjba23/hygguile.git")
-                    (commit (string-append "v" version))))
-              (file-name (git-file-name name version))
-              (sha256
-               (base32
-                "1v6rp6zdrr457ix2zxgqd83vcdkyj8wcw48x020z3av6xh5b8vb0"))))
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://codeberg.org/jjba23/hygguile.git")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1v6rp6zdrr457ix2zxgqd83vcdkyj8wcw48x020z3av6xh5b8vb0"))))
     (build-system guile-build-system)
     (native-inputs (list guile-3.0))
     (arguments
-     (list #:source-directory "src"))
+     (list
+      #:source-directory "src"))
     (home-page "https://codeberg.org/jjba23/hygguile")
     (synopsis "Web UI component library for Guile Scheme projects")
     (description
@@ -99,19 +100,20 @@ easing the learning curve, and reducing the cognitive load.")
   (package
     (name "guile-kracht")
     (version "0.1.10")
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url "https://codeberg.org/jjba23/kracht.git")
-                    (commit (string-append "v" version))))
-              (file-name (git-file-name name version))
-              (sha256
-               (base32
-                "1npicqxlahm03a6ass8f5jkjb9przn76maff5g69ag1cli8l56sw"))))
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://codeberg.org/jjba23/kracht.git")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1npicqxlahm03a6ass8f5jkjb9przn76maff5g69ag1cli8l56sw"))))
     (build-system guile-build-system)
     (native-inputs (list guile-3.0))
     (arguments
-     (list #:source-directory "src"))
+     (list
+      #:source-directory "src"))
     (home-page "https://codeberg.org/jjba23/kracht")
     (synopsis
      "Good prelude for Guile Scheme, an opt-in enhancement to the standard library")
@@ -123,19 +125,20 @@ easing the learning curve, and reducing the cognitive load.")
   (package
     (name "guile-orgwebalchemy")
     (version "0.1.12")
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url "https://codeberg.org/jjba23/orgwebalchemy.git")
-                    (commit (string-append "v" version))))
-              (file-name (git-file-name name version))
-              (sha256
-               (base32
-                "0l0c2jbfg36v1ldp7lb849lcab99malw4gqk7a4pjcvihr6jiq68"))))
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://codeberg.org/jjba23/orgwebalchemy.git")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0l0c2jbfg36v1ldp7lb849lcab99malw4gqk7a4pjcvihr6jiq68"))))
     (build-system guile-build-system)
     (native-inputs (list guile-3.0))
     (arguments
-     (list #:source-directory "src"))
+     (list
+      #:source-directory "src"))
     (home-page "https://codeberg.org/jjba23/orgwebalchemy")
     (synopsis
      "Convert Org markup to pretty HTML with a Lisp (Guile Scheme) library")
@@ -147,20 +150,21 @@ easing the learning curve, and reducing the cognitive load.")
   (package
     (name "guile-bewaking")
     (version "0.1.5")
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url "https://codeberg.org/jjba23/bewaking.git")
-                    (commit (string-append "v" version))))
-              (file-name (git-file-name name version))
-              (sha256
-               (base32
-                "15yz25b8bfi58lrb1kgfg5sq84pim04rfjqs87qzl655rfifxjq3"))))
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://codeberg.org/jjba23/bewaking.git")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "15yz25b8bfi58lrb1kgfg5sq84pim04rfjqs87qzl655rfifxjq3"))))
     (build-system guile-build-system)
     (native-inputs (list guile-uuid guile-gcrypt guile-3.0))
     (propagated-inputs (list openssl xxd))
     (arguments
-     (list #:source-directory "src"))
+     (list
+      #:source-directory "src"))
     (home-page "https://codeberg.org/jjba23/bewaking")
     (synopsis "Authentication / Authorization library for Guile Scheme")
     (description
