@@ -72,7 +72,8 @@
                               'x-bewaking-lucidplan "x-bewaking-lucidplan" t)
                (:cookies-setattr! rc
                                   'x-bewaking-lucidplan
-                                  #:expires (* 3600 24 7)
+                                  ;; token is valid for 31 days
+                                  #:expires (* 3600 24 31)
                                   #:path "/"
                                   #:secure #t
                                   #:http-only #t)
