@@ -84,9 +84,9 @@
   "Retrieves a list of all active users from the given REPO."
   ((repo-get-users repo)))
 
-(define (insert-user repo id)
+(define (insert-user repo attrs)
   "Inserts a user with ATTRS in the given REPO."
-  ((repo-insert-user-by-id repo)
+  ((repo-insert-user repo)
    attrs))
 
 (define (update-user-by-id repo id attrs)
