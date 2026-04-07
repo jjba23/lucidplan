@@ -53,13 +53,16 @@
                                                items-center gap-2))))
                    (div (@ (class ,(mk-class '(flex flex-row justify-left
                                                     items-center gap-2))))
-                        ,(emoji-for-ticket-type (assoc-ref t "ticket_type"))
-                        ,(p (org2html (assoc-ref t "title"))
+                        ,(emoji-for-ticket-type (assq-ref t
+                                                          'ticket-type))
+                        ,(p (org2html (assq-ref t
+                                                'title))
                             #:size '(text-md leading-7)))
 
                    (a (@ (class ,(mk-class '(text-md no-underline)))
-                         (href ,(format #f "/tickets/~a/id/~a" project
-                                        (assoc-ref t "human_id"))))
+                         (href ,(format #f "/tickets/~a/~a" project
+                                        (assq-ref t
+                                                  'human-id))))
                       ((i (@ (class ,(mk-class '(ph ph-link text-onyx-500
                                                     dark:text-stone-500
                                                     hover:text-asparagus-500))))
@@ -73,13 +76,13 @@
                               is-logged-in
                               (current-sort #f))
   
-  (let* ( ;Helper to DRY up ticket filtering
-          (get-tickets (lambda (status-str)
-                         (filter (lambda (x)
-                                   (string=? status-str
-                                             (assoc-ref x "ticket_status")))
-                                 tickets)))
-
+  (let* ((get-tickets (lambda (status-str)
+                        (filter (lambda (x)
+                                  (string=? status-str
+                                            (assq-ref x
+                                                      'ticket-status)))
+                                tickets)))
+         
          (tickets-todo (get-tickets "todo"))
          (tickets-wip (get-tickets "work-in-progress"))
          (tickets-rev (get-tickets "in-review"))
@@ -179,9 +182,9 @@
 
                                        (div (@ (class ,sort-wrap-face))
                                             ,(sort-select G_
-                                                          #:project-id (assoc-ref
+                                                          #:project-id (assq-ref
                                                                         project
-                                                                        "human_id")
+                                                                        'human-id)
                                                           #:current-sort
                                                           current-sort
                                                           #:option-maker

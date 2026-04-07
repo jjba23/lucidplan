@@ -21,7 +21,6 @@
         (web uri)
         (ice-9 string-fun)
         (curl)
-        (app models user)
         (lucidplan env)
         (kracht prelude)
         (lucidplan auth)
@@ -30,8 +29,12 @@
         (rnrs bytevectors)
         (json)
         (artanis security nss)
-        (app models project)
-        (app models password_reset)
+        (lucidplan sqlite project)
+        (lucidplan domain project)
+        (lucidplan sqlite user)
+        (lucidplan domain user)
+        (lucidplan domain password-reset)
+        (lucidplan sqlite password-reset)
         (bewaking bewaking))
 
 (get "/me"
@@ -43,17 +46,17 @@
                                          "x-bewaking-lucidplan")
                                 #:encryption-key encryption-key
                                 #:signing-key signing-key))
-              (proj (DB-get-all-rows (DB-query (DB-open rc)
-                                        "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC")))
-              (user ($user 'get
-                           #:ret 'top
-                           #:condition (where #:id (assoc-ref t
-                                                              'owner-id)))))
+              (project-repo (make-sqlite-project-repository rc))
+              (user-repo (make-sqlite-user-repository rc))
+              (proj (get-projects project-repo))
+              (user (get-user-by-id user-repo
+                                    (assoc-ref t
+                                               'owner-id))))
          (catch #t
                 (lambda ()
                   (response-emit (:mime rc
                                         (me-page (:i18n rc)
-                                                 #:user (car user)
+                                                 #:user user
                                                  #:projects proj
                                                  #:token t
                                                  #:is-logged-in (:cookies-value
@@ -79,15 +82,10 @@
                                   #:encryption-key encryption-key
                                   #:signing-key signing-key))
                 
-                (proj (DB-get-all-rows (DB-query (DB-open rc)
-                                        "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC")))
-                (user ($user 'get
-                             #:ret 'top
-                             #:condition (where #:id (assoc-ref t
-                                                                'owner-id))))
-                (users ($user 'get
-                              #:ret 'all
-                              #:order-by '(username asc))))
+                (project-repo (make-sqlite-project-repository rc))
+                (proj (get-projects project-repo))
+                (user-repo (make-sqlite-user-repository rc))
+                (users (get-users user-repo)))
            (response-emit (:mime rc
                                  (users-page (:i18n rc)
                                              #:users users
@@ -103,11 +101,9 @@
      #:mime 'xml
      #:i18n '(cookie "lang")
      (lambda (rc)
-       (let* ((tt (car ($password_reset 'get
-                                        #:ret 'top
-                                        #:condition (where #:reset_token (params
-                                                                          rc
-                                                                          "token")))))
+       (let* ((password-reset-repo (make-sqlite-password-reset-repository rc))
+              (tt (get-password-reset-by-token password-reset-repo
+                                               (params rc "token")))
               (now (current-time))
               (allowance (* 24 7 3600)) ;reset token is valid for a week
               (_ (when (> now
@@ -115,10 +111,10 @@
                              (assoc-ref tt "created_at")))
                    (error "reset token is found but not valid anymore")))
               (user-id (assoc-ref tt "user_id"))
-              (email (assoc-ref (car ($user 'get
-                                            #:ret 'top
-                                            #:condition (where #:id user-id)))
-                                "email")))
+              (user-repo (make-sqlite-user-repository rc))
+              (u (get-user-by-id user-repo user-repo user-id))
+              (email (assoc-ref u
+                                'email)))
          (response-emit (:mime rc
                                (reset-password-page (:i18n rc)
                                                     #:token (params rc "token")
@@ -147,7 +143,7 @@
          (r (curl-easy-perform handle #t))
          (rr (catch #t
                     (lambda ()
-                      (bytevector->string r "utf-8"))
+                      (utf8->string r))
                     (lambda (key . args)
                       r))))
     (display rr)))
@@ -162,20 +158,18 @@
                                                   encryption-key
                                                   #:signing-key signing-key)
                                    #f))
+               (user-repo (make-sqlite-user-repository rc))
+               (password-reset-repo (make-sqlite-password-reset-repository rc))
                (body (if (not (rc-body rc)) #f
                          (alist-from-url-encoded-body (rc-body rc))))
                (email (if (not body) #f
                           (assoc-ref body "email")))
                (u (if (not email)
-                      ($user 'get
-                             #:ret 'top
-                             #:condition (where #:id (assoc-ref existing-token
-                                                      'owner-id)))
-                      ($user 'get
-                             #:ret 'top
-                             #:condition (where #:email email)))))
-          
-          (request-password-reset u)
+                      (get-user-by-id user-repo
+                                      (assoc-ref existing-token
+                                                 'owner-id))
+                      (get-user-by-email user-repo email))))
+          (request-password-reset password-reset-repo u)
           (redirect-to rc
                        (string->uri (format #f "~a/?sent-password-reset=true"
                                             (current-myhost)))
@@ -189,10 +183,9 @@
                (reset-token (assoc-ref body "reset-token"))
                (new-password (assoc-ref body "new-password"))
                (confirm-password (assoc-ref body "confirm-password"))
-               (tt (car ($password_reset 'get
-                                         #:ret 'top
-                                         #:condition (where #:reset_token
-                                                            reset-token))))
+               (password-reset-repo (make-sqlite-password-reset-repository rc))
+               (tt (get-password-reset-by-token password-reset-repo
+                                                reset-token))
                (now (current-time))
                (allowance (* 24 7 3600)) ;reset token is valid for a week
                (_ (when (> now
@@ -202,19 +195,17 @@
                (_ (when (not (equal? new-password confirm-password))
                     (error "password confirmation did not match!")))
                (user-id (assoc-ref tt "user_id"))
-               (u ($user 'get
-                         #:ret 'top
-                         #:condition (where #:id user-id)))
+               (user-repo (make-sqlite-user-repository rc))
+               (u (get-user-by-id user-repo user-id))
                (new-salt (generate-string-uuid))
                (h (string->sha-256 (string-append new-password new-salt)))
-               (_ (DB-query (DB-open rc)
-                            (format #f
-                             "UPDATE user SET salt = '~a', password = '~a' WHERE id = '~a'"
-                             new-salt h
-                             (assoc-ref (car u) "id"))))
-               (_ ($password_reset 'mod
-                                   'row-delete
-                                   (where #:user_id (assoc-ref (car u) "id")))))
+               (_ (update-user-by-id user-repo
+                                     (assoc-ref u
+                                                'id)
+                                     `((salt unquote new-salt)
+                                       (password unquote h))))
+               (_ (delete-password-reset-by-user-id (assoc-ref u
+                                                               'id))))
           (:cookies-set! rc
                          'x-bewaking-lucidplan "x-bewaking-lucidplan" "")
           (:cookies-setattr! rc
@@ -229,18 +220,19 @@
                                      (current-myhost)))
                        #:status 302))))
 
-(define (request-password-reset u)
-  (let* ((_ ($password_reset 'mod
-                             'row-delete
-                             (where #:user_id (assoc-ref (car u) "id"))))
+(define (request-password-reset password-reset-repo u)
+  (let* ((_ (delete-password-reset-by-user-id password-reset-repo
+                                              (assoc-ref u
+                                                         'id)))
          (reset-token (base16-encode (format #f "~a-~a-~a"
                                              (generate-string-uuid)
                                              (generate-string-uuid)
                                              (generate-string-uuid))))
-         (pr ($password_reset 'set
-                              #:user_id (assoc-ref (car u) "id")
-                              #:reset_token reset-token
-                              #:created_at (current-time)))
+         (_ (insert-password-reset password-reset-repo
+                                   `((user-id unquote (assoc-ref u 'id))
+                                     (reset-token unquote reset-token)
+                                     (created-at unquote (current-time)))))
+         (pr (get-password-reset-by-token password-reset-repo reset-token))
          (mail-payload `((task-type . send-email) (template . password-reset)
                          (template-vars (system-name . Lucidplan)
                                         (user unquote
@@ -266,13 +258,11 @@
                                            "x-bewaking-lucidplan")
                                   #:encryption-key encryption-key
                                   #:signing-key signing-key))
-                (user ($user 'get
-                             #:ret 'top
-                             #:condition (where #:id (assoc-ref t
-                                                                'owner-id))))
-                (users ($user 'get
-                              #:ret 'all
-                              #:order-by '(username asc))))
+                (user-repo (make-sqlite-user-repository rc))
+                (user (get-user-by-id user-repo
+                                      (assoc-ref t
+                                                 'owner-id)))
+                (users (get-users user-repo)))
            (response-emit (:mime rc
                                  (new-user-page (:i18n rc))))))
 
@@ -288,9 +278,9 @@
      #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
        (define (go-to-edit-user)
-         (let* ((user (car ($user 'get
-                                  #:ret 'top
-                                  #:condition (where #:id (params rc "id"))))))
+         (let* ((user-repo (make-sqlite-user-repository rc))
+                (user (get-user-by-id user-repo
+                                      (params rc "id"))))
            (response-emit (:mime rc
                                  (edit-user-page (:i18n rc) user)))))
 
@@ -330,17 +320,19 @@
                                              lucidplan:user-delete
                                              lucidplan:modify-permissions))))
                  (new-id (generate-string-uuid))
-                 (_ ($user 'set
-                           #:id new-id
-                           #:username username
-                           #:email email
-                           #:password ""
-                           #:salt ""
-                           #:permissions (format #f "`~s" permissions)))
-                 (u ($user 'get
-                           #:ret 'top
-                           #:condition (where #:id new-id))))
-            (request-password-reset u)
+                 (user-repo (make-sqlite-user-repository rc))
+                 (password-reset-repo (make-sqlite-password-reset-repository
+                                       rc))
+                 (_ (insert-user user-repo
+                                 `((id unquote new-id)
+                                   (username unquote username)
+                                   (email unquote email)
+                                   (password . "")
+                                   (salt . "")
+                                   (permissions unquote (format #f "`~s" permissions)))))
+
+                 (u (get-user-by-id user-repo new-id)))
+            (request-password-reset password-reset-repo u)
             (redirect-to rc
                          (string->uri (format #f
                                               "~a/users/manage/?created=true"
@@ -357,10 +349,9 @@
       (lambda (rc)
         (define (do-delete-user)
           (let* ((body (alist-from-url-encoded-body (rc-body rc)))
-                 (id (assoc-ref body "id"))
-                 (_ ($user 'mod
-                           'row-delete
-                           (where #:id id))))
+                 (user-repo (make-sqlite-user-repository rc))
+                 (_ (delete-user-by-id user-repo
+                                       (assoc-ref body "id"))))
             (redirect-to rc
                          (string->uri (format #f
                                               "~a/users/manage/?deleted=true"
@@ -379,6 +370,7 @@
           (let* ((body (alist-from-url-encoded-body (rc-body rc)))
                  (username (html-escape (assoc-ref body "username")))
                  (email (html-escape (assoc-ref body "email")))
+                 (user-repo (make-sqlite-user-repository rc))
                  (permissions (filter (lambda (p)
                                         (not (equal? #f p)))
                                       (map (lambda (p)
@@ -390,14 +382,14 @@
                                              lucidplan:user-create
                                              lucidplan:user-delete
                                              lucidplan:modify-permissions))))
-                 (_ (DB-query (DB-open rc)
-                              (->sql update
-                                     'user set
-                                     `((username ,username)
-                                       (email ,email)
-                                       (permissions ,(format #f "`~s"
-                                                             permissions)))
-                                     (where #:id (params rc "id"))))))
+                 (user-repo (make-sqlite-user-repository rc))
+                 (_ (update-user-by-id user-repo
+                                       (params rc "id")
+                                       `((username unquote username)
+                                         (email unquote email)
+                                         (permissions unquote
+                                                      (format #f "`~s"
+                                                              permissions))))))
             (redirect-to rc
                          (string->uri (format #f
                                               "~a/users/manage/?edited=true"

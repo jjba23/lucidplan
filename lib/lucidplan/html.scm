@@ -180,7 +180,6 @@
                                                     dark:text-stone-300)
                              #:icon-css '(text-md text-onyx-700
                                                   dark:text-stone-300))
-
             ,(if (nil? proj)
                  '()
                  `((select (@ (onchange "window.location.href=this.value;")
@@ -193,13 +192,14 @@
                            ,(map (lambda (p)
                                    `(option (@ (value ,(format #f
                                                                "/tickets/~a"
-                                                               (assoc-ref p
-                                                                "human_id")))
+                                                               (assq-ref p
+                                                                         'human-id)))
                                                (class ,(mk-class '(text-sm
                                                                    font-light
                                                                    lowercase
                                                                    text-onyx-700))))
-                                            ,(assoc-ref p "title"))) proj))))))
+                                            ,(assq-ref p
+                                                       'title))) proj))))))
     `(,doctype-html (html (@ (lang en))
                           (head (title "LucidPlan")
                                 ,(hygguile-recommended-meta)

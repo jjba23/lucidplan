@@ -198,5 +198,6 @@ user sessions on the web or authenticating API calls.")
                           guile-orgwebalchemy
                           sqlite
                           emacs-no-x
+                          glibc-locales
                           guile-dbd-sqlite3))
 

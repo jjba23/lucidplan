@@ -25,31 +25,16 @@
         (uuid generate)
         (lucidplan html)
         (lucidplan domain)
-        (app models ticket)
-        (app models user)
-        (app models ticket_assignee)
         (artanis security nss)
-        (app models project)
+        (lucidplan domain project)
+        (lucidplan domain ticket)
+        (lucidplan domain ticket-assignee)
+        (lucidplan domain user)
+        (lucidplan sqlite project)
+        (lucidplan sqlite ticket)
+        (lucidplan sqlite ticket-assignee)
+        (lucidplan sqlite user)
         (hygguile hygguile))
-
-(define (project-id-from-human-id rc project)
-  (let ((p (DB-get-all-rows (DB-query (DB-open rc)
-                                      (format #f
-                                       "SELECT * FROM project WHERE human_id = '~a' AND deleted_at IS NULL LIMIT 1"
-                                       project)))))
-    (cond
-      ((null? p)
-       "")
-      (else (assoc-ref (car p) "id")))))
-
-(define (ticket-id-from-human-id human-id)
-  (let ((p ($ticket 'get
-                    #:ret 'top
-                    #:condition (where #:human_id human-id))))
-    (cond
-      ((null? p)
-       "")
-      (else (assoc-ref (car p) "id")))))
 
 (get "/tickets/:project"
      #:mime 'xml
@@ -58,7 +43,12 @@
                        lucidplan-ticket-sort x-bewaking-lucidplan)
      (lambda (rc)
        (define (get)
-         (let* ((is-logged-in (:cookies-value rc "x-bewaking-lucidplan"))
+         (let* ((project-repo (make-sqlite-project-repository rc))
+                (user-repo (make-sqlite-user-repository rc))
+                (ticket-repo (make-sqlite-ticket-repository rc))
+                (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
+                                       rc))
+                (is-logged-in (:cookies-value rc "x-bewaking-lucidplan"))
                 (user-search (cond
                                ((equal? #f
                                         (get-from-qstr rc "search"))
@@ -83,7 +73,7 @@
                                             "lucidplan-ticket-sort")))
                               (:cookies-value rc "lucidplan-ticket-sort"))
                              (else "last-edited-at-desc")))
-                (project-id (project-id-from-human-id rc
+                (project-id (project-id-from-human-id project-repo
                                                       (params rc "project")))
                 (with-done (cond
                              ((not (equal? #f
@@ -128,55 +118,31 @@
                                   (equal? (:cookies-value rc
                                            "lucidplan-show-rejected") "true"))
                                  (else #f)))
-                (proj (DB-get-all-rows (DB-query (DB-open rc)
-                                        "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC")))
+                (proj (get-projects project-repo))
                 (query-sort (entity-sort-from-query user-sort))
-                (project-details (car ($project 'get
-                                                #:ret 'top
-                                                #:condition (where #:human_id (params
-                                                                               rc
-                                                                               "project")))))
-                (tickets (DB-get-all-rows (DB-query (DB-open rc)
-                                                    (cond
-                                                      ((equal? #f user-search)
-                                                       (format #f
-                                                        "SELECT * FROM ticket WHERE project_id = '~a' AND deleted_at IS NULL ORDER BY ~a ~a"
-                                                        project-id
-                                                        (car query-sort)
-                                                        (cadr query-sort)))
-                                                      (else (format #f
-                                                             (string-join '("SELECT * FROM ticket"
-                                                                            " WHERE project_id = '~a' AND deleted_at IS NULL "
-                                                                            " AND (title LIKE '%~a%' OR description LIKE '%~a%') "
-                                                                            " ORDER BY ~a ~a ")
-                                                                          " ")
-                                                             project-id
-                                                             (html-escape
-                                                              user-search)
-                                                             (html-escape
-                                                              user-search)
-                                                             (car query-sort)
-                                                             (cadr query-sort)))))))
+                (project-details (get-project-by-human-id project-repo
+                                                                 (params rc
+                                                                  "project")))
+                (my-sort (format #f "~a ~a"
+                                 (car query-sort)
+                                 (cadr query-sort)))
+                (tickets (cond
+                           ((eq? #f user-search)
+                            (get-tickets ticket-repo
+                                                (assq-ref project-details
+                                                          'id) my-sort))
+                           (else (search-tickets ticket-repo
+                                                        (params rc "project")
+                                                        (html-escape
+                                                         user-search) my-sort))))
                 (ticket-id-to-human-id (map (lambda (t)
-                                              `(,(assoc-ref t "id") unquote
-                                                (assoc-ref t "human_id")))
-                                            ($ticket 'get
-                                                     #:columns '(id human_id)
-                                                     #:condition (where
-                                                                  #:project_id
-                                                                  project-id)
-                                                     #:order-by '(human_id asc))))
-                (user-names (map (lambda (t)
-                                   `(,(assoc-ref t "id") unquote
-                                     (assoc-ref t "username")))
-                                 ($user 'get
-                                        #:columns '(id username))))
-                (ticket-assignee (map (lambda (t)
-                                        `(,(assoc-ref t "ticket_id") unquote
-                                          (assoc-ref t "user_id")))
-                                      ($ticket_assignee 'get
-                                                        #:columns '(ticket_id
-                                                                    user_id)))))
+                                              `(,(assq-ref t
+                                                           'id) unquote
+                                                (assq-ref t
+                                                          'human-id))) tickets))
+                (user-names (get-id-to-username user-repo))
+                (ticket-assignee (get-ticket-assignee-by-project-id
+                                  ticket-assignee-repo project-id)))
            
            (response-emit (:mime rc
                                  (html-from-tickets (:i18n rc)
@@ -204,17 +170,16 @@
      #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
        (define (get-new)
-         (response-emit (:mime rc
-                               (html-new-ticket-form (:i18n rc)
-                                                     #:is-logged-in (:cookies-value
-                                                                     rc
-                                                                     "x-bewaking-lucidplan")
-                                                     #:projects ($project 'get
-                                                                          #:order-by '
-                                                                          (human_id
-                                                                           asc))
-                                                     #:project (params rc
-                                                                "project")))))
+         (let* ((project-repo (make-sqlite-project-repository rc)))
+           (response-emit (:mime rc
+                                 (html-new-ticket-form (:i18n rc)
+                                                       #:is-logged-in (:cookies-value
+                                                                       rc
+                                                                       "x-bewaking-lucidplan")
+                                                       #:projects (get-projects
+                                                                   project-repo)
+                                                       #:project (params rc
+                                                                  "project"))))))
        (get-new)))
 
 (post "/tickets/:project/delete"
@@ -246,26 +211,28 @@
       #:cookies '(names x-bewaking-lucidplan)
       (lambda (rc)
         (define (do-new)
-          (let* ((body (alist-from-url-encoded-body (rc-body rc)))
+          (let* ((project-repo (make-sqlite-project-repository rc))
+                 (ticket-repo (make-sqlite-ticket-repository rc))
+                 (body (alist-from-url-encoded-body (rc-body rc)))
                  (title (html-escape (assoc-ref body "title")))
                  (ticket-status (assoc-ref body "ticket-status"))
                  (ticket-type (assoc-ref body "ticket-type"))
                  (description (html-escape (assoc-ref body "description")))
                  (priority (string->number (assoc-ref body "priority")))
-                 (project-id (project-id-from-human-id rc
+                 (project-id (project-id-from-human-id project-repo
                                                        (params rc "project")))
                  (new-uuid (string-replace-substring (generate-string-uuid)
                                                      "\n" "")))
-            
-            ($ticket 'set
-                     #:id new-uuid
-                     #:project_id project-id
-                     #:title title
-                     #:ticket_status ticket-status
-                     #:ticket_type ticket-type
-                     #:priority priority
-                     #:description description
-                     #:created_at (current-time))
+            (insert-ticket ticket-repo
+                           `((id unquote new-uuid)
+                             (project-id unquote project-id)
+                             (title unquote title)
+                             (ticket-status unquote ticket-status)
+                             (ticket-type unquote ticket-type)
+                             (priority unquote priority)
+                             (description unquote description)
+                             (created-at unquote
+                                         (current-time))))
 
             (redirect-to rc
                          (string->uri (format #f "~a/tickets/~a"
@@ -278,26 +245,34 @@
                            #:happy-flow do-new
                            #:unhappy-flow back-to-login)))
 
-(get "/tickets/:project/id/:human-id/edit"
+(get "/tickets/:project/:human-id/edit"
      #:mime 'xml
      #:i18n '(cookie "lang")
      #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
        (define (get-edit)
-         (let* ((proj (DB-get-all-rows (DB-query (DB-open rc)
-                                        "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC")))
-                (t (car ($ticket 'get
-                                 #:ret 'top
-                                 #:condition (where #:human_id (params rc
-                                                                "human-id")))))
-                (assignee-data ($ticket_assignee 'get
-                                                 #:ret 'top
-                                                 #:condition (where
-                                                                    #:ticket_id
-                                                                    (assoc-ref
-                                                                     t "id"))))
+         (let* ((project-repo (make-sqlite-project-repository rc))
+                (proj (get-projects project-repo))
+                (project-details (get-project-by-human-id project-repo
+                                                                 (params rc
+                                                                  "project")))
+                (ticket-repo (make-sqlite-ticket-repository rc))
+                (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
+                                       rc))
+                (t (get-ticket-by-project-id-and-human-id ticket-repo
+                                                                 (assq-ref
+                                                                  project-details
+                                                                  'id)
+                                                                 (params rc
+                                                                  "human-id")))
+                (assignee-data (get-ticket-assignee-by-ticket-id
+                                ticket-assignee-repo
+                                (assq-ref t
+                                          'id)))
+                (_ (write assignee-data))
                 (assignee (if (nil? assignee-data) ""
-                              (assoc-ref (car assignee-data) "user_id"))))
+                              (assq-ref assignee-data
+                                        'user-id))))
            (response-emit (:mime rc
                                  (html-edit-ticket-form (:i18n rc)
                                                         #:projects proj
@@ -310,35 +285,39 @@
                                                                         "x-bewaking-lucidplan"))))))
        (get-edit)))
 
-(post "/tickets/:project/id/:human-id/edit"
+(post "/tickets/:project/:human-id/edit"
       #:mime 'xml
       #:cookies '(names x-bewaking-lucidplan)
       (lambda (rc)
         (define (do-edit)
-          (let* ((body (alist-from-url-encoded-body (rc-body rc)))
+          (let* ((ticket-repo (make-sqlite-ticket-repository rc))
+                 (body (alist-from-url-encoded-body (rc-body rc)))
                  (title (html-escape (assoc-ref body "title")))
                  (description (html-escape (assoc-ref body "description")))
                  (ticket-status (assoc-ref body "ticket-status"))
                  (priority (string->number (assoc-ref body "priority")))
                  (ticket-type (assoc-ref body "ticket-type"))
-                 (ticket-id (ticket-id-from-human-id (params rc "human-id"))))
+                 (ticket-id (ticket-id-from-human-id ticket-repo
+                                                     (params rc "project")
+                                                     (params rc "human-id")))
+                 (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
+                                        rc)))
             
-            (DB-query (DB-open rc)
-                      (->sql update
-                             'ticket set
-                             `((ticket_status ,ticket-status)
-                               (ticket_type ,ticket-type)
-                               (description ,description)
-                               (title ,title)
-                               (priority ,priority)
-                               (updated_at ,(current-time)))
-                             (where #:human_id (params rc "human-id"))))
-            (DB-query (DB-open rc)
-                      (format #f
-                       "INSERT INTO ticket_assignee (user_id, ticket_id)
-                        VALUES ('~a', '~a') ON CONFLICT(ticket_id) DO UPDATE SET user_id = excluded.user_id"
-                       (assoc-ref body "assignee") ticket-id))
-
+            (update-ticket-by-human-id ticket-repo
+                                       (params rc "human-id")
+                                       `((ticket-status unquote ticket-status)
+                                         (ticket-type unquote ticket-type)
+                                         (description unquote description)
+                                         (title unquote title)
+                                         (priority unquote priority)
+                                         (updated_at unquote
+                                                     (current-time))))
+            (upsert-ticket-assignee ticket-assignee-repo
+                                    `((project-id unquote
+                                                  (params rc "project"))
+                                      (ticket-id unquote ticket-id)
+                                      (user-id unquote
+                                               (assoc-ref body "assignee"))))
             (redirect-to rc
                          (string->uri (format #f "~a/tickets/~a"
                                               (current-myhost)
@@ -350,30 +329,36 @@
                            #:happy-flow do-edit
                            #:unhappy-flow back-to-login)))
 
-(get "/tickets/:project/id/:human-id"
+(get "/tickets/:project/:human-id"
      #:mime 'xml
      #:i18n '(cookie "lang")
      #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
        (define (get-single)
-         (let* ((proj (DB-get-all-rows (DB-query (DB-open rc)
-                                        "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC")))
-                (t (car ($ticket 'get
-                                 #:ret 'top
-                                 #:condition (where #:human_id (params rc
-                                                                "human-id")))))
-                (user-names (map (lambda (t)
-                                   `(,(assoc-ref t "id") unquote
-                                     (assoc-ref t "username")))
-                                 ($user 'get
-                                        #:columns '(id username))))
-                (ticket-assignee ($ticket_assignee 'get
-                                                   #:ret 'top
-                                                   #:columns '(user_id)
-                                                   #:condition (where
-                                                                      #:ticket_id
-                                                                      (assoc-ref
-                                                                       t "id")))))
+         (let* ((project-repo (make-sqlite-project-repository rc))
+                (proj (get-projects project-repo))
+                (user-repo (make-sqlite-user-repository rc))
+                (ticket-repo (make-sqlite-ticket-repository rc))
+                (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
+                                       rc))
+                (project-details (get-project-by-human-id project-repo
+                                                                 (params rc
+                                                                  "project")))
+                (t (get-ticket-by-project-id-and-human-id ticket-repo
+                                                                 (assq-ref
+                                                                  project-details
+                                                                  'id)
+                                                                 (params rc
+                                                                  "human-id")))
+                (user-names (get-id-to-username user-repo))
+                (ticket-assignee (get-ticket-assignee-by-ticket-id
+                                  ticket-assignee-repo
+                                  (assq-ref t
+                                            'id)))
+                (assignee-name (if (not (nil? ticket-assignee))
+                                   (assoc-ref user-names
+                                              (assq-ref ticket-assignee
+                                                        'user-id)) #f)))
            (response-emit (:mime rc
                                  (html-template (:i18n rc)
                                                 #:is-logged-in (:cookies-value
@@ -400,17 +385,6 @@
                                                                            rc
                                                                            "project")
                                                                 #:ticket t
-                                                                #:assignee (if
-                                                                            (not
-                                                                             (nil?
-                                                                              ticket-assignee))
-
-                                                                            (assoc-ref
-                                                                             user-names
-
-                                                                             (assoc-ref
-                                                                              (car
-                                                                               ticket-assignee)
-                                                                              "user_id"))
-                                                                            #f)))))))))
+                                                                #:assignee
+                                                                assignee-name))))))))
        (get-single)))

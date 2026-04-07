@@ -25,8 +25,8 @@
         (artanis security nss)
         (lucidplan env)
         (kracht prelude)
-        (app models user)
-        (app models project)
+        (lucidplan sqlite user)
+        (lucidplan domain user)
         (app views login))
 
 (get "/login"
@@ -42,34 +42,38 @@
         (let* ((body (alist-from-url-encoded-body (rc-body rc)))
                (email (assoc-ref body "email"))
                (password (assoc-ref body "password"))
-               (u ($user 'get
-                         #:ret 'top
-                         #:condition (where #:email email)))
+               (user-repo (make-sqlite-user-repository rc))
+               (u (get-user-by-email user-repo email))
                (get-owner-details (lambda ()
                                     `((id unquote
-                                          (assoc-ref (car u) "id"))
+                                          (assq-ref u
+                                                    'id))
                                       (email unquote
-                                             (assoc-ref (car u) "email"))
+                                             (assq-ref u
+                                                       'email))
                                       (name unquote
-                                            (assoc-ref (car u) "username"))
+                                            (assq-ref u
+                                                      'username))
                                       (permissions unquote
-                                                   (eval-string (assoc-ref (car
-                                                                            u)
-                                                                 "permissions"))))))
+                                                   (eval-string (assq-ref u
+                                                                          'permissions))))))
                (t (generate-token #:encryption-key encryption-key
                                   #:signing-key signing-key
                                   #:get-owner-details get-owner-details)))
           
           (cond
             ((equal? (string->sha-256 (string-append password
-                                                     (assoc-ref (car u) "salt")))
-                     (assoc-ref (car u) "password"))
+                                                     (assq-ref u
+                                                               'salt)))
+                     (assq-ref u
+                               'password))
              (begin
                (:cookies-set! rc
                               'x-bewaking-lucidplan "x-bewaking-lucidplan" t)
                (:cookies-setattr! rc
                                   'x-bewaking-lucidplan
-                                  #:expires (* 3600 24 7)
+                                  ;; token is valid for 31 days
+                                  #:expires (* 3600 24 31)
                                   #:path "/"
                                   #:secure #t
                                   #:http-only #t)
@@ -90,19 +94,17 @@
      #:i18n '(cookie "lang")
      #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
-       (let* ((proj (DB-get-all-rows (DB-query (DB-open rc)
-                                        "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC"))))
-         (begin
-           (:cookies-set! rc
-                          'x-bewaking-lucidplan "x-bewaking-lucidplan" "")
-           (:cookies-setattr! rc
-                              'x-bewaking-lucidplan
-                              #:expires 1
-                              #:path "/"
-                              #:secure #t
-                              #:http-only #t)
+       (begin
+         (:cookies-set! rc
+                        'x-bewaking-lucidplan "x-bewaking-lucidplan" "")
+         (:cookies-setattr! rc
+                            'x-bewaking-lucidplan
+                            #:expires 1
+                            #:path "/"
+                            #:secure #t
+                            #:http-only #t)
 
-           (redirect-to rc
-                        (string->uri (format #f "~a/"
-                                             (current-myhost)))
-                        #:status 302)))))
+         (redirect-to rc
+                      (string->uri (format #f "~a/"
+                                           (current-myhost)))
+                      #:status 302))))

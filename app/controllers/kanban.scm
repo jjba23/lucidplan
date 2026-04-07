@@ -23,20 +23,12 @@
         (lucidplan auth)
         (kracht prelude)
         (lucidplan domain)
+        (lucidplan sqlite ticket)
+        (lucidplan sqlite project)
+        (lucidplan domain ticket)
+        (lucidplan domain project)
         (kracht prelude)
-        (app models ticket)
-        (artanis security nss)
-        (app models project))
-
-(define (project-id-from-human-id rc project)
-  (let ((p (DB-get-all-rows (DB-query (DB-open rc)
-                                      (format #f
-                                       "SELECT * FROM project WHERE human_id = '~a' AND deleted_at IS NULL LIMIT 1"
-                                       project)))))
-    (cond
-      ((null? p)
-       "")
-      (else (assoc-ref (car p) "id")))))
+        (artanis security nss))
 
 (get "/kanban/:project"
      #:mime 'xml
@@ -44,9 +36,11 @@
      #:cookies '(names x-bewaking-lucidplan lucidplan-ticket-sort)
      (lambda (rc)
        (define (get)
-         (let* ((project-id (project-id-from-human-id rc (params rc "project")))
-                (proj (DB-get-all-rows (DB-query (DB-open rc)
-                                        "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC")))
+         (let* ((project-repo (make-sqlite-project-repository rc))
+                (project-id (project-id-from-human-id project-repo
+                                                      (params rc "project")))
+                (ticket-repo (make-sqlite-ticket-repository rc))
+                (proj (get-projects project-repo))
                 (user-sort (cond
                              ((not (equal? #f
                                            (get-from-qstr rc "sort")))
@@ -67,18 +61,15 @@
                               (:cookies-value rc "lucidplan-ticket-sort"))
                              (else "last-edited-at-desc")))
                 (query-sort (entity-sort-from-query user-sort))
-                (ticket-query (->sql select * from
-                                     'ticket
-                                     (format #f
-                                      " WHERE project_id = '~a' ORDER BY ~a ~a"
-                                      project-id
-                                      (car query-sort)
-                                      (cadr query-sort))))
-                (project-tickets (DB-get-all-rows (DB-query (DB-open rc)
-                                                            ticket-query)))
+                (project-tickets (get-tickets ticket-repo project-id
+                                                     (format #f "~a ~a"
+                                                             (car query-sort)
+                                                             (cadr query-sort))))
                 (ticket-id-to-human-id (map (lambda (t)
-                                              `(,(assoc-ref t "id") unquote
-                                                (assoc-ref t "human_id")))
+                                              `(,(assq-ref t
+                                                           'id) unquote
+                                                (assq-ref t
+                                                          'human-id)))
                                             project-tickets)))
            (response-emit (:mime rc
                                  (kanban-from-tickets (:i18n rc)

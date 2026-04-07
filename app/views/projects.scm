@@ -55,7 +55,8 @@
                                      border-stone-300/75
                                      shadow-md
                                      border-2))))
-         ,(h4 (assoc-ref p "title"))
+         ,(h4 (assq-ref p
+                        'title))
          ,(render-if-nestring (lambda (x)
                                 `(p (@ (class ,(mk-class '(text-md py-3
                                                            text-onyx-700
@@ -63,24 +64,27 @@
                                                            whitespace-pre-wrap
                                                            font-medium))))
                                     ,x))
-                              (org2html (html-unescape (format #f "~a"
-                                                               (assoc-ref p
-                                                                "description")))))
+                              (org2html (html-unescape (assq-ref p
+                                                                 'description))))
          ,(hr)
          (div (@ (class ,(mk-class '(flex flex-wrap flex-row gap-3))))
               (a (@ (href ,(format #f "/tickets/~a"
-                                   (assoc-ref p "human_id"))))
+                                   (assq-ref p
+                                             'human-id))))
                  ,(icon-button #:icon 'scroll
                                #:content (format #f "backlog: ~a"
-                                                 (assoc-ref p "title"))
+                                                 (assq-ref p
+                                                           'title))
                                #:icon-css '(text-md text-onyx-700
                                                     dark:text-stone-300)))
               (a (@ (class ,(mk-class '(text-onyx-700 dark:text-stone-300)))
                     (href ,(format #f "/kanban/~a"
-                                   (assoc-ref p "human_id"))))
+                                   (assq-ref p
+                                             'human-id))))
                  ,(icon-button #:icon 'kanban
                                #:content (format #f "kanban: ~a"
-                                                 (assoc-ref p "title"))
+                                                 (assq-ref p
+                                                           'title))
                                #:icon-css '(text-md text-onyx-700
                                                     dark:text-stone-300)))
               ,(render-if-nestring (lambda (x)
@@ -94,10 +98,10 @@
                                                        #:icon-css '(text-md
                                                                     text-onyx-700
                                                                     dark:text-stone-300))))
-                                   (uri-decode (if (assoc-ref p "url")
-                                                   (format #f "~a"
-                                                           (assoc-ref p "url"))
-                                                   "")))
+                                   (uri-decode (if (assq-ref p
+                                                             'url)
+                                                   (assq-ref p
+                                                             'url) "")))
               ,(render-if-nestring (lambda (x)
                                      `(a (@ (class ,(mk-class '(text-onyx-700
                                                                 dark:text-stone-300
@@ -109,14 +113,15 @@
                                                        #:icon-css '(text-md
                                                                     text-onyx-700
                                                                     dark:text-stone-300))))
-                                   (uri-decode (if (assoc-ref p "vcs_url")
-                                                   (format #f "~a"
-                                                           (assoc-ref p
-                                                            "vcs_url")) ""))))
+                                   (uri-decode (if (assq-ref p
+                                                             'vcs-url)
+                                                   (assq-ref p
+                                                             'vcs-url) ""))))
          (hr (@ (class ,(mk-class '(my-3)))))
          (div (@ (class ,(mk-class '(flex flex-wrap flex-row gap-4 py-4))))
               (a (@ (href ,(format #f "/projects/~a/edit"
-                                   (assoc-ref p "human_id"))))
+                                   (assq-ref p
+                                             'human-id))))
                  ,(icon-button #:icon 'pencil
                                #:content (G_ "edit project")
                                #:icon-css '(text-md text-onyx-700
@@ -126,7 +131,8 @@
                        (action "/projects/delete"))
                     (input (@ (name "id")
                               (hidden "")
-                              (value ,(assoc-ref p "id"))) "")
+                              (value ,(assq-ref p
+                                                'id))) "")
                     ,(danger-submit-button `(span (@ (class ,(mk-class '(items-center
                                                                          flex
                                                                          flex-row
@@ -137,8 +143,8 @@
                                                   ,(G_ "delete")))))
          (small (@ (class ,(mk-class '(font-mono text-onyx-700
                                                  dark:text-stone-500 text-sm))))
-                ,(format #f "~a"
-                         (assoc-ref p "human_id"))))))
+                ,(assq-ref p
+                           'human-id)))))
 
 (define (render-project-list-item G_ p)
   `((div (@ (class ,(mk-class '(flex flex-row
@@ -159,7 +165,8 @@
                                      shadow)))
             (onclick ,(format #f
                        "document.getElementById('details-~a').toggleAttribute('hidden')"
-                       (assoc-ref p "id"))))
+                       (assq-ref p
+                                 'id))))
 
          (h3 (@ (class ,(mk-class '(flex flex-row items-center gap-2 truncate
                                          leading-6))))
@@ -169,8 +176,8 @@
                                                     dark:text-stone-300
                                                     text-lg font-bold
                                                     break-words))))
-                   ,(format #f "~a"
-                            (assoc-ref p "title"))))
+                   ,(assq-ref p
+                              'title)))
          (p (@ (class ,(mk-class '(font-sans text-stone-600
                                              dark:text-stone-500
                                              text-md
@@ -179,10 +186,11 @@
                                              break-words
                                              truncate))))
             ,(org2html (html-unescape (format #f "~a"
-                                              (assoc-ref p "description"))))))
+                                              (assq-ref p
+                                                        'description))))))
     (div (@ (id ,(format #f "details-~a"
-                         (assoc-ref p "id")))
-            (class "")
+                         (assq-ref p
+                                   'id)))
             (hidden ""))
          ,(render-project G_ p))))
 
@@ -242,23 +250,26 @@
                                  #:key projects project is-logged-in)
   (html-project-form G_
                      #:is-logged-in is-logged-in
-                     #:title (assoc-ref project "title")
-                     #:human-id (format #f "~a"
-                                        (assoc-ref project "human_id"))
-                     #:url (if (assoc-ref project "url")
-                               (format #f "~a"
-                                       (assoc-ref project "url")) "")
-                     #:vcs-url (if (assoc-ref project "vcs_url")
-                                   (format #f "~a"
-                                           (assoc-ref project "vcs_url")) "")
-                     #:description (if (assoc-ref project "description")
-                                       (html-unescape (format #f "~a"
-                                                              (assoc-ref
-                                                               project
-                                                               "description")))
+                     #:title (assq-ref project
+                                       'title)
+                     #:human-id (assq-ref project
+                                          'human-id)
+                     #:url (if (assq-ref project
+                                         'url)
+                               (assq-ref project
+                                         'url) "")
+                     #:vcs-url (if (assq-ref project
+                                             'vcs-url)
+                                   (assq-ref project
+                                             'vcs-url) "")
+                     #:description (if (assq-ref project
+                                                 'description)
+                                       (html-unescape (assq-ref project
+                                                                'description))
                                        "")
                      #:action (format #f "/projects/~a/edit"
-                                      (assoc-ref project "human_id"))
+                                      (assq-ref project
+                                                'human-id))
                      #:projects projects))
 
 (define* (html-project-form G_
@@ -280,24 +291,24 @@
                                             (method POST)
                                             (action ,action))
                                          ,(input #:label (G_ "title")
-                                                 #:name "title"
+                                                 #:name 'title
                                                  #:value (html-unescape title)
                                                  #:required #t)
                                          ,(input #:label (G_ "human id")
-                                                 #:name "human-id"
+                                                 #:name 'human-id
                                                  #:value human-id
                                                  #:required #t)
                                          ,(input #:label (G_ "homepage url")
-                                                 #:name "url"
+                                                 #:name 'url
                                                  #:value (uri-decode url)
                                                  #:required #f)
                                          ,(input #:label (G_
                                                           "version control url")
-                                                 #:name "vcs-url"
+                                                 #:name 'vcs-url
                                                  #:value (uri-decode vcs-url)
                                                  #:required #f)
                                          ,(textarea #:label (G_ "description")
-                                                    #:name "description"
+                                                    #:name 'description
                                                     #:value (html-unescape
                                                              description)
                                                     #:required #f

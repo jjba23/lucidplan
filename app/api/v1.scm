@@ -22,9 +22,13 @@
         (bewaking bewaking)
         (ice-9 textual-ports)
         (artanis security nss)
-        (app models project)
-        (app models user)
-        (app models ticket))
+        (lucidplan env)
+        (lucidplan domain project)
+        (lucidplan domain ticket)
+        (lucidplan domain user)
+        (lucidplan sqlite project)
+        (lucidplan sqlite ticket)
+        (lucidplan sqlite user))
 
 (get "/api/v1/tickets/:project"
      #:mime 'json
@@ -32,10 +36,17 @@
      #:session #t
      (lambda (rc)
        (define (do-get)
-         (:mime rc
-                ($ticket 'get
-                         #:condition (where #:project_id (params rc "project"))
-                         #:order-by '(human_id asc))))
+         (let* ((project-repo (make-sqlite-project-repository rc))
+                (ticket-repo (make-sqlite-ticket-repository rc))
+                (project-details (get-project-by-human-id project-repo
+                                                                 (params rc
+                                                                  "project")))
+                (tickets (get-tickets ticket-repo
+                                             (assq-ref project-details
+                                                       'id) "human_id ASC")))
+           (:mime rc
+                  `((data unquote
+                          (list->vector tickets))))))
        (bewaking-api-endpoint #:token-name 'x-bewaking-lucidplan
                               #:needed-permissions '()
                               #:rc rc
@@ -48,9 +59,11 @@
      #:session #t
      (lambda (rc)
        (define (do-get)
-         (:mime rc
-                (DB-get-all-rows (DB-query (DB-open rc)
-                                  "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC"))))
+         (let* ((project-repo (make-sqlite-project-repository rc))
+                (projects (get-projects project-repo)))
+           (:mime rc
+                  `((data unquote
+                          (list->vector projects))))))
        (bewaking-api-endpoint #:token-name 'x-bewaking-lucidplan
                               #:needed-permissions '()
                               #:rc rc
@@ -63,31 +76,34 @@
         (let* ((body (alist-from-url-encoded-body (rc-body rc)))
                (email (assoc-ref body "email"))
                (password (assoc-ref body "password"))
-               (u ($user 'get
-                         #:ret 'top
-                         #:condition (where #:email email)))
+               (user-repo (make-sqlite-user-repository rc))
+               (u (get-user-by-email user-repo email))
                (get-owner-details (lambda ()
                                     `((id unquote
-                                          (assoc-ref (car u) "id"))
+                                          (assoc-ref u
+                                                     'id))
                                       (email unquote
-                                             (assoc-ref (car u) "email"))
+                                             (assoc-ref u
+                                                        'email))
                                       (name unquote
-                                            (assoc-ref (car u) "username"))
+                                            (assoc-ref u
+                                                       'username))
                                       (permissions unquote
-                                                   (eval-string (assoc-ref (car
-                                                                            u)
-                                                                 "permissions"))))))
+                                                   (eval-string (assoc-ref u
+                                                                           'permissions))))))
                (t (generate-token #:encryption-key encryption-key
                                   #:signing-key signing-key
                                   #:get-owner-details get-owner-details)))
           
           (cond
             ((equal? (string->sha-256 (string-append password
-                                                     (assoc-ref (car u) "salt")))
-                     (assoc-ref (car u) "password"))
+                                                     (assoc-ref u
+                                                                'salt)))
+                     (assoc-ref u
+                                'password))
              (response-emit ""
                             #:status 204
-                            #:headers `((x-bewaking-byggsteg unquote t))))
+                            #:headers `((x-bewaking-lucidplan unquote t))))
             (else (response-emit '((error . "invalid credentials, could not make token"))
                                  #:status 401
                                  #:headers '()))))))

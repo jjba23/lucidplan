@@ -17,15 +17,16 @@
 
 (define-artanis-controller projects)
 
-(import (lucidplan auth)
-        (web uri)
+(import (app views projects)
+        (artanis security nss)
         (ice-9 string-fun)
         (kracht prelude)
+        (lucidplan auth)
+        (lucidplan sqlite project)
+        (lucidplan domain project)
         (uuid generate)
-        (artanis security nss)
         (web uri)
-        (app models project)
-        (app views projects))
+        (web uri))
 
 (get "/projects"
      #:mime 'xml
@@ -39,23 +40,12 @@
                                         (get-from-qstr rc "search"))
                                 #f)
                                (else (html-escape (get-from-qstr rc "search")))))
-                (proj (DB-get-all-rows (DB-query (DB-open rc)
-                                                 (cond
-                                                   ((equal? #f user-search)
-                                                    (->sql select * from
-                                                     'project
-                                                     " WHERE deleted_at IS NULL ORDER BY title ASC"))
-                                                   (else (->sql select * from
-                                                                'project
-                                                                (format #f
-                                                                        (string-join '
-                                                                         (" WHERE deleted_at IS NULL AND (title LIKE '%~a%' OR description LIKE '%~a%') "
-                                                                          " ORDER BY title ASC ")
-                                                                         " ")
-                                                                        (html-escape
-                                                                         user-search)
-                                                                        (html-escape
-                                                                         user-search)))))))))
+                (project-repo (make-sqlite-project-repository rc))
+                (proj (cond
+                        ((nil? user-search)
+                         (get-projects project-repo))
+                        (else (search-projects project-repo
+                                                      (html-escape user-search))))))
            (response-emit (:mime rc
                                  (html-from-projects (:i18n rc)
                                                      #:projects proj
@@ -71,15 +61,14 @@
      #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
        (define (get-new)
-         (response-emit (:mime rc
-                               (html-new-project-form (:i18n rc)
-                                                      #:is-logged-in (:cookies-value
-                                                                      rc
-                                                                      "x-bewaking-lucidplan")
-                                                      #:projects (DB-get-all-rows
-                                                                  (DB-query (DB-open
-                                                                             rc)
-                                                                   "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC"))))))
+         (let* ((project-repo (make-sqlite-project-repository rc)))
+           (response-emit (:mime rc
+                                 (html-new-project-form (:i18n rc)
+                                                        #:is-logged-in (:cookies-value
+                                                                        rc
+                                                                        "x-bewaking-lucidplan")
+                                                        #:projects (get-projects
+                                                                    project-repo))))))
        (get-new)))
 
 (post "/projects/delete"
@@ -117,17 +106,18 @@
                  (vcs-url (uri-encode (assoc-ref body "vcs-url")))
                  (human-id (assoc-ref body "human-id"))
                  (new-uuid (string-replace-substring (generate-string-uuid)
-                                                     "\n" "")))
+                                                     "\n" ""))
+                 (project-repo (make-sqlite-project-repository rc)))
             
-            ($project 'set
-                      #:id new-uuid
-                      #:human_id human-id
-                      #:title title
-                      #:description description
-                      #:url url
-                      #:vcs_url vcs-url
-                      #:created_at (current-time))
-
+            (insert-project project-repo
+                            `((id unquote new-uuid)
+                              (human-id unquote human-id)
+                              (title unquote title)
+                              (description unquote description)
+                              (url unquote url)
+                              (vcs-url unquote vcs-url)
+                              (created-at unquote
+                                          (current-time))))
             (redirect-to rc
                          (string->uri (format #f "~a/projects"
                                               (current-myhost)))
@@ -144,20 +134,16 @@
      #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
        (define (get-edit)
-         (let* ((p (car ($project 'get
-                                  #:ret 'top
-                                  #:condition (where #:human_id (params rc
-                                                                 "human-id"))))))
+         (let* ((project-repo (make-sqlite-project-repository rc))
+                (p (get-project-by-human-id project-repo
+                                                   (params rc "human-id"))))
            (response-emit (:mime rc
                                  (html-edit-project-form (:i18n rc)
                                                          #:is-logged-in (:cookies-value
                                                                          rc
                                                                          "x-bewaking-lucidplan")
-                                                         #:projects (DB-get-all-rows
-                                                                     (DB-query
-                                                                      (DB-open
-                                                                       rc)
-                                                                      "SELECT * FROM project WHERE deleted_at IS NULL ORDER BY human_id ASC"))
+                                                         #:projects (get-projects
+                                                                     project-repo)
                                                          #:project p)))))
 
        (get-edit)))
@@ -172,18 +158,17 @@
                  (description (html-escape (assoc-ref body "description")))
                  (url (uri-encode (assoc-ref body "url")))
                  (vcs-url (uri-encode (assoc-ref body "vcs-url")))
-                 (human-id (assoc-ref body "human-id")))
-            
-            (DB-query (DB-open rc)
-                      (->sql update
-                             'project set
-                             `((human_id ,human-id)
-                               (url ,url)
-                               (vcs_url ,vcs-url)
-                               (description ,description)
-                               (title ,title)
-                               (updated_at ,(current-time)))
-                             (where #:human_id (params rc "human-id"))))
+                 (human-id (assoc-ref body "human-id"))
+                 (project-repo (make-sqlite-project-repository rc)))
+            (update-project-by-human-id project-repo
+                                        (params rc "human-id")
+                                        `((human-id unquote human-id)
+                                          (url unquote url)
+                                          (vcs-url unquote vcs-url)
+                                          (description unquote description)
+                                          (title unquote title)
+                                          (updated-at unquote
+                                                      (current-time))))
 
             (redirect-to rc
                          (string->uri (format #f "~a/projects"
@@ -194,4 +179,3 @@
                            #:rc rc
                            #:happy-flow do-edit
                            #:unhappy-flow back-to-login)))
-

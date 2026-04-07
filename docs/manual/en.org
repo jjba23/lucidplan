@@ -118,6 +118,8 @@ In any ~title~ or ~description~ field you can use the Org mode syntax (like in t
 
 If you are thinking of running LucidPlan yourself and hosting it on your own here follow some tips.
 
+In some systems and situations you might need to add a locale variable, like ~LC_ALL="en_US.utf8"~
+
 Firstly, make sure you use the Guix package manager, whether as a standalone distro (Guix system) or on top of any other GNU/Linux distribution.
 
 I include a ~manifest.scm~ in the repo so that it's easy to run the project if you use the Guix package manager.
