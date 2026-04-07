@@ -27,14 +27,14 @@
 ;; --- SQLite implementation ---
 (define (make-sqlite-password-reset-repository rc)
   (define password-reset-columns
-    '(token ticket-id user-id))
+    '(user-id reset-token created-at))
 
   (define password-reset-upsert-columns
-    '(token ticket-id user-id))
+    '(user-id reset-token created-at))
 
   (define (get-password-reset-by-token token)
     (let* ((query (format #f
-                   "SELECT ~a FROM ticket_assignee WHERE project_id = ~a"
+                   "SELECT ~a FROM password_reset WHERE reset_token = ~a LIMIT 1"
                    (symbols->sql-columns-list password-reset-columns)
                    (value->sql-literal token)))
            (_ (log-info "get-password-reset-by-token query:
@@ -50,7 +50,9 @@
            (_ (log-info "get-password-reset-by-token mapped-rows: ~a
 "
                         (length mapped-rows))))
-      mapped-rows))
+      (if (nil? rows)
+          #f
+          (car rows))))
 
 
   (mk-password-reset-repository #:get-password-reset-by-token-proc

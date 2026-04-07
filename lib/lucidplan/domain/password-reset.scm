@@ -27,7 +27,7 @@
 (define-record-type <password-reset-repository>
   (make-password-reset-repository get-password-reset-by-token-proc)
   password-reset-repository?
-  (password-reset-by-token-proc repo-get-password-reset-by-token))
+  (get-password-reset-by-token-proc repo-get-password-reset-by-token))
 
 ;; --- Constructor (keyword arguments for ergonomics) ---
 

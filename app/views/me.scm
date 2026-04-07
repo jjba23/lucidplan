@@ -158,9 +158,9 @@
                                               (G_
                                                "are you sure you want to delete this user?"))
                                   #:type 'submit
-                                  #:background '(bg-red-700)
+                                  #:background '(bg-redwood-700)
                                   #:color '(text-stone-300)
-                                  #:hover-background '(hover:bg-red-900)))
+                                  #:hover-background '(hover:bg-redwood-900)))
                    (a (@ (href ,(format #f "/users/edit/~a"
                                         (assq-ref u
                                                   'id))))
