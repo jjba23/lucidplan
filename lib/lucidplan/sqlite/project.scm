@@ -26,7 +26,7 @@
 
 ;; --- SQLite implementation ---
 (define (make-sqlite-project-repository rc)
-  (define project-columns
+  (define columns
     '(id human-id
          title
          url
@@ -36,7 +36,7 @@
          updated-at
          deleted-at))
 
-  (define project-insert-columns
+  (define insert-columns
     '(id human-id
          title
          url
@@ -49,7 +49,7 @@
                    "SELECT ~a
                    FROM project WHERE deleted_at IS NULL
                    ORDER BY human_id ASC"
-                   (symbols->sql-columns-list project-columns)))
+                   (symbols->sql-columns-list columns)))
            (_ (log-info "get-projects query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query (DB-open rc) query))))
@@ -63,7 +63,7 @@
                    FROM project WHERE deleted_at IS NULL
                    AND (title LIKE '%~a%' OR description LIKE '%~a%')
                    ORDER BY human_id ASC"
-                   (symbols->sql-columns-list project-columns) q q))
+                   (symbols->sql-columns-list columns) q q))
            (_ (log-info "search-projects query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query (DB-open rc) query))))
@@ -76,7 +76,7 @@
                    "SELECT ~a FROM project
                     WHERE deleted_at IS NULL AND human_id = ~a
                     LIMIT 1"
-                   (symbols->sql-columns-list project-columns) (value->sql-literal human-id)))
+                   (symbols->sql-columns-list columns) (value->sql-literal human-id)))
            (_ (log-info "get-project-by-human-id query:
 	~a
 " query))
@@ -99,7 +99,7 @@
                         (value->sql-literal (assq-ref attrs x)))
                       project-insert-columns))
            (query (format #f "INSERT INTO project (~a) VALUES (~a)"
-                          (symbols->sql-columns-list project-insert-columns)
+                          (symbols->sql-columns-list insert-columns)
                           (string-join vals ", ")))
            (_ (log-info "insert-project query:\n\t~a\n" query)))
       (DB-query (DB-open rc) query)))

@@ -26,7 +26,7 @@
 
 ;; --- SQLite implementation ---
 (define (make-sqlite-ticket-repository rc)
-  (define ticket-columns
+  (define columns
     '(id human-id
          project-id
          title
@@ -38,7 +38,7 @@
          deleted-at
          priority))
 
-  (define ticket-insert-columns
+  (define insert-columns
     '(id human-id
          project-id
          title
@@ -54,7 +54,7 @@
                    FROM ticket WHERE deleted_at IS NULL
                    AND project_id = ~a
                    ORDER BY ~a"
-                   (symbols->sql-columns-list ticket-columns)
+                   (symbols->sql-columns-list columns)
                    (value->sql-literal project-id) sort))
            (_ (log-info "get-tickets query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
@@ -70,7 +70,7 @@
                    AND project_id = '~a'
                    AND (title LIKE '%~a%' OR description LIKE '%~a%')
                    ORDER BY ~a"
-                   (symbols->sql-columns-list ticket-columns)
+                   (symbols->sql-columns-list columns)
                    project-id
                    q
                    q
@@ -87,7 +87,7 @@
                    "SELECT ~a FROM ticket
                     WHERE deleted_at IS NULL AND project_id = ~a AND human_id = ~a
                     LIMIT 1"
-                   (symbols->sql-columns-list ticket-columns)
+                   (symbols->sql-columns-list columns)
                    (value->sql-literal project-id)
                    (value->sql-literal human-id)))
            (_ (log-info "get-ticket-by-project-id-and-human-id query:
@@ -113,7 +113,7 @@
                         (value->sql-literal (assq-ref attrs x)))
                       ticket-insert-columns))
            (query (format #f "INSERT INTO ticket (~a) VALUES (~a)"
-                          (symbols->sql-columns-list ticket-insert-columns)
+                          (symbols->sql-columns-list insert-columns)
                           (string-join vals ", ")))
            (_ (log-info "insert-ticket query:\n\t~a\n" query)))
       (DB-query (DB-open rc) query)))

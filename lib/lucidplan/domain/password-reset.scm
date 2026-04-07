@@ -21,24 +21,29 @@
   #:export (<password-reset-repository> password-reset-repository?
                                         get-password-reset-by-token
                                         delete-password-reset-by-user-id
+                                        insert-password-reset
                                         mk-password-reset-repository))
 
 ;; -- Record definition ---
 
 (define-record-type <password-reset-repository>
   (make-password-reset-repository get-password-reset-by-token-proc
-                                  delete-password-reset-by-user-id-proc)
+                                  delete-password-reset-by-user-id-proc
+                                  insert-password-reset-proc)
   password-reset-repository?
   (get-password-reset-by-token-proc repo-get-password-reset-by-token)
-  (delete-password-reset-by-user-id-proc repo-delete-password-reset-by-user-id))
+  (delete-password-reset-by-user-id-proc repo-delete-password-reset-by-user-id)
+  (insert-password-reset-proc repo-insert-password-reset))
 
 ;; --- Constructor (keyword arguments for ergonomics) ---
 
 (define* (mk-password-reset-repository #:key get-password-reset-by-token-proc
-                                       delete-password-reset-by-user-id-proc)
+                                       delete-password-reset-by-user-id-proc
+                                       insert-password-reset-proc)
   "Creates a new password reset repository instance with the provided backend procedures."
   (make-password-reset-repository get-password-reset-by-token-proc
-                                  delete-password-reset-by-user-id-proc))
+                                  delete-password-reset-by-user-id-proc
+                                  insert-password-reset-proc))
 
 ;; --- eDSL: Embedded Domain Specific Language ---
 
@@ -51,3 +56,8 @@
   "Deletes the password reset associated with a specific USER-ID from the REPO"
   ((repo-delete-password-reset-by-user-id repo)
    user-id))
+
+(define (insert-password-reset repo attrs)
+  "Inserts a new password-reset using ATTRS into the given REPO."
+  ((repo-insert-password-reset repo)
+   attrs))

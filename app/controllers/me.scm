@@ -111,10 +111,10 @@
                              (assoc-ref tt "created_at")))
                    (error "reset token is found but not valid anymore")))
               (user-id (assoc-ref tt "user_id"))
-              (email (assoc-ref (car ($user 'get
-                                            #:ret 'top
-                                            #:condition (where #:id user-id)))
-                                "email")))
+              (user-repo (make-sqlite-user-repository rc))
+              (u (get-user-by-id user-repo user-repo user-id))
+              (email (assoc-ref u
+                                'email)))
          (response-emit (:mime rc
                                (reset-password-page (:i18n rc)
                                                     #:token (params rc "token")
@@ -159,6 +159,7 @@
                                                   #:signing-key signing-key)
                                    #f))
                (user-repo (make-sqlite-user-repository rc))
+               (password-reset-repo (make-sqlite-password-reset-repository rc))
                (body (if (not (rc-body rc)) #f
                          (alist-from-url-encoded-body (rc-body rc))))
                (email (if (not body) #f
@@ -168,7 +169,7 @@
                                       (assoc-ref existing-token
                                                  'owner-id))
                       (get-user-by-email user-repo email))))
-          (request-password-reset u)
+          (request-password-reset password-reset-repo u)
           (redirect-to rc
                        (string->uri (format #f "~a/?sent-password-reset=true"
                                             (current-myhost)))
@@ -198,9 +199,13 @@
                (u (get-user-by-id user-repo user-id))
                (new-salt (generate-string-uuid))
                (h (string->sha-256 (string-append new-password new-salt)))
-               (_ (update-user-by-id user-repo (assoc-ref u 'id) `((salt unquote new-salt)
-                                                                   (password unquote h))))
-               (_ (delete-password-reset-by-user-id (assoc-ref u 'id))))
+               (_ (update-user-by-id user-repo
+                                     (assoc-ref u
+                                                'id)
+                                     `((salt unquote new-salt)
+                                       (password unquote h))))
+               (_ (delete-password-reset-by-user-id (assoc-ref u
+                                                               'id))))
           (:cookies-set! rc
                          'x-bewaking-lucidplan "x-bewaking-lucidplan" "")
           (:cookies-setattr! rc
@@ -215,18 +220,19 @@
                                      (current-myhost)))
                        #:status 302))))
 
-(define (request-password-reset u)
-  (let* ((_ ($password_reset 'mod
-                             'row-delete
-                             (where #:user_id (assoc-ref (car u) "id"))))
+(define (request-password-reset password-reset-repo u)
+  (let* ((_ (delete-password-reset-by-user-id password-reset-repo
+                                              (assoc-ref u
+                                                         'id)))
          (reset-token (base16-encode (format #f "~a-~a-~a"
                                              (generate-string-uuid)
                                              (generate-string-uuid)
                                              (generate-string-uuid))))
-         (pr ($password_reset 'set
-                              #:user_id (assoc-ref (car u) "id")
-                              #:reset_token reset-token
-                              #:created_at (current-time)))
+         (_ (insert-password-reset password-reset-repo
+                                   `((user-id unquote (assoc-ref u 'id))
+                                     (reset-token unquote reset-token)
+                                     (created-at unquote (current-time)))))
+         (pr (get-password-reset-by-token password-reset-repo reset-token))
          (mail-payload `((task-type . send-email) (template . password-reset)
                          (template-vars (system-name . Lucidplan)
                                         (user unquote
@@ -253,7 +259,9 @@
                                   #:encryption-key encryption-key
                                   #:signing-key signing-key))
                 (user-repo (make-sqlite-user-repository rc))
-                (user (get-user-by-id user-repo (assoc-ref t 'owner-id)))
+                (user (get-user-by-id user-repo
+                                      (assoc-ref t
+                                                 'owner-id)))
                 (users (get-users user-repo)))
            (response-emit (:mime rc
                                  (new-user-page (:i18n rc))))))
@@ -313,15 +321,18 @@
                                              lucidplan:modify-permissions))))
                  (new-id (generate-string-uuid))
                  (user-repo (make-sqlite-user-repository rc))
-                 (_ (insert-user user-repo `((id unquote new-id)
-                                             (username unquote username)
-                                             (email unquote email)
-                                             (password . "")
-                                             (salt . "")
-                                             (permissions (format #f "`s" permissions)))))
+                 (password-reset-repo (make-sqlite-password-reset-repository
+                                       rc))
+                 (_ (insert-user user-repo
+                                 `((id unquote new-id)
+                                   (username unquote username)
+                                   (email unquote email)
+                                   (password . "")
+                                   (salt . "")
+                                   (permissions unquote (format #f "`~s" permissions)))))
 
                  (u (get-user-by-id user-repo new-id)))
-            (request-password-reset u)
+            (request-password-reset password-reset-repo u)
             (redirect-to rc
                          (string->uri (format #f
                                               "~a/users/manage/?created=true"
