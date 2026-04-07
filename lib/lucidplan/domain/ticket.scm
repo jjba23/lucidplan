@@ -18,9 +18,6 @@
 (define-module (lucidplan domain ticket)
   #:declarative? #t
   #:use-module (srfi srfi-9)
-  #:use-module (kracht prelude)
-  #:use-module (artanis db)
-  #:use-module (lucidplan sqlite util)
   #:export (<ticket-repository> ticket-repository?
                                 get-active-tickets
                                 search-active-tickets

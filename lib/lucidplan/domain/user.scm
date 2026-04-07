@@ -18,7 +18,6 @@
 (define-module (lucidplan domain user)
   #:declarative? #t
   #:use-module (srfi srfi-9)
-  #:use-module (kracht prelude)
   #:export (<user-repository> user-repository?
                               mk-user-repository
                               get-id-to-username
