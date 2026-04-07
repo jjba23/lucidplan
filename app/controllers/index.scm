@@ -30,7 +30,7 @@
      #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
        (let* ((project-repo (make-sqlite-project-repository rc))
-              (proj (get-active-projects project-repo)))
+              (proj (get-projects project-repo)))
          (response-emit (:mime rc
                                (welcome-page (:i18n rc)
                                              #:projects proj

@@ -38,10 +38,10 @@
        (define (do-get)
          (let* ((project-repo (make-sqlite-project-repository rc))
                 (ticket-repo (make-sqlite-ticket-repository rc))
-                (project-details (get-active-project-by-human-id project-repo
+                (project-details (get-project-by-human-id project-repo
                                                                  (params rc
                                                                   "project")))
-                (tickets (get-active-tickets ticket-repo
+                (tickets (get-tickets ticket-repo
                                              (assq-ref project-details
                                                        'id) "human_id ASC")))
            (:mime rc
@@ -60,7 +60,7 @@
      (lambda (rc)
        (define (do-get)
          (let* ((project-repo (make-sqlite-project-repository rc))
-                (projects (get-active-projects project-repo)))
+                (projects (get-projects project-repo)))
            (:mime rc
                   `((data unquote
                           (list->vector projects))))))

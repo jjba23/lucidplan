@@ -18,7 +18,7 @@
 (define-module (lucidplan domain)
   #:use-module (ice-9 string-fun))
 
-(define-public (only-active-tickets-filter ticket)
+(define-public (only-tickets-filter ticket)
   (or (equal? (assq-ref ticket
                         'ticket-status) "todo")
       (equal? (assq-ref ticket

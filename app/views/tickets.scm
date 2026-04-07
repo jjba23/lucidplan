@@ -330,7 +330,7 @@
                                                            search-query)))))
 
          ;; List Generators
-         (active-tickets (filter only-active-tickets-filter tickets))
+         (active-tickets (filter only-tickets-filter tickets))
          (done-tickets (filter only-done-tickets-filter tickets))
          (rejected-tickets (filter only-rejected-tickets-filter tickets))
 

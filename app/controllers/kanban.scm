@@ -40,7 +40,7 @@
                 (project-id (project-id-from-human-id project-repo
                                                       (params rc "project")))
                 (ticket-repo (make-sqlite-ticket-repository rc))
-                (proj (get-active-projects project-repo))
+                (proj (get-projects project-repo))
                 (user-sort (cond
                              ((not (equal? #f
                                            (get-from-qstr rc "sort")))
@@ -61,7 +61,7 @@
                               (:cookies-value rc "lucidplan-ticket-sort"))
                              (else "last-edited-at-desc")))
                 (query-sort (entity-sort-from-query user-sort))
-                (project-tickets (get-active-tickets ticket-repo project-id
+                (project-tickets (get-tickets ticket-repo project-id
                                                      (format #f "~a ~a"
                                                              (car query-sort)
                                                              (cadr query-sort))))

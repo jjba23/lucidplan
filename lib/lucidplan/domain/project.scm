@@ -19,9 +19,9 @@
   #:declarative? #t
   #:use-module (srfi srfi-9)
   #:export (<project-repository> project-repository?
-                                 get-active-projects
-                                 search-active-projects
-                                 get-active-project-by-human-id
+                                 get-projects
+                                 search-projects
+                                 get-project-by-human-id
                                  update-project-by-human-id
                                  mk-project-repository
                                  insert-project
@@ -30,43 +30,43 @@
 ;; -- Record definition ---
 
 (define-record-type <project-repository>
-  (make-project-repository active-projects-proc search-active-projects-proc
+  (make-project-repository active-projects-proc search-projects-proc
                            active-project-by-human-id-proc
                            update-project-by-human-id-proc insert-project-proc)
   project-repository?
-  (active-projects-proc repo-get-active-projects)
-  (search-active-projects-proc repo-search-active-projects)
-  (active-project-by-human-id-proc repo-get-active-project-by-human-id)
+  (active-projects-proc repo-get-projects)
+  (search-projects-proc repo-search-projects)
+  (active-project-by-human-id-proc repo-get-project-by-human-id)
   (update-project-by-human-id-proc repo-update-project-by-human-id)
   (insert-project-proc repo-insert-project))
 
 ;; --- Constructor (keyword arguments for ergonomics) ---
 
-(define* (mk-project-repository #:key get-active-projects-proc
-                                search-active-projects-proc
-                                get-active-project-by-human-id-proc
+(define* (mk-project-repository #:key get-projects-proc
+                                search-projects-proc
+                                get-project-by-human-id-proc
                                 update-project-by-human-id-proc
                                 insert-project-proc)
   "Creates a new project repository instance with the provided backend procedures."
-  (make-project-repository get-active-projects-proc
-                           search-active-projects-proc
-                           get-active-project-by-human-id-proc
+  (make-project-repository get-projects-proc
+                           search-projects-proc
+                           get-project-by-human-id-proc
                            update-project-by-human-id-proc insert-project-proc))
 
 ;; --- eDSL: Embedded Domain Specific Language ---
 
-(define (get-active-projects repo)
+(define (get-projects repo)
   "Retrieves a list of all active projects from the given REPO."
-  ((repo-get-active-projects repo)))
+  ((repo-get-projects repo)))
 
-(define (search-active-projects repo q)
+(define (search-projects repo q)
   "Searches for active projects matching query Q from the given REPO."
-  ((repo-search-active-projects repo)
+  ((repo-search-projects repo)
    q))
 
-(define (get-active-project-by-human-id repo human-id)
+(define (get-project-by-human-id repo human-id)
   "Retrieves a specific active project matching HUMAN-ID from the REPO."
-  ((repo-get-active-project-by-human-id repo)
+  ((repo-get-project-by-human-id repo)
    human-id))
 
 (define (update-project-by-human-id repo human-id attrs)
@@ -81,6 +81,6 @@
 
 (define (project-id-from-human-id repo human-id)
   "Resolves the internal project ID from a given HUMAN-ID in the REPO."
-  (let ((p (get-active-project-by-human-id repo human-id)))
+  (let ((p (get-project-by-human-id repo human-id)))
     (assq-ref p
               'id)))

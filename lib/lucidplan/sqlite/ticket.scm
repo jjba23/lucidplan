@@ -48,21 +48,22 @@
          created-at
          priority))
 
-  (define (get-active-tickets project-id sort)
+  (define (get-tickets project-id sort)
     (let* ((query (format #f
                    "SELECT ~a
                    FROM ticket WHERE deleted_at IS NULL
-                   AND project_id = '~a'
+                   AND project_id = ~a
                    ORDER BY ~a"
-                   (symbols->sql-columns-list ticket-columns) project-id sort))
-           (_ (log-info "get-active-tickets query:\n\t~a\n" query))
+                   (symbols->sql-columns-list ticket-columns)
+                   (value->sql-literal project-id) sort))
+           (_ (log-info "get-tickets query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query (DB-open rc) query))))
-           (_ (log-info "get-active-tickets rows: ~a\n"
+           (_ (log-info "get-tickets rows: ~a\n"
                         (length rows))))
       rows))
 
-  (define (search-active-tickets project-id q sort)
+  (define (search-tickets project-id q sort)
     (let* ((query (format #f
                    "SELECT ~a
                    FROM ticket WHERE deleted_at IS NULL
@@ -74,36 +75,36 @@
                    q
                    q
                    sort))
-           (_ (log-info "search-active-tickets query:\n\t~a\n" query))
+           (_ (log-info "search-tickets query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query (DB-open rc) query))))
-           (_ (log-info "search-active-tickets rows: ~a\n"
+           (_ (log-info "search-tickets rows: ~a\n"
                         (length rows))))
       rows))
 
-  (define (get-active-ticket-by-project-id-and-human-id project-id human-id)
+  (define (get-ticket-by-project-id-and-human-id project-id human-id)
     (let* ((query (format #f
                    "SELECT ~a FROM ticket
-                    WHERE deleted_at IS NULL AND project_id = '~a' AND human_id = '~a'
+                    WHERE deleted_at IS NULL AND project_id = ~a AND human_id = ~a
                     LIMIT 1"
-                   (symbols->sql-columns-list ticket-columns) project-id
-                   human-id))
-           (_ (log-info "get-active-ticket-by-project-id-and-human-id query:
+                   (symbols->sql-columns-list ticket-columns)
+                   (value->sql-literal project-id)
+                   (value->sql-literal human-id)))
+           (_ (log-info "get-ticket-by-project-id-and-human-id query:
 	~a
-"
-                        query))
+" query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query (DB-open rc) query))))
-           (_ (log-info "get-active-ticket-by-project-id-and-human-id rows: ~a
+           (_ (log-info "get-ticket-by-project-id-and-human-id rows: ~a
 "
-               (length rows))))
+                        (length rows))))
       (if (nil? rows) #f
           (car rows))))
 
   (define (update-ticket-by-human-id human-id attrs)
-    (let* ((query (format #f "UPDATE ticket SET ~a WHERE human_id = '~a'"
+    (let* ((query (format #f "UPDATE ticket SET ~a WHERE human_id = ~a"
                           (string-join (map pair->sql-assignment attrs) ", ")
-                          human-id))
+                          (value->sql-literal human-id)))
            (_ (log-info "update-ticket-by-human-id query:\n\t~a\n" query)))
       (DB-query (DB-open rc) query)))
 
@@ -117,10 +118,10 @@
            (_ (log-info "insert-ticket query:\n\t~a\n" query)))
       (DB-query (DB-open rc) query)))
 
-  (mk-ticket-repository #:get-active-tickets-proc get-active-tickets
-                        #:search-active-tickets-proc search-active-tickets
-                        #:get-active-ticket-by-project-id-and-human-id-proc
-                        get-active-ticket-by-project-id-and-human-id
+  (mk-ticket-repository #:get-tickets-proc get-tickets
+                        #:search-tickets-proc search-tickets
+                        #:get-ticket-by-project-id-and-human-id-proc
+                        get-ticket-by-project-id-and-human-id
                         #:update-ticket-by-human-id-proc
                         update-ticket-by-human-id
                         #:insert-ticket-proc insert-ticket))

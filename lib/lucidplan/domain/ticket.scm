@@ -19,9 +19,9 @@
   #:declarative? #t
   #:use-module (srfi srfi-9)
   #:export (<ticket-repository> ticket-repository?
-                                get-active-tickets
-                                search-active-tickets
-                                get-active-ticket-by-project-id-and-human-id
+                                get-tickets
+                                search-tickets
+                                get-ticket-by-project-id-and-human-id
                                 update-ticket-by-human-id
                                 mk-ticket-repository
                                 ticket-id-from-human-id
@@ -30,44 +30,44 @@
 ;; -- Record definition ---
 
 (define-record-type <ticket-repository>
-  (make-ticket-repository active-tickets-proc search-active-tickets-proc
+  (make-ticket-repository active-tickets-proc search-tickets-proc
                           active-ticket-by-project-id-and-human-id-proc
                           update-ticket-by-human-id-proc insert-ticket-proc)
   ticket-repository?
-  (active-tickets-proc repo-get-active-tickets)
-  (search-active-tickets-proc repo-search-active-tickets)
+  (active-tickets-proc repo-get-tickets)
+  (search-tickets-proc repo-search-tickets)
   (active-ticket-by-project-id-and-human-id-proc
-   repo-get-active-ticket-by-project-id-and-human-id)
+   repo-get-ticket-by-project-id-and-human-id)
   (update-ticket-by-human-id-proc repo-update-ticket-by-human-id)
   (insert-ticket-proc repo-insert-ticket))
 
 ;; --- Constructor (keyword arguments for ergonomics) ---
 
-(define* (mk-ticket-repository #:key get-active-tickets-proc
-          search-active-tickets-proc
-          get-active-ticket-by-project-id-and-human-id-proc
+(define* (mk-ticket-repository #:key get-tickets-proc
+          search-tickets-proc
+          get-ticket-by-project-id-and-human-id-proc
           update-ticket-by-human-id-proc
           insert-ticket-proc)
   "Creates a new ticket repository instance with the provided backend procedures."
-  (make-ticket-repository get-active-tickets-proc search-active-tickets-proc
-                          get-active-ticket-by-project-id-and-human-id-proc
+  (make-ticket-repository get-tickets-proc search-tickets-proc
+                          get-ticket-by-project-id-and-human-id-proc
                           update-ticket-by-human-id-proc insert-ticket-proc))
 
 ;; --- eDSL: Embedded Domain Specific Language ---
 
-(define (get-active-tickets repo project-id sort)
+(define (get-tickets repo project-id sort)
   "Retrieves active tickets for a given PROJECT-ID, ordered by SORT, from REPO."
-  ((repo-get-active-tickets repo)
+  ((repo-get-tickets repo)
    project-id sort))
 
-(define (search-active-tickets repo project-id q sort)
+(define (search-tickets repo project-id q sort)
   "Searches active tickets in PROJECT-ID matching query Q, ordered by SORT, from REPO."
-  ((repo-search-active-tickets repo)
+  ((repo-search-tickets repo)
    project-id q sort))
 
-(define (get-active-ticket-by-project-id-and-human-id repo project-id human-id)
+(define (get-ticket-by-project-id-and-human-id repo project-id human-id)
   "Retrieves a specific active ticket matching PROJECT-ID and HUMAN-ID from REPO."
-  ((repo-get-active-ticket-by-project-id-and-human-id repo)
+  ((repo-get-ticket-by-project-id-and-human-id repo)
    project-id human-id))
 
 (define (update-ticket-by-human-id repo human-id attrs)
@@ -83,7 +83,7 @@
 (define (ticket-id-from-human-id repo project-id human-id)
   "Resolves the internal ticket ID from a given PROJECT-ID and HUMAN-ID in REPO."
   ;; Switched let* to let since there is only a single binding
-  (let ((t (get-active-ticket-by-project-id-and-human-id repo project-id
+  (let ((t (get-ticket-by-project-id-and-human-id repo project-id
                                                          human-id)))
     (assq-ref t
               'id)))

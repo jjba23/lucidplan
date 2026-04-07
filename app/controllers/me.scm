@@ -34,7 +34,7 @@
         (lucidplan sqlite user)
         (lucidplan domain user)
         (lucidplan domain password-reset)
-        (lucidplan sqlite password-reset)                
+        (lucidplan sqlite password-reset)
         (bewaking bewaking))
 
 (get "/me"
@@ -48,7 +48,7 @@
                                 #:signing-key signing-key))
               (project-repo (make-sqlite-project-repository rc))
               (user-repo (make-sqlite-user-repository rc))
-              (proj (get-active-projects project-repo))
+              (proj (get-projects project-repo))
               (user (get-user-by-id user-repo
                                     (assoc-ref t
                                                'owner-id))))
@@ -83,9 +83,9 @@
                                   #:signing-key signing-key))
                 
                 (project-repo (make-sqlite-project-repository rc))
-                (proj (get-active-projects project-repo))
+                (proj (get-projects project-repo))
                 (user-repo (make-sqlite-user-repository rc))
-                (users (get-active-users user-repo)))
+                (users (get-users user-repo)))
            (response-emit (:mime rc
                                  (users-page (:i18n rc)
                                              #:users users
@@ -257,13 +257,9 @@
                                            "x-bewaking-lucidplan")
                                   #:encryption-key encryption-key
                                   #:signing-key signing-key))
-                (user ($user 'get
-                             #:ret 'top
-                             #:condition (where #:id (assoc-ref t
-                                                                'owner-id))))
-                (users ($user 'get
-                              #:ret 'all
-                              #:order-by '(username asc))))
+                (user-repo (make-sqlite-user-repository rc))
+                (user (get-user-by-id user-repo (assoc-ref t 'owner-id)))
+                (users (get-users user-repo)))
            (response-emit (:mime rc
                                  (new-user-page (:i18n rc))))))
 
@@ -279,8 +275,9 @@
      #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
        (define (go-to-edit-user)
-         (let* (                 (user-repo (make-sqlite-user-repository rc))
-                (user (get-user-by-id user-repo (params rc "id"))))
+         (let* ((user-repo (make-sqlite-user-repository rc))
+                (user (get-user-by-id user-repo
+                                      (params rc "id"))))
            (response-emit (:mime rc
                                  (edit-user-page (:i18n rc) user)))))
 
@@ -321,14 +318,13 @@
                                              lucidplan:modify-permissions))))
                  (new-id (generate-string-uuid))
                  (user-repo (make-sqlite-user-repository rc))
-                 (_ ($user 'set
-                           #:id new-id
-                           #:username username
-                           #:email email
-                           #:password ""
-                           #:salt ""
-                           #:permissions (format #f "`~s" permissions)))
-        
+                 (_ (insert-user user-repo `((id unquote new-id)
+                                             (username unquote username)
+                                             (email unquote email)
+                                             (password . "")
+                                             (salt . "")
+                                             (permissions (format #f "`s" permissions)))))
+
                  (u (get-user-by-id user-repo new-id)))
             (request-password-reset u)
             (redirect-to rc
@@ -347,11 +343,9 @@
       (lambda (rc)
         (define (do-delete-user)
           (let* ((body (alist-from-url-encoded-body (rc-body rc)))
-                 (id (assoc-ref body "id"))
                  (user-repo (make-sqlite-user-repository rc))
-                 (_ ($user 'mod
-                           'row-delete
-                           (where #:id id))))
+                 (_ (delete-user-by-id user-repo
+                                       (assoc-ref body "id"))))
             (redirect-to rc
                          (string->uri (format #f
                                               "~a/users/manage/?deleted=true"
@@ -370,7 +364,7 @@
           (let* ((body (alist-from-url-encoded-body (rc-body rc)))
                  (username (html-escape (assoc-ref body "username")))
                  (email (html-escape (assoc-ref body "email")))
-                                  (user-repo (make-sqlite-user-repository rc))
+                 (user-repo (make-sqlite-user-repository rc))
                  (permissions (filter (lambda (p)
                                         (not (equal? #f p)))
                                       (map (lambda (p)
@@ -382,14 +376,14 @@
                                              lucidplan:user-create
                                              lucidplan:user-delete
                                              lucidplan:modify-permissions))))
-                 (_ (DB-query (DB-open rc)
-                              (->sql update
-                                     'user set
-                                     `((username ,username)
-                                       (email ,email)
-                                       (permissions ,(format #f "`~s"
-                                                             permissions)))
-                                     (where #:id (params rc "id"))))))
+                 (user-repo (make-sqlite-user-repository rc))
+                 (_ (update-user-by-id user-repo
+                                       (params rc "id")
+                                       `((username unquote username)
+                                         (email unquote email)
+                                         (permissions unquote
+                                                      (format #f "`~s"
+                                                              permissions))))))
             (redirect-to rc
                          (string->uri (format #f
                                               "~a/users/manage/?edited=true"

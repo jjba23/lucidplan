@@ -118,9 +118,9 @@
                                   (equal? (:cookies-value rc
                                            "lucidplan-show-rejected") "true"))
                                  (else #f)))
-                (proj (get-active-projects project-repo))
+                (proj (get-projects project-repo))
                 (query-sort (entity-sort-from-query user-sort))
-                (project-details (get-active-project-by-human-id project-repo
+                (project-details (get-project-by-human-id project-repo
                                                                  (params rc
                                                                   "project")))
                 (my-sort (format #f "~a ~a"
@@ -128,10 +128,10 @@
                                  (cadr query-sort)))
                 (tickets (cond
                            ((eq? #f user-search)
-                            (get-active-tickets ticket-repo
+                            (get-tickets ticket-repo
                                                 (assq-ref project-details
                                                           'id) my-sort))
-                           (else (search-active-tickets ticket-repo
+                           (else (search-tickets ticket-repo
                                                         (params rc "project")
                                                         (html-escape
                                                          user-search) my-sort))))
@@ -176,7 +176,7 @@
                                                        #:is-logged-in (:cookies-value
                                                                        rc
                                                                        "x-bewaking-lucidplan")
-                                                       #:projects (get-active-projects
+                                                       #:projects (get-projects
                                                                    project-repo)
                                                        #:project (params rc
                                                                   "project"))))))
@@ -252,14 +252,14 @@
      (lambda (rc)
        (define (get-edit)
          (let* ((project-repo (make-sqlite-project-repository rc))
-                (proj (get-active-projects project-repo))
-                (project-details (get-active-project-by-human-id project-repo
+                (proj (get-projects project-repo))
+                (project-details (get-project-by-human-id project-repo
                                                                  (params rc
                                                                   "project")))
                 (ticket-repo (make-sqlite-ticket-repository rc))
                 (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
                                        rc))
-                (t (get-active-ticket-by-project-id-and-human-id ticket-repo
+                (t (get-ticket-by-project-id-and-human-id ticket-repo
                                                                  (assq-ref
                                                                   project-details
                                                                   'id)
@@ -336,15 +336,15 @@
      (lambda (rc)
        (define (get-single)
          (let* ((project-repo (make-sqlite-project-repository rc))
-                (proj (get-active-projects project-repo))
+                (proj (get-projects project-repo))
                 (user-repo (make-sqlite-user-repository rc))
                 (ticket-repo (make-sqlite-ticket-repository rc))
                 (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
                                        rc))
-                (project-details (get-active-project-by-human-id project-repo
+                (project-details (get-project-by-human-id project-repo
                                                                  (params rc
                                                                   "project")))
-                (t (get-active-ticket-by-project-id-and-human-id ticket-repo
+                (t (get-ticket-by-project-id-and-human-id ticket-repo
                                                                  (assq-ref
                                                                   project-details
                                                                   'id)

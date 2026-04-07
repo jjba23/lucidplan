@@ -22,27 +22,47 @@
                               mk-user-repository
                               get-id-to-username
                               get-user-by-id
-                              get-active-users
-                              get-user-by-email))
+                              get-users
+                              get-user-by-email
+                              insert-user
+                              delete-user-by-id
+                              update-user-by-id))
 
 ;; -- Record definition ---
 
 (define-record-type <user-repository>
-  (make-user-repository id-to-username-proc user-by-email-proc user-by-id-proc
-                        active-users-proc)
+  (make-user-repository id-to-username-proc
+                        user-by-email-proc
+                        user-by-id-proc
+                        users-proc
+                        insert-user-proc
+                        delete-user-by-id-proc
+                        update-user-by-id-proc)
   user-repository?
   (id-to-username-proc repo-get-id-to-username)
   (user-by-email-proc repo-get-user-by-email)
   (user-by-id-proc repo-get-user-by-id)
-  (active-users-proc repo-get-active-users))
+  (users-proc repo-get-users)
+  (insert-user-proc repo-insert-user)
+  (delete-user-by-id-proc repo-delete-user-by-id)
+  (update-user-by-id-proc repo-update-user-by-id))
 
 ;; --- Constructor (keyword arguments for ergonomics) ---
 (define* (mk-user-repository #:key get-id-to-username-proc
-                             get-user-by-email-proc get-user-by-id-proc
-                             get-active-users-proc)
+                             get-user-by-email-proc
+                             get-user-by-id-proc
+                             get-users-proc
+                             insert-user-proc
+                             delete-user-by-id-proc
+                             update-user-by-id-proc)
   "Creates a new user repository instance with the provided backend procedures."
-  (make-user-repository get-id-to-username-proc get-user-by-email-proc
-                        get-user-by-id-proc get-active-users-proc))
+  (make-user-repository get-id-to-username-proc
+                        get-user-by-email-proc
+                        get-user-by-id-proc
+                        get-users-proc
+                        insert-user-proc
+                        delete-user-by-id-proc
+                        update-user-by-id-proc))
 
 ;; --- eDSL: Embedded Domain Specific Language ---
 
@@ -60,6 +80,21 @@
   ((repo-get-user-by-id repo)
    id))
 
-(define (get-active-users repo)
+(define (get-users repo)
   "Retrieves a list of all active users from the given REPO."
-  ((repo-get-active-users repo)))
+  ((repo-get-users repo)))
+
+(define (insert-user repo id)
+  "Inserts a user with ATTRS in the given REPO."
+  ((repo-insert-user-by-id repo)
+   attrs))
+
+(define (update-user-by-id repo id attrs)
+  "Updates a user identified by ID with ATTRS in the given REPO."
+  ((repo-update-user-by-id repo)
+   id attrs))
+
+(define (delete-user-by-id repo id)
+  "Deletes a user identified by ID in the given REPO."
+  ((repo-delete-user-by-id repo)
+   id))

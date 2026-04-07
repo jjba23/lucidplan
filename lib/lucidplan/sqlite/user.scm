@@ -26,13 +26,16 @@
 
 ;; --- SQLite implementation ---
 (define (make-sqlite-user-repository rc)
-  (define user-columns
+  (define columns
+    '(id username email password salt permissions))
+
+  (define insert-columns
     '(id username email password salt permissions))
 
   (define (get-id-to-username)
     (let* ((query (format #f "SELECT ~a FROM user
                    ORDER BY username ASC"
-                          (symbols->sql-columns-list user-columns)))
+                          (symbols->sql-columns-list columns)))
            (_ (log-info "get-id-to-username query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query (DB-open rc) query))))
@@ -47,7 +50,7 @@
 
   (define (get-user-by-email email)
     (let* ((query (format #f "SELECT ~a FROM user WHERE email = ~a LIMIT 1"
-                          (symbols->sql-columns-list user-columns)
+                          (symbols->sql-columns-list columns)
                           (value->sql-literal email)))
            (_ (log-info "get-user-by-email query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
@@ -59,7 +62,7 @@
 
   (define (get-user-by-id id)
     (let* ((query (format #f "SELECT ~a FROM user WHERE id = ~a LIMIT 1"
-                          (symbols->sql-columns-list user-columns)
+                          (symbols->sql-columns-list columns)
                           (value->sql-literal id)))
            (_ (log-info "get-user-by-id query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
@@ -69,18 +72,44 @@
       (if (nil? rows) #f
           (car rows))))
 
-  (define (get-active-users)
+  (define (get-users)
     (let* ((query (format #f "SELECT ~a FROM user
                    ORDER BY username ASC"
-                          (symbols->sql-columns-list user-columns)))
-           (_ (log-info "get-active-users query:\n\t~a\n" query))
+                          (symbols->sql-columns-list columns)))
+           (_ (log-info "get-users query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query (DB-open rc) query))))
-           (_ (log-info "get-active-users rows: ~a\n"
+           (_ (log-info "get-users rows: ~a\n"
                         (length rows))))
       rows))
+
+  (define (update-user-by-id id attrs)
+    (let* ((query (format #f "UPDATE user SET ~a WHERE id = ~a"
+                          (string-join (map pair->sql-assignment attrs) ", ")
+                          (value->sql-literal id)))
+           (_ (log-info "update-user-by-id query:\n\t~a\n" query)))
+      (DB-query (DB-open rc) query)))
+
+  (define (delete-user-by-id id)
+    (let* ((query (format #f "DELETE FROM user WHERE id = ~a"
+                          (value->sql-literal id)))
+           (_ (log-info "delete-user-by-id query:\n\t~a\n" query)))
+      (DB-query (DB-open rc) query)))
+
+  (define (insert-user attrs)
+    (let* ((vals (map (lambda (x)
+                        (value->sql-literal (assq-ref attrs x)))
+                      insert-columns))
+           (query (format #f "INSERT INTO user (~a) VALUES (~a)"
+                          (symbols->sql-columns-list insert-columns)
+                          (string-join vals ", ")))
+           (_ (log-info "insert-user query:\n\t~a\n" query)))
+      (DB-query (DB-open rc) query)))
 
   (mk-user-repository #:get-id-to-username-proc get-id-to-username
                       #:get-user-by-email-proc get-user-by-email
                       #:get-user-by-id-proc get-user-by-id
-                      #:get-active-users-proc get-active-users))
+                      #:get-users-proc get-users
+                      #:insert-user-proc insert-user
+                      #:delete-user-by-id-proc delete-user-by-id
+                      #:update-user-by-id-proc update-user-by-id))
