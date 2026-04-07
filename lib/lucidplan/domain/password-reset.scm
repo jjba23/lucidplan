@@ -19,21 +19,26 @@
   #:declarative? #t
   #:use-module (srfi srfi-9)
   #:export (<password-reset-repository> password-reset-repository?
-                                         get-password-reset-by-token
-                                         mk-password-reset-repository))
+                                        get-password-reset-by-token
+                                        delete-password-reset-by-user-id
+                                        mk-password-reset-repository))
 
 ;; -- Record definition ---
 
 (define-record-type <password-reset-repository>
-  (make-password-reset-repository get-password-reset-by-token-proc)
+  (make-password-reset-repository get-password-reset-by-token-proc
+                                  delete-password-reset-by-user-id-proc)
   password-reset-repository?
-  (get-password-reset-by-token-proc repo-get-password-reset-by-token))
+  (get-password-reset-by-token-proc repo-get-password-reset-by-token)
+  (delete-password-reset-by-user-id-proc repo-delete-password-reset-by-user-id))
 
 ;; --- Constructor (keyword arguments for ergonomics) ---
 
-(define* (mk-password-reset-repository #:key get-password-reset-by-token-proc)
+(define* (mk-password-reset-repository #:key get-password-reset-by-token-proc
+                                       delete-password-reset-by-user-id-proc)
   "Creates a new password reset repository instance with the provided backend procedures."
-  (make-password-reset-repository get-password-reset-by-token-proc))
+  (make-password-reset-repository get-password-reset-by-token-proc
+                                  delete-password-reset-by-user-id-proc))
 
 ;; --- eDSL: Embedded Domain Specific Language ---
 
@@ -42,3 +47,7 @@
   ((repo-get-password-reset-by-token repo)
    token))
 
+(define (delete-password-reset-by-user-id repo user-id)
+  "Deletes the password reset associated with a specific USER-ID from the REPO"
+  ((repo-delete-password-reset-by-user-id repo)
+   user-id))

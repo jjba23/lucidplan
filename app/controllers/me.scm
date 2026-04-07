@@ -198,14 +198,9 @@
                (u (get-user-by-id user-repo user-id))
                (new-salt (generate-string-uuid))
                (h (string->sha-256 (string-append new-password new-salt)))
-               (_ (DB-query (DB-open rc)
-                            (format #f
-                             "UPDATE user SET salt = '~a', password = '~a' WHERE id = '~a'"
-                             new-salt h
-                             (assoc-ref (car u) "id"))))
-               (_ ($password_reset 'mod
-                                   'row-delete
-                                   (where #:user_id (assoc-ref (car u) "id")))))
+               (_ (update-user-by-id user-repo (assoc-ref u 'id) `((salt unquote new-salt)
+                                                                   (password unquote h))))
+               (_ (delete-password-reset-by-user-id (assoc-ref u 'id))))
           (:cookies-set! rc
                          'x-bewaking-lucidplan "x-bewaking-lucidplan" "")
           (:cookies-setattr! rc

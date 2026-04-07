@@ -37,9 +37,7 @@
                    "SELECT ~a FROM password_reset WHERE reset_token = ~a LIMIT 1"
                    (symbols->sql-columns-list password-reset-columns)
                    (value->sql-literal token)))
-           (_ (log-info "get-password-reset-by-token query:
-	~a
-" query))
+           (_ (log-info "get-password-reset-by-token query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query (DB-open rc) query))))
            (mapped-rows (map (lambda (r)
@@ -50,10 +48,18 @@
            (_ (log-info "get-password-reset-by-token mapped-rows: ~a
 "
                         (length mapped-rows))))
-      (if (nil? rows)
-          #f
+      (if (nil? rows) #f
           (car rows))))
 
+  (define (delete-password-reset-by-user-id user-id)
+    (let* ((query (format #f "DELETE FROM user WHERE user_id = ~a"
+                          (value->sql-literal user-id)))
+           (_ (log-info "delete-password-reset-by-user-id query:
+	~a
+" query)))
+      (DB-query (DB-open rc) query)))
 
   (mk-password-reset-repository #:get-password-reset-by-token-proc
-                                 get-password-reset-by-token))
+                                get-password-reset-by-token
+                                #:delete-password-reset-by-user-id-proc
+                                delete-password-reset-by-user-id))
