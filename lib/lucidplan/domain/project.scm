@@ -48,8 +48,7 @@
                                 update-project-by-human-id-proc
                                 insert-project-proc)
   "Creates a new project repository instance with the provided backend procedures."
-  (make-project-repository get-projects-proc
-                           search-projects-proc
+  (make-project-repository get-projects-proc search-projects-proc
                            get-project-by-human-id-proc
                            update-project-by-human-id-proc insert-project-proc))
 

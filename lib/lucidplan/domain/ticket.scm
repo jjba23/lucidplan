@@ -21,7 +21,7 @@
   #:export (<ticket-repository> ticket-repository?
                                 get-tickets
                                 search-tickets
-                                get-ticket-by-project-id-and-human-id
+                                get-ticket-by-project-human-id-and-human-id
                                 update-ticket-by-human-id
                                 mk-ticket-repository
                                 ticket-id-from-human-id
@@ -31,13 +31,13 @@
 
 (define-record-type <ticket-repository>
   (make-ticket-repository active-tickets-proc search-tickets-proc
-                          active-ticket-by-project-id-and-human-id-proc
+                          active-ticket-by-project-human-id-and-human-id-proc
                           update-ticket-by-human-id-proc insert-ticket-proc)
   ticket-repository?
   (active-tickets-proc repo-get-tickets)
   (search-tickets-proc repo-search-tickets)
-  (active-ticket-by-project-id-and-human-id-proc
-   repo-get-ticket-by-project-id-and-human-id)
+  (active-ticket-by-project-human-id-and-human-id-proc
+   repo-get-ticket-by-project-human-id-and-human-id)
   (update-ticket-by-human-id-proc repo-update-ticket-by-human-id)
   (insert-ticket-proc repo-insert-ticket))
 
@@ -45,12 +45,12 @@
 
 (define* (mk-ticket-repository #:key get-tickets-proc
           search-tickets-proc
-          get-ticket-by-project-id-and-human-id-proc
+          get-ticket-by-project-human-id-and-human-id-proc
           update-ticket-by-human-id-proc
           insert-ticket-proc)
   "Creates a new ticket repository instance with the provided backend procedures."
   (make-ticket-repository get-tickets-proc search-tickets-proc
-                          get-ticket-by-project-id-and-human-id-proc
+                          get-ticket-by-project-human-id-and-human-id-proc
                           update-ticket-by-human-id-proc insert-ticket-proc))
 
 ;; --- eDSL: Embedded Domain Specific Language ---
@@ -65,9 +65,9 @@
   ((repo-search-tickets repo)
    project-id q sort))
 
-(define (get-ticket-by-project-id-and-human-id repo project-id human-id)
+(define (get-ticket-by-project-human-id-and-human-id repo project-id human-id)
   "Retrieves a specific active ticket matching PROJECT-ID and HUMAN-ID from REPO."
-  ((repo-get-ticket-by-project-id-and-human-id repo)
+  ((repo-get-ticket-by-project-human-id-and-human-id repo)
    project-id human-id))
 
 (define (update-ticket-by-human-id repo human-id attrs)
@@ -83,7 +83,7 @@
 (define (ticket-id-from-human-id repo project-id human-id)
   "Resolves the internal ticket ID from a given PROJECT-ID and HUMAN-ID in REPO."
   ;; Switched let* to let since there is only a single binding
-  (let ((t (get-ticket-by-project-id-and-human-id repo project-id
-                                                         human-id)))
+  (let ((t (get-ticket-by-project-human-id-and-human-id repo project-id
+                                                        human-id)))
     (assq-ref t
               'id)))

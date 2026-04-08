@@ -59,7 +59,7 @@
 " query)))
       (DB-query (DB-open rc) query)))
 
-    (define (insert-password-reset attrs)
+  (define (insert-password-reset attrs)
     (let* ((vals (map (lambda (x)
                         (value->sql-literal (assq-ref attrs x)))
                       insert-columns))

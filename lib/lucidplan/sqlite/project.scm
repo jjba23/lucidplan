@@ -76,10 +76,9 @@
                    "SELECT ~a FROM project
                     WHERE deleted_at IS NULL AND human_id = ~a
                     LIMIT 1"
-                   (symbols->sql-columns-list columns) (value->sql-literal human-id)))
-           (_ (log-info "get-project-by-human-id query:
-	~a
-" query))
+                   (symbols->sql-columns-list columns)
+                   (value->sql-literal human-id)))
+           (_ (log-info "get-project-by-human-id query:\n\t~a\n" query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query (DB-open rc) query))))
            (_ (log-info "get-project-by-human-id rows: ~a\n"

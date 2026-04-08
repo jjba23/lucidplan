@@ -52,7 +52,7 @@
     (let* ((query (format #f
                    "SELECT ~a
                    FROM ticket WHERE deleted_at IS NULL
-                   AND project_id = ~a
+                   AND project_id = (SELECT id FROM project WHERE human_id = ~a LIMIT 1)
                    ORDER BY ~a"
                    (symbols->sql-columns-list columns)
                    (value->sql-literal project-id) sort))
@@ -67,11 +67,11 @@
     (let* ((query (format #f
                    "SELECT ~a
                    FROM ticket WHERE deleted_at IS NULL
-                   AND project_id = '~a'
+                   AND project_id = (SELECT id FROM project WHERE human_id = ~a LIMIT 1)
                    AND (title LIKE '%~a%' OR description LIKE '%~a%')
                    ORDER BY ~a"
                    (symbols->sql-columns-list columns)
-                   project-id
+                   (value->sql-literal project-id)
                    q
                    q
                    sort))
@@ -82,22 +82,24 @@
                         (length rows))))
       rows))
 
-  (define (get-ticket-by-project-id-and-human-id project-id human-id)
+  (define (get-ticket-by-project-human-id-and-human-id project-id human-id)
     (let* ((query (format #f
                    "SELECT ~a FROM ticket
-                    WHERE deleted_at IS NULL AND project_id = ~a AND human_id = ~a
+                    WHERE deleted_at IS NULL AND project_id = (SELECT id FROM project WHERE human_id = ~a LIMIT 1)
+                    AND human_id = ~a
                     LIMIT 1"
                    (symbols->sql-columns-list columns)
                    (value->sql-literal project-id)
                    (value->sql-literal human-id)))
-           (_ (log-info "get-ticket-by-project-id-and-human-id query:
+           (_ (log-info "get-ticket-by-project-human-id-and-human-id query:
 	~a
-" query))
+"
+                        query))
            (rows (map sql-row->scheme-alist
                       (DB-get-all-rows (DB-query (DB-open rc) query))))
-           (_ (log-info "get-ticket-by-project-id-and-human-id rows: ~a
+           (_ (log-info "get-ticket-by-project-human-id-and-human-id rows: ~a
 "
-                        (length rows))))
+               (length rows))))
       (if (nil? rows) #f
           (car rows))))
 
@@ -120,8 +122,8 @@
 
   (mk-ticket-repository #:get-tickets-proc get-tickets
                         #:search-tickets-proc search-tickets
-                        #:get-ticket-by-project-id-and-human-id-proc
-                        get-ticket-by-project-id-and-human-id
+                        #:get-ticket-by-project-human-id-and-human-id-proc
+                        get-ticket-by-project-human-id-and-human-id
                         #:update-ticket-by-human-id-proc
                         update-ticket-by-human-id
                         #:insert-ticket-proc insert-ticket))

@@ -73,8 +73,6 @@
                                             "lucidplan-ticket-sort")))
                               (:cookies-value rc "lucidplan-ticket-sort"))
                              (else "last-edited-at-desc")))
-                (project-id (project-id-from-human-id project-repo
-                                                      (params rc "project")))
                 (with-done (cond
                              ((not (equal? #f
                                            (get-from-qstr rc "with-done")))
@@ -121,28 +119,27 @@
                 (proj (get-projects project-repo))
                 (query-sort (entity-sort-from-query user-sort))
                 (project-details (get-project-by-human-id project-repo
-                                                                 (params rc
-                                                                  "project")))
+                                                          (params rc "project")))
                 (my-sort (format #f "~a ~a"
                                  (car query-sort)
                                  (cadr query-sort)))
                 (tickets (cond
                            ((eq? #f user-search)
                             (get-tickets ticket-repo
-                                                (assq-ref project-details
-                                                          'id) my-sort))
+                                         (params rc "project") my-sort))
                            (else (search-tickets ticket-repo
-                                                        (params rc "project")
-                                                        (html-escape
-                                                         user-search) my-sort))))
+                                                 (params rc "project")
+                                                 (html-escape user-search)
+                                                 my-sort))))
                 (ticket-id-to-human-id (map (lambda (t)
                                               `(,(assq-ref t
                                                            'id) unquote
                                                 (assq-ref t
                                                           'human-id))) tickets))
                 (user-names (get-id-to-username user-repo))
-                (ticket-assignee (get-ticket-assignee-by-project-id
-                                  ticket-assignee-repo project-id)))
+                (ticket-assignee (get-ticket-assignee-by-project-human-id
+                                  ticket-assignee-repo
+                                  (params rc "project"))))
            
            (response-emit (:mime rc
                                  (html-from-tickets (:i18n rc)
@@ -253,18 +250,14 @@
        (define (get-edit)
          (let* ((project-repo (make-sqlite-project-repository rc))
                 (proj (get-projects project-repo))
-                (project-details (get-project-by-human-id project-repo
-                                                                 (params rc
-                                                                  "project")))
                 (ticket-repo (make-sqlite-ticket-repository rc))
                 (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
                                        rc))
-                (t (get-ticket-by-project-id-and-human-id ticket-repo
-                                                                 (assq-ref
-                                                                  project-details
-                                                                  'id)
-                                                                 (params rc
-                                                                  "human-id")))
+                (t (get-ticket-by-project-human-id-and-human-id ticket-repo
+                                                                (params rc
+                                                                 "project")
+                                                                (params rc
+                                                                 "human-id")))
                 (assignee-data (get-ticket-assignee-by-ticket-id
                                 ticket-assignee-repo
                                 (assq-ref t
@@ -299,9 +292,8 @@
                  (priority (string->number (assoc-ref body "priority")))
                  (ticket-type (assoc-ref body "ticket-type"))
                  (project-id (project-id-from-human-id project-repo
-                                                      (params rc "project")))                 
-                 (ticket-id (ticket-id-from-human-id ticket-repo
-                                                     project-id
+                                                       (params rc "project")))
+                 (ticket-id (ticket-id-from-human-id ticket-repo project-id
                                                      (params rc "human-id")))
 
                  (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
@@ -317,8 +309,7 @@
                                          (updated_at unquote
                                                      (current-time))))
             (upsert-ticket-assignee ticket-assignee-repo
-                                    `((project-id unquote
-                                                  project-id)
+                                    `((project-id unquote project-id)
                                       (ticket-id unquote ticket-id)
                                       (user-id unquote
                                                (assoc-ref body "assignee"))))
@@ -345,15 +336,11 @@
                 (ticket-repo (make-sqlite-ticket-repository rc))
                 (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
                                        rc))
-                (project-details (get-project-by-human-id project-repo
-                                                                 (params rc
-                                                                  "project")))
-                (t (get-ticket-by-project-id-and-human-id ticket-repo
-                                                                 (assq-ref
-                                                                  project-details
-                                                                  'id)
-                                                                 (params rc
-                                                                  "human-id")))
+                (t (get-ticket-by-project-human-id-and-human-id ticket-repo
+                                                                (params rc
+                                                                 "project")
+                                                                (params rc
+                                                                 "human-id")))
                 (user-names (get-id-to-username user-repo))
                 (ticket-assignee (get-ticket-assignee-by-ticket-id
                                   ticket-assignee-repo

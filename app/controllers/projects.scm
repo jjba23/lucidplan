@@ -45,7 +45,7 @@
                         ((nil? user-search)
                          (get-projects project-repo))
                         (else (search-projects project-repo
-                                                      (html-escape user-search))))))
+                                               (html-escape user-search))))))
            (response-emit (:mime rc
                                  (html-from-projects (:i18n rc)
                                                      #:projects proj
@@ -136,7 +136,7 @@
        (define (get-edit)
          (let* ((project-repo (make-sqlite-project-repository rc))
                 (p (get-project-by-human-id project-repo
-                                                   (params rc "human-id"))))
+                                            (params rc "human-id"))))
            (response-emit (:mime rc
                                  (html-edit-project-form (:i18n rc)
                                                          #:is-logged-in (:cookies-value

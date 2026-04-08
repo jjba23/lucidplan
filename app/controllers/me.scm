@@ -229,9 +229,12 @@
                                              (generate-string-uuid)
                                              (generate-string-uuid))))
          (_ (insert-password-reset password-reset-repo
-                                   `((user-id unquote (assoc-ref u 'id))
+                                   `((user-id unquote
+                                              (assoc-ref u
+                                                         'id))
                                      (reset-token unquote reset-token)
-                                     (created-at unquote (current-time)))))
+                                     (created-at unquote
+                                                 (current-time)))))
          (pr (get-password-reset-by-token password-reset-repo reset-token))
          (mail-payload `((task-type . send-email) (template . password-reset)
                          (template-vars (system-name . Lucidplan)
@@ -329,7 +332,8 @@
                                    (email unquote email)
                                    (password . "")
                                    (salt . "")
-                                   (permissions unquote (format #f "`~s" permissions)))))
+                                   (permissions unquote
+                                                (format #f "`~s" permissions)))))
 
                  (u (get-user-by-id user-repo new-id)))
             (request-password-reset password-reset-repo u)

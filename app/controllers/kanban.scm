@@ -37,8 +37,6 @@
      (lambda (rc)
        (define (get)
          (let* ((project-repo (make-sqlite-project-repository rc))
-                (project-id (project-id-from-human-id project-repo
-                                                      (params rc "project")))
                 (ticket-repo (make-sqlite-ticket-repository rc))
                 (proj (get-projects project-repo))
                 (user-sort (cond
@@ -61,10 +59,11 @@
                               (:cookies-value rc "lucidplan-ticket-sort"))
                              (else "last-edited-at-desc")))
                 (query-sort (entity-sort-from-query user-sort))
-                (project-tickets (get-tickets ticket-repo project-id
-                                                     (format #f "~a ~a"
-                                                             (car query-sort)
-                                                             (cadr query-sort))))
+                (project-tickets (get-tickets ticket-repo
+                                              (params rc "project")
+                                              (format #f "~a ~a"
+                                                      (car query-sort)
+                                                      (cadr query-sort))))
                 (ticket-id-to-human-id (map (lambda (t)
                                               `(,(assq-ref t
                                                            'id) unquote

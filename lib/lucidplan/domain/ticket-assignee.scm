@@ -19,37 +19,37 @@
   #:declarative? #t
   #:use-module (srfi srfi-9)
   #:export (<ticket-assignee-repository> ticket-assignee-repository?
-                                         get-ticket-assignee-by-project-id
-                                         get-ticket-assignee-by-ticket-id
-                                         upsert-ticket-assignee
-                                         mk-ticket-assignee-repository))
+            get-ticket-assignee-by-project-human-id
+            get-ticket-assignee-by-ticket-id upsert-ticket-assignee
+            mk-ticket-assignee-repository))
 
 ;; -- Record definition ---
 
 (define-record-type <ticket-assignee-repository>
-  (make-ticket-assignee-repository ticket-assignee-by-project-id-proc
+  (make-ticket-assignee-repository ticket-assignee-by-project-human-id-proc
                                    ticket-assignee-by-ticket-id-proc
                                    upsert-ticket-assignee-proc)
   ticket-assignee-repository?
-  (ticket-assignee-by-project-id-proc repo-get-ticket-assignee-by-project-id)
+  (ticket-assignee-by-project-human-id-proc
+   repo-get-ticket-assignee-by-project-human-id)
   (ticket-assignee-by-ticket-id-proc repo-get-ticket-assignee-by-ticket-id)
   (upsert-ticket-assignee-proc repo-upsert-ticket-assignee))
 
 ;; --- Constructor (keyword arguments for ergonomics) ---
 
 (define* (mk-ticket-assignee-repository #:key
-          get-ticket-assignee-by-project-id-proc
+          get-ticket-assignee-by-project-human-id-proc
           get-ticket-assignee-by-ticket-id-proc upsert-ticket-assignee-proc)
   "Creates a new ticket assignee repository instance with the provided backend procedures."
-  (make-ticket-assignee-repository get-ticket-assignee-by-project-id-proc
-                                   get-ticket-assignee-by-ticket-id-proc
-                                   upsert-ticket-assignee-proc))
+  (make-ticket-assignee-repository
+   get-ticket-assignee-by-project-human-id-proc
+   get-ticket-assignee-by-ticket-id-proc upsert-ticket-assignee-proc))
 
 ;; --- eDSL: Embedded Domain Specific Language ---
 
-(define (get-ticket-assignee-by-project-id repo project-id)
+(define (get-ticket-assignee-by-project-human-id repo project-id)
   "Retrieves the ticket assignees associated with a specific PROJECT-ID from the REPO."
-  ((repo-get-ticket-assignee-by-project-id repo)
+  ((repo-get-ticket-assignee-by-project-human-id repo)
    project-id))
 
 (define (get-ticket-assignee-by-ticket-id repo ticket-id)

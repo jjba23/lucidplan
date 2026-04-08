@@ -32,12 +32,12 @@
   (define upsert-columns
     '(project-id ticket-id user-id))
 
-  (define (get-ticket-assignee-by-project-id project-id)
+  (define (get-ticket-assignee-by-project-human-id project-id)
     (let* ((query (format #f
-                   "SELECT ~a FROM ticket_assignee WHERE project_id = ~a"
+                   "SELECT ~a FROM ticket_assignee WHERE project_id = (SELECT id FROM project WHERE human_id = ~a LIMIT 1)"
                    (symbols->sql-columns-list columns)
                    (value->sql-literal project-id)))
-           (_ (log-info "get-ticket-assignee-by-project-id query:
+           (_ (log-info "get-ticket-assignee-by-project-human-id query:
 	~a
 " query))
            (rows (map sql-row->scheme-alist
@@ -47,9 +47,10 @@
                                                'ticket-id)
                                      (assq-ref r
                                                'user-id))) rows))
-           (_ (log-info "get-ticket-assignee-by-project-id mapped-rows: ~a
+           (_ (log-info
+               "get-ticket-assignee-by-project-human-id mapped-rows: ~a
 "
-                        (length mapped-rows))))
+               (length mapped-rows))))
       mapped-rows))
 
   (define (get-ticket-assignee-by-ticket-id ticket-id)
@@ -85,8 +86,9 @@
            (_ (log-info "upsert-ticket-assignee query:\n\t~a\n" query)))
       (DB-query (DB-open rc) query)))
 
-  (mk-ticket-assignee-repository #:get-ticket-assignee-by-project-id-proc
-                                 get-ticket-assignee-by-project-id
+  (mk-ticket-assignee-repository
+                                 #:get-ticket-assignee-by-project-human-id-proc
+                                 get-ticket-assignee-by-project-human-id
                                  #:get-ticket-assignee-by-ticket-id-proc
                                  get-ticket-assignee-by-ticket-id
                                  #:upsert-ticket-assignee-proc
