@@ -291,15 +291,19 @@
       (lambda (rc)
         (define (do-edit)
           (let* ((ticket-repo (make-sqlite-ticket-repository rc))
+                 (project-repo (make-sqlite-project-repository rc))
                  (body (alist-from-url-encoded-body (rc-body rc)))
                  (title (html-escape (assoc-ref body "title")))
                  (description (html-escape (assoc-ref body "description")))
                  (ticket-status (assoc-ref body "ticket-status"))
                  (priority (string->number (assoc-ref body "priority")))
                  (ticket-type (assoc-ref body "ticket-type"))
+                 (project-id (project-id-from-human-id project-repo
+                                                      (params rc "project")))                 
                  (ticket-id (ticket-id-from-human-id ticket-repo
-                                                     (params rc "project")
+                                                     project-id
                                                      (params rc "human-id")))
+
                  (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
                                         rc)))
             
@@ -314,7 +318,7 @@
                                                      (current-time))))
             (upsert-ticket-assignee ticket-assignee-repo
                                     `((project-id unquote
-                                                  (params rc "project"))
+                                                  project-id)
                                       (ticket-id unquote ticket-id)
                                       (user-id unquote
                                                (assoc-ref body "assignee"))))
