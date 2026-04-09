@@ -69,33 +69,38 @@ In summary, we foster an inclusive, respectful, and cooperative environment for 
 
 -------
 
-* Lucidplan Project
+* About this Project and Contributing
 
-Contributing to free software is a uniquely beautiful act because it embodies principles of generosity, collaboration, and empowerment.
+Contributing to free software (as in freedom) is a uniquely beautiful act because it embodies principles of generosity, collaboration, and empowerment.
 
-We welcome everyone to feel invited to the lucidplan Project, and encourage active contribution in all forms, to improve it and/or suggest improvements, brainstorm with me, make it more modular/flexible, etc, feel free to contact me <jjbigorra@gmail.com> to chat, discuss or report feedback.
+Feel free to open an issue on this repository's homepage at Codeberg or in LucidPlan
 
-Find here the Backlog and Kanban boards for lucidplan: https://lucidplan.jointhefreeworld.org/tickets/lucidplan
+We welcome everyone to feel invited to the LucidPlan Project.
+
+We encourage active contribution in all forms, to improve it and/or suggest improvements, report issues, brainstorm with me, make it more modular/flexible, etc,
+
+Feel free to open issue on tracker, on Git / Codeberg repository, or mail me <jjbigorra@gmail.com> to chat, discuss or report feedback.
+
+See here the [[https://lucidplan.jointhefreeworld.org/tickets/lucidplan][Backlog and Kanban]]  for this project.
 
 --------
 
 * Authentication, Authorization, User management
 
-Bewaking is a nice library to help you secure your web applications with Guile Scheme: https://codeberg.org/jjba23/bewaking
+[[https://codeberg.org/jjba23/bewaking][bewaking]] 🔗 is a nice library to help you secure your web applications with Guile Scheme.
 
-With bewaking we use secure tokens encrypted and stored in secure cookies (for browsers) and headers (for REST API)
+With bewaking we use secure tokens encrypted and stored in secure cookies (for browsers) and headers (for REST API) as well  as authentication and authorization, with ACLs (access control list) and fine-grained permissions.
 
-If you want to be a super user in lucidplan your token will need to have the ~lucidplan:modify-permissions~ permission, effectively meaning you can give yourself and others all wanted permissions and do everything.
+If you want to be a super user/root user in lucidplan your token's permissions list will need to contain the ~lucidplan:modify-permissions~ permission, effectively meaning you can give yourself and others all wanted permissions and do everything.
 
-See more of the permissions here:
-
-- lucidplan:ticket-create
-- lucidplan:ticket-delete
-- lucidplan:project-create
-- lucidplan:project-delete
-- lucidplan:user-create
-- lucidplan:user-delete
-- lucidplan:modify-permissions
+LucidPlan's permission model ACL:
+- ~lucidplan:ticket-create~
+- ~lucidplan:ticket-delete~
+- ~lucidplan:project-create~
+- ~lucidplan:project-delete~
+- ~lucidplan:user-create~
+- ~lucidplan:user-delete~
+- ~lucidplan:modify-permissions~
 
 Lucidplan requires an authenticated session for performing administrative tasks such as creating/deleting tickets and projects. For web browsers you can simply use the login page, for scripts and headless usage, use the ~/api/v1/login~ endpoint and take the ~x-bewaking-lucidplan~ response header.
 
