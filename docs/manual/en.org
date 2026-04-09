@@ -104,9 +104,7 @@ LucidPlan's permission model ACL:
 
 Lucidplan requires an authenticated session for performing administrative tasks such as creating/deleting tickets and projects. For web browsers you can simply use the login page, for scripts and headless usage, use the ~/api/v1/login~ endpoint and take the ~x-bewaking-lucidplan~ response header.
 
-Upon starting a blank new lucidplan deployment you will have no users in the database. Check in ~db/migration~ and edit the password field and salt, or add more users. An important note is that currently the passwords should NOT contain any special characters (letters and numbers are OK).
-
-Then do a ~guix shell -m manifest.scm -- art migrate up user~ to add your users.
+Upon starting a blank new lucidplan deployment you will have no users in the database. Check in ~resources/migrations/~ and edit the password field and salt, or add more users.
 
 If running locally, it's recommended to use ~localhost~ instead of ~127.0.0.1~ as this will work better with the authentication/authorization and other cookies.
 
