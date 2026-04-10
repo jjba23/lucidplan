@@ -128,7 +128,7 @@
                            #:happy-flow do-new
                            #:unhappy-flow back-to-login)))
 
-(get "/projects/:human-id/edit"
+(get "/projects/id/:human-id/edit"
      #:mime 'xml
      #:i18n '(cookie "lang")
      #:cookies '(names x-bewaking-lucidplan)
@@ -148,7 +148,7 @@
 
        (get-edit)))
 
-(post "/projects/:human-id/edit"
+(post "/projects/id/:human-id/edit"
       #:mime 'xml
       #:cookies '(names x-bewaking-lucidplan)
       (lambda (rc)

@@ -87,7 +87,7 @@
          (toggle-js (format #f
                      "document.getElementById('details-~a').toggleAttribute('hidden')"
                      id))
-         (edit-url (format #f "/tickets/~a/~a/edit" project human-id))
+         (edit-url (format #f "/tickets/~a/id/~a/edit" project human-id))
          (delete-url (format #f "/tickets/~a/delete" project)))
     
     ;; Render the clean SXML
@@ -205,7 +205,7 @@
          (toggle-js (format #f
                      "document.getElementById('~a').toggleAttribute('hidden')"
                      details-id))
-         (ticket-url (format #f "/tickets/~a/~a" project human-id))
+         (ticket-url (format #f "/tickets/~a/id/~a" project human-id))
 
          ;; Consolidate CSS Classes
          (wrapper-face (mk-class '(flex flex-col gap-2)))
@@ -550,7 +550,7 @@
                     #:assignee assignee
                     #:priority (assq-ref t
                                          'priority)
-                    #:action (format #f "/tickets/~a/~a/edit" project
+                    #:action (format #f "/tickets/~a/id/~a/edit" project
                                      (assq-ref t
                                                'human-id))
                     #:projects projects))

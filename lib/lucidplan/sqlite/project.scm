@@ -96,7 +96,7 @@
   (define (insert-project attrs)
     (let* ((vals (map (lambda (x)
                         (value->sql-literal (assq-ref attrs x)))
-                      project-insert-columns))
+                      insert-columns))
            (query (format #f "INSERT INTO project (~a) VALUES (~a)"
                           (symbols->sql-columns-list insert-columns)
                           (string-join vals ", ")))

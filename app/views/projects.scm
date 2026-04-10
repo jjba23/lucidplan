@@ -119,7 +119,7 @@
                                                              'vcs-url) ""))))
          (hr (@ (class ,(mk-class '(my-3)))))
          (div (@ (class ,(mk-class '(flex flex-wrap flex-row gap-4 py-4))))
-              (a (@ (href ,(format #f "/projects/~a/edit"
+              (a (@ (href ,(format #f "/projects/id/~a/edit"
                                    (assq-ref p
                                              'human-id))))
                  ,(icon-button #:icon 'pencil
@@ -267,7 +267,7 @@
                                        (html-unescape (assq-ref project
                                                                 'description))
                                        "")
-                     #:action (format #f "/projects/~a/edit"
+                     #:action (format #f "/projects/id/~a/edit"
                                       (assq-ref project
                                                 'human-id))
                      #:projects projects))

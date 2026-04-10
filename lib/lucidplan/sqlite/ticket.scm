@@ -113,7 +113,7 @@
   (define (insert-ticket attrs)
     (let* ((vals (map (lambda (x)
                         (value->sql-literal (assq-ref attrs x)))
-                      ticket-insert-columns))
+                      insert-columns))
            (query (format #f "INSERT INTO ticket (~a) VALUES (~a)"
                           (symbols->sql-columns-list insert-columns)
                           (string-join vals ", ")))

@@ -242,7 +242,7 @@
                            #:happy-flow do-new
                            #:unhappy-flow back-to-login)))
 
-(get "/tickets/:project/:human-id/edit"
+(get "/tickets/:project/id/:human-id/edit"
      #:mime 'xml
      #:i18n '(cookie "lang")
      #:cookies '(names x-bewaking-lucidplan)
@@ -278,7 +278,7 @@
                                                                         "x-bewaking-lucidplan"))))))
        (get-edit)))
 
-(post "/tickets/:project/:human-id/edit"
+(post "/tickets/:project/id/:human-id/edit"
       #:mime 'xml
       #:cookies '(names x-bewaking-lucidplan)
       (lambda (rc)
@@ -324,7 +324,7 @@
                            #:happy-flow do-edit
                            #:unhappy-flow back-to-login)))
 
-(get "/tickets/:project/:human-id"
+(get "/tickets/:project/id/:human-id"
      #:mime 'xml
      #:i18n '(cookie "lang")
      #:cookies '(names x-bewaking-lucidplan)
