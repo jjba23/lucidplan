@@ -1,6 +1,6 @@
-;;; lucidplan - the CI/CD orchestrator written in Guile Scheme
+;;; lucidplan - free and open project management for everyone
 
-;; Copyright (C) Josep Bigorra <jjbigorra@gmail.com>
+;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
 ;; lucidplan is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU Affero General Public License as published by
@@ -18,46 +18,33 @@
 (define-module (lucidplan domain ticket-assignee)
   #:declarative? #t
   #:use-module (srfi srfi-9)
-  #:export (<ticket-assignee-repository> ticket-assignee-repository?
-            get-ticket-assignee-by-project-human-id
-            get-ticket-assignee-by-ticket-id upsert-ticket-assignee
-            mk-ticket-assignee-repository))
+  #:use-module (lucidplan domain repo)
+  #:export (get-ticket-assignee-by-project-human-id
+            get-ticket-assignee-by-ticket-id upsert-ticket-assignee))
 
 ;; -- Record definition ---
 
-(define-record-type <ticket-assignee-repository>
-  (make-ticket-assignee-repository ticket-assignee-by-project-human-id-proc
-                                   ticket-assignee-by-ticket-id-proc
-                                   upsert-ticket-assignee-proc)
-  ticket-assignee-repository?
-  (ticket-assignee-by-project-human-id-proc
-   repo-get-ticket-assignee-by-project-human-id)
-  (ticket-assignee-by-ticket-id-proc repo-get-ticket-assignee-by-ticket-id)
-  (upsert-ticket-assignee-proc repo-upsert-ticket-assignee))
-
-;; --- Constructor (keyword arguments for ergonomics) ---
-
-(define* (mk-ticket-assignee-repository #:key
-          get-ticket-assignee-by-project-human-id-proc
-          get-ticket-assignee-by-ticket-id-proc upsert-ticket-assignee-proc)
-  "Creates a new ticket assignee repository instance with the provided backend procedures."
-  (make-ticket-assignee-repository
-   get-ticket-assignee-by-project-human-id-proc
-   get-ticket-assignee-by-ticket-id-proc upsert-ticket-assignee-proc))
+(define-record-with-kw (<ticket-assignee-repository>
+                        %make-ticket-assignee-repository
+                        ticket-assignee-repository?)
+                       mk-ticket-assignee-repository
+                       (get-ticket-assignee-by-project-human-id-proc
+                        repo-get-ticket-assignee-by-project-human-id)
+                       (get-ticket-assignee-by-ticket-id-proc
+                        repo-get-ticket-assignee-by-ticket-id)
+                       (upsert-ticket-assignee-proc
+                        repo-upsert-ticket-assignee))
 
 ;; --- eDSL: Embedded Domain Specific Language ---
 
-(define (get-ticket-assignee-by-project-human-id repo project-id)
-  "Retrieves the ticket assignees associated with a specific PROJECT-ID from the REPO."
-  ((repo-get-ticket-assignee-by-project-human-id repo)
-   project-id))
+(define-repo-method get-ticket-assignee-by-project-human-id
+ repo-get-ticket-assignee-by-project-human-id
+ "Retrieves the ticket assignees associated with a specific PROJECT-ID from the REPO.")
 
-(define (get-ticket-assignee-by-ticket-id repo ticket-id)
-  "Retrieves the assignee details for a specific TICKET-ID from the REPO."
-  ((repo-get-ticket-assignee-by-ticket-id repo)
-   ticket-id))
+(define-repo-method get-ticket-assignee-by-ticket-id
+ repo-get-ticket-assignee-by-ticket-id
+ "Retrieves the assignee details for a specific TICKET-ID from the REPO.")
 
-(define (upsert-ticket-assignee repo attrs)
-  "Inserts or updates a ticket assignee record using the provided ATTRS alist in the REPO."
-  ((repo-upsert-ticket-assignee repo)
-   attrs))
+(define-repo-method upsert-ticket-assignee repo-upsert-ticket-assignee
+ "Inserts or updates a ticket assignee record using the provided ATTRS alist in the REPO.")
+

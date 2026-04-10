@@ -1,6 +1,6 @@
-;;; lucidplan - the CI/CD orchestrator written in Guile Scheme
+;;; lucidplan - free and open project management for everyone
 
-;; Copyright (C) Josep Bigorra <jjbigorra@gmail.com>
+;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
 ;; lucidplan is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU Affero General Public License as published by
@@ -18,46 +18,31 @@
 (define-module (lucidplan domain password-reset)
   #:declarative? #t
   #:use-module (srfi srfi-9)
-  #:export (<password-reset-repository> password-reset-repository?
-                                        get-password-reset-by-token
-                                        delete-password-reset-by-user-id
-                                        insert-password-reset
-                                        mk-password-reset-repository))
+  #:use-module (lucidplan domain repo)
+  #:export (get-password-reset-by-token delete-password-reset-by-user-id
+                                        insert-password-reset))
 
 ;; -- Record definition ---
 
-(define-record-type <password-reset-repository>
-  (make-password-reset-repository get-password-reset-by-token-proc
-                                  delete-password-reset-by-user-id-proc
-                                  insert-password-reset-proc)
-  password-reset-repository?
-  (get-password-reset-by-token-proc repo-get-password-reset-by-token)
-  (delete-password-reset-by-user-id-proc repo-delete-password-reset-by-user-id)
-  (insert-password-reset-proc repo-insert-password-reset))
-
-;; --- Constructor (keyword arguments for ergonomics) ---
-
-(define* (mk-password-reset-repository #:key get-password-reset-by-token-proc
-                                       delete-password-reset-by-user-id-proc
-                                       insert-password-reset-proc)
-  "Creates a new password reset repository instance with the provided backend procedures."
-  (make-password-reset-repository get-password-reset-by-token-proc
-                                  delete-password-reset-by-user-id-proc
-                                  insert-password-reset-proc))
+(define-record-with-kw (<password-reset-repository>
+                        %make-password-reset-repository
+                        password-reset-repository?)
+                       mk-password-reset-repository
+                       (get-password-reset-by-token-proc
+                        repo-get-password-reset-by-token)
+                       (delete-password-reset-by-user-id-proc
+                        repo-delete-password-reset-by-user-id)
+                       (insert-password-reset-proc repo-insert-password-reset))
 
 ;; --- eDSL: Embedded Domain Specific Language ---
 
-(define (get-password-reset-by-token repo token)
-  "Retrieves the password reset associated with a specific TOKEN from the REPO."
-  ((repo-get-password-reset-by-token repo)
-   token))
+(define-repo-method get-password-reset-by-token
+ repo-get-password-reset-by-token
+ "Retrieves the password reset associated with a specific TOKEN from the REPO.")
 
-(define (delete-password-reset-by-user-id repo user-id)
-  "Deletes the password reset associated with a specific USER-ID from the REPO"
-  ((repo-delete-password-reset-by-user-id repo)
-   user-id))
+(define-repo-method delete-password-reset-by-user-id
+ repo-delete-password-reset-by-user-id
+ "Deletes the password reset associated with a specific USER-ID from the REPO")
 
-(define (insert-password-reset repo attrs)
-  "Inserts a new password-reset using ATTRS into the given REPO."
-  ((repo-insert-password-reset repo)
-   attrs))
+(define-repo-method insert-password-reset repo-insert-password-reset
+ "Inserts a new password-reset using ATTRS into the given REPO.")

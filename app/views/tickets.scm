@@ -330,7 +330,7 @@
                                                            search-query)))))
 
          ;; List Generators
-         (active-tickets (filter only-tickets-filter tickets))
+         (tickets (filter only-tickets-filter tickets))
          (done-tickets (filter only-done-tickets-filter tickets))
          (rejected-tickets (filter only-rejected-tickets-filter tickets))
 
@@ -345,7 +345,7 @@
                                       #:ticket-id-to-human-id
                                       ticket-id-to-human-id
                                       #:ticket-assignee ticket-assignee
-                                      #:user-names user-names)) active-tickets))))
+                                      #:user-names user-names)) tickets))))
 
          (done-ticket-list (if with-done
                                `(div (@ (id lucidplan-done-tickets-list)
@@ -516,7 +516,7 @@
 
                                       ;; Sub-Components & Lists
                                       ,search-param-components
-                                      ,(if (nil? active-tickets)
+                                      ,(if (nil? tickets)
                                            fallback-no-ticket-list ticket-list)
                                       ,done-ticket-list
                                       ,rejected-ticket-list))))))

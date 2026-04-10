@@ -1,4 +1,4 @@
-;;; lucidplan - the CI/CD orchestrator written in Guile Scheme
+;;; lucidplan - free and open project management for everyone
 
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 

@@ -1,6 +1,6 @@
-;;; lucidplan - the CI/CD orchestrator written in Guile Scheme
+;;; lucidplan - free and open project management for everyone
 
-;; Copyright (C) Josep Bigorra <jjbigorra@gmail.com>
+;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
 ;; lucidplan is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU Affero General Public License as published by
@@ -18,65 +18,40 @@
 (define-module (lucidplan domain project)
   #:declarative? #t
   #:use-module (srfi srfi-9)
-  #:export (<project-repository> project-repository?
-                                 get-projects
-                                 search-projects
-                                 get-project-by-human-id
-                                 update-project-by-human-id
-                                 mk-project-repository
-                                 insert-project
-                                 project-id-from-human-id))
+  #:use-module (lucidplan domain repo)
+  #:export (get-projects search-projects get-project-by-human-id
+                         update-project-by-human-id insert-project
+                         project-id-from-human-id))
 
 ;; -- Record definition ---
 
-(define-record-type <project-repository>
-  (make-project-repository active-projects-proc search-projects-proc
-                           active-project-by-human-id-proc
-                           update-project-by-human-id-proc insert-project-proc)
-  project-repository?
-  (active-projects-proc repo-get-projects)
-  (search-projects-proc repo-search-projects)
-  (active-project-by-human-id-proc repo-get-project-by-human-id)
-  (update-project-by-human-id-proc repo-update-project-by-human-id)
-  (insert-project-proc repo-insert-project))
-
-;; --- Constructor (keyword arguments for ergonomics) ---
-
-(define* (mk-project-repository #:key get-projects-proc
-                                search-projects-proc
-                                get-project-by-human-id-proc
-                                update-project-by-human-id-proc
-                                insert-project-proc)
-  "Creates a new project repository instance with the provided backend procedures."
-  (make-project-repository get-projects-proc search-projects-proc
-                           get-project-by-human-id-proc
-                           update-project-by-human-id-proc insert-project-proc))
+(define-record-with-kw (<project-repository> %make-project-repository
+                                             project-repository?)
+                       mk-project-repository
+                       (get-projects-proc repo-get-projects)
+                       (search-projects-proc repo-search-projects)
+                       (get-project-by-human-id-proc
+                        repo-get-project-by-human-id)
+                       (update-project-by-human-id-proc
+                        repo-update-project-by-human-id)
+                       (insert-project-proc repo-insert-project))
 
 ;; --- eDSL: Embedded Domain Specific Language ---
 
-(define (get-projects repo)
-  "Retrieves a list of all active projects from the given REPO."
-  ((repo-get-projects repo)))
+(define-repo-method get-projects repo-get-projects
+ "Retrieves a list of all active projects from the given REPO.")
 
-(define (search-projects repo q)
-  "Searches for active projects matching query Q from the given REPO."
-  ((repo-search-projects repo)
-   q))
+(define-repo-method search-projects repo-search-projects
+ "Searches for active projects matching query Q from the given REPO.")
 
-(define (get-project-by-human-id repo human-id)
-  "Retrieves a specific active project matching HUMAN-ID from the REPO."
-  ((repo-get-project-by-human-id repo)
-   human-id))
+(define-repo-method get-project-by-human-id repo-get-project-by-human-id
+ "Retrieves a specific active project matching HUMAN-ID from the REPO.")
 
-(define (update-project-by-human-id repo human-id attrs)
-  "Updates a project identified by HUMAN-ID with ATTRS in the given REPO."
-  ((repo-update-project-by-human-id repo)
-   human-id attrs))
+(define-repo-method update-project-by-human-id repo-update-project-by-human-id
+ "Updates a project identified by HUMAN-ID with ATTRS in the given REPO.")
 
-(define (insert-project repo attrs)
-  "Inserts a new project using ATTRS into the given REPO."
-  ((repo-insert-project repo)
-   attrs))
+(define-repo-method insert-project repo-insert-project
+                    "Inserts a new project using ATTRS into the given REPO.")
 
 (define (project-id-from-human-id repo human-id)
   "Resolves the internal project ID from a given HUMAN-ID in the REPO."
