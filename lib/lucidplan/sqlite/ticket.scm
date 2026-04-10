@@ -39,7 +39,7 @@
          priority))
 
   (define insert-columns
-    '(id human-id
+    '(id
          project-id
          title
          ticket-status
