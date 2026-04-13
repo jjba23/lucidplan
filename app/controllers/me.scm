@@ -50,8 +50,8 @@
               (user-repo (make-sqlite-user-repository rc))
               (proj (get-projects project-repo))
               (user (get-user-by-id user-repo
-                                    (assoc-ref t
-                                               'owner-id))))
+                                    (assq-ref t
+                                              'owner-id))))
          (catch #t
                 (lambda ()
                   (response-emit (:mime rc
@@ -108,13 +108,15 @@
               (allowance (* 24 7 3600)) ;reset token is valid for a week
               (_ (when (> now
                           (+ allowance
-                             (assoc-ref tt "created_at")))
+                             (assq-ref tt
+                                       'created-at)))
                    (error "reset token is found but not valid anymore")))
-              (user-id (assoc-ref tt "user_id"))
+              (user-id (assq-ref tt
+                                 'user-id))
               (user-repo (make-sqlite-user-repository rc))
               (u (get-user-by-id user-repo user-repo user-id))
-              (email (assoc-ref u
-                                'email)))
+              (email (assq-ref u
+                               'email)))
          (response-emit (:mime rc
                                (reset-password-page (:i18n rc)
                                                     #:token (params rc "token")
@@ -166,8 +168,8 @@
                           (assoc-ref body "email")))
                (u (if (not email)
                       (get-user-by-id user-repo
-                                      (assoc-ref existing-token
-                                                 'owner-id))
+                                      (assq-ref existing-token
+                                                'owner-id))
                       (get-user-by-email user-repo email))))
           (request-password-reset password-reset-repo u)
           (redirect-to rc
@@ -190,22 +192,24 @@
                (allowance (* 24 7 3600)) ;reset token is valid for a week
                (_ (when (> now
                            (+ allowance
-                              (assoc-ref tt "created_at")))
+                              (assq-ref tt
+                                        'created-at)))
                     (error "reset token is found but not valid anymore!")))
                (_ (when (not (equal? new-password confirm-password))
                     (error "password confirmation did not match!")))
-               (user-id (assoc-ref tt "user_id"))
+               (user-id (assq-ref tt
+                                  'user-id))
                (user-repo (make-sqlite-user-repository rc))
                (u (get-user-by-id user-repo user-id))
                (new-salt (generate-string-uuid))
                (h (string->sha-256 (string-append new-password new-salt)))
                (_ (update-user-by-id user-repo
-                                     (assoc-ref u
-                                                'id)
+                                     (assq-ref u
+                                               'id)
                                      `((salt unquote new-salt)
                                        (password unquote h))))
-               (_ (delete-password-reset-by-user-id (assoc-ref u
-                                                               'id))))
+               (_ (delete-password-reset-by-user-id (assq-ref u
+                                                              'id))))
           (:cookies-set! rc
                          'x-bewaking-lucidplan "x-bewaking-lucidplan" "")
           (:cookies-setattr! rc
@@ -222,16 +226,16 @@
 
 (define (request-password-reset password-reset-repo u)
   (let* ((_ (delete-password-reset-by-user-id password-reset-repo
-                                              (assoc-ref u
-                                                         'id)))
+                                              (assq-ref u
+                                                        'id)))
          (reset-token (base16-encode (format #f "~a-~a-~a"
                                              (generate-string-uuid)
                                              (generate-string-uuid)
                                              (generate-string-uuid))))
          (_ (insert-password-reset password-reset-repo
                                    `((user-id unquote
-                                              (assoc-ref u
-                                                         'id))
+                                              (assq-ref u
+                                                        'id))
                                      (reset-token unquote reset-token)
                                      (created-at unquote
                                                  (current-time)))))
@@ -239,7 +243,8 @@
          (mail-payload `((task-type . send-email) (template . password-reset)
                          (template-vars (system-name . Lucidplan)
                                         (user unquote
-                                              (assoc-ref (car u) "email"))
+                                              (assq-ref u
+                                                        'email))
                                         (reset-link unquote
                                                     (format #f
                                                      "~a/password/reset/token/~a"
@@ -248,7 +253,7 @@
                          (sender-name . "No Reply - Lucidplan")
                          (sender-address . "noreply@lucidplan.jointhefreeworld.org")
                          (subject . "Lucidplan - Password Reset")
-                         (recipients . #(((name unquote (assoc-ref (car u) "username")) (address unquote (assoc-ref (car u) "email"))))))))
+                         (recipients . #(((name unquote (assq-ref u (quote username))) (address unquote (assq-ref u (quote email)))))))))
     (send-to-pingwing #:body mail-payload)))
 
 (get "/users/new"
@@ -263,8 +268,8 @@
                                   #:signing-key signing-key))
                 (user-repo (make-sqlite-user-repository rc))
                 (user (get-user-by-id user-repo
-                                      (assoc-ref t
-                                                 'owner-id)))
+                                      (assq-ref t
+                                                'owner-id)))
                 (users (get-users user-repo)))
            (response-emit (:mime rc
                                  (new-user-page (:i18n rc))))))
