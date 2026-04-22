@@ -48,6 +48,12 @@
          created-at
          priority))
 
+    (define execute-write
+    (db-write conn))
+
+  (define execute-read
+    (db-read conn))
+
   (define (get-tickets project-id sort)
     (let* ((query (format #f
                    "SELECT ~a

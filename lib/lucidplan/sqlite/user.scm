@@ -32,6 +32,12 @@
   (define insert-columns
     '(id username email password salt permissions))
 
+    (define execute-write
+    (db-write conn))
+
+  (define execute-read
+    (db-read conn))
+
   (define (get-id-to-username)
     (let* ((query (format #f "SELECT ~a FROM user
                    ORDER BY username ASC"

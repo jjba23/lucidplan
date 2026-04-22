@@ -32,6 +32,12 @@
   (define insert-columns
     '(user-id reset-token created-at))
 
+    (define execute-write
+    (db-write conn))
+
+  (define execute-read
+    (db-read conn))
+
   (define (get-password-reset-by-token token)
     (let* ((query (format #f
                    "SELECT ~a FROM password_reset WHERE reset_token = ~a LIMIT 1"

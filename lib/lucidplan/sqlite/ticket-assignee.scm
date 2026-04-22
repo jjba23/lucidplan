@@ -32,6 +32,12 @@
   (define upsert-columns
     '(project-id ticket-id user-id))
 
+    (define execute-write
+    (db-write conn))
+
+  (define execute-read
+    (db-read conn))
+
   (define (get-ticket-assignee-by-project-human-id project-id)
     (let* ((query (format #f
                    "SELECT ~a FROM ticket_assignee WHERE project_id = (SELECT id FROM project WHERE human_id = ~a LIMIT 1)"
