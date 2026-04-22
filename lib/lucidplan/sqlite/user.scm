@@ -39,20 +39,9 @@
     (db-read conn))
 
   (define (get-id-to-username)
-    (let* ((query (format #f "SELECT ~a FROM user
-                   ORDER BY username ASC"
-                          (symbols->sql-columns-list columns)))
-           (_ (log-info "get-id-to-username query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query (DB-open rc) query))))
-           (mapped-rows (map (lambda (r)
-                               (cons (assq-ref r
-                                               'id)
-                                     (assq-ref r
-                                               'username))) rows))
-           (_ (log-info "get-id-to-username mapped-rows: ~a\n"
-                        (length mapped-rows))))
-      mapped-rows))
+    (let* ((query "SELECT id, username FROM user
+                   ORDER BY username ASC"))
+      (execute-read "get-id-to-username" query)))
 
   (define (get-user-by-email email)
     (let* ((query (format #f "SELECT ~a FROM user WHERE email = ~a LIMIT 1"
