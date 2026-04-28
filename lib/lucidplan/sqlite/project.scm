@@ -44,6 +44,8 @@
          description
          created-at))
 
+    (define conn (DB-open rc))
+
   (define execute-write
     (db-write conn))
 

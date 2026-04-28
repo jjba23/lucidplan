@@ -48,6 +48,8 @@
          created-at
          priority))
 
+    (define conn (DB-open rc))
+    
     (define execute-write
     (db-write conn))
 

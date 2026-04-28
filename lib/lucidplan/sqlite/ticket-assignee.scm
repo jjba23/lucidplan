@@ -29,6 +29,8 @@
   (define columns
     '(project-id ticket-id user-id))
 
+    (define conn (DB-open rc))
+    
   (define execute-write
     (db-write conn))
 

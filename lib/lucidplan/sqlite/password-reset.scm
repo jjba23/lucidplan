@@ -32,6 +32,8 @@
   (define cols-sql
     (symbols->sql-columns-list columns))
 
+  (define conn (DB-open rc))
+
   (define execute-write
     (db-write conn))
 

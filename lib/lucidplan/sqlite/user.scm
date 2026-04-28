@@ -29,9 +29,9 @@
   (define columns
     '(id username email password salt permissions))
 
-  (define insert-columns
-    '(id username email password salt permissions))
 
+    (define conn (DB-open rc))
+    
     (define execute-write
     (db-write conn))
 
@@ -94,7 +94,7 @@
   (define (insert-user attrs)
     (let* ((vals (map (lambda (x)
                         (value->sql-literal (assq-ref attrs x)))
-                      insert-columns))
+                      columns))
            (query (format #f "INSERT INTO user (~a) VALUES (~a)"
                           (symbols->sql-columns-list insert-columns)
                           (string-join vals ", ")))
