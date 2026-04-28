@@ -39,18 +39,13 @@
          priority))
 
   (define insert-columns
-    '(id
-         project-id
-         title
-         ticket-status
-         ticket-type
-         description
-         created-at
-         priority))
+    (delq 'deleted-at
+          (delq 'updated-at columns)))
 
-    (define conn (DB-open rc))
-    
-    (define execute-write
+  (define conn
+    (DB-open rc))
+
+  (define execute-write
     (db-write conn))
 
   (define execute-read
@@ -63,13 +58,8 @@
                    AND project_id = (SELECT id FROM project WHERE human_id = ~a LIMIT 1)
                    ORDER BY ~a"
                    (symbols->sql-columns-list columns)
-                   (value->sql-literal project-id) sort))
-           (_ (log-info "get-tickets query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query (DB-open rc) query))))
-           (_ (log-info "get-tickets rows: ~a\n"
-                        (length rows))))
-      rows))
+                   (value->sql-literal project-id) sort)))
+      (execute-read "get-tickets" query)))
 
   (define (search-tickets project-id q sort)
     (let* ((query (format #f
@@ -82,13 +72,8 @@
                    (value->sql-literal project-id)
                    q
                    q
-                   sort))
-           (_ (log-info "search-tickets query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query (DB-open rc) query))))
-           (_ (log-info "search-tickets rows: ~a\n"
-                        (length rows))))
-      rows))
+                   sort)))
+      (execute-read "search-tickets" query)))
 
   (define (get-ticket-by-project-human-id-and-human-id project-id human-id)
     (let* ((query (format #f
@@ -99,24 +84,16 @@
                    (symbols->sql-columns-list columns)
                    (value->sql-literal project-id)
                    (value->sql-literal human-id)))
-           (_ (log-info "get-ticket-by-project-human-id-and-human-id query:
-	~a
-"
-                        query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query (DB-open rc) query))))
-           (_ (log-info "get-ticket-by-project-human-id-and-human-id rows: ~a
-"
-               (length rows))))
+           (rows (execute-read "get-ticket-by-project-human-id-and-human-id"
+                               query)))
       (if (nil? rows) #f
           (car rows))))
 
   (define (update-ticket-by-human-id human-id attrs)
     (let* ((query (format #f "UPDATE ticket SET ~a WHERE human_id = ~a"
                           (string-join (map pair->sql-assignment attrs) ", ")
-                          (value->sql-literal human-id)))
-           (_ (log-info "update-ticket-by-human-id query:\n\t~a\n" query)))
-      (DB-query (DB-open rc) query)))
+                          (value->sql-literal human-id))))
+      (execute-write "update-ticket-by-human-id" query)))
 
   (define (insert-ticket attrs)
     (let* ((vals (map (lambda (x)
@@ -124,9 +101,8 @@
                       insert-columns))
            (query (format #f "INSERT INTO ticket (~a) VALUES (~a)"
                           (symbols->sql-columns-list insert-columns)
-                          (string-join vals ", ")))
-           (_ (log-info "insert-ticket query:\n\t~a\n" query)))
-      (DB-query (DB-open rc) query)))
+                          (string-join vals ", "))))
+      (execute-write "insert-ticket" query)))
 
   (mk-ticket-repository #:get-tickets-proc get-tickets
                         #:search-tickets-proc search-tickets

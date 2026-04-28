@@ -20,6 +20,7 @@
 (import (app views tickets)
         (web uri)
         (ice-9 string-fun)
+        (srfi srfi-1)
         (lucidplan auth)
         (kracht prelude)
         (uuid generate)
@@ -262,7 +263,6 @@
                                 ticket-assignee-repo
                                 (assq-ref t
                                           'id)))
-                (_ (write assignee-data))
                 (assignee (if (nil? assignee-data) ""
                               (assq-ref assignee-data
                                         'user-id))))
@@ -293,7 +293,8 @@
                  (ticket-type (assoc-ref body "ticket-type"))
                  (project-id (project-id-from-human-id project-repo
                                                        (params rc "project")))
-                 (ticket-id (ticket-id-from-human-id ticket-repo project-id
+                 (ticket-id (ticket-id-from-human-id ticket-repo
+                                                     (params rc "project")
                                                      (params rc "human-id")))
 
                  (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
@@ -346,10 +347,12 @@
                                   ticket-assignee-repo
                                   (assq-ref t
                                             'id)))
-                (assignee-name (if (not (nil? ticket-assignee))
-                                   (assoc-ref user-names
-                                              (assq-ref ticket-assignee
-                                                        'user-id)) #f)))
+                (ticket-assignee-user (find (lambda (u)
+                                              (equal? (assq-ref u
+                                                                'id)
+                                                      (assq-ref
+                                                       ticket-assignee
+                                                       'user-id))) user-names)))
            (response-emit (:mime rc
                                  (html-template (:i18n rc)
                                                 #:is-logged-in (:cookies-value
@@ -376,6 +379,11 @@
                                                                            rc
                                                                            "project")
                                                                 #:ticket t
-                                                                #:assignee
-                                                                assignee-name))))))))
+                                                                #:assignee (if
+                                                                            (nil?
+                                                                             ticket-assignee-user)
+                                                                            #f
+                                                                            (assq-ref
+                                                                             ticket-assignee-user
+                                                                             'username))))))))))
        (get-single)))

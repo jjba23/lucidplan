@@ -29,8 +29,9 @@
   (define columns
     '(project-id ticket-id user-id))
 
-    (define conn (DB-open rc))
-    
+  (define conn
+    (DB-open rc))
+
   (define execute-write
     (db-write conn))
 
@@ -42,33 +43,21 @@
                    "SELECT ~a FROM ticket_assignee WHERE project_id =
                         (SELECT id FROM project WHERE human_id = ~a LIMIT 1)"
                    (symbols->sql-columns-list columns)
-                   (value->sql-literal project-id)))
-           (rows (execute-read "get-ticket-assignee-by-project-human-id" query))
-           (mapped-rows (map (lambda (r)
-                               (cons (assq-ref r
-                                               'ticket-id)
-                                     (assq-ref r
-                                               'user-id))) rows)))
-      mapped-rows))
+                   (value->sql-literal project-id))))
+      (execute-read "get-ticket-assignee-by-project-human-id" query)))
 
   (define (get-ticket-assignee-by-ticket-id ticket-id)
     (let* ((query (format #f
                    "SELECT ~a FROM ticket_assignee WHERE ticket_id = ~a LIMIT 1"
                    (symbols->sql-columns-list columns)
                    (value->sql-literal ticket-id)))
-           (rows (execute-read "get-ticket-assignee-by-ticket-id" query))
-           (mapped-rows (map (lambda (r)
-                               (cons (assq-ref r
-                                               'ticket-id)
-                                     (assq-ref r
-                                               'user-id))) rows)))
-      (if (nil? mapped-rows) #f
-          (car mapped-rows))))
+           (rows (execute-read "get-ticket-assignee-by-ticket-id" query)))
+      (if (nil? rows) #f
+          (car rows))))
 
   (define (upsert-ticket-assignee attrs)
     (let* ((vals (map (lambda (x)
-                        (value->sql-literal (assq-ref attrs x)))
-                      upsert-columns))
+                        (value->sql-literal (assq-ref attrs x))) columns))
            (query (format #f
                    "INSERT INTO ticket_assignee (~a)
                         VALUES (~a) ON CONFLICT(ticket_id) DO UPDATE SET user_id = excluded.user_id"

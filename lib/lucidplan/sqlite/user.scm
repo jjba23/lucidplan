@@ -29,10 +29,10 @@
   (define columns
     '(id username email password salt permissions))
 
+  (define conn
+    (DB-open rc))
 
-    (define conn (DB-open rc))
-    
-    (define execute-write
+  (define execute-write
     (db-write conn))
 
   (define execute-read
@@ -47,11 +47,7 @@
     (let* ((query (format #f "SELECT ~a FROM user WHERE email = ~a LIMIT 1"
                           (symbols->sql-columns-list columns)
                           (value->sql-literal email)))
-           (_ (log-info "get-user-by-email query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query (DB-open rc) query))))
-           (_ (log-info "get-user-by-email rows: ~a\n"
-                        (length rows))))
+           (rows (execute-read "get-user-by-email" query)))
       (if (nil? rows) #f
           (car rows))))
 
@@ -59,47 +55,34 @@
     (let* ((query (format #f "SELECT ~a FROM user WHERE id = ~a LIMIT 1"
                           (symbols->sql-columns-list columns)
                           (value->sql-literal id)))
-           (_ (log-info "get-user-by-id query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query (DB-open rc) query))))
-           (_ (log-info "get-user-by-id rows: ~a\n"
-                        (length rows))))
+           (rows (execute-read "get-user-by-id" query)))
       (if (nil? rows) #f
           (car rows))))
 
   (define (get-users)
     (let* ((query (format #f "SELECT ~a FROM user
                    ORDER BY username ASC"
-                          (symbols->sql-columns-list columns)))
-           (_ (log-info "get-users query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query (DB-open rc) query))))
-           (_ (log-info "get-users rows: ~a\n"
-                        (length rows))))
-      rows))
+                          (symbols->sql-columns-list columns))))
+      (execute-read "get-users" query)))
 
   (define (update-user-by-id id attrs)
     (let* ((query (format #f "UPDATE user SET ~a WHERE id = ~a"
                           (string-join (map pair->sql-assignment attrs) ", ")
-                          (value->sql-literal id)))
-           (_ (log-info "update-user-by-id query:\n\t~a\n" query)))
-      (DB-query (DB-open rc) query)))
+                          (value->sql-literal id))))
+      (execute-write "update-user-by-id" query)))
 
   (define (delete-user-by-id id)
     (let* ((query (format #f "DELETE FROM user WHERE id = ~a"
-                          (value->sql-literal id)))
-           (_ (log-info "delete-user-by-id query:\n\t~a\n" query)))
-      (DB-query (DB-open rc) query)))
+                          (value->sql-literal id))))
+      (execute-write "delete-user-by-id" query)))
 
   (define (insert-user attrs)
     (let* ((vals (map (lambda (x)
-                        (value->sql-literal (assq-ref attrs x)))
-                      columns))
+                        (value->sql-literal (assq-ref attrs x))) columns))
            (query (format #f "INSERT INTO user (~a) VALUES (~a)"
                           (symbols->sql-columns-list insert-columns)
-                          (string-join vals ", ")))
-           (_ (log-info "insert-user query:\n\t~a\n" query)))
-      (DB-query (DB-open rc) query)))
+                          (string-join vals ", "))))
+      (execute-write "insert-user" query)))
 
   (mk-user-repository #:get-id-to-username-proc get-id-to-username
                       #:get-user-by-email-proc get-user-by-email

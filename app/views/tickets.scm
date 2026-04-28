@@ -21,6 +21,7 @@
   #:use-module (web response)
   #:use-module (web uri)
   #:use-module (json)
+  #:use-module (srfi srfi-1)
   #:use-module (ice-9 popen)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 time)
@@ -151,7 +152,6 @@
                   (small (@ (class ,val-face))
                          ,(format #f "~a" priority)))
                 '())
-
            ,(if (not (nil? assignee))
                 `((small (@ (class ,label-face))
                          ,(G_ "assignee"))
@@ -206,6 +206,10 @@
                      "document.getElementById('~a').toggleAttribute('hidden')"
                      details-id))
          (ticket-url (format #f "/tickets/~a/id/~a" project human-id))
+         (ticket-assignee-user (find (lambda (u)
+                                       (equal? (assq-ref u
+                                                         'id) ticket-assignee))
+                                     user-names))
 
          ;; Consolidate CSS Classes
          (wrapper-face (mk-class '(flex flex-col gap-2)))
@@ -266,9 +270,9 @@
                 ,(render-ticket G_
                                 #:project project
                                 #:ticket ticket
-                                #:assignee (assoc-ref user-names
-                                                      (assoc-ref
-                                                       ticket-assignee id))))))))
+                                #:assignee (if (nil? ticket-assignee-user) #f
+                                               (assq-ref ticket-assignee-user
+                                                         'username))))))))
 
 (define* (html-from-tickets G_
                             #:key is-logged-in
@@ -333,19 +337,31 @@
          (tickets (filter only-tickets-filter tickets))
          (done-tickets (filter only-done-tickets-filter tickets))
          (rejected-tickets (filter only-rejected-tickets-filter tickets))
-
          (ticket-list `((div (@ (id lucidplan-tickets-list)
                                 (ondrop "dropTicketsItem(event)")
                                 (ondragover "allowDrop(event)")
                                 (class ,(mk-class '(flex flex-col gap-2))))
                              ,(map (lambda (t)
-                                     (render-ticket-listitem G_
-                                      #:project proj-human-id
-                                      #:ticket t
-                                      #:ticket-id-to-human-id
-                                      ticket-id-to-human-id
-                                      #:ticket-assignee ticket-assignee
-                                      #:user-names user-names)) tickets))))
+                                     (let* ((tt-assignee (find (lambda (a)
+                                                                 (equal? (assq-ref
+                                                                          t
+                                                                          'id)
+                                                                         (assq-ref
+                                                                          a
+                                                                          'ticket-id)))
+                                                          ticket-assignee))
+                                            (ttt-assignee (if (nil?
+                                                               tt-assignee) #f
+                                                              (assq-ref
+                                                               tt-assignee
+                                                               'user-id))))
+                                       (render-ticket-listitem G_
+                                        #:project proj-human-id
+                                        #:ticket t
+                                        #:ticket-id-to-human-id
+                                        ticket-id-to-human-id
+                                        #:ticket-assignee ttt-assignee
+                                        #:user-names user-names))) tickets))))
 
          (done-ticket-list (if with-done
                                `(div (@ (id lucidplan-done-tickets-list)
