@@ -29,10 +29,7 @@
   (define columns
     '(project-id ticket-id user-id))
 
-  (define upsert-columns
-    '(project-id ticket-id user-id))
-
-    (define execute-write
+  (define execute-write
     (db-write conn))
 
   (define execute-read
@@ -40,23 +37,16 @@
 
   (define (get-ticket-assignee-by-project-human-id project-id)
     (let* ((query (format #f
-                   "SELECT ~a FROM ticket_assignee WHERE project_id = (SELECT id FROM project WHERE human_id = ~a LIMIT 1)"
+                   "SELECT ~a FROM ticket_assignee WHERE project_id =
+                        (SELECT id FROM project WHERE human_id = ~a LIMIT 1)"
                    (symbols->sql-columns-list columns)
                    (value->sql-literal project-id)))
-           (_ (log-info "get-ticket-assignee-by-project-human-id query:
-	~a
-" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query (DB-open rc) query))))
+           (rows (execute-read "get-ticket-assignee-by-project-human-id" query))
            (mapped-rows (map (lambda (r)
                                (cons (assq-ref r
                                                'ticket-id)
                                      (assq-ref r
-                                               'user-id))) rows))
-           (_ (log-info
-               "get-ticket-assignee-by-project-human-id mapped-rows: ~a
-"
-               (length mapped-rows))))
+                                               'user-id))) rows)))
       mapped-rows))
 
   (define (get-ticket-assignee-by-ticket-id ticket-id)
@@ -64,19 +54,12 @@
                    "SELECT ~a FROM ticket_assignee WHERE ticket_id = ~a LIMIT 1"
                    (symbols->sql-columns-list columns)
                    (value->sql-literal ticket-id)))
-           (_ (log-info "get-ticket-assignee-by-ticket-id query:
-	~a
-" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query (DB-open rc) query))))
+           (rows (execute-read "get-ticket-assignee-by-ticket-id" query))
            (mapped-rows (map (lambda (r)
                                (cons (assq-ref r
                                                'ticket-id)
                                      (assq-ref r
-                                               'user-id))) rows))
-           (_ (log-info "get-ticket-assignee-by-ticket-id mapped-rows: ~a
-"
-                        (length mapped-rows))))
+                                               'user-id))) rows)))
       (if (nil? mapped-rows) #f
           (car mapped-rows))))
 
@@ -87,10 +70,9 @@
            (query (format #f
                    "INSERT INTO ticket_assignee (~a)
                         VALUES (~a) ON CONFLICT(ticket_id) DO UPDATE SET user_id = excluded.user_id"
-                   (symbols->sql-columns-list upsert-columns)
-                   (string-join vals ", ")))
-           (_ (log-info "upsert-ticket-assignee query:\n\t~a\n" query)))
-      (DB-query (DB-open rc) query)))
+                   (symbols->sql-columns-list columns)
+                   (string-join vals ", "))))
+      (execute-write "upsert-ticket-assignee" query)))
 
   (mk-ticket-assignee-repository
                                  #:get-ticket-assignee-by-project-human-id-proc

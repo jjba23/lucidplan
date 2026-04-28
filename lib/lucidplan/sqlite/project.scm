@@ -44,7 +44,7 @@
          description
          created-at))
 
-    (define execute-write
+  (define execute-write
     (db-write conn))
 
   (define execute-read
@@ -55,13 +55,8 @@
                    "SELECT ~a
                    FROM project WHERE deleted_at IS NULL
                    ORDER BY human_id ASC"
-                   (symbols->sql-columns-list columns)))
-           (_ (log-info "get-projects query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query (DB-open rc) query))))
-           (_ (log-info "get-projects rows: ~a\n"
-                        (length rows))))
-      rows))
+                   (symbols->sql-columns-list columns))))
+      (execute-read "get-projects" query)))
 
   (define (search-projects q)
     (let* ((query (format #f
@@ -69,13 +64,8 @@
                    FROM project WHERE deleted_at IS NULL
                    AND (title LIKE '%~a%' OR description LIKE '%~a%')
                    ORDER BY human_id ASC"
-                   (symbols->sql-columns-list columns) q q))
-           (_ (log-info "search-projects query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query (DB-open rc) query))))
-           (_ (log-info "search-projects rows: ~a\n"
-                        (length rows))))
-      rows))
+                   (symbols->sql-columns-list columns) q q)))
+      (execute-read "search-projects" query)))
 
   (define (get-project-by-human-id human-id)
     (let* ((query (format #f
@@ -84,20 +74,15 @@
                     LIMIT 1"
                    (symbols->sql-columns-list columns)
                    (value->sql-literal human-id)))
-           (_ (log-info "get-project-by-human-id query:\n\t~a\n" query))
-           (rows (map sql-row->scheme-alist
-                      (DB-get-all-rows (DB-query (DB-open rc) query))))
-           (_ (log-info "get-project-by-human-id rows: ~a\n"
-                        (length rows))))
+           (rows (execute-read "get-project-by-human-id" query)))
       (if (nil? rows) #f
           (car rows))))
 
   (define (update-project-by-human-id human-id attrs)
     (let* ((query (format #f "UPDATE project SET ~a WHERE human_id = ~a"
                           (string-join (map pair->sql-assignment attrs) ", ")
-                          (value->sql-literal human-id)))
-           (_ (log-info "update-project-by-human-id query:\n\t~a\n" query)))
-      (DB-query (DB-open rc) query)))
+                          (value->sql-literal human-id))))
+      (execute-write "update-project-by-human-id" query)))
 
   (define (insert-project attrs)
     (let* ((vals (map (lambda (x)
@@ -105,9 +90,8 @@
                       insert-columns))
            (query (format #f "INSERT INTO project (~a) VALUES (~a)"
                           (symbols->sql-columns-list insert-columns)
-                          (string-join vals ", ")))
-           (_ (log-info "insert-project query:\n\t~a\n" query)))
-      (DB-query (DB-open rc) query)))
+                          (string-join vals ", "))))
+      (execute-write "insert-project" query)))
 
   (mk-project-repository #:get-projects-proc get-projects
                          #:search-projects-proc search-projects
