@@ -81,7 +81,7 @@
                                            "x-bewaking-lucidplan")
                                   #:encryption-key encryption-key
                                   #:signing-key signing-key))
-                
+
                 (project-repo (make-sqlite-project-repository rc))
                 (proj (get-projects project-repo))
                 (user-repo (make-sqlite-user-repository rc))
@@ -123,7 +123,7 @@
                                                     #:email email))))))
 
 (define* (send-to-pingwing #:key body)
-  
+
   (let* ((handle (curl-easy-init))
          (_ (begin
               (curl-easy-setopt handle
@@ -251,7 +251,7 @@
                                                      (current-myhost)
                                                      reset-token)))
                          (sender-name . "No Reply - Lucidplan")
-                         (sender-address . "noreply@lucidplan.jointhefreeworld.org")
+                         (sender-address . "noreply@mail.jointhefreeworld.org")
                          (subject . "Lucidplan - Password Reset")
                          (recipients . #(((name unquote (assq-ref u (quote username))) (address unquote (assq-ref u (quote email)))))))))
     (send-to-pingwing #:body mail-payload)))
