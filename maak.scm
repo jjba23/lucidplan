@@ -28,7 +28,7 @@
 (define deploy-dir
   "/srv/http/jointhefreeworld.org")
 
-;; The file where the Lucidplan DB is located.  
+;; The file where the Lucidplan DB is located.
 (define lucidplan-db
   "lucidplan.db")
 
@@ -50,7 +50,7 @@
 (define hot-reload-file-types
   '(scm css js))
 
-;; The Emacs Lisp script to run for publishing the manual. 
+;; The Emacs Lisp script to run for publishing the manual.
 (define emacs-lisp-manual-publish-cmd
   '(progn (find-file "./docs/manual/en.org")
           (org-html-export-to-html)

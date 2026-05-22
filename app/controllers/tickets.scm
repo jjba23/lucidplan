@@ -213,7 +213,7 @@
                  (ticket-repo (make-sqlite-ticket-repository rc))
                  (latest-ticket (get-ticket-of-latest-human-id ticket-repo
                                          (params rc "project")))
-                 (new-human-id (+ 1 (assq-ref latest-ticket  'human-id)))
+                 (new-human-id (+ 1 (assq-ref latest-ticket 'human-id)))
                  (_ (write new-human-id))
                  (body (alist-from-url-encoded-body (rc-body rc)))
                  (title (html-escape (assoc-ref body "title")))
