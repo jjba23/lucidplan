@@ -141,7 +141,7 @@
                 (ticket-assignee (get-ticket-assignee-by-project-human-id
                                   ticket-assignee-repo
                                   (params rc "project"))))
-
+           
            (response-emit (:mime rc
                                  (html-from-tickets (:i18n rc)
                                                     #:is-logged-in
@@ -212,8 +212,12 @@
           (let* ((project-repo (make-sqlite-project-repository rc))
                  (ticket-repo (make-sqlite-ticket-repository rc))
                  (latest-ticket (get-ticket-of-latest-human-id ticket-repo
-                                         (params rc "project")))
-                 (new-human-id (+ 1 (assq-ref latest-ticket 'human-id)))
+                                                               (params rc
+                                                                "project")))
+                 (latest-id (assq-ref latest-ticket
+                                      'human-id))
+                 (new-human-id (+ 1
+                                  (if latest-id latest-id 0)))
                  (_ (write new-human-id))
                  (body (alist-from-url-encoded-body (rc-body rc)))
                  (title (html-escape (assoc-ref body "title")))
@@ -304,7 +308,7 @@
 
                  (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
                                         rc)))
-
+            
             (update-ticket-by-human-id ticket-repo
                                        (params rc "human-id")
                                        `((ticket-status unquote ticket-status)
