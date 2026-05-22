@@ -89,6 +89,19 @@
       (if (nil? rows) #f
           (car rows))))
 
+    (define (get-ticket-of-latest-human-id project-id )
+    (let* ((query (format #f
+                   "SELECT ~a FROM ticket
+                    WHERE deleted_at IS NULL AND project_id = (SELECT id FROM project WHERE human_id = ~a LIMIT 1)
+                    ORDER BY human_id DESC
+LIMIT 1 "
+                   (symbols->sql-columns-list columns)
+                   (value->sql-literal project-id)))
+           (rows (execute-read "get-ticket-of-latest-human-id"
+                               query)))
+      (if (nil? rows) #f
+          (car rows))))
+
   (define (update-ticket-by-human-id human-id attrs)
     (let* ((query (format #f "UPDATE ticket SET ~a WHERE human_id = ~a"
                           (string-join (map pair->sql-assignment attrs) ", ")
@@ -108,6 +121,8 @@
                         #:search-tickets-proc search-tickets
                         #:get-ticket-by-project-human-id-and-human-id-proc
                         get-ticket-by-project-human-id-and-human-id
+                        #:get-ticket-of-latest-human-id-proc
+                        get-ticket-of-latest-human-id
                         #:update-ticket-by-human-id-proc
                         update-ticket-by-human-id
                         #:insert-ticket-proc insert-ticket))

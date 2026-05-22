@@ -21,6 +21,7 @@
   #:use-module (lucidplan domain repo)
   #:export (get-tickets search-tickets
                         get-ticket-by-project-human-id-and-human-id
+                        get-ticket-of-latest-human-id
                         update-ticket-by-human-id ticket-id-from-human-id
                         insert-ticket))
 
@@ -30,6 +31,7 @@
                                             ticket-repository?)
                        mk-ticket-repository
                        (get-tickets-proc repo-get-tickets)
+                       (get-ticket-of-latest-human-id-proc repo-get-ticket-of-latest-human-id)
                        (search-tickets-proc repo-search-tickets)
                        (get-ticket-by-project-human-id-and-human-id-proc
                         repo-get-ticket-by-project-human-id-and-human-id)
@@ -41,6 +43,9 @@
 
 (define-repo-method get-tickets repo-get-tickets
  "Retrieves active tickets for a given PROJECT-ID, ordered by SORT, from REPO.")
+
+(define-repo-method get-ticket-of-latest-human-id repo-get-ticket-of-latest-human-id
+  "")
 
 (define-repo-method search-tickets repo-search-tickets
  "Searches active tickets in PROJECT-ID matching query Q, ordered by SORT, from REPO.")
