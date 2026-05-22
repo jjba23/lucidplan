@@ -80,7 +80,7 @@
     (let* ((vals (map (lambda (x)
                         (value->sql-literal (assq-ref attrs x))) columns))
            (query (format #f "INSERT INTO user (~a) VALUES (~a)"
-                          (symbols->sql-columns-list insert-columns)
+                          (symbols->sql-columns-list columns)
                           (string-join vals ", "))))
       (execute-write "insert-user" query)))
 
