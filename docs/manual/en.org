@@ -7,8 +7,8 @@
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" />
 
 
-[[https://jointhefreeworld.org/ggg/dist/scheme-guile.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-guix.svg]]  
-[[https://jointhefreeworld.org/ggg/dist/license-agpl3+.svg]]    [[https://jointhefreeworld.org/ggg/dist/license-fdl13+.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-artanis.svg]] [[https://jointhefreeworld.org/ggg/dist/jointhefreeworld-org.svg]] 
+[[https://jointhefreeworld.org/ggg/dist/scheme-guile.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-guix.svg]]
+[[https://jointhefreeworld.org/ggg/dist/license-agpl3+.svg]]    [[https://jointhefreeworld.org/ggg/dist/license-fdl13+.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-artanis.svg]] [[https://jointhefreeworld.org/ggg/dist/jointhefreeworld-org.svg]]
 
 
 /free and open project management for everyone/
@@ -45,7 +45,7 @@ LucidPlan provides a comprehensive suite of tools to keep your projects organize
 [[https://jointhefreeworld.org/static-assets/lucidplan/img/logo-small.jpg]]
 
 ------
-  
+
 * Licensing
 
 lucidplan and all of its source code are free software, licensed under the GNU Affero General Public License v3 (or newer at your convenience).
@@ -107,6 +107,33 @@ Lucidplan requires an authenticated session for performing administrative tasks 
 Upon starting a blank new lucidplan deployment you will have no users in the database. Check in ~resources/migrations/~ and edit the password field and salt, or add more users.
 
 If running locally, it's recommended to use ~localhost~ instead of ~127.0.0.1~ as this will work better with the authentication/authorization and other cookies.
+
+** Useful query
+
+#+begin_src sql
+-- INSERT INTO "user" (
+--     username,
+--     email,
+--     password,
+--     salt,
+--     permissions
+-- ) VALUES (
+--     'Joe',
+--     'jjbigorra@gmail.com',
+--
+-- you should compute a
+-- SHA-256 hash of (password + salt)
+--
+--     'e3b0c44298fc1c149afbf4c.....5',
+--     'my-personal-salt',
+
+-- here we pass the list of permissions
+-- as a backquoted Lisp list of symbols
+
+--     '`(lucidplan:modify-permissions lucidplan:ticket-create lucidplan:ticket-delete lucidplan:project-create lucidplan:project-delete lucidplan:user-create lucidplan:user-delete)'
+-- );
+
+#+end_src
 
 
 ------
