@@ -1,8 +1,25 @@
+;;; lucidplan - free and open project management for everyone
+
+;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
+
+;; lucidplan is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU Affero General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; lucidplan is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU Affero General Public License for more details.
+
+;; You should have received a copy of the GNU Affero General Public License
+;; along with lucidplan.  If not, see <https://www.gnu.org/licenses/>.
+
 (list (channel
         (name 'guix)
         (url "https://codeberg.org/guix/guix.git")
         (branch "master")
-        (commit "442fff85d1cb39461fabd7f9e0301716c9f5aa6d")
+        (commit "8c95d6364a34cfbd60efbd15d85ce8b02ff6a2cd")
         (introduction
          (make-channel-introduction "9edb3f66fd807b096b48283debdcddccfea34bad"
           (openpgp-fingerprint
