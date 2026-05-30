@@ -5,8 +5,8 @@
 #+options: toc:nil
 
 
-[[https://jointhefreeworld.org/ggg/dist/scheme-guile.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-guix.svg]]   [[https://jointhefreeworld.org/ggg/dist/maak.svg]] 
-[[https://jointhefreeworld.org/ggg/dist/license-agpl3+.svg]]    [[https://jointhefreeworld.org/ggg/dist/license-fdl13+.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-artanis.svg]] [[https://jointhefreeworld.org/ggg/dist/jointhefreeworld-org.svg]] 
+[[https://jointhefreeworld.org/ggg/dist/scheme-guile.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-guix.svg]]   [[https://jointhefreeworld.org/ggg/dist/maak.svg]]
+[[https://jointhefreeworld.org/ggg/dist/license-agpl3+.svg]]    [[https://jointhefreeworld.org/ggg/dist/license-fdl13+.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-artanis.svg]] [[https://jointhefreeworld.org/ggg/dist/jointhefreeworld-org.svg]]
 
 
 /free and open project management for everyone/
@@ -43,7 +43,7 @@ LucidPlan provides a comprehensive suite of tools to keep your projects organize
 [[https://jointhefreeworld.org/static-assets/lucidplan/img/logo-small.jpg]]
 
 ------
-  
+
 * Licensing
 
 lucidplan and all of its source code are free software, licensed under the GNU Affero General Public License v3 (or newer at your convenience).
@@ -65,6 +65,18 @@ I strive to provide proper and extensive documentation on LucidPlan, available a
 
 
 --------
+
+* AI Policy
+
+This project adheres to the [[https://jointhefreeworld.org/blog/articles/personal/jointhefreeworld-ai-policy/index.html][jointhefreeworld AI (Artificial Intelligence) policy]].
+
+Our core principle is simple: *AI should assist human creativity and problem-solving, never replace human reasoning.*
+
+While tools like Large Language Models (LLMs) and interactive chatbots can be beneficial for reviewing, refactoring small functions, or acting as a sounding board, they should be used with moderation.
+
+We require a human in the loop for all contributions. The use of autonomous AI agents to automatically generate and submit pull requests to this project is strictly prohibited.
+
+------------------
 
 * Code of conduct
 
@@ -91,5 +103,3 @@ Feel free to open issue on tracker, on Git / Codeberg repository, or mail me <jj
 See here the [[https://lucidplan.jointhefreeworld.org/tickets/lucidplan][Backlog and Kanban]]  for this project.
 
 -----------
-
-
