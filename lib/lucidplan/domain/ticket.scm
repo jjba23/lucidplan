@@ -22,7 +22,8 @@
   #:export (get-tickets search-tickets
                         get-ticket-by-project-human-id-and-human-id
                         get-ticket-of-latest-human-id
-                        update-ticket-by-human-id ticket-id-from-human-id
+                        update-ticket-by-project-human-id-and-human-id
+                        ticket-id-from-human-id
                         insert-ticket))
 
 ;; -- Record definition ---
@@ -31,12 +32,13 @@
                                             ticket-repository?)
                        mk-ticket-repository
                        (get-tickets-proc repo-get-tickets)
-                       (get-ticket-of-latest-human-id-proc repo-get-ticket-of-latest-human-id)
+                       (get-ticket-of-latest-human-id-proc
+                        repo-get-ticket-of-latest-human-id)
                        (search-tickets-proc repo-search-tickets)
                        (get-ticket-by-project-human-id-and-human-id-proc
                         repo-get-ticket-by-project-human-id-and-human-id)
-                       (update-ticket-by-human-id-proc
-                        repo-update-ticket-by-human-id)
+                       (update-ticket-by-project-human-id-and-human-id-proc
+                        repo-update-ticket-by-project-human-id-and-human-id)
                        (insert-ticket-proc repo-insert-ticket))
 
 ;; --- eDSL: Embedded Domain Specific Language ---
@@ -44,8 +46,8 @@
 (define-repo-method get-tickets repo-get-tickets
  "Retrieves active tickets for a given PROJECT-ID, ordered by SORT, from REPO.")
 
-(define-repo-method get-ticket-of-latest-human-id repo-get-ticket-of-latest-human-id
-  "")
+(define-repo-method get-ticket-of-latest-human-id
+                    repo-get-ticket-of-latest-human-id "")
 
 (define-repo-method search-tickets repo-search-tickets
  "Searches active tickets in PROJECT-ID matching query Q, ordered by SORT, from REPO.")
@@ -54,8 +56,9 @@
  repo-get-ticket-by-project-human-id-and-human-id
  "Retrieves a specific active ticket matching PROJECT-ID and HUMAN-ID from REPO.")
 
-(define-repo-method update-ticket-by-human-id repo-update-ticket-by-human-id
- "Updates a ticket identified by HUMAN-ID with ATTRS in the given REPO.")
+(define-repo-method update-ticket-by-project-human-id-and-human-id
+ repo-update-ticket-by-project-human-id-and-human-id
+ "Updates a ticket identified by PROJECT-ID and HUMAN-ID with ATTRS in the given REPO.")
 
 (define-repo-method insert-ticket repo-insert-ticket
                     "Inserts a new ticket using ATTRS into the given REPO.")

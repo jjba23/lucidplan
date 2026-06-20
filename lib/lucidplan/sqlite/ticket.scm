@@ -89,7 +89,7 @@
       (if (nil? rows) #f
           (car rows))))
 
-    (define (get-ticket-of-latest-human-id project-id )
+  (define (get-ticket-of-latest-human-id project-id)
     (let* ((query (format #f
                    "SELECT ~a FROM ticket
                     WHERE deleted_at IS NULL AND project_id = (SELECT id FROM project WHERE human_id = ~a LIMIT 1)
@@ -97,16 +97,20 @@
 LIMIT 1 "
                    (symbols->sql-columns-list columns)
                    (value->sql-literal project-id)))
-           (rows (execute-read "get-ticket-of-latest-human-id"
-                               query)))
+           (rows (execute-read "get-ticket-of-latest-human-id" query)))
       (if (nil? rows) #f
           (car rows))))
 
-  (define (update-ticket-by-human-id human-id attrs)
-    (let* ((query (format #f "UPDATE ticket SET ~a WHERE human_id = ~a"
-                          (string-join (map pair->sql-assignment attrs) ", ")
-                          (value->sql-literal human-id))))
-      (execute-write "update-ticket-by-human-id" query)))
+  (define (update-ticket-by-project-human-id-and-human-id project-id human-id
+                                                          attrs)
+    (let* ((query (format #f
+                   "UPDATE ticket SET ~a WHERE
+                              project_id = (SELECT id FROM project WHERE human_id = ~a LIMIT 1)
+                              AND human_id = ~a"
+                   (string-join (map pair->sql-assignment attrs) ", ")
+                   (value->sql-literal project-id)
+                   (value->sql-literal human-id))))
+      (execute-write "update-ticket-by-project-human-id-and-human-id" query)))
 
   (define (insert-ticket attrs)
     (let* ((vals (map (lambda (x)
@@ -123,6 +127,6 @@ LIMIT 1 "
                         get-ticket-by-project-human-id-and-human-id
                         #:get-ticket-of-latest-human-id-proc
                         get-ticket-of-latest-human-id
-                        #:update-ticket-by-human-id-proc
-                        update-ticket-by-human-id
+                        #:update-ticket-by-project-human-id-and-human-id-proc
+                        update-ticket-by-project-human-id-and-human-id
                         #:insert-ticket-proc insert-ticket))

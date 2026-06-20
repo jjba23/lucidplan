@@ -309,15 +309,28 @@
                  (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
                                         rc)))
             
-            (update-ticket-by-human-id ticket-repo
-                                       (params rc "human-id")
-                                       `((ticket-status unquote ticket-status)
-                                         (ticket-type unquote ticket-type)
-                                         (description unquote description)
-                                         (title unquote title)
-                                         (priority unquote priority)
-                                         (updated_at unquote
-                                                     (current-time))))
+            (update-ticket-by-project-human-id-and-human-id ticket-repo
+                                                            (params rc
+                                                                    "project")
+                                                            (params rc
+                                                             "human-id")
+                                                            `((ticket-status
+                                                               unquote
+                                                               ticket-status)
+                                                              (ticket-type
+                                                               unquote
+                                                               ticket-type)
+                                                              (description
+                                                               unquote
+                                                               description)
+                                                              (title unquote
+                                                                     title)
+                                                              (priority
+                                                               unquote
+                                                               priority)
+                                                              (updated_at
+                                                               unquote
+                                                               (current-time))))
             (upsert-ticket-assignee ticket-assignee-repo
                                     `((project-id unquote project-id)
                                       (ticket-id unquote ticket-id)
