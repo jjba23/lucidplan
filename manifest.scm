@@ -157,8 +157,7 @@ user sessions on the web or authenticating API calls.")
 ;; define manifest
 ;;
 
-(packages->manifest (list (specification->package "make")
-                          (specification->package "gettext")
+(packages->manifest (list (specification->package "gettext")
                           guile-3.0-latest
                           guile-json-4
                           guile-ares-rs
