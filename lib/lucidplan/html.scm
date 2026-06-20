@@ -391,9 +391,9 @@ function addSearchQueryParam(form) {
 (begin
   (define (org2html org)
     (org-to-html org
-                 #:link-classes '(text-blue-500 hover:text-blue-700
-                                                dark:text-blue:400
-                                                hover:dark:text-blue-300
+                 #:link-classes '(text-jeans-blue-500 hover:text-jeans-blue-700
+                                                dark:text-jeans-blue:300
+                                                hover:dark:text-jeans-blue-100
                                                 hover:underline font-bold)
                  #:code-block-classes '(bg-stone-300/75 dark:bg-onyx-700/75
                                                         text-onyx-700
