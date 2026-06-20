@@ -478,7 +478,9 @@
                                                                               (text-sm
                                                                                text-onyx-700
                                                                                font-sans
-                                                                               dark:text-stone-300))))
+                                                                               dark:text-stone-300
+                                                                               truncate
+                                                                               max-w-196))))
                                                                   ,x))
                                                            proj-desc)
 
