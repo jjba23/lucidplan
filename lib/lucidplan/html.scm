@@ -403,11 +403,13 @@ function addSearchQueryParam(form) {
                                                         py-2
                                                         px-3
                                                         whitespace-pre
+                                                        font-mono
                                                         overflow-x-scroll)
                  #:code-classes '(rounded-lg bg-stone-300/75
                                              dark:bg-onyx-700/75
                                              text-onyx-700
                                              px-2
                                              py-1
+                                             font-mono
                                              dark:text-stone-300)))
   (export org2html))
