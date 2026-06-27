@@ -163,6 +163,7 @@ user sessions on the web or authenticating API calls.")
                           guile-ares-rs
                           artanis
                           guile-hygguile
+                          guile-scriba
                           guile-kracht
                           guile-curl
                           guile-bewaking
