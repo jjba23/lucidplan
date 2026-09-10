@@ -39,7 +39,7 @@
   #:use-module (artanis route))
 
 (define-public asset-library
-  (build-asset-library '("pub/js/tickets.js")))
+  (build-asset-library '("pub/js/tickets.js" "pub/js/symbanta.js")))
 
 (define-public (page-footer G_)
   (footer `(,(em (G_ "lucidplan - free project management for everyone")) ,(em
@@ -239,6 +239,8 @@
 }
 ")
                                 (script ,(assoc-ref asset-library
+                                                    "pub/js/symbanta.js"))
+                                (script ,(assoc-ref asset-library
                                                     "pub/js/tickets.js")))
                           (body (@ (class ,(mk-class '(bg-stone-100
                                                        dark:bg-onyx-900
@@ -391,10 +393,11 @@ function addSearchQueryParam(form) {
 (begin
   (define (org2html org)
     (org-to-html org
-                 #:link-classes '(text-jeans-blue-500 hover:text-jeans-blue-700
-                                                dark:text-jeans-blue:300
-                                                hover:dark:text-jeans-blue-100
-                                                hover:underline font-bold)
+                 #:link-classes '(text-jeans-blue-500
+                                  hover:text-jeans-blue-700
+                                  dark:text-jeans-blue:300
+                                  hover:dark:text-jeans-blue-100
+                                  hover:underline font-bold)
                  #:code-block-classes '(bg-stone-300/75 dark:bg-onyx-700/75
                                                         text-onyx-700
                                                         dark:text-stone-300
