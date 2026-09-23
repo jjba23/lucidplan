@@ -100,7 +100,7 @@ easing the learning curve, and reducing the cognitive load.")
 (define-public guile-orgwebalchemy
   (package
     (name "guile-orgwebalchemy")
-    (version "0.1.12")
+    (version "1.0.2")
     (source
      (origin
        (method git-fetch)
@@ -109,7 +109,7 @@ easing the learning curve, and reducing the cognitive load.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0l0c2jbfg36v1ldp7lb849lcab99malw4gqk7a4pjcvihr6jiq68"))))
+        (base32 "0khac5vydcmgkcmq7mvxgpml5b1sawndv1waz0z0sqv6hddlvlmf"))))
     (build-system guile-build-system)
     (native-inputs (list guile-3.0))
     (arguments
@@ -125,7 +125,7 @@ easing the learning curve, and reducing the cognitive load.")
 (define-public guile-bewaking
   (package
     (name "guile-bewaking")
-    (version "0.1.5")
+    (version "0.2.3")
     (source
      (origin
        (method git-fetch)
@@ -134,7 +134,7 @@ easing the learning curve, and reducing the cognitive load.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "15yz25b8bfi58lrb1kgfg5sq84pim04rfjqs87qzl655rfifxjq3"))))
+        (base32 "1i63n0c6bbwrs8skxvbpcbgjwci97ry1qgvzc4vxvfjc3dijk29c"))))
     (build-system guile-build-system)
     (native-inputs (list guile-uuid guile-gcrypt guile-3.0))
     (propagated-inputs (list openssl xxd))
