@@ -55,8 +55,8 @@
                                                     items-center gap-2))))
                         ,(emoji-for-ticket-type (assq-ref t
                                                           'ticket-type))
-                        ,(p (org2html (assq-ref t
-                                                'title))
+                        ,(p (org2html (html-unescape (assq-ref t
+                                                'title)))
                             #:size '(text-md leading-7)))
 
                    (a (@ (class ,(mk-class '(text-md no-underline)))
@@ -75,14 +75,14 @@
                               ticket-id-to-human-id
                               is-logged-in
                               (current-sort #f))
-  
+
   (let* ((get-tickets (lambda (status-str)
                         (filter (lambda (x)
                                   (string=? status-str
                                             (assq-ref x
                                                       'ticket-status)))
                                 tickets)))
-         
+
          (tickets-todo (get-tickets "todo"))
          (tickets-wip (get-tickets "work-in-progress"))
          (tickets-rev (get-tickets "in-review"))
@@ -224,7 +224,7 @@
                              ,(hr)
                              ,(build-details-col "rejected" "Rejected"
                                                  tickets-rej)))))
-    
+
     ;; Render final template
     (html-template G_
                    #:is-logged-in is-logged-in

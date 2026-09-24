@@ -90,13 +90,13 @@
                      id))
          (edit-url (format #f "/tickets/~a/id/~a/edit" project human-id))
          (delete-url (format #f "/tickets/~a/delete" project)))
-    
+
     ;; Render the clean SXML
     `((div (@ (class ,card-face))
 
            ;; Header
            (div (@ (class ,(mk-class '(flex flex-row justify-between))))
-                ,(h4 (org2html title))
+                ,(h4 (org2html (html-unescape title)))
                 (div (@ (class ,(mk-class '(flex justify-right))))
                      (span (@ (class ,(mk-class '(cursor-pointer)))
                               (onclick ,toggle-js))
@@ -139,7 +139,7 @@
                                                                  whitespace-pre-wrap
                                                                  leading-7
                                                                  ml-4))))
-                                          ,(org2html d)))) desc)
+                                          ,(org2html (html-unescape d))))) desc)
 
            ;; Ticket Details
            (small (@ (class ,mono-face))
@@ -242,7 +242,7 @@
                                      items-center
                                      justify-start
                                      no-underline))))
-    
+
     ;; Render the clean SXML
     `((div (@ (class ,wrapper-face)
               (id ,item-id))
@@ -252,7 +252,7 @@
                    (class ,header-face))
                 ,(emoji-for-ticket-type type)
                 (h5 (@ (class ,title-face))
-                    ,(org2html title))
+                    ,(org2html (html-unescape title)))
 
                 ;; Direct Link Icon
                 (div (a (@ (class ,link-face)
@@ -426,7 +426,7 @@
                                    '()))
 
          (fallback-no-ticket-list `(,(p (G_ "Wow.. it's really empty here")))))
-    
+
     ;; Build the final HTML View
     (html-template G_
                    #:is-logged-in is-logged-in
@@ -585,7 +585,7 @@
                            (is-edit #f)
                            (projects '())
                            (is-logged-in #f))
-  
+
   (let* ( ;Consolidate Reusable CSS Classes
           (form-face (mk-class '(flex flex-col gap-6)))
          (field-face (mk-class '(max-w-128)))
@@ -686,7 +686,7 @@
 
                                 ;; Submit Button
                                 (div ,(submit-button (G_ "submit")))))))
-    
+
     ;; Render final template
     (html-template G_
                    #:is-logged-in is-logged-in
