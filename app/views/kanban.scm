@@ -38,6 +38,7 @@
   #:use-module (lucidplan html)
   #:use-module (hygguile hygguile)
   #:use-module (artanis route)
+  #:use-module (kracht prelude)
   #:export (render-k-ticket kanban-from-tickets))
 
 (define (render-k-ticket project t)
@@ -51,13 +52,12 @@
                                                 shadow))))
               (div (@ (class ,(mk-class '(flex flex-row justify-between
                                                items-center gap-2))))
-                   (div (@ (class ,(mk-class '(flex flex-row justify-left
-                                                    items-center gap-2))))
+                   (div (@ (class ,(mk-class '(flex flex-row justify-start
+                                                    items-center gap-2 min-w-0 flex-1))))
                         ,(emoji-for-ticket-type (assq-ref t
                                                           'ticket-type))
-                        ,(p (org2html (assq-ref t
-                                                'title))
-                            #:size '(text-md leading-7)))
+                        ,(org2html (html-unescape (assq-ref t
+                                                'title))))
 
                    (a (@ (class ,(mk-class '(text-md no-underline)))
                          (href ,(format #f "/tickets/~a/id/~a" project
@@ -75,14 +75,14 @@
                               ticket-id-to-human-id
                               is-logged-in
                               (current-sort #f))
-  
+
   (let* ((get-tickets (lambda (status-str)
                         (filter (lambda (x)
                                   (string=? status-str
                                             (assq-ref x
                                                       'ticket-status)))
                                 tickets)))
-         
+
          (tickets-todo (get-tickets "todo"))
          (tickets-wip (get-tickets "work-in-progress"))
          (tickets-rev (get-tickets "in-review"))
@@ -105,13 +105,13 @@
 
          (board-face (mk-class '(flex flex-wrap gap-8 justify-center px-1 py-4)))
          (todo-col-face (mk-class '(w-full sm:w-1/2
-                                           md:w-1/3
-                                           lg:w-1/4
+                                           md:w-1/2
+                                           lg:w-1/3
                                            flex
                                            flex-col
                                            gap-2)))
-         (std-col-face (mk-class '(sm:w-1/3 flex flex-col gap-2)))
-         (details-col-face (mk-class '(sm:w-1/3 my-6 p-4 flex flex-col gap-2)))
+         (std-col-face (mk-class '(sm:w-1/2 flex flex-col gap-2)))
+         (details-col-face (mk-class '(sm:w-1/2 my-6 p-4 flex flex-col gap-2)))
 
          (col-title-face (mk-class '(text-md font-bold
                                              flex
@@ -224,7 +224,7 @@
                              ,(hr)
                              ,(build-details-col "rejected" "Rejected"
                                                  tickets-rej)))))
-    
+
     ;; Render final template
     (html-template G_
                    #:is-logged-in is-logged-in

@@ -66,7 +66,7 @@
                                     ,x))
                               (org2html (html-unescape (assq-ref p
                                                                  'description))))
-         ,(hr)
+         ,(hr #:margin '(my-3 mx-3))
          (div (@ (class ,(mk-class '(flex flex-wrap flex-row gap-3))))
               (a (@ (href ,(format #f "/tickets/~a"
                                    (assq-ref p
@@ -117,8 +117,8 @@
                                                              'vcs-url)
                                                    (assq-ref p
                                                              'vcs-url) ""))))
-         (hr (@ (class ,(mk-class '(my-3)))))
-         (div (@ (class ,(mk-class '(flex flex-wrap flex-row gap-4 py-4))))
+
+         (div (@ (class ,(mk-class '(flex flex-wrap flex-row gap-4 py-1))))
               (a (@ (href ,(format #f "/projects/id/~a/edit"
                                    (assq-ref p
                                              'human-id))))
@@ -162,7 +162,9 @@
                                      px-4
                                      cursor-pointer
                                      rounded-xl
-                                     shadow)))
+                                     shadow
+                                     h-14
+                                     truncate)))
             (onclick ,(format #f
                        "document.getElementById('details-~a').toggleAttribute('hidden')"
                        (assq-ref p
@@ -178,7 +180,7 @@
                                                     break-words))))
                    ,(assq-ref p
                               'title)))
-         (p (@ (class ,(mk-class '(font-sans text-stone-600
+         (p (@ (class ,(mk-class '(font-sans text-onyx-500
                                              dark:text-stone-500
                                              text-md
                                              leading-7
