@@ -397,6 +397,44 @@ function addSearchQueryParam(form) {
                                    dark:text-jeans-blue:300
                                    hover:dark:text-jeans-blue-100
                                    hover:underline font-bold))
+                   (separator-classes '(my-8 mx-4 border-2 border-stone-500/50
+                                             dark:border-onyx-100/50))
+                   (paragraph-classes '(font-sans text-onyx-500
+                                                  dark:text-stone-500
+                                                  text-md
+                                                  leading-7
+                                                  max-w-196
+                                                  break-words
+                                                  truncate))
+                   (bold-classes '(font-sans font-bold
+                                             text-onyx-500
+                                             dark:text-stone-500
+                                             text-md
+                                             leading-7
+                                             max-w-196
+                                             break-words
+                                             truncate))
+                   (example-block-classes '(bg-stone-300/75
+                                            dark:bg-onyx-700/75
+                                            text-onyx-700
+                                            dark:text-stone-300
+                                            rounded-lg
+                                            my-3
+                                            py-2
+                                            px-3
+                                            whitespace-pre
+                                            font-mono
+                                            overflow-x-scroll))
+                   (quote-block-classes '(bg-stone-300/75 dark:bg-onyx-700/75
+                                                          text-onyx-700
+                                                          dark:text-stone-300
+                                                          rounded-lg
+                                                          my-3
+                                                          py-2
+                                                          px-3
+                                                          whitespace-pre
+                                                          font-sans
+                                                          overflow-x-scroll))
                    (code-block-classes '(bg-stone-300/75 dark:bg-onyx-700/75
                                                          text-onyx-700
                                                          dark:text-stone-300

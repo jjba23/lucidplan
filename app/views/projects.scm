@@ -178,7 +178,7 @@
                                                     break-words))))
                    ,(assq-ref p
                               'title)))
-         (p (@ (class ,(mk-class '(font-sans text-stone-600
+         (p (@ (class ,(mk-class '(font-sans text-onyx-500
                                              dark:text-stone-500
                                              text-md
                                              leading-7
