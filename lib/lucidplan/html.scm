@@ -398,20 +398,31 @@ function addSearchQueryParam(form) {
                                    hover:dark:text-jeans-blue-100
                                    hover:underline font-bold))
                    (italic-classes '(italic))
+                   (ordered-list-classes '(list-decimal ml-3))
+                   (ordered-list-item-classes '(font-sans text-onyx-500
+                                                          dark:text-stone-500
+                                                          text-md leading-7))
+                   (unordered-list-classes '(list-disc ml-3))
+                   (unordered-list-item-classes '(font-sans text-onyx-500
+                                                  dark:text-stone-500 text-md
+                                                  leading-7))
                    (heading-classes (lambda (level)
                                       (case level
                                         ((1)
-                                         '(my-2 text-4xl font-bold text-onyx-300
-                                                    dark:text-stone-300))
+                                         '(my-2 text-4xl font-bold
+                                                text-onyx-300
+                                                dark:text-stone-300))
                                         ((2)
-                                         '(my-2 text-3xl font-bold text-onyx-300
-                                                    dark:text-stone-300))
+                                         '(my-2 text-3xl font-bold
+                                                text-onyx-300
+                                                dark:text-stone-300))
                                         ((3)
-                                         '(my-2 text-2xl font-bold text-onyx-300
-                                                    dark:text-stone-300))
+                                         '(my-2 text-2xl font-bold
+                                                text-onyx-300
+                                                dark:text-stone-300))
                                         (else '(my-2 text-xl font-bold
-                                                        text-onyx-300
-                                                        dark:text-stone-300)))))
+                                                     text-onyx-300
+                                                     dark:text-stone-300)))))
                    (separator-classes '(my-8 mx-4 border-2 border-stone-500/50
                                              dark:border-onyx-100/50))
                    (paragraph-classes '(font-sans text-onyx-500
@@ -419,16 +430,8 @@ function addSearchQueryParam(form) {
                                                   text-md
                                                   leading-7
                                                   max-w-196
-                                                  break-words
-                                                  truncate))
-                   (bold-classes '(font-sans font-bold
-                                             text-onyx-500
-                                             dark:text-stone-500
-                                             text-md
-                                             leading-7
-                                             max-w-196
-                                             break-words
-                                             truncate))
+                                                  break-words))
+                   (bold-classes '(font-bold text-onyx-500 dark:text-stone-500))
                    (example-block-classes '(bg-stone-300/75
                                             dark:bg-onyx-700/75
                                             text-onyx-700
