@@ -398,6 +398,20 @@ function addSearchQueryParam(form) {
                                    hover:dark:text-jeans-blue-100
                                    hover:underline font-bold))
                    (italic-classes '(italic))
+                   (heading-classes (lambda (level)
+                                      (case level
+                                        ((1)
+                                         '(my-2 text-4xl font-bold text-onyx-300
+                                                    dark:text-stone-300))
+                                        ((2)
+                                         '(my-2 text-3xl font-bold text-onyx-300
+                                                    dark:text-stone-300))
+                                        ((3)
+                                         '(my-2 text-2xl font-bold text-onyx-300
+                                                    dark:text-stone-300))
+                                        (else '(my-2 text-xl font-bold
+                                                        text-onyx-300
+                                                        dark:text-stone-300)))))
                    (separator-classes '(my-8 mx-4 border-2 border-stone-500/50
                                              dark:border-onyx-100/50))
                    (paragraph-classes '(font-sans text-onyx-500
