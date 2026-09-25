@@ -20,7 +20,6 @@
   #:use-module (web request)
   #:use-module (web response)
   #:use-module (web uri)
-  #:use-module (json)
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 popen)
   #:use-module (ice-9 textual-ports)
@@ -41,146 +40,196 @@
   #:use-module (lucidplan domain)
   #:use-module (hygguile hygguile)
   #:use-module (artanis security nss)
-  #:use-module (artanis route)
   #:export (render-ticket render-ticket-listitem html-from-tickets
                           html-new-ticket-form html-edit-ticket-form
                           html-ticket-form))
 
+;; =============================================================================
+;; Reusable Styles
+;; =============================================================================
+
+(define %card-face
+  (mk-class '(flex flex-col
+                   gap-2
+                   px-6
+                   py-10
+                   bg-stone-100
+                   dark:bg-onyx-900
+                   rounded-2xl
+                   dark:border-onyx-100/75
+                   border-stone-300/75
+                   shadow-md
+                   border-2)))
+
+(define %label-face
+  (mk-class '(font-sans text-onyx-700 dark:text-stone-300 text-md font-light)))
+
+(define %val-face
+  (mk-class '(font-sans text-onyx-700 dark:text-stone-300 text-md ml-4)))
+
+(define %mono-face
+  (mk-class '(font-sans text-onyx-700 dark:text-stone-300 text-sm ml-4
+                        font-mono)))
+
+(define %list-wrapper-face
+  (mk-class '(flex flex-col gap-2)))
+
+(define %list-header-face
+  (mk-class '(flex flex-row
+                   gap-4
+                   items-center
+                   justify-left
+                   bg-stone-300/75
+                   dark:bg-onyx-700
+                   dark:border-onyx-100/75
+                   border-stone-300/75
+                   shadow-md
+                   border-2
+                   py-2
+                   px-4
+                   shadow
+                   cursor-pointer
+                   rounded-xl)))
+
+(define %list-title-face
+  (mk-class '(font-sans text-onyx-700
+                        dark:text-stone-300
+                        text-md
+                        font-bold
+                        break-words
+                        max-w-196
+                        leading-6
+                        truncate)))
+
+(define %list-link-face
+  (mk-class '(flex flex-row
+                   flex-wrap
+                   gap-2
+                   items-center
+                   justify-start
+                   no-underline)))
+
+;; =============================================================================
+;;  UI Helper Components
+;; =============================================================================
+
+(define (render-meta-badge label icon value)
+  `(div (@ (class ,(mk-class '(flex flex-col gap-3))))
+        (small (@ (class ,%label-face))
+               ,label)
+        (div (@ (class ,(mk-class '(ml-4 flex gap-2 items-center))))
+             (span (@ (class ,(mk-class '(text-2xl))))
+                   ,icon)
+             (p (@ (class ,%label-face))
+                ,value))))
+
+(define (render-field label value val-class)
+  `((small (@ (class ,%label-face))
+           ,label)
+    (small (@ (class ,val-class))
+           ,(format #f "~a" value))))
+
+(define (render-toggle-button label js-action)
+  `(button (@ (class ,(mk-class '(text-sm font-semibold
+                                          underline
+                                          cursor-pointer
+                                          text-onyx-700
+                                          dark:text-stone-300
+                                          hover:text-onyx-900
+                                          hover:dark:text-stone-100)))
+              (onclick ,js-action))
+           ,label))
+
 (define* (render-ticket G_
                         #:key project ticket
                         (assignee #f))
-  (let* ( ;Extract Ticket Data
-          (id (assq-ref ticket
-                        'id))
-         (human-id (assq-ref ticket
-                             'human-id))
-         (title (assq-ref ticket
-                          'title))
-         (status (assq-ref ticket
-                           'ticket-status))
-         (type (assq-ref ticket
-                         'ticket-type))
-         (desc (assq-ref ticket
-                         'description))
-         (priority (assq-ref ticket
-                             'priority))
-
-         ;; Consolidate Reusable CSS Classes
-         (card-face (mk-class '(flex flex-col
-                                     gap-2
-                                     px-6
-                                     py-10
-                                     bg-stone-100
-                                     dark:bg-onyx-900
-                                     rounded-2xl
-                                     dark:border-onyx-100/75
-                                     border-stone-300/75
-                                     shadow-md
-                                     border-2)))
-         (label-face (mk-class '(font-sans text-onyx-700 dark:text-stone-300
-                                           text-md font-light)))
-         (val-face (mk-class '(font-sans text-onyx-700 dark:text-stone-300
-                                         text-md ml-4)))
-         (mono-face (mk-class '(font-sans text-onyx-700 dark:text-stone-300
-                                          text-sm ml-4 font-mono)))
+  (let* ((t-ref (lambda (k)
+                  (assq-ref ticket k)))
+         (id (t-ref 'id))
+         (human-id (t-ref 'human-id))
+         (title (t-ref 'title))
+         (status (t-ref 'ticket-status))
+         (type (t-ref 'ticket-type))
+         (desc (t-ref 'description))
+         (priority (t-ref 'priority))
 
          (toggle-js (format #f
                      "document.getElementById('details-~a').toggleAttribute('hidden')"
                      id))
          (edit-url (format #f "/tickets/~a/id/~a/edit" project human-id))
          (delete-url (format #f "/tickets/~a/delete" project)))
+    
+    `(div (@ (class ,%card-face))
 
-    ;; Render the clean SXML
-    `((div (@ (class ,card-face))
+          ;; Header
+          (div (@ (class ,(mk-class '(flex flex-row justify-between))))
+               ,(h4 (org2html (html-unescape title)))
+               (div (@ (class ,(mk-class '(flex justify-right))))
+                    (span (@ (class ,(mk-class '(cursor-pointer)))
+                             (onclick ,toggle-js))
+                          ,(icon #:type 'x
+                                 #:icon-css '(text-onyx-700
+                                              dark:text-stone-300 text-xl)))))
 
-           ;; Header
-           (div (@ (class ,(mk-class '(flex flex-row justify-between))))
-                ,(h4 (org2html (html-unescape title)))
-                (div (@ (class ,(mk-class '(flex justify-right))))
-                     (span (@ (class ,(mk-class '(cursor-pointer)))
-                              (onclick ,toggle-js))
-                           ,(icon #:type 'x
-                                  #:icon-css '(text-onyx-700
-                                               dark:text-stone-300 text-xl)))))
+          ;; Meta Info (Status & Type)
+          (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-6
+                                           justify-left))))
+               ,(render-meta-badge (G_ "status")
+                                   (emoji-for-ticket-status status) status)
+               ,(render-meta-badge (G_ "type")
+                                   (emoji-for-ticket-type type) type))
 
-           ;; Meta Info (Status & Type)
-           (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-6
-                                            justify-left))))
+          ;; Description
+          ,(render-if-nestring (lambda (d)
+                                 `((small (@ (class ,%label-face))
+                                          ,(G_ "description"))
+                                   (span (@ (class ,(mk-class '(text-md py-3
+                                                                text-onyx-700
+                                                                dark:text-stone-300
+                                                                font-medium
+                                                                font-sans
+                                                                max-w-prose
+                                                                whitespace-pre-wrap
+                                                                leading-7
+                                                                ml-4))))
+                                         ,(org2html (html-unescape d))))) desc)
 
-                ;; Status
-                (div (@ (class ,(mk-class '(flex flex-col gap-3))))
-                     (small (@ (class ,label-face))
-                            ,(G_ "status"))
-                     (div (@ (class ,(mk-class '(flex gap-2 items-center))))
-                          (span (@ (class ,(mk-class '(text-2xl))))
-                                ,(emoji-for-ticket-status status))
-                          ,(p status)))
+          ;; Ticket Details
+          (small (@ (class ,%mono-face))
+                 ,(format #f "~a-~s" project human-id))
 
-                ;; Type
-                (div (@ (class ,(mk-class '(flex flex-col gap-3))))
-                     (small (@ (class ,label-face))
-                            ,(G_ "type"))
-                     (div (@ (class ,(mk-class '(ml-4 flex gap-2 items-center))))
-                          (span (@ (class ,(mk-class '(text-2xl))))
-                                ,(emoji-for-ticket-type type))
-                          ,(p type))))
-
-           ;; Description
-           ,(render-if-nestring (lambda (d)
-                                  `((small (@ (class ,label-face))
-                                           ,(G_ "description"))
-                                    (span (@ (class ,(mk-class '(text-md py-3
-                                                                 text-onyx-700
-                                                                 dark:text-stone-300
-                                                                 font-medium
-                                                                 font-sans
-                                                                 max-w-prose
-                                                                 whitespace-pre-wrap
-                                                                 leading-7
-                                                                 ml-4))))
-                                          ,(org2html (html-unescape d)))))
-                                desc)
-
-           ;; Ticket Details
-           (small (@ (class ,mono-face))
-                  ,(format #f "~a-~s" project human-id))
-
-           ,(if (and (not (nil? priority))
+          ,@(if (and (not (nil? priority))
                      (> priority 0))
-                `((small (@ (class ,label-face))
-                         ,(G_ "priority"))
-                  (small (@ (class ,val-face))
-                         ,(format #f "~a" priority)))
-                '())
-           ,(if (not (nil? assignee))
-                `((small (@ (class ,label-face))
-                         ,(G_ "assignee"))
-                  (small (@ (class ,val-face))
-                         ,(format #f "~a" assignee)))
+                (render-field (G_ "priority") priority %val-face)
                 '())
 
-           ;; Action Buttons
-           (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-4 py-3))))
-                (a (@ (href ,edit-url))
-                   ,(icon-button #:icon 'pencil
-                                 #:content (G_ "edit ticket")
-                                 #:icon-css '(text-md text-onyx-700
-                                                      dark:text-stone-300)))
-                (form (@ (enctype application/x-www-form-urlencoded)
-                         (method POST)
-                         (action ,delete-url))
-                      (input (@ (hidden "")
-                                (name id)
-                                (value ,id)))
-                      ,(danger-submit-button `(span (@ (class ,(mk-class '(items-center
-                                                                           flex
-                                                                           flex-row
-                                                                           gap-1))))
-                                                    (,(icon #:type 'trash
-                                                            #:icon-css '(text-stone-300
-                                                                         dark:text-stone-300
-                                                                         text-lg)))
-                                                    ,(G_ "delete")))))))))
+          ,@(if (not (nil? assignee))
+                (render-field (G_ "assignee") assignee %val-face)
+                '())
+
+          ;; Action Buttons
+          (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-4 py-3))))
+               (a (@ (href ,edit-url))
+                  ,(icon-button #:icon 'pencil
+                                #:content (G_ "edit ticket")
+                                #:icon-css '(text-md text-onyx-700
+                                                     dark:text-stone-300)))
+
+               (form (@ (enctype application/x-www-form-urlencoded)
+                        (method POST)
+                        (action ,delete-url))
+                     (input (@ (hidden "")
+                               (name "id")
+                               (value ,id)))
+                     ,(danger-submit-button `(span (@ (class ,(mk-class '(items-center
+                                                                          flex
+                                                                          flex-row
+                                                                          gap-1))))
+                                                   ,(icon #:type 'trash
+                                                          #:icon-css '(text-stone-300
+                                                                       dark:text-stone-300
+                                                                       text-lg))
+                                                   ,(G_ "delete"))))))))
 
 (define* (render-ticket-listitem G_
                                  #:key project
@@ -188,126 +237,77 @@
                                  ticket-id-to-human-id
                                  ticket-assignee
                                  user-names)
-  (let* ( ;Extract Ticket Data
-          (id (assq-ref ticket
-                        'id))
-         (human-id (assq-ref ticket
-                             'human-id))
-         (title (assq-ref ticket
-                          'title))
-         (type (assq-ref ticket
-                         'ticket-type))
+  (let* ((t-ref (lambda (k)
+                  (assq-ref ticket k)))
+         (id (t-ref 'id))
+         (human-id (t-ref 'human-id))
+         (title (t-ref 'title))
+         (type (t-ref 'ticket-type))
 
-         ;; Pre-calculate IDs, URLs, and JS
          (item-id (format #f "listitem-~a" id))
          (details-id (format #f "details-~a" id))
-         ;; We can reuse the details-id variable directly in the toggle JS!
          (toggle-js (format #f
                      "document.getElementById('~a').toggleAttribute('hidden')"
                      details-id))
          (ticket-url (format #f "/tickets/~a/id/~a" project human-id))
-         (ticket-assignee-user (find (lambda (u)
-                                       (equal? (assq-ref u
-                                                         'id) ticket-assignee))
-                                     user-names))
 
-         ;; Consolidate CSS Classes
-         (wrapper-face (mk-class '(flex flex-col gap-2)))
-         (header-face (mk-class '(flex flex-row
-                                       gap-4
-                                       items-center
-                                       justify-left
-                                       bg-stone-300/75
-                                       dark:bg-onyx-700
-                                       dark:border-onyx-100/75
-                                       border-stone-300/75
-                                       shadow-md
-                                       border-2
-                                       py-2
-                                       px-4
-                                       shadow
-                                       cursor-pointer
-                                       rounded-xl)))
-         (title-face (mk-class '(font-sans text-onyx-700
+         (assignee-user (find (lambda (u)
+                                (equal? (assq-ref u
+                                                  'id) ticket-assignee))
+                              user-names)))
+    
+    `(div (@ (class ,%list-wrapper-face)
+             (id ,item-id))
+
+          ;; Clickable Header Row
+          (div (@ (onclick ,toggle-js)
+                  (tabindex "0")
+                  (onkeydown
+                   "if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }")
+                  (class ,%list-header-face))
+
+               ,(emoji-for-ticket-type type)
+               (h5 (@ (class ,%list-title-face))
+                   ,(org2html (html-unescape title)))
+
+               ;; Direct Link Icon
+               (div (a (@ (class ,%list-link-face)
+                          (href ,ticket-url))
+                       ,(icon #:type 'link
+                              #:icon-css '(text-md text-onyx-700
                                            dark:text-stone-300
-                                           text-md
-                                           font-bold
-                                           break-words
-                                           max-w-196
-                                           leading-6
-                                           truncate)))
-         (link-face (mk-class '(flex flex-row
-                                     flex-wrap
-                                     gap-2
-                                     items-center
-                                     justify-start
-                                     no-underline))))
+                                           hover:text-asparagus-500
+                                           hover:dark:text-asparagus-300)))))
 
-    ;; Render the clean SXML
-    `((div (@ (class ,wrapper-face)
-              (id ,item-id))
-
-           ;; Clickable Header Row
-           (div (@ (onclick ,toggle-js)
-                   (tabindex "0")
-                   (onkeydown
-                    "if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }")
-                   (class ,header-face))
-                ,(emoji-for-ticket-type type)
-                (h5 (@ (class ,title-face))
-                    ,(org2html (html-unescape title)))
-
-                ;; Direct Link Icon
-                (div (a (@ (class ,link-face)
-                           (href ,ticket-url))
-                        ,(icon #:type 'link
-                               #:icon-css '(text-md text-onyx-700
-                                            dark:text-stone-300
-                                            hover:text-asparagus-500
-                                            hover:dark:text-asparagus-300)))))
-
-           ;; Expandable Details Container
-           (div (@ (id ,details-id)
-                   (class "ml-4")
-                   (hidden ""))
-                ,(render-ticket G_
-                                #:project project
-                                #:ticket ticket
-                                #:assignee (if (nil? ticket-assignee-user) #f
-                                               (assq-ref ticket-assignee-user
-                                                         'username))))))))
+          ;; Expandable Details Container
+          (div (@ (id ,details-id)
+                  (class "ml-4")
+                  (hidden ""))
+               ,(render-ticket G_
+                               #:project project
+                               #:ticket ticket
+                               #:assignee (if (nil? assignee-user) #f
+                                              (assq-ref assignee-user
+                                                        'username)))))))
 
 (define (expand-and-tips G_)
-  `((div (@ (class ,(mk-class '(flex flex-row
-                                     flex-wrap
-                                     justify-between
-                                     items-center
-                                     my-1
-                                     gap-4))))
-         (p (@ (class ,(mk-class '(text-sm text-onyx-500 dark:text-stone-500))))
-            ,(G_
-              "Tip: Use Tab to navigate tickets and Enter/Space to expand or collapse cards."))
-         (div (@ (class ,(mk-class '(flex flex-row gap-4))))
-              (button (@ (class ,(mk-class '(text-sm font-semibold
-                                             underline
-                                             cursor-pointer
-                                             text-onyx-700
-                                             dark:text-stone-300
-                                             hover:text-onyx-900
-                                             hover:dark:text-stone-100)))
-                         (onclick
-                          "document.querySelectorAll('[id^=\"details-\"]').forEach(el => el.hidden = false)"))
-                      ,(G_ "Expand All"))
-              (button (@ (class ,(mk-class '(text-sm font-semibold
-                                             underline
-                                             cursor-pointer
-                                             text-onyx-700
-                                             dark:text-stone-300
-                                             hover:text-onyx-900
-                                             hover:dark:text-stone-100)))
-                         (onclick
-                          "document.querySelectorAll('[id^=\"details-\"]').forEach(el => el.hidden = true)"))
-                      ,(G_ "Collapse All"))))))
+  `(div (@ (class ,(mk-class '(flex flex-row
+                                    flex-wrap
+                                    justify-between
+                                    items-center
+                                    my-1
+                                    gap-4))))
+        (p (@ (class ,(mk-class '(text-sm text-onyx-500 dark:text-stone-500))))
+           ,(G_
+             "Tip: Use Tab to navigate tickets and Enter/Space to expand or collapse cards."))
+
+        (div (@ (class ,(mk-class '(flex flex-row gap-4))))
+             ,(render-toggle-button (G_ "Expand All")
+               "document.querySelectorAll('[id^=\"details-\"]').forEach(el => el.hidden = false)")
+
+             ,(render-toggle-button (G_ "Collapse All")
+               "document.querySelectorAll('[id^=\"details-\"]').forEach(el => el.hidden = true)"))))
+
 (define* (html-from-tickets G_
                             #:key is-logged-in
                             (current-sort #f)
@@ -460,7 +460,7 @@
                                    '()))
 
          (fallback-no-ticket-list `(,(p (G_ "Wow.. it's really empty here")))))
-
+    
     ;; Build the final HTML View
     (html-template G_
                    #:is-logged-in is-logged-in
@@ -620,7 +620,7 @@
                            (is-edit #f)
                            (projects '())
                            (is-logged-in #f))
-
+  
   (let* ( ;Consolidate Reusable CSS Classes
           (form-face (mk-class '(flex flex-col gap-6)))
          (field-face (mk-class '(max-w-128)))
@@ -721,7 +721,7 @@
 
                                 ;; Submit Button
                                 (div ,(submit-button (G_ "submit")))))))
-
+    
     ;; Render final template
     (html-template G_
                    #:is-logged-in is-logged-in
