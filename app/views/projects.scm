@@ -16,39 +16,114 @@
 ;; along with lucidplan.  If not, see <https://www.gnu.org/licenses/>.
 
 (define-module (app views projects)
-  #:use-module (web server)
-  #:use-module (web request)
-  #:use-module (web response)
   #:use-module (web uri)
-  #:use-module (json)
-  #:use-module (ice-9 popen)
-  #:use-module (ice-9 textual-ports)
-  #:use-module (ice-9 time)
   #:use-module (ice-9 format)
-  #:use-module (ice-9 string-fun)
-  #:use-module (ice-9 iconv)
-  #:use-module (ice-9 hash-table)
-  #:use-module (ice-9 threads)
   #:use-module (lucidplan html)
   #:use-module (artanis artanis)
-  #:use-module (artanis i18n)
-  #:use-module (artanis i18n sxml)
-  #:use-module (artanis i18n locale)
-  #:use-module (ice-9 i18n)
   #:use-module (kracht prelude)
   #:use-module (hygguile hygguile)
-  #:use-module (artanis security nss)
-  #:use-module (artanis route)
   #:export (render-project render-project-list-item html-from-projects
                            html-new-project-form html-edit-project-form
                            html-project-form))
 
+;;; ----------------------------------------------------------------------------
+;;; Data Access Helpers
+;;; ----------------------------------------------------------------------------
+
+(define (proj-ref p key . default)
+  "Safely retrieve KEY from project association list P, falling back to DEFAULT or empty string."
+  (let ((val (assq-ref p key)))
+    (if val val
+        (if (null? default) ""
+            (car default)))))
+
+(define (proj-decoded-url p key)
+  "Retrieve and URI-decode a URL field from project P."
+  (uri-decode (proj-ref p key "")))
+
+;;; ----------------------------------------------------------------------------
+;;; UI Helpers & Sub-components
+;;; ----------------------------------------------------------------------------
+
+(define (toggle-details-js id)
+  (format #f "document.getElementById('details-~a').toggleAttribute('hidden')"
+          id))
+
+(define (project-external-link G_ href label)
+  `(a (@ (class ,(mk-class '(text-onyx-700 dark:text-stone-300 no-underline)))
+         (href ,href))
+      ,(icon-button #:icon 'link
+                    #:content (G_ label)
+                    #:icon-css '(text-md text-onyx-700 dark:text-stone-300))))
+
+(define (project-links-bar G_ p)
+  (let ((title (proj-ref p
+                         'title))
+        (human-id (proj-ref p
+                            'human-id))
+        (url (proj-decoded-url p
+                               'url))
+        (vcs-url (proj-decoded-url p
+                                   'vcs-url)))
+    `(div (@ (class ,(mk-class '(flex flex-wrap flex-row gap-3))))
+          (a (@ (href ,(format #f "/tickets/~a" human-id)))
+             ,(icon-button #:icon 'scroll
+                           #:content (format #f "backlog: ~a" title)
+                           #:icon-css '(text-md text-onyx-700
+                                                dark:text-stone-300)))
+          (a (@ (class ,(mk-class '(text-onyx-700 dark:text-stone-300)))
+                (href ,(format #f "/kanban/~a" human-id)))
+             ,(icon-button #:icon 'kanban
+                           #:content (format #f "kanban: ~a" title)
+                           #:icon-css '(text-md text-onyx-700
+                                                dark:text-stone-300)))
+          ,(render-if-nestring (lambda (x)
+                                 (project-external-link G_ x "view live")) url)
+          ,(render-if-nestring (lambda (x)
+                                 (project-external-link G_ x "project code"))
+                               vcs-url))))
+
+(define (project-actions-bar G_ p)
+  (let ((id (proj-ref p
+                      'id))
+        (human-id (proj-ref p
+                            'human-id)))
+    `(div (@ (class ,(mk-class '(flex flex-wrap flex-row align-center items-center gap-4 py-1))))
+          (a (@ (href ,(format #f "/projects/id/~a/edit" human-id)))
+             ,(icon-button #:icon 'pencil
+                           #:content (G_ "edit project")
+                           #:icon-css '(text-md text-onyx-700
+                                                dark:text-stone-300)))
+          (form (@ (enctype "application/x-www-form-urlencoded")
+                   (method "POST")
+                   (action "/projects/delete"))
+                (input (@ (name "id")
+                          (hidden "")
+                          (value ,id)) "")
+                ,(danger-submit-button `(span (@ (class ,(mk-class '(items-center
+                                                                     flex
+                                                                     flex-row
+                                                                     gap-1))))
+                                              ,(icon #:type 'trash
+                                                     #:icon-css '(text-md
+                                                                  text-stone-300))
+                                              ,(G_ "delete"))))
+          (small (@ (class ,(mk-class '(font-mono text-onyx-700
+                                                  dark:text-stone-500 text-sm))))
+                 ,human-id))))
+
+;;; ----------------------------------------------------------------------------
+;;; Core View Components
+;;; ----------------------------------------------------------------------------
+
 (define (render-project G_ p)
-  (let* ((id (assq-ref p
+  (let* ((id (proj-ref p
                        'id))
-         (toggle-js (format #f
-                     "document.getElementById('details-~a').toggleAttribute('hidden')"
-                     id)))
+         (title (proj-ref p
+                          'title))
+         (description (proj-ref p
+                                'description))
+         (toggle-js (toggle-details-js id)))
     `((div (@ (class ,(mk-class '(flex flex-col
                                        gap-2
                                        px-6
@@ -56,14 +131,13 @@
                                        bg-stone-100
                                        dark:bg-onyx-900
                                        rounded-2xl
-                                       dark:border-onyx-100/75
+                                       border-2
                                        border-stone-300/75
-                                       shadow-md
-                                       border-2))))
+                                       dark:border-onyx-100/75
+                                       shadow-md))))
            ;; Header
            (div (@ (class ,(mk-class '(flex flex-row justify-between))))
-                ,(h4 (assq-ref p
-                               'title))
+                ,(h4 title)
                 (div (@ (class ,(mk-class '(flex justify-right))))
                      (span (@ (class ,(mk-class '(cursor-pointer)))
                               (onclick ,toggle-js))
@@ -71,6 +145,7 @@
                                   #:icon-css '(text-onyx-700
                                                dark:text-stone-300 text-xl)))))
 
+           ;; Description
            ,(render-if-nestring (lambda (x)
                                   `(p (@ (class ,(mk-class '(text-md py-3
                                                              text-onyx-700
@@ -78,226 +153,137 @@
                                                              whitespace-pre-wrap
                                                              font-medium))))
                                       ,x))
-                                (org2html (html-unescape (assq-ref p
-                                                                   'description))))
-           ,(hr #:margin '(my-3 mx-3))
-           (div (@ (class ,(mk-class '(flex flex-wrap flex-row gap-3))))
-                (a (@ (href ,(format #f "/tickets/~a"
-                                     (assq-ref p
-                                               'human-id))))
-                   ,(icon-button #:icon 'scroll
-                                 #:content (format #f "backlog: ~a"
-                                                   (assq-ref p
-                                                             'title))
-                                 #:icon-css '(text-md text-onyx-700
-                                                      dark:text-stone-300)))
-                (a (@ (class ,(mk-class '(text-onyx-700 dark:text-stone-300)))
-                      (href ,(format #f "/kanban/~a"
-                                     (assq-ref p
-                                               'human-id))))
-                   ,(icon-button #:icon 'kanban
-                                 #:content (format #f "kanban: ~a"
-                                                   (assq-ref p
-                                                             'title))
-                                 #:icon-css '(text-md text-onyx-700
-                                                      dark:text-stone-300)))
-                ,(render-if-nestring (lambda (x)
-                                       `(a (@ (class ,(mk-class '(text-onyx-700
-                                                                  dark:text-stone-300
-                                                                  no-underline)))
-                                              (href ,x))
-                                           ,(icon-button #:icon 'link
-                                                         #:content (G_
-                                                                    "view live")
-                                                         #:icon-css '(text-md
-                                                                      text-onyx-700
-                                                                      dark:text-stone-300))))
-                                     (uri-decode (if (assq-ref p
-                                                               'url)
-                                                     (assq-ref p
-                                                               'url) "")))
-                ,(render-if-nestring (lambda (x)
-                                       `(a (@ (class ,(mk-class '(text-onyx-700
-                                                                  dark:text-stone-300
-                                                                  no-underline)))
-                                              (href ,x))
-                                           ,(icon-button #:icon 'link
-                                                         #:content (G_
-                                                                    "project code")
-                                                         #:icon-css '(text-md
-                                                                      text-onyx-700
-                                                                      dark:text-stone-300))))
-                                     (uri-decode (if (assq-ref p
-                                                               'vcs-url)
-                                                     (assq-ref p
-                                                               'vcs-url) ""))))
+                                (org2html (html-unescape description)))
 
-           (div (@ (class ,(mk-class '(flex flex-wrap flex-row gap-4 py-1))))
-                (a (@ (href ,(format #f "/projects/id/~a/edit"
-                                     (assq-ref p
-                                               'human-id))))
-                   ,(icon-button #:icon 'pencil
-                                 #:content (G_ "edit project")
-                                 #:icon-css '(text-md text-onyx-700
-                                                      dark:text-stone-300)))
-                (form (@ (enctype "application/x-www-form-urlencoded")
-                         (method "POST")
-                         (action "/projects/delete"))
-                      (input (@ (name "id")
-                                (hidden "")
-                                (value ,(assq-ref p
-                                                  'id))) "")
-                      ,(danger-submit-button `(span (@ (class ,(mk-class '(items-center
-                                                                           flex
-                                                                           flex-row
-                                                                           gap-1))))
-                                                    ,(icon #:type 'trash
-                                                           #:icon-css '(text-md
-                                                                        text-stone-300))
-                                                    ,(G_ "delete")))))
-           (small (@ (class ,(mk-class '(font-mono text-onyx-700
-                                                   dark:text-stone-500 text-sm))))
-                  ,(assq-ref p
-                             'human-id))))))
+           ,(hr #:margin '(my-3 mx-3))
+
+           ;; Links & Actions
+           ,(project-links-bar G_ p)
+           ,(project-actions-bar G_ p)))))
 
 (define (render-project-list-item G_ p)
-  `((div (@ (class ,(mk-class '(flex flex-row
-                                     flex-wrap
-                                     gap-4
-                                     items-center
-                                     justify-left
-                                     bg-stone-300/75
-                                     dark:bg-onyx-700
-                                     dark:border-onyx-100/75
-                                     border-stone-300/75
-                                     shadow-md
-                                     border-2
-                                     py-2
-                                     px-4
-                                     cursor-pointer
-                                     rounded-xl
-                                     shadow
-                                     h-14
-                                     truncate
-                                     focus:outline-none
-                                     focus:ring-2
-                                     focus:ring-onyx-900
-                                     dark:focus:ring-stone-300)))
-            (tabindex "0")
-            (onclick ,(format #f
-                       "document.getElementById('details-~a').toggleAttribute('hidden')"
-                       (assq-ref p
-                                 'id)))
-            (onkeydown
-             "if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }"))
+  (let* ((id (proj-ref p
+                       'id))
+         (title (proj-ref p
+                          'title))
+         (description (proj-ref p
+                                'description))
+         (toggle-js (toggle-details-js id)))
+    `((div (@ (class ,(mk-class '(flex flex-row
+                                       flex-wrap
+                                       gap-4
+                                       items-center
+                                       justify-left
+                                       bg-stone-300/75
+                                       dark:bg-onyx-700
+                                       border-2
+                                       border-stone-300/75
+                                       dark:border-onyx-100/75
+                                       shadow-md
+                                       py-2
+                                       px-4
+                                       cursor-pointer
+                                       rounded-xl
+                                       h-14
+                                       truncate
+                                       focus:outline-none
+                                       focus:ring-2
+                                       focus:ring-onyx-900
+                                       dark:focus:ring-stone-300)))
+              (tabindex "0")
+              (onclick ,toggle-js)
+              (onkeydown
+               "if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }"))
+           (h3 (@ (class ,(mk-class '(flex flex-row items-center gap-2
+                                           truncate leading-6))))
+               ,(icon #:type 'list
+                      #:icon-css '(text-onyx-700 dark:text-stone-300 text-lg))
+               (span (@ (class ,(mk-class '(font-sans text-onyx-700
+                                                      dark:text-stone-300
+                                                      text-lg font-bold
+                                                      break-words))))
+                     ,title))
+           (p (@ (class ,(mk-class '(font-sans text-onyx-500
+                                               dark:text-stone-500
+                                               text-md
+                                               leading-7
+                                               max-w-196
+                                               break-words
+                                               truncate))))
+              ,(org2html (html-unescape (format #f "~a" description)))))
+      (div (@ (id ,(format #f "details-~a" id))
+              (hidden ""))
+           ,(render-project G_ p)))))
 
-         (h3 (@ (class ,(mk-class '(flex flex-row items-center gap-2 truncate
-                                         leading-6))))
-             ,(icon #:type 'list
-                    #:icon-css '(text-onyx-700 dark:text-stone-300 text-lg))
-             (span (@ (class ,(mk-class '(font-sans text-onyx-700
+(define (projects-header-title G_ search-query)
+  `(div (@ (class ,(mk-class '(flex flex-row justify-between flex-wrap
+                                    items-center gap-1))))
+        (div (@ (class ,(mk-class '(flex flex-row flex-wrap items-center gap-1))))
+             ,(icon #:type 'align-bottom
+                    #:icon-css '(text-onyx-700 dark:text-stone-300 text-2xl))
+             ,(h2 (G_ "Projects"))
+             (div (@ (class ,(mk-class '(ml-2))))
+                  (a (@ (href "/projects/new"))
+                     ,(icon-button #:icon 'plus
+                                   #:content (G_ "new project")
+                                   #:size '(text-sm)
+                                   #:icon-css '(text-sm text-onyx-700
+                                                        dark:text-stone-300)))))
+        (div (@ (class ,(mk-class '(flex flex-row flex-wrap justify-end))))
+             ,(search-box G_
+                          #:search-query search-query))))
+
+(define (projects-toolbar G_)
+  `(div (@ (class ,(mk-class '(flex flex-row
+                                    flex-wrap
+                                    justify-between
+                                    items-center
+                                    my-1
+                                    gap-4))))
+        (p (@ (class ,(mk-class '(text-sm text-onyx-500 dark:text-stone-500))))
+           ,(G_
+             "Tip: Use Tab to navigate projects and Enter/Space to expand or collapse cards."))
+        (div (@ (class ,(mk-class '(flex flex-row gap-4))))
+             (button (@ (class ,(mk-class '(text-sm font-semibold
+                                                    underline
+                                                    cursor-pointer
+                                                    text-onyx-700
                                                     dark:text-stone-300
-                                                    text-lg font-bold
-                                                    break-words))))
-                   ,(assq-ref p
-                              'title)))
-         (p (@ (class ,(mk-class '(font-sans text-onyx-500
-                                             dark:text-stone-500
-                                             text-md
-                                             leading-7
-                                             max-w-196
-                                             break-words
-                                             truncate))))
-            ,(org2html (html-unescape (format #f "~a"
-                                              (assq-ref p
-                                                        'description))))))
-    (div (@ (id ,(format #f "details-~a"
-                         (assq-ref p
-                                   'id)))
-            (hidden ""))
-         ,(render-project G_ p))))
+                                                    hover:text-onyx-900
+                                                    hover:dark:text-stone-100)))
+                        (onclick
+                         "document.querySelectorAll('[id^=\"details-\"]').forEach(el => el.hidden = false)"))
+                     ,(G_ "Expand All"))
+             (button (@ (class ,(mk-class '(text-sm font-semibold
+                                                    underline
+                                                    cursor-pointer
+                                                    text-onyx-700
+                                                    dark:text-stone-300
+                                                    hover:text-onyx-900
+                                                    hover:dark:text-stone-100)))
+                        (onclick
+                         "document.querySelectorAll('[id^=\"details-\"]').forEach(el => el.hidden = true)"))
+                     ,(G_ "Collapse All")))))
 
 (define* (html-from-projects G_
                              #:key projects is-logged-in search-query)
-  (let* ((tit `((div (@ (class ,(mk-class '(flex flex-row justify-between
-                                                 flex-wrap items-center gap-1))))
-                     (div (@ (class ,(mk-class '(flex flex-row flex-wrap
-                                                      items-center gap-1))))
-                          ,(icon #:type 'align-bottom
-                                 #:icon-css '(text-onyx-700
-                                              dark:text-stone-300 text-2xl))
-                          ,(h2 (G_ "Projects"))
-                          (div (@ (class ,(mk-class '(ml-2))))
-                               (a (@ (href "/projects/new"))
-                                  ,(icon-button #:icon 'plus
-                                                #:content (G_ "new project")
-                                                #:size '(text-sm)
-                                                #:icon-css '(text-sm
-                                                             text-onyx-700
-                                                             dark:text-stone-300)))))
-
-                     (div (@ (class ,(mk-class '(flex flex-row flex-wrap
-                                                      justify-end))))
-                          ,(search-box G_
-                                       #:search-query search-query))))))
-    (html-template G_
-                   #:is-logged-in is-logged-in
-                   #:body `((div (@ (class ,(mk-class '(px-3 pb-6))))
-                                 ((div (@ (class ,(mk-class '(flex flex-col
-                                                                   gap-4
-                                                                   flex-grow))))
-                                       ,tit
-
-                                       (div (@ (class ,(mk-class '(flex
-                                                                   flex-row
-                                                                   flex-wrap
-                                                                   justify-between
-                                                                   items-center
-                                                                   my-1
-                                                                   gap-4))))
-                                            (p (@ (class ,(mk-class '(text-sm
-                                                                      text-onyx-500
-                                                                      dark:text-stone-500))))
-                                               ,(G_
-                                                 "Tip: Use Tab to navigate projects and Enter/Space to expand or collapse cards."))
-                                            (div (@ (class ,(mk-class '(flex
-                                                                        flex-row
-                                                                        gap-4))))
-                                                 (button (@ (class ,(mk-class '
-                                                                              (text-sm
-                                                                               font-semibold
-                                                                               underline
-                                                                               cursor-pointer
-                                                                               text-onyx-700
-                                                                               dark:text-stone-300
-                                                                               hover:text-onyx-900
-                                                                               hover:dark:text-stone-100)))
-                                                            (onclick
-                                                             "document.querySelectorAll('[id^=\"details-\"]').forEach(el => el.hidden = false)"))
-                                                         ,(G_ "Expand All"))
-                                                 (button (@ (class ,(mk-class '
-                                                                              (text-sm
-                                                                               font-semibold
-                                                                               underline
-                                                                               cursor-pointer
-                                                                               text-onyx-700
-                                                                               dark:text-stone-300
-                                                                               hover:text-onyx-900
-                                                                               hover:dark:text-stone-100)))
-                                                            (onclick
-                                                             "document.querySelectorAll('[id^=\"details-\"]').forEach(el => el.hidden = true)"))
-                                                         ,(G_ "Collapse All"))))
-
-                                       (div (@ (id lucidplan-projects-list)
-                                               (class ,(mk-class '(flex
-                                                                   flex-col
-                                                                   gap-2
-                                                                   container
-                                                                   my-3))))
-                                            ,(map (lambda (x)
-                                                    (render-project-list-item
-                                                     G_ x)) projects))))))
-                   #:proj projects)))
+  (html-template G_
+                 #:is-logged-in is-logged-in
+                 #:body `((div (@ (class ,(mk-class '(px-3 pb-6))))
+                               ((div (@ (class ,(mk-class '(flex flex-col
+                                                                 gap-4
+                                                                 flex-grow))))
+                                     ,(projects-header-title G_ search-query)
+                                     ,(projects-toolbar G_)
+                                     (div (@ (id lucidplan-projects-list)
+                                             (class ,(mk-class '(flex flex-col
+                                                                 gap-2
+                                                                 container
+                                                                 my-3))))
+                                          ,(map (lambda (x)
+                                                  (render-project-list-item G_
+                                                   x)) projects))))))
+                 #:proj projects))
 
 (define* (html-new-project-form G_
                                 #:key projects is-logged-in)
@@ -309,25 +295,18 @@
                                  #:key projects project is-logged-in)
   (html-project-form G_
                      #:is-logged-in is-logged-in
-                     #:title (assq-ref project
+                     #:title (proj-ref project
                                        'title)
-                     #:human-id (assq-ref project
+                     #:human-id (proj-ref project
                                           'human-id)
-                     #:url (if (assq-ref project
-                                         'url)
-                               (assq-ref project
-                                         'url) "")
-                     #:vcs-url (if (assq-ref project
-                                             'vcs-url)
-                                   (assq-ref project
-                                             'vcs-url) "")
-                     #:description (if (assq-ref project
-                                                 'description)
-                                       (html-unescape (assq-ref project
-                                                                'description))
-                                       "")
+                     #:url (proj-ref project
+                                     'url)
+                     #:vcs-url (proj-ref project
+                                         'vcs-url)
+                     #:description (html-unescape (proj-ref project
+                                                            'description))
                      #:action (format #f "/projects/id/~a/edit"
-                                      (assq-ref project
+                                      (proj-ref project
                                                 'human-id))
                      #:projects projects))
 
@@ -347,7 +326,7 @@
                                                                      gap-4)))
                                             (enctype
                                              "application/x-www-form-urlencoded")
-                                            (method POST)
+                                            (method "POST")
                                             (action ,action))
                                          ,(input #:label (G_ "title")
                                                  #:name 'title
@@ -368,22 +347,18 @@
                                                  #:required #f)
                                          ,(textarea #:label (G_ "description")
                                                     #:name 'description
-                                                    #:value (html-unescape
-                                                             description)
-                                                    #:required #f
-                                                    #:textarea-css '(leading-7
-                                                                     p-4
-                                                                     rounded-xl
-                                                                     border-stone-700
-                                                                     dark:border-onyx-100
-                                                                     dark:text-stone-300
-                                                                     dark:bg-onyx-700/75
-                                                                     bg-stone-300/75
-                                                                     border-2
-                                                                     min-h-72
-                                                                     min-w-90
-                                                                     shadow-md
-                                                                     min-w-prose))
-
-                                         (div ,(submit-button (G_ "submit"))))))
+                                                    #:value description
+                                                    #:required #f)
+                                         (div (@ (class ,(mk-class '(flex
+                                                                     flex-row
+                                                                     gap-3
+                                                                     items-center
+                                                                     mt-2))))
+                                              ,(submit-button (G_ "save project"))
+                                              (a (@ (href "/projects")
+                                                    (class ,(mk-class '(text-sm
+                                                                        text-onyx-700
+                                                                        dark:text-stone-300
+                                                                        underline))))
+                                                 ,(G_ "cancel"))))))
                  #:proj projects))
