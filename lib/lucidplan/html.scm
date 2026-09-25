@@ -44,7 +44,9 @@
 (define-public (page-footer G_)
   (footer `(,(em (G_ "lucidplan - free project management for everyone")) ,(em
                                                                             (G_
-                                                                             "lucidplan is free software, available under the GNU AGPL v3 or newer"))
+                                                                             "lucidplan is free software, available under the GNU AGPL v3 or newer")
+                                                                            #:size '
+                                                                            (text-sm))
             (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
                                              align-center items-center))))
                  ,(em (G_ "find the source code here"))
@@ -57,7 +59,8 @@
                  ,(a "jointhefreeworld.org/manuals/lucidplan/"
                      #:href "https://jointhefreeworld.org/manuals/lucidplan/"
                      #:size '(text-sm)))
-            ,(em (G_ "Copyright © Josep Bigorra  &lt;jjbigorra@gmail.com&gt;"))
+            ,(em (G_ "Copyright © Josep Bigorra  &lt;jjbigorra@gmail.com&gt;")
+                 #:size '(text-sm))
             (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-8
                                              align-center items-center))))
                  (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
@@ -102,8 +105,8 @@
                                         flex-wrap
                                         gap-3
                                         p-3
-                                        bg-asparagus-500/90
-                                        dark:bg-asparagus-900/50
+                                        bg-jeans-blue-500/90
+                                        dark:bg-jeans-blue-900/50
                                         items-center
                                         justify-left
                                         shadow-2xl))))
@@ -326,8 +329,11 @@ function addSearchQueryParam(form) {
 ")
       (div (@ (class ,(mk-class '(my-3))))
            (form (@ (onsubmit "addSearchQueryParam(this)"))
-                 (div (@ (class ,(mk-class '(flex flex-row align-center
-                                                  items-center justify-left
+                 (div (@ (class ,(mk-class '(flex flex-row
+                                                  flex-wrap
+                                                  align-center
+                                                  items-center
+                                                  justify-left
                                                   gap-2))))
                       ,(input #:label ""
                               #:name "search"
@@ -345,7 +351,13 @@ function addSearchQueryParam(form) {
                                                 border-2
                                                 shadow-md)
                               #:input-flex-css #f)
-                      ,(submit-button (G_ "search")))))))
+                      ,(button (G_ "search")
+                               #:type 'submit
+                               #:background '(bg-jeans-blue-500
+                                              dark:bg-jeans-blue-900)
+                               #:color '(text-stone-300)
+                               #:hover-background '(hover:bg-jeans-blue-700
+                                                    hover:dark:bg-jeans-blue-700)))))))
   (export search-box))
 
 (begin

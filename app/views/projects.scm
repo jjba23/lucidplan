@@ -164,11 +164,18 @@
                                      rounded-xl
                                      shadow
                                      h-14
-                                     truncate)))
+                                     truncate
+                                     focus:outline-none
+                                     focus:ring-2
+                                     focus:ring-onyx-900
+                                     dark:focus:ring-stone-300)))
+            (tabindex "0")
             (onclick ,(format #f
                        "document.getElementById('details-~a').toggleAttribute('hidden')"
                        (assq-ref p
-                                 'id))))
+                                 'id)))
+            (onkeydown
+             "if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }"))
 
          (h3 (@ (class ,(mk-class '(flex flex-row items-center gap-2 truncate
                                          leading-6))))
@@ -198,26 +205,30 @@
 
 (define* (html-from-projects G_
                              #:key projects is-logged-in search-query)
-  (let* ((tit `((div (@ (class ,(mk-class '(flex flex-row
-                                                 justify-between
-                                                 flex-wrap
-                                                 items-center
-                                                 gap-1
-                                                 my-3))))
-                     (div (@ (class ,(mk-class '(flex flex-row items-center
+  (let* ((tit `((div (@ (class ,(mk-class '(flex flex-row justify-between
+                                                 flex-wrap items-center gap-1))))
+                     (div (@ (class ,(mk-class '(flex flex-row flex-wrap items-center
                                                       gap-1))))
                           ,(icon #:type 'align-bottom
                                  #:icon-css '(text-onyx-700
                                               dark:text-stone-300 text-2xl))
-                          ,(h2 (G_ "Projects")))
-                     (div (a (@ (href "/projects/new"))
-                             ,(icon-button #:icon 'plus
-                                           #:content (G_ "new project")
-                                           #:icon-css '(text-md text-onyx-700
-                                                        dark:text-stone-300))))))))
+                          ,(h2 (G_ "Projects"))
+                          (div (@ (class ,(mk-class '(ml-2))))
+                               (a (@ (href "/projects/new"))
+                                  ,(icon-button #:icon 'plus
+                                                #:content (G_ "new project")
+                                                #:size '(text-sm)
+                                                #:icon-css '(text-sm
+                                                             text-onyx-700
+                                                             dark:text-stone-300)))))
+
+                     (div (@ (class ,(mk-class '(flex flex-row flex-wrap
+                                                      justify-end))))
+                          ,(search-box G_
+                                       #:search-query search-query))))))
     (html-template G_
                    #:is-logged-in is-logged-in
-                   #:body `((div (@ (class ,(mk-class '(px-4 py-4))))
+                   #:body `((div (@ (class ,(mk-class '(px-3 pb-6))))
                                  ((div (@ (class ,(mk-class '(flex flex-col
                                                                    gap-4
                                                                    flex-grow))))
@@ -226,10 +237,42 @@
                                        (div (@ (class ,(mk-class '(flex
                                                                    flex-row
                                                                    flex-wrap
-                                                                   justify-end))))
-                                            ,(search-box G_
-                                                         #:search-query
-                                                         search-query))
+                                                                   justify-between
+                                                                   items-center
+                                                                   my-1
+                                                                   gap-4))))
+                                            (p (@ (class ,(mk-class '(text-sm
+                                                                      text-onyx-500
+                                                                      dark:text-stone-500))))
+                                               ,(G_
+                                                 "Tip: Use Tab to navigate projects and Enter/Space to expand or collapse cards."))
+                                            (div (@ (class ,(mk-class '(flex
+                                                                        flex-row
+                                                                        gap-4))))
+                                                 (button (@ (class ,(mk-class '
+                                                                              (text-sm
+                                                                               font-semibold
+                                                                               underline
+                                                                               cursor-pointer
+                                                                               text-onyx-700
+                                                                               dark:text-stone-300
+                                                                               hover:text-onyx-900
+                                                                               hover:dark:text-stone-100)))
+                                                            (onclick
+                                                             "document.querySelectorAll('[id^=\"details-\"]').forEach(el => el.hidden = false)"))
+                                                         ,(G_ "Expand All"))
+                                                 (button (@ (class ,(mk-class '
+                                                                              (text-sm
+                                                                               font-semibold
+                                                                               underline
+                                                                               cursor-pointer
+                                                                               text-onyx-700
+                                                                               dark:text-stone-300
+                                                                               hover:text-onyx-900
+                                                                               hover:dark:text-stone-100)))
+                                                            (onclick
+                                                             "document.querySelectorAll('[id^=\"details-\"]').forEach(el => el.hidden = true)"))
+                                                         ,(G_ "Collapse All"))))
 
                                        (div (@ (id lucidplan-projects-list)
                                                (class ,(mk-class '(flex
