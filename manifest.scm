@@ -100,7 +100,7 @@ easing the learning curve, and reducing the cognitive load.")
 (define-public guile-orgwebalchemy
   (package
     (name "guile-orgwebalchemy")
-    (version "1.0.8")
+    (version "1.0.9")
     (source
      (origin
        (method git-fetch)
@@ -109,7 +109,7 @@ easing the learning curve, and reducing the cognitive load.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "10g8jgiv7lbpl1vy6pvs3jf3lb0byhf2c2ypf5m2zcb21xyvmc26"))))
+        (base32 "1kgq4ck9nwk9mqqxr968m4bcijkf1xwlkcn0vlg97fk55pizdkcr"))))
     (build-system guile-build-system)
     (native-inputs (list guile-3.0))
     (arguments
