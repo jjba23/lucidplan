@@ -84,7 +84,6 @@
          (mono-face (mk-class '(font-sans text-onyx-700 dark:text-stone-300
                                           text-sm ml-4 font-mono)))
 
-         ;; Pre-calculate URLs and JS callbacks
          (toggle-js (format #f
                      "document.getElementById('details-~a').toggleAttribute('hidden')"
                      id))
@@ -139,7 +138,8 @@
                                                                  whitespace-pre-wrap
                                                                  leading-7
                                                                  ml-4))))
-                                          ,(org2html (html-unescape d))))) desc)
+                                          ,(org2html (html-unescape d)))))
+                                desc)
 
            ;; Ticket Details
            (small (@ (class ,mono-face))
@@ -249,6 +249,9 @@
 
            ;; Clickable Header Row
            (div (@ (onclick ,toggle-js)
+                   (tabindex "0")
+                   (onkeydown
+                    "if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }")
                    (class ,header-face))
                 ,(emoji-for-ticket-type type)
                 (h5 (@ (class ,title-face))
@@ -274,6 +277,37 @@
                                                (assq-ref ticket-assignee-user
                                                          'username))))))))
 
+(define (expand-and-tips G_)
+  `((div (@ (class ,(mk-class '(flex flex-row
+                                     flex-wrap
+                                     justify-between
+                                     items-center
+                                     my-1
+                                     gap-4))))
+         (p (@ (class ,(mk-class '(text-sm text-onyx-500 dark:text-stone-500))))
+            ,(G_
+              "Tip: Use Tab to navigate tickets and Enter/Space to expand or collapse cards."))
+         (div (@ (class ,(mk-class '(flex flex-row gap-4))))
+              (button (@ (class ,(mk-class '(text-sm font-semibold
+                                             underline
+                                             cursor-pointer
+                                             text-onyx-700
+                                             dark:text-stone-300
+                                             hover:text-onyx-900
+                                             hover:dark:text-stone-100)))
+                         (onclick
+                          "document.querySelectorAll('[id^=\"details-\"]').forEach(el => el.hidden = false)"))
+                      ,(G_ "Expand All"))
+              (button (@ (class ,(mk-class '(text-sm font-semibold
+                                             underline
+                                             cursor-pointer
+                                             text-onyx-700
+                                             dark:text-stone-300
+                                             hover:text-onyx-900
+                                             hover:dark:text-stone-100)))
+                         (onclick
+                          "document.querySelectorAll('[id^=\"details-\"]').forEach(el => el.hidden = true)"))
+                      ,(G_ "Collapse All"))))))
 (define* (html-from-tickets G_
                             #:key is-logged-in
                             (current-sort #f)
@@ -534,6 +568,7 @@
 
                                       ;; Sub-Components & Lists
                                       ,search-param-components
+                                      ,(expand-and-tips G_)
                                       ,(if (nil? tickets)
                                            fallback-no-ticket-list ticket-list)
                                       ,done-ticket-list

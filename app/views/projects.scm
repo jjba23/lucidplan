@@ -44,107 +44,121 @@
                            html-project-form))
 
 (define (render-project G_ p)
-  `((div (@ (class ,(mk-class '(flex flex-col
-                                     gap-2
-                                     px-6
-                                     py-10
-                                     bg-stone-100
-                                     dark:bg-onyx-900
-                                     rounded-2xl
-                                     dark:border-onyx-100/75
-                                     border-stone-300/75
-                                     shadow-md
-                                     border-2))))
-         ,(h4 (assq-ref p
-                        'title))
-         ,(render-if-nestring (lambda (x)
-                                `(p (@ (class ,(mk-class '(text-md py-3
-                                                           text-onyx-700
-                                                           dark:text-stone-300
-                                                           whitespace-pre-wrap
-                                                           font-medium))))
-                                    ,x))
-                              (org2html (html-unescape (assq-ref p
-                                                                 'description))))
-         ,(hr #:margin '(my-3 mx-3))
-         (div (@ (class ,(mk-class '(flex flex-wrap flex-row gap-3))))
-              (a (@ (href ,(format #f "/tickets/~a"
-                                   (assq-ref p
-                                             'human-id))))
-                 ,(icon-button #:icon 'scroll
-                               #:content (format #f "backlog: ~a"
-                                                 (assq-ref p
-                                                           'title))
-                               #:icon-css '(text-md text-onyx-700
-                                                    dark:text-stone-300)))
-              (a (@ (class ,(mk-class '(text-onyx-700 dark:text-stone-300)))
-                    (href ,(format #f "/kanban/~a"
-                                   (assq-ref p
-                                             'human-id))))
-                 ,(icon-button #:icon 'kanban
-                               #:content (format #f "kanban: ~a"
-                                                 (assq-ref p
-                                                           'title))
-                               #:icon-css '(text-md text-onyx-700
-                                                    dark:text-stone-300)))
-              ,(render-if-nestring (lambda (x)
-                                     `(a (@ (class ,(mk-class '(text-onyx-700
-                                                                dark:text-stone-300
-                                                                no-underline)))
-                                            (href ,x))
-                                         ,(icon-button #:icon 'link
-                                                       #:content (G_
-                                                                  "view live")
-                                                       #:icon-css '(text-md
-                                                                    text-onyx-700
-                                                                    dark:text-stone-300))))
-                                   (uri-decode (if (assq-ref p
-                                                             'url)
-                                                   (assq-ref p
-                                                             'url) "")))
-              ,(render-if-nestring (lambda (x)
-                                     `(a (@ (class ,(mk-class '(text-onyx-700
-                                                                dark:text-stone-300
-                                                                no-underline)))
-                                            (href ,x))
-                                         ,(icon-button #:icon 'link
-                                                       #:content (G_
-                                                                  "project code")
-                                                       #:icon-css '(text-md
-                                                                    text-onyx-700
-                                                                    dark:text-stone-300))))
-                                   (uri-decode (if (assq-ref p
-                                                             'vcs-url)
-                                                   (assq-ref p
-                                                             'vcs-url) ""))))
+  (let* ((id (assq-ref p
+                       'id))
+         (toggle-js (format #f
+                     "document.getElementById('details-~a').toggleAttribute('hidden')"
+                     id)))
+    `((div (@ (class ,(mk-class '(flex flex-col
+                                       gap-2
+                                       px-6
+                                       py-10
+                                       bg-stone-100
+                                       dark:bg-onyx-900
+                                       rounded-2xl
+                                       dark:border-onyx-100/75
+                                       border-stone-300/75
+                                       shadow-md
+                                       border-2))))
+           ;; Header
+           (div (@ (class ,(mk-class '(flex flex-row justify-between))))
+                ,(h4 (assq-ref p
+                               'title))
+                (div (@ (class ,(mk-class '(flex justify-right))))
+                     (span (@ (class ,(mk-class '(cursor-pointer)))
+                              (onclick ,toggle-js))
+                           ,(icon #:type 'x
+                                  #:icon-css '(text-onyx-700
+                                               dark:text-stone-300 text-xl)))))
 
-         (div (@ (class ,(mk-class '(flex flex-wrap flex-row gap-4 py-1))))
-              (a (@ (href ,(format #f "/projects/id/~a/edit"
-                                   (assq-ref p
-                                             'human-id))))
-                 ,(icon-button #:icon 'pencil
-                               #:content (G_ "edit project")
-                               #:icon-css '(text-md text-onyx-700
-                                                    dark:text-stone-300)))
-              (form (@ (enctype "application/x-www-form-urlencoded")
-                       (method "POST")
-                       (action "/projects/delete"))
-                    (input (@ (name "id")
-                              (hidden "")
-                              (value ,(assq-ref p
-                                                'id))) "")
-                    ,(danger-submit-button `(span (@ (class ,(mk-class '(items-center
-                                                                         flex
-                                                                         flex-row
-                                                                         gap-1))))
-                                                  ,(icon #:type 'trash
+           ,(render-if-nestring (lambda (x)
+                                  `(p (@ (class ,(mk-class '(text-md py-3
+                                                             text-onyx-700
+                                                             dark:text-stone-300
+                                                             whitespace-pre-wrap
+                                                             font-medium))))
+                                      ,x))
+                                (org2html (html-unescape (assq-ref p
+                                                                   'description))))
+           ,(hr #:margin '(my-3 mx-3))
+           (div (@ (class ,(mk-class '(flex flex-wrap flex-row gap-3))))
+                (a (@ (href ,(format #f "/tickets/~a"
+                                     (assq-ref p
+                                               'human-id))))
+                   ,(icon-button #:icon 'scroll
+                                 #:content (format #f "backlog: ~a"
+                                                   (assq-ref p
+                                                             'title))
+                                 #:icon-css '(text-md text-onyx-700
+                                                      dark:text-stone-300)))
+                (a (@ (class ,(mk-class '(text-onyx-700 dark:text-stone-300)))
+                      (href ,(format #f "/kanban/~a"
+                                     (assq-ref p
+                                               'human-id))))
+                   ,(icon-button #:icon 'kanban
+                                 #:content (format #f "kanban: ~a"
+                                                   (assq-ref p
+                                                             'title))
+                                 #:icon-css '(text-md text-onyx-700
+                                                      dark:text-stone-300)))
+                ,(render-if-nestring (lambda (x)
+                                       `(a (@ (class ,(mk-class '(text-onyx-700
+                                                                  dark:text-stone-300
+                                                                  no-underline)))
+                                              (href ,x))
+                                           ,(icon-button #:icon 'link
+                                                         #:content (G_
+                                                                    "view live")
                                                          #:icon-css '(text-md
-                                                                      text-stone-300))
-                                                  ,(G_ "delete")))))
-         (small (@ (class ,(mk-class '(font-mono text-onyx-700
-                                                 dark:text-stone-500 text-sm))))
-                ,(assq-ref p
-                           'human-id)))))
+                                                                      text-onyx-700
+                                                                      dark:text-stone-300))))
+                                     (uri-decode (if (assq-ref p
+                                                               'url)
+                                                     (assq-ref p
+                                                               'url) "")))
+                ,(render-if-nestring (lambda (x)
+                                       `(a (@ (class ,(mk-class '(text-onyx-700
+                                                                  dark:text-stone-300
+                                                                  no-underline)))
+                                              (href ,x))
+                                           ,(icon-button #:icon 'link
+                                                         #:content (G_
+                                                                    "project code")
+                                                         #:icon-css '(text-md
+                                                                      text-onyx-700
+                                                                      dark:text-stone-300))))
+                                     (uri-decode (if (assq-ref p
+                                                               'vcs-url)
+                                                     (assq-ref p
+                                                               'vcs-url) ""))))
+
+           (div (@ (class ,(mk-class '(flex flex-wrap flex-row gap-4 py-1))))
+                (a (@ (href ,(format #f "/projects/id/~a/edit"
+                                     (assq-ref p
+                                               'human-id))))
+                   ,(icon-button #:icon 'pencil
+                                 #:content (G_ "edit project")
+                                 #:icon-css '(text-md text-onyx-700
+                                                      dark:text-stone-300)))
+                (form (@ (enctype "application/x-www-form-urlencoded")
+                         (method "POST")
+                         (action "/projects/delete"))
+                      (input (@ (name "id")
+                                (hidden "")
+                                (value ,(assq-ref p
+                                                  'id))) "")
+                      ,(danger-submit-button `(span (@ (class ,(mk-class '(items-center
+                                                                           flex
+                                                                           flex-row
+                                                                           gap-1))))
+                                                    ,(icon #:type 'trash
+                                                           #:icon-css '(text-md
+                                                                        text-stone-300))
+                                                    ,(G_ "delete")))))
+           (small (@ (class ,(mk-class '(font-mono text-onyx-700
+                                                   dark:text-stone-500 text-sm))))
+                  ,(assq-ref p
+                             'human-id))))))
 
 (define (render-project-list-item G_ p)
   `((div (@ (class ,(mk-class '(flex flex-row
@@ -207,8 +221,8 @@
                              #:key projects is-logged-in search-query)
   (let* ((tit `((div (@ (class ,(mk-class '(flex flex-row justify-between
                                                  flex-wrap items-center gap-1))))
-                     (div (@ (class ,(mk-class '(flex flex-row flex-wrap items-center
-                                                      gap-1))))
+                     (div (@ (class ,(mk-class '(flex flex-row flex-wrap
+                                                      items-center gap-1))))
                           ,(icon #:type 'align-bottom
                                  #:icon-css '(text-onyx-700
                                               dark:text-stone-300 text-2xl))
