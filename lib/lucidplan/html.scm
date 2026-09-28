@@ -90,16 +90,7 @@
                           body
                           (proj '())
                           (is-logged-in #f))
-    (define custom-fonts
-      `((link (@ (rel preconnect)
-                 (href "https://fonts.googleapis.com")))
-        (link (@ (rel preconnect)
-                 (href "https://fonts.gstatic.com")
-                 (crossorigin "")))
-        (link (@ (rel stylesheet)
-                 (href
-                  "https://fonts.googleapis.com/css2?family=Intel+One+Mono:ital,wght@0,300..700;1,300..700&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap")))))
-
+    
     (define nav
       `(div (@ (class ,(mk-class '(flex flex-row
                                         flex-wrap
@@ -216,8 +207,7 @@
     `(,doctype-html (html (@ (lang en))
                           (head (title "LucidPlan")
                                 ,(hygguile-recommended-meta)
-                                ,(hygguile-recommended-resources #:fonts
-                                                                 custom-fonts)
+                                ,(hygguile-recommended-resources #:fonts (custom-fonts))
 
                                 (link (@ (rel "shortcut icon")
                                          (href "/favicon.ico")
