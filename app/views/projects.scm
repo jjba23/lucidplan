@@ -88,7 +88,12 @@
                       'id))
         (human-id (proj-ref p
                             'human-id)))
-    `(div (@ (class ,(mk-class '(flex flex-wrap flex-row align-center items-center gap-4 py-1))))
+    `(div (@ (class ,(mk-class '(flex flex-wrap
+                                      flex-row
+                                      align-center
+                                      items-center
+                                      gap-4
+                                      py-1))))
           (a (@ (href ,(format #f "/projects/id/~a/edit" human-id)))
              ,(icon-button #:icon 'pencil
                            #:content (G_ "edit project")
@@ -125,9 +130,13 @@
                                 'description))
          (toggle-js (toggle-details-js id)))
     `((div (@ (class ,(mk-class '(flex flex-col
-                                       gap-2
-                                       px-6
-                                       py-10
+                                       gap-1
+                                       px-3
+                                       sm:px-4
+                                       md:px-6
+                                       py-4
+                                       sm:py-6
+                                       md:py-10
                                        bg-stone-100
                                        dark:bg-onyx-900
                                        rounded-2xl
@@ -136,7 +145,7 @@
                                        dark:border-onyx-100/75
                                        shadow-md))))
            ;; Header
-           (div (@ (class ,(mk-class '(flex flex-row justify-between))))
+           (div (@ (class ,(mk-class '(flex flex-row justify-between gap-2))))
                 ,(h4 title)
                 (div (@ (class ,(mk-class '(flex justify-right))))
                      (span (@ (class ,(mk-class '(cursor-pointer)))
@@ -147,11 +156,19 @@
 
            ;; Description
            ,(render-if-nestring (lambda (x)
-                                  `(p (@ (class ,(mk-class '(text-md py-3
+                                  `(p (@ (class ,(mk-class '(
+                                                              text-sm
+                                                             sm:text-md
+                                                             py-2
+                                                             sm:py-3
+                                                             leading-6
                                                              text-onyx-700
                                                              dark:text-stone-300
                                                              whitespace-pre-wrap
-                                                             font-medium))))
+                                                             font-medium
+                                                             break-words
+
+                                                             ))))
                                       ,x))
                                 (org2html (html-unescape description)))
 
@@ -354,7 +371,8 @@
                                                                      gap-3
                                                                      items-center
                                                                      mt-2))))
-                                              ,(submit-button (G_ "save project"))
+                                              ,(submit-button (G_
+                                                               "save project"))
                                               (a (@ (href "/projects")
                                                     (class ,(mk-class '(text-sm
                                                                         text-onyx-700
