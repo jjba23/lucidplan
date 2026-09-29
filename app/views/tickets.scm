@@ -163,7 +163,7 @@
                      id))
          (edit-url (format #f "/tickets/~a/id/~a/edit" project human-id))
          (delete-url (format #f "/tickets/~a/delete" project)))
-    
+
     `(div (@ (class ,%card-face))
 
           ;; Header
@@ -260,7 +260,7 @@
                                 (equal? (assq-ref u
                                                   'id) ticket-assignee))
                               user-names)))
-    
+
     `(div (@ (class ,%list-wrapper-face)
              (id ,item-id))
 
@@ -286,7 +286,7 @@
 
           ;; Expandable Details Container
           (div (@ (id ,details-id)
-                  (class ,(mk-class '(ml-1 sm:ml-4)))
+                  (class ,(mk-class '(ml-1 sm:ml-3)))
                   (hidden ""))
                ,(render-ticket G_
                                #:project project
@@ -464,7 +464,7 @@
                                    '()))
 
          (fallback-no-ticket-list `(,(p (G_ "Wow.. it's really empty here")))))
-    
+
     ;; Build the final HTML View
     (html-template G_
                    #:is-logged-in is-logged-in
@@ -635,7 +635,7 @@
                            (is-edit #f)
                            (projects '())
                            (is-logged-in #f))
-  
+
   (let* ( ;Consolidate Reusable CSS Classes
           (form-face (mk-class '(flex flex-col gap-6)))
          (field-face (mk-class '(max-w-128)))
@@ -736,7 +736,7 @@
 
                                 ;; Submit Button
                                 (div ,(submit-button (G_ "submit")))))))
-    
+
     ;; Render final template
     (html-template G_
                    #:is-logged-in is-logged-in

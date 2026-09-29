@@ -42,22 +42,32 @@
   #:export (render-k-ticket kanban-from-tickets))
 
 (define (render-k-ticket project t)
-  `((div (@ (class ,(mk-class '(max-w-128))))
+  `((div (@ (class ,(mk-class '(w-full))))
          (div (@ (class ,(mk-class '(rounded-xl bg-stone-300/25
                                                 dark:bg-onyx-700/50
                                                 p-3
                                                 border-stone-500/75
                                                 dark:border-onyx-100/75
                                                 border-2
-                                                shadow))))
+                                                shadow-sm
+                                                hover:shadow-md
+                                                transition-shadow))))
               (div (@ (class ,(mk-class '(flex flex-row justify-between
                                                items-center gap-2))))
-                   (div (@ (class ,(mk-class '(flex flex-row justify-start
-                                                    items-center gap-2 min-w-0 flex-1))))
+                   (div (@ (class ,(mk-class '(flex flex-row
+                                                    justify-start
+                                                    items-center
+                                                    gap-1
+                                                    min-w-0
+                                                    flex-1
+                                                    whitespace-normal
+                                                    leading-5))))
                         ,(emoji-for-ticket-type (assq-ref t
                                                           'ticket-type))
-                        ,(org2html (html-unescape (assq-ref t
-                                                'title))))
+                        (span (@ (class ,(mk-class '(text-sm font-medium
+                                                             break-words))))
+                              ,(org2html (html-unescape (assq-ref t
+                                                                  'title)))))
 
                    (a (@ (class ,(mk-class '(text-md no-underline)))
                          (href ,(format #f "/tickets/~a/id/~a" project
@@ -75,14 +85,14 @@
                               ticket-id-to-human-id
                               is-logged-in
                               (current-sort #f))
-
+  
   (let* ((get-tickets (lambda (status-str)
                         (filter (lambda (x)
                                   (string=? status-str
                                             (assq-ref x
                                                       'ticket-status)))
                                 tickets)))
-
+         
          (tickets-todo (get-tickets "todo"))
          (tickets-wip (get-tickets "work-in-progress"))
          (tickets-rev (get-tickets "in-review"))
@@ -91,9 +101,13 @@
 
          ;; Consolidate CSS Faces
          (kanban-wrap-face (mk-class '(flex flex-col gap-3 flex-grow)))
-         (toolbar-face (mk-class '(flex flex-wrap flex-row gap-4 items-center
+         (toolbar-face (mk-class '(flex flex-col
+                                        sm:flex-row
+                                        gap-3
+                                        items-stretch
+                                        sm:items-center
                                         justify-between)))
-         (header-face (mk-class '(flex flex-row gap-2 items-center)))
+         (header-face (mk-class '(flex flex-row gap-2 items-center min-w-0)))
          (sort-wrap-face (mk-class '(my-3 px-1
                                           py-3
                                           flex
@@ -101,9 +115,18 @@
                                           flex-wrap
                                           justify-start
                                           items-center)))
-         (btn-row-face (mk-class '(flex flex-row flex-wrap gap-1 items-center)))
+         (btn-row-face (mk-class '(flex flex-row flex-wrap gap-2 items-center)))
 
-         (board-face (mk-class '(flex flex-wrap gap-8 justify-center px-1 py-4)))
+         (board-face (mk-class '(flex flex-wrap
+                                      gap-2
+                                      sm:gap-4
+                                      items-start
+                                      justify-start
+                                      px-1
+                                      py-3
+                                      pb-4
+                                      snap-x
+                                      snap-mandatory)))
          (todo-col-face (mk-class '(w-full sm:w-1/2
                                            md:w-1/2
                                            lg:w-1/3
@@ -224,7 +247,7 @@
                              ,(hr)
                              ,(build-details-col "rejected" "Rejected"
                                                  tickets-rej)))))
-
+    
     ;; Render final template
     (html-template G_
                    #:is-logged-in is-logged-in
