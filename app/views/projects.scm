@@ -190,7 +190,7 @@
                                        gap-1
                                        sm:gap-4
                                        items-center
-                                       justify-start
+                                       justify-between
                                        bg-stone-300/75
                                        dark:bg-onyx-700
                                        border-2
@@ -224,18 +224,10 @@
                                                       font-bold
                                                       truncate))))
                      ,title))
-           (p (@ (class ,(mk-class '(font-sans text-onyx-500
-                                               dark:text-stone-500
-                                               text-sm
-                                               sm:text-base
-                                               leading-tight
-                                               sm:leading-6
-                                               flex-1
-                                               min-w-0
-                                               max-w-64
-                                               truncate))))
-              ,(org2html (html-unescape (format #f "~a" description))
-                         #:extra-paragraph-classes '(truncate))))
+           ,(org2html (html-unescape (format #f "~a" description))
+                      #:extra-paragraph-classes '(truncate italic
+                                                  text-onyx-300
+                                                  dark:text-stone-700 text-md)))
       (div (@ (id ,(format #f "details-~a" id))
               (hidden ""))
            ,(render-project G_ p)))))
