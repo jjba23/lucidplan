@@ -117,24 +117,17 @@
                                           items-center)))
          (btn-row-face (mk-class '(flex flex-row flex-wrap gap-2 items-center)))
 
-         (board-face (mk-class '(flex flex-wrap
-                                      gap-2
-                                      sm:gap-4
+         (board-face (mk-class '(grid grid-cols-1
+                                      md:grid-cols-2
+                                      lg:grid-cols-3
+                                      gap-4
                                       items-start
-                                      justify-start
                                       px-1
                                       py-3
-                                      pb-4
-                                      snap-x
-                                      snap-mandatory)))
-         (todo-col-face (mk-class '(w-full sm:w-1/2
-                                           md:w-1/2
-                                           lg:w-1/3
-                                           flex
-                                           flex-col
-                                           gap-2)))
-         (std-col-face (mk-class '(sm:w-1/2 flex flex-col gap-2)))
-         (details-col-face (mk-class '(sm:w-1/2 my-6 p-4 flex flex-col gap-2)))
+                                      pb-4)))
+         (std-col-face (mk-class '(flex flex-col gap-2 w-full)))
+         (todo-col-face std-col-face)
+         (details-col-face (mk-class '(w-full my-6 p-4 flex flex-col gap-2)))
 
          (col-title-face (mk-class '(text-md font-bold
                                              flex
