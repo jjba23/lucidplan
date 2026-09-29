@@ -130,13 +130,13 @@
                                 'description))
          (toggle-js (toggle-details-js id)))
     `((div (@ (class ,(mk-class '(flex flex-col
-                                       gap-1
+                                       gap-2
                                        px-3
                                        sm:px-4
                                        md:px-6
-                                       py-4
+                                       py-3
                                        sm:py-6
-                                       md:py-10
+                                       md:py-8
                                        bg-stone-100
                                        dark:bg-onyx-900
                                        rounded-2xl
@@ -145,9 +145,10 @@
                                        dark:border-onyx-100/75
                                        shadow-md))))
            ;; Header
-           (div (@ (class ,(mk-class '(flex flex-row justify-between gap-2))))
+           (div (@ (class ,(mk-class '(flex flex-row justify-between
+                                            items-start gap-2))))
                 ,(h4 title)
-                (div (@ (class ,(mk-class '(flex justify-right))))
+                (div (@ (class ,(mk-class '(flex justify-end pt-1))))
                      (span (@ (class ,(mk-class '(cursor-pointer)))
                               (onclick ,toggle-js))
                            ,(icon #:type 'x
@@ -156,23 +157,21 @@
 
            ;; Description
            ,(render-if-nestring (lambda (x)
-                                  `(p (@ (class ,(mk-class '(
-                                                              text-sm
-                                                             sm:text-md
-                                                             py-2
+                                  `(p (@ (class ,(mk-class '(text-sm
+                                                             sm:text-base
+                                                             py-1
                                                              sm:py-3
-                                                             leading-6
+                                                             leading-snug
+                                                             sm:leading-6
                                                              text-onyx-700
                                                              dark:text-stone-300
                                                              whitespace-pre-wrap
                                                              font-medium
-                                                             break-words
-
-                                                             ))))
+                                                             break-words))))
                                       ,x))
                                 (org2html (html-unescape description)))
 
-           ,(hr #:margin '(my-3 mx-3))
+           ,(hr #:margin '(my-2 sm:my-3 mx-1 sm:mx-3))
 
            ;; Links & Actions
            ,(project-links-bar G_ p)
@@ -188,21 +187,24 @@
          (toggle-js (toggle-details-js id)))
     `((div (@ (class ,(mk-class '(flex flex-row
                                        flex-wrap
-                                       gap-4
+                                       gap-1
+                                       sm:gap-4
                                        items-center
-                                       justify-left
+                                       justify-start
                                        bg-stone-300/75
                                        dark:bg-onyx-700
                                        border-2
                                        border-stone-300/75
                                        dark:border-onyx-100/75
-                                       shadow-md
+                                       shadow-sm
+                                       sm:shadow-md
                                        py-2
-                                       px-4
+                                       px-3
+                                       sm:px-4
                                        cursor-pointer
                                        rounded-xl
-                                       h-14
-                                       truncate
+                                       w-full
+                                       overflow-hidden
                                        focus:outline-none
                                        focus:ring-2
                                        focus:ring-onyx-900
@@ -212,30 +214,43 @@
               (onkeydown
                "if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }"))
            (h3 (@ (class ,(mk-class '(flex flex-row items-center gap-2
-                                           truncate leading-6))))
+                                           max-w-full truncate))))
                ,(icon #:type 'list
                       #:icon-css '(text-onyx-700 dark:text-stone-300 text-lg))
                (span (@ (class ,(mk-class '(font-sans text-onyx-700
                                                       dark:text-stone-300
-                                                      text-lg font-bold
-                                                      break-words))))
+                                                      text-base
+                                                      sm:text-lg
+                                                      font-bold
+                                                      truncate))))
                      ,title))
            (p (@ (class ,(mk-class '(font-sans text-onyx-500
                                                dark:text-stone-500
-                                               text-md
-                                               leading-7
-                                               max-w-196
-                                               break-words
+                                               text-sm
+                                               sm:text-base
+                                               leading-tight
+                                               sm:leading-6
+                                               flex-1
+                                               min-w-0
+                                               max-w-64
                                                truncate))))
-              ,(org2html (html-unescape (format #f "~a" description)))))
+              ,(org2html (html-unescape (format #f "~a" description))
+                         #:extra-paragraph-classes '(truncate))))
       (div (@ (id ,(format #f "details-~a" id))
               (hidden ""))
            ,(render-project G_ p)))))
 
 (define (projects-header-title G_ search-query)
-  `(div (@ (class ,(mk-class '(flex flex-row justify-between flex-wrap
-                                    items-center gap-1))))
-        (div (@ (class ,(mk-class '(flex flex-row flex-wrap items-center gap-1))))
+  `(div (@ (class ,(mk-class '(flex flex-col
+                                    sm:flex-row
+                                    justify-between
+                                    w-full
+                                    gap-3
+                                    sm:gap-1
+                                    items-start
+                                    sm:items-center))))
+        (div (@ (class ,(mk-class '(flex flex-row flex-wrap items-center gap-1
+                                         sm:gap-2))))
              ,(icon #:type 'align-bottom
                     #:icon-css '(text-onyx-700 dark:text-stone-300 text-2xl))
              ,(h2 (G_ "Projects"))
@@ -243,24 +258,28 @@
                   (a (@ (href "/projects/new"))
                      ,(icon-button #:icon 'plus
                                    #:content (G_ "new project")
-                                   #:size '(text-sm)
+                                   #:size '(text-xs sm:text-sm)
                                    #:icon-css '(text-sm text-onyx-700
                                                         dark:text-stone-300)))))
-        (div (@ (class ,(mk-class '(flex flex-row flex-wrap justify-end))))
+        (div (@ (class ,(mk-class '(w-full sm:w-auto flex justify-start
+                                           sm:justify-end))))
              ,(search-box G_
                           #:search-query search-query))))
 
 (define (projects-toolbar G_)
-  `(div (@ (class ,(mk-class '(flex flex-row
-                                    flex-wrap
+  `(div (@ (class ,(mk-class '(flex flex-col
+                                    sm:flex-row
                                     justify-between
-                                    items-center
-                                    my-1
-                                    gap-4))))
-        (p (@ (class ,(mk-class '(text-sm text-onyx-500 dark:text-stone-500))))
+                                    items-start
+                                    sm:items-center
+                                    my-2
+                                    gap-2
+                                    sm:gap-4))))
+        (p (@ (class ,(mk-class '(text-xs sm:text-sm text-onyx-500
+                                          dark:text-stone-500 leading-6))))
            ,(G_
              "Tip: Use Tab to navigate projects and Enter/Space to expand or collapse cards."))
-        (div (@ (class ,(mk-class '(flex flex-row gap-4))))
+        (div (@ (class ,(mk-class '(flex flex-row gap-3 sm:gap-4 pt-1 sm:pt-0))))
              (button (@ (class ,(mk-class '(text-sm font-semibold
                                                     underline
                                                     cursor-pointer

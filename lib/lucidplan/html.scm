@@ -90,7 +90,7 @@
                           body
                           (proj '())
                           (is-logged-in #f))
-    
+
     (define nav
       `(div (@ (class ,(mk-class '(flex flex-row
                                         flex-wrap
@@ -393,8 +393,10 @@ function addSearchQueryParam(form) {
   (export sort-select))
 
 (begin
-  (define (org2html org)
-    (parameterize ((link-classes '(text-jeans-blue-500
+  (define* (org2html org
+                     #:key (extra-paragraph-classes '()))
+    (parameterize (
+                   (link-classes '(text-jeans-blue-500
                                    hover:text-jeans-blue-700
                                    dark:text-jeans-blue:300
                                    hover:dark:text-jeans-blue-100
@@ -427,12 +429,13 @@ function addSearchQueryParam(form) {
                                                      dark:text-stone-300)))))
                    (separator-classes '(my-8 mx-4 border-2 border-stone-500/50
                                              dark:border-onyx-100/50))
-                   (paragraph-classes '(font-sans text-onyx-500
-                                                  dark:text-stone-500
-                                                  text-md
-                                                  leading-7
-                                                  max-w-196
-                                                  break-words))
+                   (paragraph-classes (append extra-paragraph-classes
+                                              '(font-sans text-onyx-500
+                                                          dark:text-stone-500
+                                                          text-md
+                                                          leading-7
+                                                          max-w-196
+                                                          break-words)))
                    (bold-classes '(font-bold text-onyx-500 dark:text-stone-500))
                    (example-block-classes '(bg-stone-300/75
                                             dark:bg-onyx-700/75
