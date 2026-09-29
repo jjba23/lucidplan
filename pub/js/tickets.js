@@ -46,7 +46,7 @@ function handleKanbanDragLeave(e) {
   }
 }
 
-async function handleDrop(e, project) {
+async function handleKanbanDrop(e, project) {
   e.preventDefault();
 
   const dropZone = e.currentTarget.closest(".ticket-drop-zone");

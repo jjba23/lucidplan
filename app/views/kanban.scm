@@ -130,8 +130,19 @@
                                       px-1
                                       py-3
                                       pb-4)))
-         (std-col-face (mk-class '(flex flex-col gap-2 w-full min-h-24)))
-         (details-col-face (mk-class '(w-full my-6 p-4 flex flex-col gap-2)))
+         (std-col-face (mk-class '(flex flex-col
+                                        gap-2
+                                        w-full
+                                        min-h-24
+                                        border-stone-500/25
+                                        dark:border-onyx-100/25
+                                        border-2
+                                        rounded-xl
+                                        py-2
+                                        sm:py-3
+                                        my-2
+                                        px-1
+                                        sm:px-2)))
 
          (col-title-face (mk-class '(text-md font-bold
                                              flex
@@ -143,7 +154,14 @@
                                          font-light)))
          (summary-face (mk-class '(marker:block hover:cursor-pointer
                                                 items-center)))
-         (done-wrap-face (mk-class '(my-8 flex flex-col gap-2)))
+         (done-wrap-face (mk-class '(my-8 flex
+                                          flex-col
+                                          gap-2
+                                          ticket-drop-zone
+                                          min-h-24
+                                          p-2
+                                          rounded-lg
+                                          transition-colors)))
 
          (kanban-icon-face '(text-onyx-700 dark:text-stone-300 text-2xl))
          (btn-icon-face '(text-md text-onyx-700 dark:text-stone-300))
@@ -160,34 +178,34 @@
 
          ;; Column SXML Generators
          (build-col (lambda (status title list face)
-                      `(div (@ (class ,face))
-                            (div (@ (class ,col-title-face))
-                                 ,(emoji-for-ticket-status status)
-                                 ,(sub-h3 (G_ title))
-                                 (span (@ (class ,count-face))
-                                       ,(format #f " ( ~a ) "
-                                                (length list))))
+                      `((div (@ (class ,face))
+                             (div (@ (class ,col-title-face))
+                                  ,(emoji-for-ticket-status status)
+                                  ,(sub-h3 (G_ title))
+                                  (span (@ (class ,count-face))
+                                        ,(format #f " ( ~a ) "
+                                                 (length list))))
 
-                            ;; Drop zone container
-                            (div (@ (class ,(mk-class '(ticket-drop-zone flex
-                                                        flex-col
-                                                        gap-2
-                                                        min-h-24
-                                                        p-2
-                                                        rounded-lg
-                                                        transition-colors)))
-                                    (data-status ,status)
-                                    (ondragover "handleKanbanDragOver(event)")
-                                    (ondragleave
-                                     "handleKanbanDragLeave(event)")
-                                    (ondrop ,(format #f
-                                              "handleDrop(event, '~a')"
-                                              project)))
-                                 ,@(map (lambda (t)
-                                          (render-k-ticket project t)) list)))))
+                             ;; Drop zone container
+                             (div (@ (class ,(mk-class '(ticket-drop-zone flex
+                                                         flex-col
+                                                         gap-2
+                                                         min-h-24
+                                                         p-2
+                                                         rounded-lg
+                                                         transition-colors)))
+                                     (data-status ,status)
+                                     (ondragover "handleKanbanDragOver(event)")
+                                     (ondragleave
+                                      "handleKanbanDragLeave(event)")
+                                     (ondrop ,(format #f
+                                               "handleKanbanDrop(event, '~a')"
+                                               project)))
+                                  ,(map (lambda (t)
+                                          (render-k-ticket project t)) list))))))
 
          (build-details-col (lambda (status title list)
-                              `(div (@ (class ,details-col-face))
+                              `(div (@ (class ,std-col-face))
                                     (details (@ (class ,(mk-class '(cursor-pointer))))
                                              (summary (@ (class ,summary-face))
                                                       (div (@ (class ,col-title-face))
@@ -199,10 +217,18 @@
                                                                    " ( ~a ) "
                                                                    (length
                                                                     list)))))
-                                             (div (@ (class ,done-wrap-face))
-                                                  ,(map (lambda (t)
-                                                          (render-k-ticket
-                                                           project t)) list))))))
+                                             (div (@ (class ,done-wrap-face)
+                                                     (data-status ,status)
+                                                     (ondragover
+                                                      "handleKanbanDragOver(event)")
+                                                     (ondragleave
+                                                      "handleKanbanDragLeave(event)")
+                                                     (ondrop ,(format #f
+                                                               "handleKanbanDrop(event, '~a')"
+                                                               project)))
+                                                  ,@(map (lambda (t)
+                                                           (render-k-ticket
+                                                            project t)) list))))))
 
          ;; Build Main HTML
          (kanban-html `((div (@ (class ,(mk-class '(px-2 py-4))))
@@ -254,10 +280,10 @@
                                   ,(build-col "in-review" "In Review"
                                               tickets-rev std-col-face))
 
-                             ,(hr)
+                             )
+                        (div (@ (class ,(mk-class '(px-1))))
                              ,(build-details-col "done" "Done" tickets-done)
 
-                             ,(hr)
                              ,(build-details-col "rejected" "Rejected"
                                                  tickets-rej)))))
     
