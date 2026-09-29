@@ -90,14 +90,14 @@
                               ticket-id-to-human-id
                               is-logged-in
                               (current-sort #f))
-
+  
   (let* ((get-tickets (lambda (status-str)
                         (filter (lambda (x)
                                   (string=? status-str
                                             (assq-ref x
                                                       'ticket-status)))
                                 tickets)))
-
+         
          (tickets-todo (get-tickets "todo"))
          (tickets-wip (get-tickets "work-in-progress"))
          (tickets-rev (get-tickets "in-review"))
@@ -130,8 +130,7 @@
                                       px-1
                                       py-3
                                       pb-4)))
-         (std-col-face (mk-class '(flex flex-col gap-2 w-full)))
-         (todo-col-face std-col-face)
+         (std-col-face (mk-class '(flex flex-col gap-2 w-full min-h-24)))
          (details-col-face (mk-class '(w-full my-6 p-4 flex flex-col gap-2)))
 
          (col-title-face (mk-class '(text-md font-bold
@@ -170,11 +169,17 @@
                                                 (length list))))
 
                             ;; Drop zone container
-                            (div (@ (class
-                                     "ticket-drop-zone flex flex-col gap-2 min-h-[150px] p-2 rounded-lg transition-colors")
+                            (div (@ (class ,(mk-class '(ticket-drop-zone flex
+                                                        flex-col
+                                                        gap-2
+                                                        min-h-24
+                                                        p-2
+                                                        rounded-lg
+                                                        transition-colors)))
                                     (data-status ,status)
                                     (ondragover "handleKanbanDragOver(event)")
-                                    (ondragleave "handleKanbanDragLeave(event)")
+                                    (ondragleave
+                                     "handleKanbanDragLeave(event)")
                                     (ondrop ,(format #f
                                               "handleDrop(event, '~a')"
                                               project)))
@@ -242,7 +247,7 @@
                              ;; Main Board
                              (div (@ (class ,board-face))
                                   ,(build-col "todo" "To-do" tickets-todo
-                                              todo-col-face)
+                                              std-col-face)
                                   ,(build-col "work-in-progress"
                                               "Work in Progress" tickets-wip
                                               std-col-face)
@@ -255,7 +260,7 @@
                              ,(hr)
                              ,(build-details-col "rejected" "Rejected"
                                                  tickets-rej)))))
-
+    
     ;; Render final template
     (html-template G_
                    #:is-logged-in is-logged-in
