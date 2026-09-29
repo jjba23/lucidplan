@@ -51,11 +51,16 @@
 (define %card-face
   (mk-class '(flex flex-col
                    gap-2
-                   px-6
-                   py-10
+                   px-3
+                   sm:px-4
+                   md:px-6
+                   py-4
+                   sm:py-6
+                   md:py-8
                    bg-stone-100
                    dark:bg-onyx-900
-                   rounded-2xl
+                   rounded-xl
+                   md:rounded-2xl
                    dark:border-onyx-100/75
                    border-stone-300/75
                    shadow-md
@@ -92,14 +97,14 @@
                    rounded-xl)))
 
 (define %list-title-face
-  (mk-class '(font-sans text-onyx-700
-                        dark:text-stone-300
-                        text-md
+  (mk-class '(font-sans text-sm
+                        sm:text-md
                         font-bold
                         break-words
-                        max-w-196
-                        leading-6
-                        truncate)))
+                        flex-grow
+                        leading-5
+                        line-clamp-2
+                        sm:line-clamp-none)))
 
 (define %list-link-face
   (mk-class '(flex flex-row
@@ -281,7 +286,7 @@
 
           ;; Expandable Details Container
           (div (@ (id ,details-id)
-                  (class "ml-4")
+                  (class ,(mk-class '(ml-1 sm:ml-4)))
                   (hidden ""))
                ,(render-ticket G_
                                #:project project
@@ -345,9 +350,9 @@
          ;; Search Component
          (search-param-components `((div (@ (class ,(mk-class '(flex flex-row
                                                                 flex-wrap
+                                                                gap-1 sm:gap-2
                                                                 justify-between))))
-                                         (div (@ (class ,(mk-class '(my-3 p-2
-                                                                     flex
+                                         (div (@ (class ,(mk-class '(flex
                                                                      flex-row
                                                                      flex-wrap
                                                                      justify-start
@@ -357,8 +362,7 @@
                                                             proj-human-id
                                                             #:current-sort
                                                             current-sort))
-                                         (div (@ (class ,(mk-class '(my-3 p-2
-                                                                     flex
+                                         (div (@ (class ,(mk-class '(flex
                                                                      flex-row
                                                                      flex-wrap
                                                                      justify-end
@@ -465,16 +469,23 @@
     (html-template G_
                    #:is-logged-in is-logged-in
                    #:proj projects
-                   #:body `(div (@ (class ,(mk-class '(px-4 py-4))))
+                   #:body `(div (@ (class ,(mk-class '(px-2 sm:px-4
+                                                            md:px-6
+                                                            pt-1
+                                                            sm:pt-2
+                                                            pb-3
+                                                            sm:pb-5))))
                                 ((div (@ (class ,(mk-class '(flex flex-col
-                                                                  gap-4
+                                                                  gap-2
+                                                                  sm:gap-4
                                                                   flex-grow))))
 
                                       ;; Header Section
                                       (div (@ (class ,(mk-class '(flex
                                                                   flex-wrap
                                                                   flex-row
-                                                                  gap-4
+                                                                  gap-2
+                                                                  sm:gap-4
                                                                   items-center
                                                                   justify-between))))
                                            (div (@ (class ,header-face))
@@ -513,8 +524,10 @@
                                                                                text-onyx-700
                                                                                font-sans
                                                                                dark:text-stone-300
-                                                                               truncate
-                                                                               max-w-196))))
+                                                                               break-words
+                                                                               line-clamp-3
+                                                                               sm:line-clamp-none
+                                                                               max-w-full))))
                                                                   ,x))
                                                            proj-desc)
 
@@ -524,14 +537,16 @@
                                                                           dark:text-stone-300
                                                                           text-sm
                                                                           font-sans
-                                                                          cursor-pointer))))
+                                                                          cursor-pointer
+                                                                          py-2))))
                                                              ,(G_
                                                                "backlog options"))
                                                     (div (@ (class ,(mk-class '
                                                                               (flex
                                                                                flex-wrap
                                                                                flex-row
-                                                                               gap-4
+                                                                               gap-2
+                                                                               sm:gap-4
                                                                                my-3))))
 
                                                          ;; Done Checkbox
