@@ -42,7 +42,12 @@
   #:export (render-k-ticket kanban-from-tickets))
 
 (define (render-k-ticket project t)
-  `((div (@ (class ,(mk-class '(w-full))))
+  `((div (@ (class ,(mk-class '(w-full cursor-grab active:cursor-grabbing)))
+            (draggable "true")
+            (data-ticket-id ,(assq-ref t
+                                       'human-id))
+            (ondragstart "handleKanbanDragStart(event)"))
+
          (div (@ (class ,(mk-class '(rounded-xl bg-stone-300/25
                                                 dark:bg-onyx-700/50
                                                 p-3
@@ -85,14 +90,14 @@
                               ticket-id-to-human-id
                               is-logged-in
                               (current-sort #f))
-  
+
   (let* ((get-tickets (lambda (status-str)
                         (filter (lambda (x)
                                   (string=? status-str
                                             (assq-ref x
                                                       'ticket-status)))
                                 tickets)))
-         
+
          (tickets-todo (get-tickets "todo"))
          (tickets-wip (get-tickets "work-in-progress"))
          (tickets-rev (get-tickets "in-review"))
@@ -163,8 +168,18 @@
                                  (span (@ (class ,count-face))
                                        ,(format #f " ( ~a ) "
                                                 (length list))))
-                            ,(map (lambda (t)
-                                    (render-k-ticket project t)) list))))
+
+                            ;; Drop zone container
+                            (div (@ (class
+                                     "ticket-drop-zone flex flex-col gap-2 min-h-[150px] p-2 rounded-lg transition-colors")
+                                    (data-status ,status)
+                                    (ondragover "handleKanbanDragOver(event)")
+                                    (ondragleave "handleKanbanDragLeave(event)")
+                                    (ondrop ,(format #f
+                                              "handleDrop(event, '~a')"
+                                              project)))
+                                 ,@(map (lambda (t)
+                                          (render-k-ticket project t)) list)))))
 
          (build-details-col (lambda (status title list)
                               `(div (@ (class ,details-col-face))
@@ -240,7 +255,7 @@
                              ,(hr)
                              ,(build-details-col "rejected" "Rejected"
                                                  tickets-rej)))))
-    
+
     ;; Render final template
     (html-template G_
                    #:is-logged-in is-logged-in

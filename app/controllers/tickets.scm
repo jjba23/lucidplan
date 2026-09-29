@@ -20,12 +20,14 @@
 (import (app views tickets)
         (web uri)
         (ice-9 string-fun)
+        (ice-9 iconv)
         (srfi srfi-1)
         (lucidplan auth)
         (kracht prelude)
         (uuid generate)
         (lucidplan html)
         (lucidplan domain)
+        (json)
         (artanis security nss)
         (lucidplan domain project)
         (lucidplan domain ticket)
@@ -141,7 +143,7 @@
                 (ticket-assignee (get-ticket-assignee-by-project-human-id
                                   ticket-assignee-repo
                                   (params rc "project"))))
-           
+
            (response-emit (:mime rc
                                  (html-from-tickets (:i18n rc)
                                                     #:is-logged-in
@@ -287,6 +289,29 @@
                                                                         "x-bewaking-lucidplan"))))))
        (get-edit)))
 
+(post "/tickets/:project/id/:human-id/status"
+      #:mime 'json
+      #:from-post 'json
+      #:cookies '(names x-bewaking-lucidplan)
+      (lambda (rc)
+        (let* ((proj (params rc "project"))
+               (human-id (params rc "human-id"))
+               (ticket-repo (make-sqlite-ticket-repository rc))
+               (raw-b (bytevector->string (rc-body rc) "utf-8"))
+               (b (json-string->scm raw-b))
+               (new-status (assoc-ref b "status")))
+
+          (if (and new-status
+                   (update-ticket-by-project-human-id-and-human-id ticket-repo
+                    proj human-id
+                    `((ticket-status unquote new-status))))
+              (response-emit (json-encode '(("result" . "success")))
+                             #:type 'json
+                             #:status 200)
+              (response-emit (json-encode '(("error" . "Failed to update status")))
+                             #:type 'json
+                             #:status 400)))))
+
 (post "/tickets/:project/id/:human-id/edit"
       #:mime 'xml
       #:cookies '(names x-bewaking-lucidplan)
@@ -308,7 +333,7 @@
 
                  (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
                                         rc)))
-            
+
             (update-ticket-by-project-human-id-and-human-id ticket-repo
                                                             (params rc
                                                                     "project")
