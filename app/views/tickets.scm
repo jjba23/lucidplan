@@ -248,6 +248,7 @@
          (human-id (t-ref 'human-id))
          (title (t-ref 'title))
          (type (t-ref 'ticket-type))
+         (priority (or (t-ref 'priority) 0))
 
          (item-id (format #f "listitem-~a" id))
          (details-id (format #f "details-~a" id))
@@ -255,14 +256,19 @@
                      "document.getElementById('~a').toggleAttribute('hidden')"
                      details-id))
          (ticket-url (format #f "/tickets/~a/id/~a" project human-id))
-
          (assignee-user (find (lambda (u)
                                 (equal? (assq-ref u
                                                   'id) ticket-assignee))
                               user-names)))
 
-    `(div (@ (class ,%list-wrapper-face)
-             (id ,item-id))
+    `(div (@ (class ,(string-append %list-wrapper-face
+                                    " cursor-grab active:cursor-grabbing"))
+             (id ,item-id)
+             (draggable "true")
+             (data-ticket-id ,human-id)
+             (data-priority ,(number->string priority))
+             (ondragstart "dragTicketStart(event)")
+             (ondragend "dragTicketEnd(event)"))
 
           ;; Clickable Header Row
           (div (@ (onclick ,toggle-js)
@@ -376,8 +382,9 @@
          (done-tickets (filter only-done-tickets-filter tickets))
          (rejected-tickets (filter only-rejected-tickets-filter tickets))
          (ticket-list `((div (@ (id lucidplan-tickets-list)
-                                (ondrop "dropTicketsItem(event)")
+                                (data-project-id ,proj-human-id)
                                 (ondragover "allowDrop(event)")
+                                (ondrop "dropTicketsItem(event)")
                                 (class ,(mk-class '(flex flex-col gap-2))))
                              ,(map (lambda (t)
                                      (let* ((tt-assignee (find (lambda (a)

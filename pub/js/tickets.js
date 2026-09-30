@@ -1,24 +1,46 @@
+// ==================================
 
-function allowDrop(ev) {
-  ev.preventDefault();
+function allowDrop(event) {
+  event.preventDefault();
+  event.dataTransfer.dropEffect = 'move';
+
+  const list = document.getElementById('lucidplan-tickets-list');
+  const target = event.target.closest('[draggable="true"]');
+
+  if (target && target !== draggedElement && list.contains(target)) {
+    const rect = target.getBoundingClientRect();
+    const next = (event.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
+    list.insertBefore(draggedElement, next ? target.nextSibling : target);
+  }
 }
 
-function dragTicketsItem(ev) {
-  ev.dataTransfer.setData("text", ev.target.id);
-}
+async function dropTicketsItem(event) {
+  event.preventDefault();
+  const list = document.getElementById('lucidplan-tickets-list');
+  const projectId = list.getAttribute('data-project-id');
+  const ticketNodes = Array.from(list.querySelectorAll('[data-ticket-id]'));
 
-function dropTicketsItem(ev) {
-  ev.preventDefault();
-  // console.log("ev.dataTransfer");
-  // console.log(ev.dataTransfer);
-  var data = ev.dataTransfer.getData("text");
-  console.log(data);
-  // console.log("ev.target");
-  // console.log(ev.target);
-  // console.log("ev.target.parentNode.parentNode");
-  // console.log(ev.target.parentNode.parentNode);
-  //ev.target.parentNode.parentNode.appendChild(document.getElementById(data));
-  document.getElementById('lucidplan-tickets-list').appendChild(document.getElementById(data));
+  // Priority mapping: top item gets highest priority, or index-based ranking
+  const reorderedTickets = ticketNodes.map((node, index) => ({
+    id: node.getAttribute('data-ticket-id'),
+    priority: ticketNodes.length - index // 1-indexed descending priority
+  }));
+
+  try {
+    const response = await fetch(`/tickets/${projectId}/reorder`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ tickets: reorderedTickets })
+    });
+
+    if (!response.ok) {
+      console.error('Failed to update ticket priorities');
+    }
+  } catch (err) {
+    console.error('Network error updating priorities:', err);
+  }
 }
 
 // ==================================
