@@ -42,7 +42,7 @@ LucidPlan provides a comprehensive suite of tools to keep your projects organize
 - *Cross-platform:* Runs anywhere that Guile Scheme can run, and exposes web endpoints, and is thus accessible from computers, phones, etc.
 - *Free Software*: Contribute to its development or extend it with your own custom features.
 
-[[https://jointhefreeworld.org/static-assets/lucidplan/img/logo-small.jpg]]
+[[https://jointhefreeworld.org/static-assets/lucidplan/lucidplan-showcase.gif]]
 
 ------
 
@@ -123,6 +123,10 @@ https://jointhefreeworld.org/blog/articles/personal/jointhefreeworld-code-of-con
 In summary, we foster an inclusive, respectful, and cooperative environment for all contributors and users of this free software project. Inspired by the ideals of the GNU Project, we strive to uphold freedom, equality, and community as guiding principles. We believe that collaboration in a community of mutual respect is essential to creating excellent free software.
 
 --------
+
+[[https://jointhefreeworld.org/static-assets/lucidplan/img/logo-small.jpg]]
+
+-------
 
 * About this Project and Contributing
 
