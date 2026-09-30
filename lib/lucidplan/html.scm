@@ -140,9 +140,7 @@
                                                   justify-between
                                                   shadow-lg
                                                   md:shadow-2xl
-                                                  sticky
-                                                  top-0
-                                                  z-50))))
+                                                  ))))
 
                       ;; Left Section: Brand/Logo
                       (div (@ (class ,(mk-class '(flex items-center
@@ -320,7 +318,7 @@
                                                                           (flex
                                                                            flex-col
                                                                            justify-between
-                                                                           min-h-screen))))
+                                                                           min-h-96))))
                                                               (div (@ (class ,
                                                                              (mk-class '
                                                                               (flex
