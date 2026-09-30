@@ -81,7 +81,7 @@
 
 (define %list-header-face
   (mk-class '(flex flex-row
-                   gap-4
+                   gap-2
                    items-center
                    justify-left
                    bg-stone-300/75
@@ -163,7 +163,7 @@
                      id))
          (edit-url (format #f "/tickets/~a/id/~a/edit" project human-id))
          (delete-url (format #f "/tickets/~a/delete" project)))
-
+    
     `(div (@ (class ,%card-face))
 
           ;; Header
@@ -260,7 +260,7 @@
                                 (equal? (assq-ref u
                                                   'id) ticket-assignee))
                               user-names)))
-
+    
     `(div (@ (class ,(string-append %list-wrapper-face
                                     " cursor-grab active:cursor-grabbing"))
              (id ,item-id)
@@ -276,7 +276,7 @@
                   (onkeydown
                    "if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }")
                   (class ,%list-header-face))
-
+               ,grab-indicator
                ,(emoji-for-ticket-type type)
                (h5 (@ (class ,%list-title-face))
                    ,(org2html (html-unescape title)))
@@ -471,7 +471,7 @@
                                    '()))
 
          (fallback-no-ticket-list `(,(p (G_ "Wow.. it's really empty here")))))
-
+    
     ;; Build the final HTML View
     (html-template G_
                    #:is-logged-in is-logged-in
@@ -642,7 +642,7 @@
                            (is-edit #f)
                            (projects '())
                            (is-logged-in #f))
-
+  
   (let* ( ;Consolidate Reusable CSS Classes
           (form-face (mk-class '(flex flex-col gap-6)))
          (field-face (mk-class '(max-w-128)))
@@ -743,7 +743,7 @@
 
                                 ;; Submit Button
                                 (div ,(submit-button (G_ "submit")))))))
-
+    
     ;; Render final template
     (html-template G_
                    #:is-logged-in is-logged-in

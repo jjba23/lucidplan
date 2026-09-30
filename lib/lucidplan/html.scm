@@ -126,7 +126,7 @@
                                                           ,(assq-ref p
                                                                      'title)))
                                                proj))))
-
+           
            (nav `(nav (@ (class ,(mk-class '(flex flex-col
                                                   md:flex-row
                                                   w-full
@@ -139,8 +139,7 @@
                                                   items-center
                                                   justify-between
                                                   shadow-lg
-                                                  md:shadow-2xl
-                                                  ))))
+                                                  md:shadow-2xl))))
 
                       ;; Left Section: Brand/Logo
                       (div (@ (class ,(mk-class '(flex items-center
@@ -276,7 +275,7 @@
                                                               transition-opacity))
                            ;; Dropdown Select
                            ,project-select))))
-
+      
       ;; Output Page
       `(,doctype-html (html (@ (lang en))
                             (head (title "LucidPlan")
@@ -550,3 +549,13 @@ function addSearchQueryParam(form) {
                                               dark:text-stone-300)))
       (org->html org)))
   (export org2html))
+
+(define-public grab-indicator
+  `((div (@ (class ,(mk-class '(text-onyx-100 dark:text-stone-300 cursor-grab
+                                              active:cursor-grabbing flex
+                                              items-center))))
+         (svg (@ (class "w-4 h-4")
+                 (fill "currentColor")
+                 (viewBox "0 0 16 16"))
+              (path (@ (d
+                        "M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 6a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 4a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 4a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z")))))))
