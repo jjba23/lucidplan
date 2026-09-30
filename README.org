@@ -17,6 +17,7 @@ It's a flexible system made to simplify everyone's life, accessbile to all kinds
 
 If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
 
+---------------
 
 LucidPlan enhances the use of Agile work methodologies in teams due to its fast-paced no nonesense-workflows and customizability, also thanks to being written in Lisp.
 
@@ -27,15 +28,16 @@ https://lucidplan.jointhefreeworld.org/
 
 This is free software (free as in freedom), licensed under the GNU Affero General Public License v3 or newer.
 
-Built with [[https://www.gnu.org/software/guile/][Guile Scheme]] and [[https://artanis.dev/][GNU Artanis]], [[https://sqlite.org/][SQLite]], [[https://codeberg.org/jjba23/olive-css][Olive CSS]]
+Built with [[https://www.gnu.org/software/guile/][Guile Scheme]] and [[https://artanis.dev/][GNU Artanis]], [[https://sqlite.org/][SQLite]], [[https://codeberg.org/jjba23/olive-css][Olive CSS]] and some small sprinkles of vanilla JavaScript.
 
 LucidPlan provides a comprehensive suite of tools to keep your projects organized:
 
 - *Multi-Project Workspaces*: Easily manage dozens of repositories or projects from a single unified dashboard. Features a quick-access "go to" dropdown and search functionality to navigate between contexts instantly.
-- *Versatile Backlog Management*: View all your project tasks in a clean, list-based backlog. Tickets have different types (e.g., task), statuses (e.g., todo), org-mode syntax descriptions with links and rich content, and easy editing/deletion.
-- *Kanban Boards*: Visualize your workflow with built-in Kanban boards. Effortlessly track tickets as they move through columns like =To-do=, =Work in Progress=, and =In Review=.
+- *Versatile Backlog Management*: View all your project tasks in a clean, list-based backlog with priority drag and drop. Tickets have different types (e.g., task), statuses (e.g., todo), org-mode syntax descriptions with links and rich content, and easy editing/deletion.
+- *Kanban Boards*: Visualize your workflow with built-in Kanban boards. Effortlessly track tickets and drag and drop as they move through columns like =To-do=, =Work in Progress=, and =In Review=.
 - *Clean and Distraction-Free UI*: A minimalist and accessible interface built with [[https://codeberg.org/jjba23/olive-css][Olive CSS]], featuring global search, quick project creation, and a toggleable light/dark mode to suit your preferences.
 - *Granular User Management*: Add, edit, and manage team members with ease. Permissions are handled using native Lisp lists (e.g., =`(lucidplan:ticket-create lucidplan:project-delete)=), allowing for incredibly fine-grained, programmatic access control, effectively providing an easy to use ACL with which you can control exactly what each user can/cannot do.
+- *Org mode support* : Titles and descriptions can be written using Org mode syntax, which enables more advanced media. This Org text gets automatically rendered to attractive HTML.
 - *Fully Customizable:* Hack the behavior and content of everything with simple Lisp (Scheme) code.
 - *Cross-platform:* Runs anywhere that Guile Scheme can run, and exposes web endpoints, and is thus accessible from computers, phones, etc.
 - *Free Software*: Contribute to its development or extend it with your own custom features.
@@ -43,6 +45,41 @@ LucidPlan provides a comprehensive suite of tools to keep your projects organize
 [[https://jointhefreeworld.org/static-assets/lucidplan/img/logo-small.jpg]]
 
 ------
+
+* Backlog Management
+
+LucidPlan provides several ways to organize and work with tickets directly from the web interface. Ticket management is designed around fast, simple interactions.
+
+Tickets in the backlog can be reordered (in terms of priority) using native browser drag-and-drop. It's recommended to view in ~Priority - Descending~ for this.
+
+Backlog tickets can be expanded and collapsed without navigating away from the page.
+
+Each ticket contains an expandable details section containing information such as:
+
+- description;
+- status;
+- type;
+- priority;
+- assignee;
+- project/ticket identifier;
+- edit and delete actions.
+
+* Kanban Management
+
+The Kanban board also provides a drag-and-drop interaction. Dragging a ticket onto another Kanban column changes its status.
+
+For example, a ticket can be moved from:
+
+#+begin_example
+To-do → Work in Progress → In Review → Done
+#+end_example
+
+
+* Keyboard Accessibility
+
+Ticket and project lists are fully keyboard accessible using =Tab= navigation with ~Enter~ or ~Space~ for toggling visibility. The UI aims to be accessible to all kinds of users and usage patterns.
+
+---------------
 
 * Licensing
 
@@ -62,7 +99,6 @@ I strive to provide proper and extensive documentation on LucidPlan, available a
 
 - Org format [[file:docs/manual/en.org]]
 - Online HTML: https://jointhefreeworld.org/manuals/lucidplan/index.html
-
 
 --------
 
