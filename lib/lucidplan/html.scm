@@ -49,14 +49,14 @@
                                                                             (text-sm))
             (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
                                              align-center items-center))))
-                 ,(em (G_ "find the source code here"))
-                 ,(a "codeberg.org/jjba23/lucidplan"
+                 ,(em (G_ "find here the:"))
+                 ,(a "source code"
                      #:href "https://codeberg.org/jjba23/lucidplan"
                      #:size '(text-sm)))
             (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
                                              align-center items-center))))
-                 ,(em (G_ "find the manual here"))
-                 ,(a "jointhefreeworld.org/manuals/lucidplan/"
+                 ,(em (G_ "find here the:"))
+                 ,(a "manual"
                      #:href "https://jointhefreeworld.org/manuals/lucidplan/"
                      #:size '(text-sm)))
             ,(em (G_ "Copyright © Josep Bigorra  &lt;jjbigorra@gmail.com&gt;")
@@ -90,137 +90,214 @@
                           body
                           (proj '())
                           (is-logged-in #f))
-    
-    (define nav
-      `(div (@ (class ,(mk-class '(flex flex-row
-                                        flex-wrap
-                                        gap-3
-                                        p-3
-                                        bg-jeans-blue-500/90
-                                        dark:bg-jeans-blue-900/50
-                                        items-center
-                                        justify-left
-                                        shadow-2xl))))
-            (div (@ (class ,(mk-class '(px-4 py-1 w-full md:w-48))))
-                 (a (@ (href "/")
-                       (class ,(mk-class '(flex flex-row gap-2 items-center
-                                                no-underline))))
-                    ,(h4 (list (icon #:type 'scroll
-                                     #:icon-css '(text-xl text-stone-300
-                                                  dark:text-stone-300
-                                                  hover:text-white
-                                                  hover:dark:text-white))
-                               "&nbsp;"
-                               `(span ,(G_ "LucidPlan")))
-                         #:color '(text-stone-300 dark:text-stone-300
-                                                  hover:text-white
-                                                  hover:dark:text-white)
-                         #:size '(text-xl))))
-            ,(if (not is-logged-in)
-                 `((a (@ (class ,(mk-class '(lowercase font-sans font-medium
-                                                       px-2 flex-items-center
-                                                       gap-2)))
-                         (href "/login"))
-                      ,(icon-button #:icon 'sign-in
-                                    #:content (G_ "login")
-                                    #:size '(text-md)
-                                    #:extra-classes '(py-1 md:py-2
-                                                      px-2
-                                                      md:px-3
-                                                      max-w-prose
-                                                      cursor-pointer
-                                                      text-onyx-700
-                                                      dark:text-stone-300)
-                                    #:icon-css '(text-md text-onyx-700
-                                                         dark:text-stone-300))))
-                 `((a (@ (class ,(mk-class '(lowercase
+    (let* ((project-select (if (nil? proj)
+                               '()
+                               `(select (@ (onchange
+                                            "window.location.href=this.value;")
+                                           (class ,(mk-class '(text-sm
+                                                               md:text-md
+                                                               text-stone-900
+                                                               dark:text-stone-100
+                                                               bg-transparent
+                                                               rounded
+                                                               px-2
+                                                               py-1
+                                                               border-0
+                                                               font-medium
+                                                               font-sans
+                                                               cursor-pointer
+                                                               hover:bg-stone-200/80
+                                                               dark:hover:bg-black/40
+                                                               focus:ring-2
+                                                               outline-none))))
+                                        (option "🔗 go to")
+                                        ,@(map (lambda (p)
+                                                 `(option (@ (value ,(format
+                                                                             #f
+                                                                             "/tickets/~a"
+                                                                             (assq-ref
+                                                                              p
+                                                                              'human-id)))
+                                                             (class ,(mk-class '
+                                                                      (text-sm
+                                                                       font-light
+                                                                       lowercase
+                                                                       text-onyx-700))))
+                                                          ,(assq-ref p
+                                                                     'title)))
+                                               proj))))
 
-                                                       font-sans
-                                                       font-medium
-                                                       px-2
-                                                       flex-items-center
-                                                       gap-2)))
-                         (href "/me"))
-                      ,(icon-button #:icon 'user-circle
-                                    #:content (G_ "me")
-                                    #:size '(text-md)
-                                    #:extra-classes '(py-1 md:py-2
-                                                      px-2
-                                                      md:px-3
-                                                      max-w-prose
-                                                      cursor-pointer
-                                                      text-onyx-700
-                                                      dark:text-stone-300)
-                                    #:icon-css '(text-md text-onyx-700
-                                                         dark:text-stone-300)))))
-            (a (@ (class ,(mk-class '(lowercase no-underline
-                                                font-sans
-                                                font-medium
-                                                px-2
-                                                flex
-                                                items-center
-                                                gap-2)))
-                  (href "/projects"))
-               ,(icon-button #:icon 'align-bottom
-                             #:content (G_ "projects")
-                             #:size '(text-md)
-                             #:extra-classes '(py-1 md:py-2
-                                                    px-2
-                                                    md:px-3
-                                                    max-w-prose
-                                                    cursor-pointer
-                                                    text-onyx-700
-                                                    dark:text-stone-300)
-                             #:icon-css '(text-md text-onyx-700
-                                                  dark:text-stone-300)))
+           (nav `(nav (@ (class ,(mk-class '(flex flex-col
+                                                  md:flex-row
+                                                  w-full
+                                                  gap-4
+                                                  md:gap-6
+                                                  px-4
+                                                  py-3
+                                                  bg-jeans-blue-500/90
+                                                  dark:bg-jeans-blue-900/50
+                                                  items-center
+                                                  justify-between
+                                                  shadow-lg
+                                                  md:shadow-2xl
+                                                  sticky
+                                                  top-0
+                                                  z-50))))
 
-            ,(ui-mode-button #:size '(text-md)
-                             #:extra-classes '(py-1 md:py-2
-                                                    px-2
-                                                    md:px-3
-                                                    max-w-prose
-                                                    cursor-pointer
-                                                    text-onyx-700
-                                                    dark:text-stone-300)
-                             #:icon-css '(text-md text-onyx-700
-                                                  dark:text-stone-300))
-            ,(if (nil? proj)
-                 '()
-                 `((select (@ (onchange "window.location.href=this.value;")
-                              (class ,(mk-class '(text-md text-stone-100
-                                                          dark:text-stone-100
-                                                          bg-transparent
-                                                          font-medium
-                                                          font-sans))))
-                           (option "🔗 go to")
-                           ,(map (lambda (p)
-                                   `(option (@ (value ,(format #f
-                                                               "/tickets/~a"
-                                                               (assq-ref p
-                                                                         'human-id)))
-                                               (class ,(mk-class '(text-sm
-                                                                   font-light
-                                                                   lowercase
-                                                                   text-onyx-700))))
-                                            ,(assq-ref p
-                                                       'title))) proj))))))
-    `(,doctype-html (html (@ (lang en))
-                          (head (title "LucidPlan")
-                                ,(hygguile-recommended-meta)
-                                ,(hygguile-recommended-resources #:fonts (custom-fonts))
+                      ;; Left Section: Brand/Logo
+                      (div (@ (class ,(mk-class '(flex items-center
+                                                       justify-center
+                                                       md:justify-start w-full
+                                                       md:w-auto))))
+                           (a (@ (href "/")
+                                 (class ,(mk-class '(flex flex-row
+                                                          gap-2
+                                                          items-center
+                                                          no-underline
+                                                          hover:opacity-80
+                                                          transition-opacity))))
+                              ,(h4 (list (icon #:type 'scroll
+                                               #:icon-css '(text-xl
+                                                            text-stone-300
+                                                            dark:text-stone-300
+                                                            hover:text-white
+                                                            hover:dark:text-white))
+                                         "&nbsp;"
+                                         `(span ,(G_ "LucidPlan")))
+                                   #:color '(text-stone-300
+                                             dark:text-stone-300
+                                             hover:text-white
+                                             hover:dark:text-white)
+                                   #:size '(text-xl font-bold))))
 
-                                (link (@ (rel "shortcut icon")
-                                         (href "/favicon.ico")
-                                         (type "image/x-icon")) "")
-                                (link (@ (rel icon)
-                                         (href "/favicon.ico")
-                                         (type "image/x-icon")) "")
-                                (link (@ (rel stylesheet)
-                                         (href "/css/lucidplan.olive.min.css"))
-                                      "")
+                      ;; Right Section: Navigation Links & Controls
+                      (div (@ (class ,(mk-class '(flex flex-row
+                                                       flex-wrap
+                                                       items-center
+                                                       justify-center
+                                                       md:justify-end
+                                                       gap-3
+                                                       md:gap-4
+                                                       w-full
+                                                       md:w-auto))))
 
-                                (script (@ (type speculationrules))
-                                        "
+                           ;; Auth Link
+                           ,(if (not is-logged-in)
+                                `(a (@ (class ,(mk-class '(lowercase font-sans
+                                                           font-medium
+                                                           flex
+                                                           items-center
+                                                           no-underline
+                                                           hover:opacity-80)))
+                                       (href "/login"))
+                                    ,(icon-button #:icon 'sign-in
+                                                  #:content (G_ "login")
+                                                  #:size '(text-sm md:text-md)
+                                                  #:extra-classes '(py-1
+                                                                    md:py-2
+                                                                    px-2
+                                                                    md:px-3
+                                                                    max-w-prose
+                                                                    cursor-pointer
+                                                                    text-onyx-700
+                                                                    dark:text-stone-300)
+                                                  #:icon-css '(text-md
+                                                               text-onyx-700
+                                                               dark:text-stone-300)))
+                                `(a (@ (class ,(mk-class '(lowercase font-sans
+                                                           font-medium
+                                                           flex
+                                                           items-center
+                                                           no-underline
+                                                           hover:opacity-80)))
+                                       (href "/me"))
+                                    ,(icon-button #:icon 'user-circle
+                                                  #:content (G_ "me")
+                                                  #:size '(text-sm md:text-md)
+                                                  #:extra-classes '(py-1
+                                                                    md:py-2
+                                                                    px-2
+                                                                    md:px-3
+                                                                    max-w-prose
+                                                                    cursor-pointer
+                                                                    text-onyx-700
+                                                                    dark:text-stone-300)
+                                                  #:icon-css '(text-md
+                                                               text-onyx-700
+                                                               dark:text-stone-300))))
+
+                           ;; Projects Link
+                           (a (@ (class ,(mk-class '(lowercase no-underline
+                                                     font-sans
+                                                     font-medium
+                                                     flex
+                                                     items-center
+                                                     hover:opacity-80)))
+                                 (href "/projects"))
+                              ,(icon-button #:icon 'align-bottom
+                                            #:content (G_ "projects")
+                                            #:size '(text-sm md:text-md)
+                                            #:extra-classes '(py-1 md:py-2
+                                                              px-2
+                                                              md:px-3
+                                                              max-w-prose
+                                                              cursor-pointer
+                                                              text-onyx-700
+                                                              dark:text-stone-300)
+                                            #:icon-css '(text-md text-onyx-700
+                                                         dark:text-stone-300)))
+
+                           ;; Theme Toggle
+                           ,(ui-mode-button #:icon ""
+                                            #:size '(text-md)
+                                            #:icon-css '(text-onyx-300
+                                                         dark:text-stone-300
+                                                         text-md)
+                                            #:family '(font-sans)
+                                            #:content `((div ,(icon #:type 'sun
+                                                                    #:icon-css '
+                                                                    (text-md
+                                                                     lg:text-lg
+                                                                     text-onyx-300
+                                                                     dark:text-stone-300))
+                                                             ,(icon #:type 'moon
+                                                                    #:icon-css '
+                                                                    (text-md
+                                                                     lg:text-lg
+                                                                     text-onyx-300
+                                                                     dark:text-stone-300))))
+                                            #:color '(text-onyx-900
+                                                      dark:text-stone-100)
+                                            #:weight '(font-light)
+                                            #:extra-classes '(py-1 md:py-2
+                                                              px-2
+                                                              lg:px-3
+                                                              max-w-prose
+                                                              cursor-pointer
+                                                              hover:opacity-80
+                                                              transition-opacity))
+                           ;; Dropdown Select
+                           ,project-select))))
+
+      ;; Output Page
+      `(,doctype-html (html (@ (lang en))
+                            (head (title "LucidPlan")
+                                  ,(hygguile-recommended-meta)
+                                  ,(hygguile-recommended-resources #:fonts (custom-fonts))
+
+                                  (link (@ (rel "shortcut icon")
+                                           (href "/favicon.ico")
+                                           (type "image/x-icon")) "")
+                                  (link (@ (rel icon)
+                                           (href "/favicon.ico")
+                                           (type "image/x-icon")) "")
+                                  (link (@ (rel stylesheet)
+                                           (href
+                                            "/css/lucidplan.olive.min.css"))
+                                        "")
+
+                                  (script (@ (type speculationrules))
+                                          "
 {
   \"prerender\": [
     {
@@ -231,27 +308,28 @@
   ]
 }
 ")
-                                (script ,(assoc-ref asset-library
-                                                    "pub/js/symbanta.js"))
-                                (script ,(assoc-ref asset-library
-                                                    "pub/js/tickets.js")))
-                          (body (@ (class ,(mk-class '(bg-stone-100
-                                                       dark:bg-onyx-900
-                                                       font-sans))))
-                                ,notification-tray
-                                ,(with-footer #:main `((div (@ (class ,(mk-class '
-                                                                        (flex
-                                                                         flex-col
-                                                                         justify-between
-                                                                         min-h-96))))
-                                                            (div (@ (class ,(mk-class '
-                                                                             (flex
-                                                                              flex-col
-                                                                              gap-8
-                                                                              justify-start))))
-                                                                 ,nav
-                                                                 ,body)))
-                                              #:footer (page-footer G_))))))
+                                  (script ,(assoc-ref asset-library
+                                                      "pub/js/symbanta.js"))
+                                  (script ,(assoc-ref asset-library
+                                                      "pub/js/tickets.js")))
+                            (body (@ (class ,(mk-class '(bg-stone-100
+                                                         dark:bg-onyx-900
+                                                         font-sans))))
+                                  ,notification-tray
+                                  ,(with-footer #:main `((div (@ (class ,(mk-class '
+                                                                          (flex
+                                                                           flex-col
+                                                                           justify-between
+                                                                           min-h-screen))))
+                                                              (div (@ (class ,
+                                                                             (mk-class '
+                                                                              (flex
+                                                                               flex-col
+                                                                               gap-8
+                                                                               justify-start))))
+                                                                   ,nav
+                                                                   ,body)))
+                                                #:footer (page-footer G_)))))))
   (export html-template))
 
 (define-public (emoji-for-ticket-status ticket-status)
