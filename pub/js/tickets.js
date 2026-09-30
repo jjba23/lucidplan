@@ -17,8 +17,24 @@ function dragTicketEnd(event) {
 }
 
 function allowDrop(event) {
-  event.preventDefault();
-  event.dataTransfer.dropEffect = 'move';
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+    const target = event.target.closest('[data-ticket-id]');
+    if (target && target !== draggedTicket) {
+        const rect = target.getBoundingClientRect();
+        const isAfter = (event.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
+
+        // Clear previous drop indicators across all items
+        document.querySelectorAll('.drop-target-above, .drop-target-below')
+            .forEach(el => el.classList.remove('drop-target-above', 'drop-target-below', 'border-t-4', 'border-b-4', 'border-jeans-blue-500'));
+
+        // Highlight placement edge
+        if (isAfter) {
+            target.classList.add('drop-target-below', 'border-b-4', 'border-jeans-blue-500');
+        } else {
+            target.classList.add('drop-target-above', 'border-t-4', 'border-jeans-blue-500');
+        }
+    }
 }
 
 async function dropTicketsItem(event) {
