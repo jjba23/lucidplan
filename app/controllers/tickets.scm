@@ -143,7 +143,7 @@
                 (ticket-assignee (get-ticket-assignee-by-project-human-id
                                   ticket-assignee-repo
                                   (params rc "project"))))
-           
+
            (response-emit (:mime rc
                                  (html-from-tickets (:i18n rc)
                                                     #:is-logged-in
@@ -299,7 +299,6 @@
                  (ticket-repo (make-sqlite-ticket-repository rc))
                  (raw-b (bytevector->string (rc-body rc) "utf-8"))
                  (b (json-string->scm raw-b))
-                 (_ (write b))
                  (upd-r (begin
                           (for-each (lambda (item)
                                       (let ((human-id (assoc-ref item "id"))
@@ -309,7 +308,7 @@
                                          ticket-repo proj human-id
                                          `((priority unquote priority)))))
                                     (vector->list (assoc-ref b "tickets"))) #t)))
-            
+
             (if upd-r
                 (:mime rc
                        '(("result" . "success")))
@@ -335,7 +334,7 @@
                  (raw-b (bytevector->string (rc-body rc) "utf-8"))
                  (b (json-string->scm raw-b))
                  (new-status (assoc-ref b "status")))
-            
+
             (if (and new-status
                      (update-ticket-by-project-human-id-and-human-id
                       ticket-repo proj human-id
@@ -373,7 +372,7 @@
 
                  (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
                                         rc)))
-            
+
             (update-ticket-by-project-human-id-and-human-id ticket-repo
                                                             (params rc
                                                                     "project")
