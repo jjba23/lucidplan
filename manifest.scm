@@ -129,7 +129,7 @@ more efficient, and more powerful code.")
 (define-public guile-bewaking
   (package
     (name "guile-bewaking")
-    (version "0.2.3")
+    (version "0.4.0")
     (source
      (origin
        (method git-fetch)
@@ -138,10 +138,9 @@ more efficient, and more powerful code.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1i63n0c6bbwrs8skxvbpcbgjwci97ry1qgvzc4vxvfjc3dijk29c"))))
+        (base32 "0d04h1jfza549c3jqayi7cw3cppvhlkl2pkjj7bgxb5yi4f1p8ms"))))
     (build-system guile-build-system)
     (native-inputs (list guile-uuid guile-gcrypt guile-3.0))
-    (propagated-inputs (list openssl xxd))
     (arguments
      (list
       #:source-directory "src"))
