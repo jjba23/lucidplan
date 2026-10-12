@@ -22,7 +22,14 @@
         (ice-9 string-fun)
         (lucidplan sqlite project)
         (lucidplan domain project)
-        (app views index))
+        (app views index)
+        (app views error))
+
+;; The pages the server answers a refusal with are not routes -- an unmatched
+;; path and a handler that threw never reach one -- so they are registered
+;; with the framework here, while the application is being loaded.  See
+;; `app/views/error.scm' for the pages themselves.
+(register-error-pages!)
 
 (get "/"
      #:mime 'xml

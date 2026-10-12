@@ -76,10 +76,17 @@
                  #:conflict-target 'ticket-id
                  #:update '(user-id))))
 
+  (define (unassign-ticket-assignee ticket-id)
+    (execute-write "unassign-ticket-assignee"
+                   (sql-delete 'ticket_assignee
+                               #:where (list (cons 'ticket-id ticket-id)))))
+
   (mk-ticket-assignee-repository
                                  #:get-ticket-assignee-by-project-human-id-proc
                                  get-ticket-assignee-by-project-human-id
                                  #:get-ticket-assignee-by-ticket-id-proc
                                  get-ticket-assignee-by-ticket-id
                                  #:upsert-ticket-assignee-proc
-                                 upsert-ticket-assignee))
+                                 upsert-ticket-assignee
+                                 #:unassign-ticket-assignee-proc
+                                 unassign-ticket-assignee))

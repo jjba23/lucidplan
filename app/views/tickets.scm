@@ -42,7 +42,7 @@
   #:use-module (artanis security nss)
   #:export (render-ticket render-ticket-listitem html-from-tickets
                           html-new-ticket-form html-edit-ticket-form
-                          html-ticket-form))
+                          html-ticket-form render-quiet-notice))
 
 ;; =============================================================================
 ;; Reusable Styles
@@ -125,6 +125,117 @@
              (p (@ (class ,%label-face))
                 ,value))))
 
+;; =============================================================================
+;;  The two ladders a ticket is triaged with
+;; =============================================================================
+
+;; The form and the ticket's own page offer the same rows, so the rows are
+;; built in one place -- and the rows a ladder offers are the values the
+;; schema holds (`ticket-statuses', `ticket-types'), with the label and the
+;; glyph a reader is shown hung off them here.  A value with no label of its
+;; own is shown as the value itself, so a ladder that grows in the domain
+;; still renders a row rather than dropping one.
+;;
+;; A row's glyph is a character rather than an icon component: a native menu
+;; lays out the text of a row and renders nothing nested inside it (see
+;; `glyph-for-ticket-status').
+(define ticket-status-labels
+  '(("todo" . "To-do")
+    ("work-in-progress" . "Work in Progress")
+    ("in-review" . "In Review")
+    ("done" . "Done")
+    ("rejected" . "Rejected")))
+
+(define ticket-type-labels
+  '(("task" . "Task")
+    ("bug" . "Bug")
+    ("story" . "Story")
+    ("spike" . "Spike")
+    ("time-box" . "Time Box")))
+
+(define (ticket-choices G_ values labels glyph-for selected)
+  (map (lambda (value)
+         (glyph-option #:value value
+                       #:glyph (glyph-for value)
+                       #:content (G_ (or (assoc-ref labels value) value))
+                       #:selected-value selected))
+       values))
+
+(define (ticket-status-choices G_ selected)
+  (ticket-choices G_ ticket-statuses ticket-status-labels
+                  glyph-for-ticket-status selected))
+
+(define (ticket-type-choices G_ selected)
+  (ticket-choices G_ ticket-types ticket-type-labels
+                  glyph-for-ticket-type selected))
+
+;; =============================================================================
+;;  Changing a ticket in place
+;; =============================================================================
+
+;; The card a change is confirmed with lives in the page as an inert
+;; `template' until it is needed: it is hygguile's own frosted notification
+;; card, so the confirmation looks like every other notice in the framework
+;; rather than like a second card built to match.  The script that puts it in
+;; the tray is in `pub/js/tickets.js'.
+;;
+;; What the card says travels with it as data -- the template holds the
+;; wording of both a change that was written and one that was not, and the
+;; field that was changed lends its own name to the sentence -- so no
+;; sentence is written into the script, where it could not be translated.
+(define %quiet-notice-template-id "lucidplan-quiet-notice")
+
+(define (render-quiet-notice G_)
+  `((template (@ (id ,%quiet-notice-template-id)
+                 (data-saved-label ,(G_ "saved"))
+                 (data-failed-label ,(G_ "not saved"))
+                 (data-failed-body ,(G_ "the ticket was left as it was")))
+              ,@(notification-card))))
+
+(define* (render-inline-choice G_ #:key project human-id field value options)
+  "A field of a ticket as the small control it is on the ticket's own page.
+
+The control is a native menu wearing a frosted pill, so what it shows is the
+value the ticket holds and a change is one gesture rather than a trip
+through the edit form.  It posts as soon as it is changed and is confirmed
+by a card in the tray.  The label is there for assistive technology -- the
+column above the pill already says which field this is."
+  `(div (@ (class ,(mk-class (append '(px-2 py-1 w-fit rounded-full)
+                                     frosted-tint-classes)))
+           ;; What the script needs is here rather than inferred from the
+           ;; markup: which field this is, the name it answers to in the
+           ;; notice, and the value the ticket held before the menu was
+           ;; touched, which is what a change that never reached the server is
+           ;; put back to.
+           (data-inline-field ,field)
+           (data-field-label ,(G_ field))
+           (data-current-value ,value))
+        ,@(select #:name (string->symbol (format #f "inline-~a" field))
+                  #:on-change (format #f "updateTicketField(this, '~a', '~a', '~a')"
+                                      project human-id field)
+                  #:label (G_ field)
+                  #:label-css '(sr-only)
+                  #:options options
+                  #:select-classes '(w-auto max-w-full
+                                          bg-transparent
+                                          border-0
+                                          rounded-full
+                                          px-0
+                                          py-0
+                                          text-sm
+                                          font-medium
+                                          font-sans
+                                          text-onyx-700
+                                          dark:text-stone-300
+                                          cursor-pointer
+                                          outline-none
+                                          focus:ring-2)
+                  #:select-flex-css '(flex flex-row
+                                           items-center
+                                           gap-1
+                                           my-0
+                                           w-fit))))
+
 (define (render-field label value val-class)
   `((small (@ (class ,%label-face))
            ,label)
@@ -144,7 +255,8 @@
 
 (define* (render-ticket G_
                         #:key project ticket
-                        (assignee #f))
+                        (assignee #f)
+                        (editable? #f))
   (let* ((t-ref (lambda (k)
                   (assq-ref ticket k)))
          (id (t-ref 'id))
@@ -173,13 +285,39 @@
                                  #:icon-css '(text-onyx-700
                                               dark:text-stone-300 text-xl)))))
 
-          ;; Meta Info (Status & Type)
+          ;; Meta Info (Status & Type).  On the ticket's own page each of the
+          ;; two is a control that posts its change straight away; anywhere
+          ;; else -- the backlog's expanded rows -- they stay the read-only
+          ;; badges they read as at a glance.
           (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-6
                                            justify-start))))
-               ,(render-meta-badge (G_ "status")
-                                   (emoji-for-ticket-status status) status)
-               ,(render-meta-badge (G_ "type")
-                                   (emoji-for-ticket-type type) type))
+               ,@(if editable?
+                     `((div (@ (class ,(mk-class '(flex flex-col gap-3))))
+                            (small (@ (class ,%label-face))
+                                   ,(G_ "status"))
+                            ,(render-inline-choice G_
+                                                   #:project project
+                                                   #:human-id human-id
+                                                   #:field "status"
+                                                   #:value status
+                                                   #:options (ticket-status-choices
+                                                              G_ status)))
+                       (div (@ (class ,(mk-class '(flex flex-col gap-3))))
+                            (small (@ (class ,%label-face))
+                                   ,(G_ "type"))
+                            ,(render-inline-choice G_
+                                                   #:project project
+                                                   #:human-id human-id
+                                                   #:field "type"
+                                                   #:value type
+                                                   #:options (ticket-type-choices
+                                                              G_ type))))
+                     `(,(render-meta-badge (G_ "status")
+                                           (emoji-for-ticket-status status)
+                                           status)
+                       ,(render-meta-badge (G_ "type")
+                                           (emoji-for-ticket-type type)
+                                           type))))
 
           ;; Description
           ,(render-if-nestring (lambda (d)
@@ -632,11 +770,12 @@
                                       ,rejected-ticket-list))))))
 
 (define* (html-new-ticket-form G_
-                               #:key projects project is-logged-in)
+                               #:key projects project users is-logged-in)
   (html-ticket-form G_
                     #:is-logged-in is-logged-in
                     #:project project
                     #:projects projects
+                    #:users users
                     #:action (format #f "/tickets/~a/new" project)))
 
 (define* (html-edit-ticket-form G_
@@ -644,6 +783,7 @@
                                 project
                                 t
                                 assignee
+                                users
                                 is-logged-in)
   (html-ticket-form G_
                     #:is-logged-in is-logged-in
@@ -658,6 +798,7 @@
                     #:ticket-status (assq-ref t
                                               'ticket-status)
                     #:assignee assignee
+                    #:users users
                     #:priority (assq-ref t
                                          'priority)
                     #:action (format #f "/tickets/~a/id/~a/edit" project
@@ -676,6 +817,7 @@
                            (action "")
                            (is-edit #f)
                            (projects '())
+                           (users '())
                            (is-logged-in #f))
   
   (let* ( ;Consolidate Reusable CSS Classes
@@ -688,30 +830,25 @@
          (safe-desc (html-unescape description))
          (safe-prio (or priority 0))
 
-         ;; Dynamically generate dropdown options using `map`
-         (status-opts (map (lambda (opt)
-                             (glyph-option #:value (car opt)
-                                           #:glyph (glyph-for-ticket-status (car
-                                                                             opt))
-                                           #:content (G_ (cadr opt))
-                                           #:selected-value ticket-status))
-                           '(("todo" "To-do")
-                             ("work-in-progress" "Work in Progress")
-                             ("in-review" "In Review")
-                             ("done" "Done")
-                             ("rejected" "Rejected"))))
+         ;; The two ladders every triage control in the app shares
+         (status-opts (ticket-status-choices G_ ticket-status))
 
-         (type-opts (map (lambda (opt)
-                           (glyph-option #:value (car opt)
-                                         #:glyph (glyph-for-ticket-type (car
-                                                                         opt))
-                                         #:content (G_ (cadr opt))
-                                         #:selected-value ticket-type))
-                         '(("task" "Task")
-                           ("bug" "Bug")
-                           ("story" "Story")
-                           ("spike" "Spike")
-                           ("time-box" "Time Box"))))
+         (type-opts (ticket-type-choices G_ ticket-type))
+
+         ;; The assignee is chosen from the accounts that exist rather than
+         ;; typed, so a ticket cannot name somebody the instance has never
+         ;; heard of.  The value submitted is the user's id -- which is what
+         ;; the assignment row records -- and the row shown is their name.
+         ;; Nobody is the first row, and it is the one an unassigned ticket
+         ;; opens on.
+         (assignee-opts (cons (option #:value ""
+                                      #:content (G_ "unassigned")
+                                      #:selected-value assignee)
+                              (map (lambda (u)
+                                     (option #:value (assq-ref u 'id)
+                                             #:content (assq-ref u 'username)
+                                             #:selected-value assignee))
+                                   users)))
 
          ;; Build the Form SXML
          (form-sxml `(form (@ (enctype "application/x-www-form-urlencoded")
@@ -751,12 +888,12 @@
                                              #:value safe-prio))
 
                                 ;; Assignee
-                                ,(if is-edit
-                                     `((div ,(input #:label (G_ "assignee")
-                                                    #:name "assignee"
-                                                    #:value assignee
-                                                    #:required #f)))
-                                     '())
+                                (div (@ (class ,field-face))
+                                     (label (@ (class ,label-face))
+                                            ,(G_ "assignee"))
+                                     (div ,(select #:name 'assignee
+                                                   #:on-change ""
+                                                   #:options assignee-opts)))
 
                                 ;; Description
                                 ,(textarea #:label (G_ "description")

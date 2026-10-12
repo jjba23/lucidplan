@@ -139,3 +139,82 @@ async function handleKanbanDrop(e, project) {
     window.location.reload();
   }
 }
+
+// ==================================
+// Changing a ticket in place, from the ticket's own page
+// ==================================
+
+// A change is confirmed by the same frosted card the framework shows every
+// notice in. The card sits in the page as an inert template and its wording
+// travels with it as data, so no sentence is written into script, where it
+// could not be translated. The tray is the polite live region the card was
+// built for, so the confirmation is announced without interrupting a reader.
+function showQuietNotice(title, body) {
+  const tray = document.getElementById('notification-tray');
+  const template = document.getElementById('lucidplan-quiet-notice');
+  if (!tray || !template) return;
+
+  // The tray hangs at the top of the viewport, which is where this page's own
+  // sticky header is: the notice is dropped below the header, so it is read
+  // instead of sitting half-behind the bar it was announced under.
+  const header = document.querySelector('header');
+  if (header) {
+    tray.style.top = `${header.getBoundingClientRect().bottom + 12}px`;
+  }
+
+  tray.innerHTML = '';
+  tray.appendChild(template.content.cloneNode(true));
+
+  const titleNode = document.getElementById('notification-title');
+  const bodyNode = document.getElementById('notification-body');
+  if (titleNode) titleNode.textContent = title ?? '';
+  if (bodyNode) bodyNode.textContent = body ?? '';
+
+  setTimeout(() => { tray.innerHTML = ''; }, 3000);
+}
+
+// A row of a native menu is written as "<glyph> <label>", both as the row's
+// own text, so the label a reader chose is what follows the first word.
+function chosenOptionLabel(select) {
+  const option = select.options[select.selectedIndex];
+  const text = option ? option.textContent.trim() : '';
+  const space = text.indexOf(' ');
+  return space === -1 ? text : text.slice(space + 1);
+}
+
+// The small control on a ticket's own page posts its change as soon as it is
+// changed and says so quietly: the notice names the field and the value it
+// now holds, and a change that did not reach the server puts the menu back
+// where it was rather than leaving the page claiming something untrue.
+async function updateTicketField(select, project, humanId, field) {
+  const wrapper = select.closest('[data-inline-field]');
+  const template = document.getElementById('lucidplan-quiet-notice');
+  const previous = wrapper ? wrapper.dataset.currentValue : undefined;
+
+  try {
+    const response = await fetch(`/tickets/${project}/id/${humanId}/field`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ field: field, value: select.value })
+    });
+
+    // A session that has aged out is not a saved change. The server answers
+    // with the ticket page's own rule -- the login page -- so the reader goes
+    // there instead of being told a change was written that was not.
+    if (response.redirected) {
+      window.location.assign(response.url);
+      return;
+    }
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    if (wrapper) wrapper.dataset.currentValue = select.value;
+    showQuietNotice(template ? template.dataset.savedLabel : '',
+                    `${wrapper ? wrapper.dataset.fieldLabel : field}: ${chosenOptionLabel(select)}`);
+  } catch (err) {
+    console.error('Failed to change the ticket:', err);
+    if (previous !== undefined) select.value = previous;
+    showQuietNotice(template ? template.dataset.failedLabel : '',
+                    template ? template.dataset.failedBody : '');
+  }
+}

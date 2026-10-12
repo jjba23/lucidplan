@@ -168,7 +168,8 @@
      #:cookies '(names x-bewaking-lucidplan)
      (lambda (rc)
        (define (get-new)
-         (let* ((project-repo (make-sqlite-project-repository rc)))
+         (let* ((project-repo (make-sqlite-project-repository rc))
+                (user-repo (make-sqlite-user-repository rc)))
            (response-emit (:mime rc
                                  (html-new-ticket-form (:i18n rc)
                                                        #:is-logged-in (:cookies-value
@@ -177,7 +178,9 @@
                                                        #:projects (get-projects
                                                                    project-repo)
                                                        #:project (params rc
-                                                                  "project"))))))
+                                                                  "project")
+                                                       #:users (get-id-to-username
+                                                                user-repo))))))
        (get-new)))
 
 (post "/tickets/:project/delete"
@@ -224,11 +227,17 @@
                  (ticket-status (assoc-ref body "ticket-status"))
                  (ticket-type (assoc-ref body "ticket-type"))
                  (description (html-escape (assoc-ref body "description")))
-                 (priority (string->number (assoc-ref body "priority")))
-                 (project-id (project-id-from-human-id project-repo
+                 (priority (string->number (assoc-ref body "priority")))                (project-id (project-id-from-human-id project-repo
                                                        (params rc "project")))
-                 (new-uuid (string-replace-substring (generate-string-uuid)
-                                                     "\n" "")))
+                (new-uuid (string-replace-substring (generate-string-uuid)
+                                                    "\n" ""))
+                (user-repo (make-sqlite-user-repository rc))
+                (user-ids (map (lambda (u)
+                                 (assq-ref u 'id))
+                               (get-id-to-username user-repo)))
+                (submitted-assignee (assoc-ref body "assignee"))
+                (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
+                                       rc)))
             (insert-ticket ticket-repo
                            `((id unquote new-uuid)
                              (human-id unquote new-human-id)
@@ -240,6 +249,17 @@
                              (description unquote description)
                              (created-at unquote
                                          (current-time))))
+
+            ;; A new ticket may be assigned to one of the accounts that
+            ;; exist, or to nobody -- which is simply the absence of an
+            ;; assignment row, so there is nothing to write.
+            (let ((assignee-id (known-user-id user-ids submitted-assignee)))
+              (when assignee-id
+                (upsert-ticket-assignee ticket-assignee-repo
+                                        `((project-id unquote project-id)
+                                          (ticket-id unquote new-uuid)
+                                          (user-id unquote assignee-id)))))
+
 
             (redirect-to rc
                          (string->uri (format #f "~a/tickets/~a"
@@ -259,6 +279,7 @@
      (lambda (rc)
        (define (get-edit)
          (let* ((project-repo (make-sqlite-project-repository rc))
+                (user-repo (make-sqlite-user-repository rc))
                 (proj (get-projects project-repo))
                 (ticket-repo (make-sqlite-ticket-repository rc))
                 (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
@@ -282,6 +303,8 @@
                                                                    "project")
                                                         #:t t
                                                         #:assignee assignee
+                                                        #:users (get-id-to-username
+                                                                 user-repo)
                                                         #:is-logged-in (:cookies-value
                                                                         rc
                                                                         "x-bewaking-lucidplan"))))))
@@ -349,6 +372,58 @@
                            #:happy-flow do-re-status
                            #:unhappy-flow back-to-login)))
 
+;; The status and the type of a ticket are changed from the ticket's own page
+;; by the two small controls at the top of it, which post the field they name
+;; as soon as it is changed.  Both changes are the same change -- one column
+;; of one ticket -- so they are one endpoint, and the ladder the submitted
+;; value has to be on is the same ladder the menu offered.
+(post "/tickets/:project/id/:human-id/field"
+      #:mime 'json
+      #:from-post 'json
+      #:cookies '(names x-bewaking-lucidplan)
+      (lambda (rc)
+        ;; A refused change is answered as JSON, with the status that says
+        ;; which kind of refusal it was.  (`http-status' cannot do this: it
+        ;; *registers* the handler a status is rendered with, so calling it
+        ;; here would make the handler's own return value a procedure -- and
+        ;; the response would be a 500 about an invalid body.)
+        (define (refuse status message)
+          (response-emit (scm->json-string `((error . ,message)))
+                         #:status status
+                         #:headers '((content-type . (application/json)))))
+        (define (do-field-change)
+          (let* ((proj (params rc "project"))
+                 (human-id (params rc "human-id"))
+                 (ticket-repo (make-sqlite-ticket-repository rc))
+                 (raw-b (bytevector->string (rc-body rc) "utf-8"))
+                 (b (json-string->scm raw-b))
+                 (change (ticket-field-change (assoc-ref b "field")
+                                              (assoc-ref b "value")))
+                 ;; Ask for the ticket before writing it: an unknown project or
+                 ;; human id then answers a plain "no such ticket" rather than
+                 ;; resting on what the driver reports for a write that
+                 ;; matched no row.
+                 (t (get-ticket-by-project-human-id-and-human-id
+                     ticket-repo proj human-id)))
+            (cond
+              ((not change)
+               (refuse 400 "Unknown field or value"))
+              ((not t)
+               (refuse 404 "No such ticket"))
+              (else
+               ;; A change is an edit, so the ticket's own "last edited" stamp
+               ;; moves with it and the backlog can order by it.
+               (update-ticket-by-project-human-id-and-human-id
+                ticket-repo proj human-id
+                (append change `((updated_at unquote (current-time)))))
+               (:mime rc
+                      '(("result" . "success")))))))
+        (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                           #:needed-permissions '(lucidplan:ticket-create)
+                           #:rc rc
+                           #:happy-flow do-field-change
+                           #:unhappy-flow back-to-login)))
+
 (post "/tickets/:project/id/:human-id/edit"
       #:mime 'xml
       #:cookies '(names x-bewaking-lucidplan)
@@ -366,10 +441,13 @@
                                                        (params rc "project")))
                  (ticket-id (ticket-id-from-human-id ticket-repo
                                                      (params rc "project")
-                                                     (params rc "human-id")))
-
-                 (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
-                                        rc)))
+                                                     (params rc "human-id")))                (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
+                                       rc))
+                (user-repo (make-sqlite-user-repository rc))
+                (user-ids (map (lambda (u)
+                                 (assq-ref u 'id))
+                               (get-id-to-username user-repo)))
+                (submitted-assignee (assoc-ref body "assignee")))
 
             (update-ticket-by-project-human-id-and-human-id ticket-repo
                                                             (params rc
@@ -393,11 +471,23 @@
                                                               (updated_at
                                                                unquote
                                                                (current-time))))
-            (upsert-ticket-assignee ticket-assignee-repo
-                                    `((project-id unquote project-id)
-                                      (ticket-id unquote ticket-id)
-                                      (user-id unquote
-                                               (assoc-ref body "assignee"))))
+            ;; Who a ticket is assigned to is one of the accounts that exist,
+            ;; or nobody.  Nobody is the row that the form offers to put the
+            ;; ticket back to, so an empty value clears the assignment rather
+            ;; than recording a user called ""; anything else that is not one
+            ;; of the offered accounts leaves the ticket as it was.
+            (cond
+              ((and (string? submitted-assignee)
+                    (string-null? submitted-assignee))
+               (unassign-ticket-assignee ticket-assignee-repo ticket-id))
+              ((known-user-id user-ids submitted-assignee)
+               =>
+               (lambda (assignee-id)
+                 (upsert-ticket-assignee ticket-assignee-repo
+                                         `((project-id unquote project-id)
+                                           (ticket-id unquote ticket-id)
+                                           (user-id unquote assignee-id)))))
+              (else #f))
             (redirect-to rc
                          (string->uri (format #f "~a/tickets/~a"
                                               (current-myhost)
@@ -436,7 +526,24 @@
                                                                 'id)
                                                       (assq-ref
                                                        ticket-assignee
-                                                       'user-id))) user-names)))
+                                                       'user-id))) user-names))
+                ;; The card a change is confirmed with, inert in the page
+                ;; until the script has something to say.
+                (quiet-notice (render-quiet-notice (:i18n rc)))
+                ;; The ticket itself.  Signed out, its status and its type
+                ;; stay the badges they read as at a glance; signed in, each
+                ;; of the two is the small control that posts its own change.
+                (ticket-card (render-ticket
+                              (:i18n rc)
+                              #:project (params rc "project")
+                              #:ticket t
+                              #:assignee (if (nil? ticket-assignee-user)
+                                             #f
+                                             (assq-ref ticket-assignee-user
+                                                       'username))
+                              #:editable? (:cookies-value
+                                           rc
+                                           "x-bewaking-lucidplan"))))
            (response-emit (:mime rc
                                  (html-template (:i18n rc)
                                                 #:is-logged-in (:cookies-value
@@ -456,18 +563,6 @@
                                                                              "project")))
                                                          (div (@ (class ,(mk-class '
                                                                           (p-2))))
-
-                                                              ,(render-ticket (:i18n
-                                                                               rc)
-                                                                #:project (params
-                                                                           rc
-                                                                           "project")
-                                                                #:ticket t
-                                                                #:assignee (if
-                                                                            (nil?
-                                                                             ticket-assignee-user)
-                                                                            #f
-                                                                            (assq-ref
-                                                                             ticket-assignee-user
-                                                                             'username))))))))))
+                                                              ,ticket-card)
+                                                         ,@quiet-notice))))))
        (get-single)))

@@ -20,7 +20,8 @@
   #:use-module (srfi srfi-9)
   #:use-module (lucidplan domain repo)
   #:export (get-ticket-assignee-by-project-human-id
-            get-ticket-assignee-by-ticket-id upsert-ticket-assignee))
+            get-ticket-assignee-by-ticket-id upsert-ticket-assignee
+            unassign-ticket-assignee))
 
 ;; -- Record definition ---
 
@@ -33,7 +34,9 @@
                        (get-ticket-assignee-by-ticket-id-proc
                         repo-get-ticket-assignee-by-ticket-id)
                        (upsert-ticket-assignee-proc
-                        repo-upsert-ticket-assignee))
+                        repo-upsert-ticket-assignee)
+                       (unassign-ticket-assignee-proc
+                        repo-unassign-ticket-assignee))
 
 ;; --- eDSL: Embedded Domain Specific Language ---
 
@@ -47,4 +50,10 @@
 
 (define-repo-method upsert-ticket-assignee repo-upsert-ticket-assignee
  "Inserts or updates a ticket assignee record using the provided ATTRS alist in the REPO.")
+
+(define-repo-method unassign-ticket-assignee repo-unassign-ticket-assignee
+ "Removes the assignee record of a TICKET-ID from the REPO, leaving the ticket
+unassigned.  Sending a ticket back to nobody is the row's absence rather than
+a row naming an empty user, so the clearing of an assignment is stated rather
+than left to whichever value a form submits.")
 
