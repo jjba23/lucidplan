@@ -19,8 +19,7 @@
 
 (import (ice-9 string-fun)
         (kracht prelude)
-        (lucidplan html)
-        (web uri))
+        (lucidplan html))
 
 ;; A reader's preferences are not session state -- they are what the reader
 ;; wants the pages to be -- so the choice outlives the visit that made it:
@@ -55,10 +54,8 @@
                                #:path "/"
                                #:secure #t
                                #:http-only #t))
-          ;; The reader is sent back to a path on the host they asked on,
-          ;; rather than to an absolute address built from the configured
-          ;; one: the cookie just written belongs to the host that answered,
-          ;; and a reader who reached this instance by its address (or by
-          ;; `127.0.0.1') would arrive at the configured name holding a
-          ;; cookie that host never saw -- in the language they just left.
-          (redirect-to rc (string->uri target) #:status 302))))
+          ;; The reader is sent back to the page the choice was made on,
+          ;; which is where a language change is easiest to read.  The
+          ;; framework turns the path into an absolute address on the
+          ;; instance's own name, as it does for every other redirect here.
+          (redirect-to rc target #:status 302))))
