@@ -720,23 +720,48 @@ The choice is posted to @code{/preferences/locale}, which writes it to the
 and sends the reader back to the page they were reading.  The language a
 page is *being* read in is the server's to state, since it is the language
 that page was rendered in, so the row the menu shows is the one the caller
-passes rather than one this control guesses."
+passes rather than one this control guesses.
+
+The control wears the page's own glass and names itself: a translate glyph
+and the word @code{language} stand beside the menu rather than hiding
+behind it, because a reader who cannot read the page around them cannot be
+asked to recognise a control that shows nothing but the language it is
+already set to.  The name is bound to the menu with @code{for}, so it
+reaches assistive technology as well."
   `((form (@ (action "/preferences/locale")
              (method "POST")
              (enctype "application/x-www-form-urlencoded")
-             (class ,(mk-class '(flex flex-row flex-wrap
-                                        items-center gap-2))))
+             (class ,(mk-class (append '(flex flex-row flex-wrap
+                                              items-center
+                                              gap-1
+                                              pl-2 pr-1 py-1
+                                              w-fit
+                                              rounded-full
+                                              border-2
+                                              border-jeans-blue-500/50
+                                              dark:border-jeans-blue-300/25
+                                              shadow-md)
+                                        frosted-tint-classes))))
           ,@(if return-to
                 `((input (@ (type "hidden")
                             (name "return-to")
                             (value ,return-to))))
                 '())
+          ,(icon #:type 'translate
+                 #:icon-css '(text-lg text-jeans-blue-700
+                                     dark:text-jeans-blue-300))
+          (label (@ (class ,(mk-class '(text-md
+                                                font-medium
+                                                font-sans
+                                                px-1
+                                                text-onyx-700
+                                                dark:text-stone-300)))
+                    (for user-lang))
+                 ,(G_ "language"))
           ,(select #:name 'user-lang
-                   #:label (G_ "language")
-                   #:label-css '(sr-only)
                    ;; No `lowercase' here: a language writes its own name,
                    ;; and `Nederlands' or `Español' is how it is spelled.
-                   #:select-classes '(text-sm
+                   #:select-classes '(text-md
                                       font-medium
                                       font-sans
                                       text-onyx-900
@@ -751,6 +776,10 @@ passes rather than one this control guesses."
                                       hover:bg-stone-300/75
                                       dark:hover:bg-onyx-700/75
                                       focus:ring-2)
+                   #:select-flex-css '(flex flex-row
+                                             items-center
+                                             my-0
+                                             w-fit)
                    #:options (map (lambda (locale)
                                     (option #:value (car locale)
                                             #:content (cdr locale)
@@ -765,6 +794,6 @@ passes rather than one this control guesses."
                                           cursor-pointer
                                           text-onyx-700
                                           dark:text-stone-300)
-                        #:icon-css '(text-md
+                        #:icon-css '(text-lg
                                      text-onyx-700
                                      dark:text-stone-300)))))

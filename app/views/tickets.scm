@@ -79,6 +79,11 @@
   (mk-class '(flex flex-col gap-2)))
 
 (define %list-header-face
+  ;; One line, always: the grip, the type's glyph, the title and the link
+  ;; stand in a row, and the title takes whatever is left.  Nothing else
+  ;; rides here -- the triage pills belong to the card the row unfolds into
+  ;; -- because a wider row would either wrap, and stop reading as a line, or
+  ;; squeeze the title it exists to show down to a few characters.
   (mk-class (append '(flex flex-row
                       gap-2
                       items-center
@@ -202,14 +207,22 @@
                  (data-failed-body ,(G_ "the ticket was left as it was")))
               ,@(notification-card))))
 
-(define* (render-inline-choice G_ #:key project human-id field value options)
+(define* (render-inline-choice G_ #:key project human-id field value options
+                               (id-suffix ""))
   "A field of a ticket as the small control it is on the ticket's own page.
 
 The control is a native menu wearing a frosted pill, so what it shows is the
 value the ticket holds and a change is one gesture rather than a trip
 through the edit form.  It posts as soon as it is changed and is confirmed
 by a card in the tray.  The label is there for assistive technology -- the
-column above the pill already says which field this is."
+column above the pill already says which field this is.
+
+The menu is named and identified after the field it changes, which is what
+the control needs on a page holding one of them.  A page holding one per
+row -- the backlog, where every row carries its own pair -- passes
+@var{id-suffix} to tell the rows apart: an id names one element, and a page
+of thirty-three controls sharing one name is a page whose labels all point
+at the first of them."
   `(div (@ (class ,(mk-class (append '(px-2 py-1 w-fit rounded-full)
                                      frosted-tint-classes)))
            ;; What the script needs is here rather than inferred from the
@@ -220,7 +233,8 @@ column above the pill already says which field this is."
            (data-inline-field ,field)
            (data-field-label ,(G_ field))
            (data-current-value ,value))
-        ,@(select #:name (string->symbol (format #f "inline-~a" field))
+        ,@(select #:name (string->symbol (format #f "inline-~a~a"
+                                                    field id-suffix))
                   #:on-change (format #f "updateTicketField(this, '~a', '~a', '~a')"
                                       project human-id field)
                   #:label (G_ field)
@@ -266,7 +280,8 @@ column above the pill already says which field this is."
 (define* (render-ticket G_
                         #:key project ticket
                         (assignee #f)
-                        (editable? #f))
+                        (editable? #f)
+                        (id-suffix ""))
   (let* ((t-ref (lambda (k)
                   (assq-ref ticket k)))
          (id (t-ref 'id))
@@ -295,10 +310,13 @@ column above the pill already says which field this is."
                                  #:icon-css '(text-onyx-700
                                               dark:text-stone-300 text-xl)))))
 
-          ;; Meta Info (Status & Type).  On the ticket's own page each of the
-          ;; two is a control that posts its change straight away; anywhere
-          ;; else -- the backlog's expanded rows -- they stay the read-only
-          ;; badges they read as at a glance.
+          ;; Meta Info (Status & Type).  Where the reader can change them each
+          ;; of the two is the control that posts its own change; where they
+          ;; cannot -- a reader who is not signed in -- they stay the
+          ;; read-only badges they read as at a glance.  Either way what they
+          ;; say is the label a reader knows the value by, never the value
+          ;; itself: `work-in-progress' and `time-box' are how the schema
+          ;; spells a state, not how a reader names it.
           (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-6
                                            justify-start))))
                ,@(if editable?
@@ -310,6 +328,7 @@ column above the pill already says which field this is."
                                                    #:human-id human-id
                                                    #:field "status"
                                                    #:value status
+                                                   #:id-suffix id-suffix
                                                    #:options (ticket-status-choices
                                                               G_ status)))
                        (div (@ (class ,(mk-class '(flex flex-col gap-3))))
@@ -320,14 +339,15 @@ column above the pill already says which field this is."
                                                    #:human-id human-id
                                                    #:field "type"
                                                    #:value type
+                                                   #:id-suffix id-suffix
                                                    #:options (ticket-type-choices
                                                               G_ type))))
                      `(,(render-meta-badge (G_ "status")
                                            (emoji-for-ticket-status status)
-                                           status)
+                                           (ticket-status-label G_ status))
                        ,(render-meta-badge (G_ "type")
                                            (emoji-for-ticket-type type)
-                                           type))))
+                                           (ticket-type-label G_ type)))))
 
           ;; Description
           ,(render-if-nestring (lambda (d)
@@ -381,12 +401,19 @@ column above the pill already says which field this is."
                                                                        text-lg))
                                                    ,(G_ "delete"))))))))
 
+;; A row reads as one line -- the grip, the type's glyph, the title and the
+;; link -- and unfolds into the ticket itself, which is where it is triaged:
+;; the card a row opens carries the same two controls the ticket's own page
+;; does, for the same reader the ticket's own page asks (a reader who is
+;; signed in).  A reader who is not signed in gets the card as it reads at a
+;; glance, which is what the row's expanded body has always been.
 (define* (render-ticket-listitem G_
                                  #:key project
                                  ticket
                                  ticket-id-to-human-id
                                  ticket-assignee
-                                 user-names)
+                                 user-names
+                                 (editable? #f))
   (let* ((t-ref (lambda (k)
                   (assq-ref ticket k)))
          (id (t-ref 'id))
@@ -438,6 +465,12 @@ column above the pill already says which field this is."
                ,(render-ticket G_
                                #:project project
                                #:ticket ticket
+                               ;; The card is inside a list, so its two
+                               ;; controls are told apart from the pairs the
+                               ;; other rows carry; the page says which row
+                               ;; by naming it.
+                               #:editable? editable?
+                               #:id-suffix (format #f "-row-~a" human-id)
                                #:assignee (if (nil? assignee-user) #f
                                               (assq-ref assignee-user
                                                         'username)))))))
@@ -518,6 +551,12 @@ column above the pill already says which field this is."
                                                            #:search-query
                                                            search-query)))))
 
+         ;; A reader who is signed in triages a ticket from the row it is
+         ;; listed in, exactly as they do from the ticket's own page: it is
+         ;; the same control, offered to the same reader, and it posts to the
+         ;; same endpoint.
+         (triage? (not (nil? is-logged-in)))
+
          ;; List Generators
          ;; Keep the list as it arrived before it is rebound: the binding below
          ;; narrows `tickets' to the still-open ones, so the done and rejected
@@ -551,7 +590,8 @@ column above the pill already says which field this is."
                                         #:ticket-id-to-human-id
                                         ticket-id-to-human-id
                                         #:ticket-assignee ttt-assignee
-                                        #:user-names user-names))) tickets))))
+                                        #:user-names user-names
+                                        #:editable? triage?))) tickets))))
 
          (done-ticket-list (if with-done
                                `(div (@ (id lucidplan-done-tickets-list)
@@ -578,7 +618,8 @@ column above the pill already says which field this is."
                                                    ticket-id-to-human-id
                                                    #:ticket-assignee
                                                    ticket-assignee
-                                                   #:user-names user-names))
+                                                   #:user-names user-names
+                                                   #:editable? triage?))
                                                 done-tickets)))
                                '()))
 
@@ -611,7 +652,8 @@ column above the pill already says which field this is."
                                                        ticket-id-to-human-id
                                                        #:ticket-assignee
                                                        ticket-assignee
-                                                       #:user-names user-names))
+                                                       #:user-names user-names
+                                                       #:editable? triage?))
                                                     rejected-tickets)))
                                    '()))
 
@@ -773,7 +815,13 @@ column above the pill already says which field this is."
                                       ,(if (nil? tickets)
                                            fallback-no-ticket-list ticket-list)
                                       ,done-ticket-list
-                                      ,rejected-ticket-list))))))
+                                      ,rejected-ticket-list))
+                                ;; The card a change made from a row is
+                                ;; confirmed with, once for the page: the
+                                ;; rows share it, and it is inert until the
+                                ;; script has something to say.  See
+                                ;; `render-quiet-notice'.
+                                ,@(render-quiet-notice G_)))))
 
 (define* (html-new-ticket-form G_
                                #:key projects project users is-logged-in)
