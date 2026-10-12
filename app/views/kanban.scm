@@ -114,11 +114,15 @@
                                         sm:items-center
                                         justify-between)))
          (header-face (mk-class '(flex flex-row gap-2 items-center min-w-0)))
+         ;; `shrink-0' keeps the chosen sort readable: alongside a long
+         ;; project name the toolbar would otherwise squeeze the control
+         ;; below the width of its own label.
          (sort-wrap-face (mk-class '(my-3 px-1
                                           py-3
                                           flex
                                           flex-row
                                           flex-wrap
+                                          shrink-0
                                           justify-start
                                           items-center)))
          (btn-row-face (mk-class '(flex flex-row flex-wrap gap-2 items-center)))
@@ -241,8 +245,15 @@
                                        (div (@ (class ,header-face))
                                             ,(icon #:type 'kanban
                                                    #:icon-css kanban-icon-face)
+                                            ;; The toolbar shares its row
+                                            ;; with the sort control and two
+                                            ;; buttons, so the board's name
+                                            ;; is set smaller until there is
+                                            ;; room for the display size.
                                             ,(h1 (format #f "kanban for ~a"
-                                                         project)))
+                                                         project)
+                                                 #:size '(text-2xl
+                                                          lg:text-4xl)))
 
                                        (div (@ (class ,sort-wrap-face))
                                             ,(sort-select G_
