@@ -691,7 +691,7 @@
          ;; Dynamically generate dropdown options using `map`
          (status-opts (map (lambda (opt)
                              (glyph-option #:value (car opt)
-                                           #:glyph (emoji-for-ticket-status (car
+                                           #:glyph (glyph-for-ticket-status (car
                                                                              opt))
                                            #:content (G_ (cadr opt))
                                            #:selected-value ticket-status))
@@ -703,7 +703,7 @@
 
          (type-opts (map (lambda (opt)
                            (glyph-option #:value (car opt)
-                                         #:glyph (emoji-for-ticket-type (car
+                                         #:glyph (glyph-for-ticket-type (car
                                                                          opt))
                                          #:content (G_ (cadr opt))
                                          #:selected-value ticket-type))

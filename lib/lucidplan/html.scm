@@ -178,7 +178,14 @@ event."
                                                                dark:hover:bg-onyx-700/75
                                                                focus:ring-2
                                                                outline-none))))
-                                        (option "🔗 go to")
+                                        ;; The row the menu opens on is a
+                                        ;; placeholder, so it says so with a
+                                        ;; value of its own: an option
+                                        ;; without one answers with its own
+                                        ;; text, and choosing it would then
+                                        ;; navigate to `/🔗 go to'.
+                                        (option (@ (value ""))
+                                                "🔗 go to")
                                         ,@(map (lambda (p)
                                                  `(option (@ (value ,(format
                                                                              #f
@@ -404,7 +411,9 @@ event."
                                                                    ,@nav
                                                                    ,body)))
                                                 #:footer (page-footer G_))))))))
-  (export html-template frosted-tint-classes render-page))
+  (export html-template frosted-tint-classes render-page
+          emoji-for-ticket-status emoji-for-ticket-type
+          glyph-for-ticket-status glyph-for-ticket-type))
 
 (define-public (emoji-for-ticket-status ticket-status)
   (cond
@@ -442,6 +451,33 @@ event."
     ((equal? "time-box" ticket-type)
      `((i (@ (class ,(mk-class '(ph ph-clock text-onyx-300 dark:text-stone-300
                                     text-xl)))) "")))
+    (else "")))
+
+;;; ===== The same two ladders, as the text a dropdown row can hold =====
+
+;;; A native dropdown is drawn by the browser or the operating system, and
+;;; it lays out the text of a row: an element nested inside an `<option>' is
+;;; not rendered, and one handed to hygguile's `glyph-option' is printed into
+;;; the row as the list it is.  The glyph that introduces a row is therefore
+;;; a character and not one of the icon components above.  Each one stands
+;;; for the same thing its Phosphor icon does, so a status reads the same
+;;; whichever control is showing it.
+(define-public (glyph-for-ticket-status ticket-status)
+  (cond
+    ((equal? "todo" ticket-status) "⚓")
+    ((equal? "work-in-progress" ticket-status) "⚙️")
+    ((equal? "in-review" ticket-status) "🔍")
+    ((equal? "done" ticket-status) "✅")
+    ((equal? "rejected" ticket-status) "❌")
+    (else "")))
+
+(define-public (glyph-for-ticket-type ticket-type)
+  (cond
+    ((equal? "task" ticket-type) "🔧")
+    ((equal? "bug" ticket-type) "🐛")
+    ((equal? "story" ticket-type) "📖")
+    ((equal? "spike" ticket-type) "🧪")
+    ((equal? "time-box" ticket-type) "⏳")
     (else "")))
 
 (begin
