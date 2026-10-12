@@ -45,7 +45,7 @@
 (define-public guile-hygguile
   (package
     (name "guile-hygguile")
-    (version "2.2.2")
+    (version "2.5.0")
     (source
      (origin
        (method git-fetch)
@@ -54,9 +54,9 @@
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1b6m1nli9xlcnivqk5cwai96v7pygk65wh004hpblddwby8aw00s"))))
+        (base32 "1vdqzxs2n97iqk53p0an3fzxrghh12q14v3ahm84yf7pcyyyny2d"))))
     (build-system guile-build-system)
-    (native-inputs (list guile-3.0))
+    (native-inputs (list guile-uuid guile-3.0))
     (arguments
      (list
       #:source-directory "src"))
@@ -75,7 +75,7 @@ easing the learning curve, and reducing the cognitive load.")
 (define-public guile-kracht
   (package
     (name "guile-kracht")
-    (version "0.2.1")
+    (version "0.3.0")
     (source
      (origin
        (method git-fetch)
@@ -84,7 +84,7 @@ easing the learning curve, and reducing the cognitive load.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0mcyi3a6vpqm4z01rcmv6fqhf7gayppa9yib76jqrihxv8w70m5g"))))
+        (base32 "0ayazqxg5rcvfpabfican1a2mzix63nklj06ksdb34zlbbiqzcjr"))))
     (build-system guile-build-system)
     (native-inputs (list guile-3.0))
     (arguments
@@ -92,38 +92,9 @@ easing the learning curve, and reducing the cognitive load.")
       #:source-directory "src"))
     (home-page "https://codeberg.org/jjba23/kracht")
     (synopsis
-     "Utility methods and functionalities for Guile Scheme programming")
+     "Good prelude for Guile Scheme, an opt-in enhancement to the standard library")
     (description
-     "Kracht provides helpful and convenient functionalities that can help you
-develop more comfortably in your Guile Scheme project. You can see it as a
-batteries-included addition to the (already great) standard library
-of Guile Scheme, complementing it, and helping developers write cleaner,
-more efficient, and more powerful code.")
-    (license license:lgpl3+)))
-
-(define-public guile-orgwebalchemy
-  (package
-    (name "guile-orgwebalchemy")
-    (version "1.0.9")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://codeberg.org/jjba23/orgwebalchemy.git")
-             (commit (string-append "v" version))))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "1kgq4ck9nwk9mqqxr968m4bcijkf1xwlkcn0vlg97fk55pizdkcr"))))
-    (build-system guile-build-system)
-    (native-inputs (list guile-3.0))
-    (arguments
-     (list
-      #:source-directory "src"))
-    (home-page "https://codeberg.org/jjba23/orgwebalchemy")
-    (synopsis
-     "Convert Org markup to pretty HTML with a Lisp (Guile Scheme) library")
-    (description
-     "Convert Org markup to pretty HTML with a Lisp (Guile Scheme) library")
+     "Good prelude for Guile Scheme, an opt-in enhancement to the standard library. kracht means power/strength in the Dutch language, and is also a recursive acronym which stands for: KRACHT Reliable And Consistent Helper Tools")
     (license license:lgpl3+)))
 
 (define-public guile-bewaking
@@ -156,6 +127,95 @@ and obfuscation tricks, producing secure tokens you can use for example for
 user sessions on the web or authenticating API calls.")
     (license license:lgpl3+)))
 
+(define-public guile-scriba
+  (package
+    (name "guile-scriba")
+    (version "0.3.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://codeberg.org/jjba23/scriba.git")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0b05a74k2gcz5whn5czkjq28lp1m4b88ww16d8y7q3708ncdwq23"))))
+    (build-system guile-build-system)
+    (arguments
+     (list
+      #:source-directory "src"))
+    (propagated-inputs (list guile-json-4))
+    (inputs (list guile-3.0))
+    (synopsis "Structured logging framework for Guile Scheme")
+    (description
+     "Scriba is a structured logging library for GNU Guile that prioritizes
+flexibility and observability.  It provides modular log routing, formatting,
+and filtering, allowing developers to generate human-readable console logs
+during development and machine-readable JSON logs for production environments.
+Key features include an auto-logger configured via environment variables,
+dynamically scoped log contexts using Scheme parameters, ahead-of-time log
+level filtering, and minimal runtime overhead achieved through memoization
+and compile-time macros.")
+    (home-page "https://codeberg.org/jjba23/scriba")
+    (license license:lgpl3+)))
+
+
+(define-public guile-veritas
+  (package
+    (name "guile-veritas")
+    (version "0.7.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://codeberg.org/jjba23/veritas.git")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "11n9gyqb7nc0zw4z0fadmw4bd6k673314wpdd66mllwxs2xfcs0q"))))
+    (build-system guile-build-system)
+    (arguments
+     (list
+      #:source-directory "src"))
+    (native-inputs (list guile-3.0))
+    (propagated-inputs (list guile-fibers
+                             guile-json-4)) ;; for versions >= 2.0.0
+    (home-page "https://codeberg.org/jjba23/veritas")
+    (synopsis "Testing framework for Guile")
+    (description
+     "Veritas is a testing framework for Guile with an @acronym{EDSL,
+embedded domain specific language} to define test suites.  Emphasis is placed
+on legible, maintainable tests.  Veritas shuffles tests and runs them
+concurrently by default.")
+    (license license:lgpl3+)))
+
+(define-public guile-orgwebalchemy
+  (package
+    (name "guile-orgwebalchemy")
+    (version "1.0.9")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://codeberg.org/jjba23/orgwebalchemy.git")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1kgq4ck9nwk9mqqxr968m4bcijkf1xwlkcn0vlg97fk55pizdkcr"))))
+    (build-system guile-build-system)
+    (native-inputs (list guile-3.0))
+    (arguments
+     (list
+      #:source-directory "src"))
+    (home-page "https://codeberg.org/jjba23/orgwebalchemy")
+    (synopsis
+     "Convert Org markup to pretty HTML with a Lisp (Guile Scheme) library")
+    (description
+     "Convert Org markup to pretty HTML with a Lisp (Guile Scheme) library")
+    (license license:lgpl3+)))
+
+
+
 ;;
 ;; define manifest
 ;;
@@ -171,6 +231,7 @@ user sessions on the web or authenticating API calls.")
                           guile-curl
                           guile-bewaking
                           guile-uuid
+                          guile-veritas
                           guile-dbi
                           guile-gcrypt
                           watchexec
