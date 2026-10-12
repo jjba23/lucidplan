@@ -1,0 +1,432 @@
+# Dutch translations for lucidplan package.
+# Copyright (C) 2026 Josep Bigorra <jjbigorra@gmail.com>
+# This file is distributed under the same license as the lucidplan package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: lucidplan\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2026-10-12 20:00+0100\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: app/views/error.scm:106
+msgid "sign in"
+msgstr "inloggen"
+
+#: app/views/error.scm:107 app/views/index.scm:75
+msgid "browse projects"
+msgstr "projecten bekijken"
+
+#: app/views/error.scm:154
+msgid "back to the top"
+msgstr "terug naar boven"
+
+#: app/views/index.scm:40
+msgid "Welcome to LucidPlan"
+msgstr "Welkom bij LucidPlan"
+
+#: app/views/index.scm:43
+msgid "free and open project management for everyone"
+msgstr "vrij en open projectbeheer voor iedereen"
+
+#: app/views/index.scm:63
+msgid "Take control of your projects with LucidPlan, the open and flexible project management solution built for teams of every shape and size."
+msgstr "Neem de regie over je projecten met LucidPlan, de open en flexibele oplossing voor projectbeheer, gemaakt voor teams van elke vorm en grootte."
+
+#: app/views/index.scm:66
+msgid "We believe powerful tools shouldn't be complicated or restricted, so LucidPlan keeps your workflow simple and approachable."
+msgstr "Wij vinden dat krachtig gereedschap niet ingewikkeld of beperkt hoort te zijn, dus LucidPlan houdt je werkwijze eenvoudig en toegankelijk."
+
+#: app/views/index.scm:78
+msgid "start a project"
+msgstr "een project starten"
+
+#: app/views/index.scm:87 lib/lucidplan/html.scm:301
+msgid "projects"
+msgstr "projecten"
+
+#: app/views/index.scm:89
+msgid "workflow columns"
+msgstr "werkstroomkolommen"
+
+#: app/views/kanban.scm:275
+msgid "backlog"
+msgstr "backlog"
+
+#: app/views/kanban.scm:283 app/views/tickets.scm:698
+msgid "new ticket"
+msgstr "nieuw ticket"
+
+#: app/views/login.scm:44 app/views/me.scm:148 app/views/me.scm:276
+#: app/views/me.scm:356
+msgid "email"
+msgstr "e-mail"
+
+#: app/views/login.scm:49
+msgid "password"
+msgstr "wachtwoord"
+
+#: app/views/login.scm:54 app/views/me.scm:134 lib/lucidplan/html.scm:259
+msgid "login"
+msgstr "inloggen"
+
+#: app/views/login.scm:68
+msgid "account to reset (email)"
+msgstr "account om te herstellen (e-mail)"
+
+#: app/views/login.scm:75 app/views/me.scm:249
+msgid "reset"
+msgstr "herstellen"
+
+#: app/views/login.scm:88
+msgid "login to lucidplan"
+msgstr "inloggen bij LucidPlan"
+
+#: app/views/login.scm:93 app/views/me.scm:131
+msgid "reset password"
+msgstr "wachtwoord herstellen"
+
+#: app/views/me.scm:61
+msgid "my unique id:"
+msgstr "mijn unieke id:"
+
+#: app/views/me.scm:71
+msgid "my permissions (in database):"
+msgstr "mijn rechten (in de database):"
+
+#: app/views/me.scm:82
+msgid "current session permissions (in token):"
+msgstr "rechten van deze sessie (in het token):"
+
+#: app/views/me.scm:89
+msgid "tip: if your session permissions don't match the DB consider logging out and logging in again"
+msgstr "tip: komen de rechten van je sessie niet overeen met de database, log dan uit en weer in"
+
+#: app/views/me.scm:95
+msgid "logged in until"
+msgstr "ingelogd tot"
+
+#: app/views/me.scm:121
+msgid "go to user management"
+msgstr "naar gebruikersbeheer"
+
+#: app/views/me.scm:125
+msgid "logout"
+msgstr "uitloggen"
+
+#: app/views/me.scm:142 app/views/me.scm:273 app/views/me.scm:351
+msgid "username"
+msgstr "gebruikersnaam"
+
+#: app/views/me.scm:153
+msgid "id"
+msgstr "id"
+
+#: app/views/me.scm:159
+msgid "permissions"
+msgstr "rechten"
+
+#: app/views/me.scm:171 app/views/projects.scm:115 app/views/tickets.scm:382
+msgid "delete"
+msgstr "verwijderen"
+
+#: app/views/me.scm:177
+msgid "are you sure you want to delete this user?"
+msgstr "weet je zeker dat je deze gebruiker wilt verwijderen?"
+
+#: app/views/me.scm:186 app/views/me.scm:390
+msgid "edit"
+msgstr "bewerken"
+
+#: app/views/me.scm:195
+msgid "User management"
+msgstr "Gebruikersbeheer"
+
+#: app/views/me.scm:199
+msgid "new user"
+msgstr "nieuwe gebruiker"
+
+#: app/views/me.scm:217
+msgid "Reset your password"
+msgstr "Herstel je wachtwoord"
+
+#: app/views/me.scm:220
+msgid "perform a password reset for"
+msgstr "herstel het wachtwoord van"
+
+#: app/views/me.scm:238
+msgid "new password"
+msgstr "nieuw wachtwoord"
+
+#: app/views/me.scm:244
+msgid "confirm password"
+msgstr "wachtwoord bevestigen"
+
+#: app/views/me.scm:262
+msgid "New User"
+msgstr "Nieuwe gebruiker"
+
+#: app/views/me.scm:281 app/views/me.scm:363
+msgid "user permissions"
+msgstr "rechten van de gebruiker"
+
+#: app/views/me.scm:296
+msgid "create"
+msgstr "aanmaken"
+
+#: app/views/me.scm:334
+msgid "Edit User"
+msgstr "Gebruiker bewerken"
+
+#: app/views/projects.scm:99
+msgid "edit project"
+msgstr "project bewerken"
+
+#: app/views/projects.scm:242
+msgid "Projects"
+msgstr "Projecten"
+
+#: app/views/projects.scm:246
+msgid "new project"
+msgstr "nieuw project"
+
+#: app/views/projects.scm:267
+msgid "Tip: Use Tab to navigate projects and Enter/Space to expand or collapse cards."
+msgstr "Tip: gebruik Tab om door projecten te gaan en Enter of spatie om kaarten open of dicht te klappen."
+
+#: app/views/projects.scm:278 app/views/tickets.scm:457
+msgid "Expand All"
+msgstr "Alles uitklappen"
+
+#: app/views/projects.scm:288 app/views/tickets.scm:460
+msgid "Collapse All"
+msgstr "Alles inklappen"
+
+#: app/views/projects.scm:353 app/views/tickets.scm:867
+msgid "title"
+msgstr "titel"
+
+#: app/views/projects.scm:357
+msgid "human id"
+msgstr "leesbare id"
+
+#: app/views/projects.scm:361
+msgid "homepage url"
+msgstr "url van de website"
+
+#: app/views/projects.scm:366
+msgid "version control url"
+msgstr "url van de versiebeheer"
+
+#: app/views/projects.scm:370 app/views/tickets.scm:335
+#: app/views/tickets.scm:905
+msgid "description"
+msgstr "beschrijving"
+
+#: app/views/projects.scm:380
+msgid "save project"
+msgstr "project opslaan"
+
+#: app/views/projects.scm:386
+msgid "cancel"
+msgstr "annuleren"
+
+#: app/views/tickets.scm:150
+msgid "To-do"
+msgstr "Te doen"
+
+#: app/views/tickets.scm:151
+msgid "Work in Progress"
+msgstr "In behandeling"
+
+#: app/views/tickets.scm:152
+msgid "In Review"
+msgstr "In beoordeling"
+
+#: app/views/tickets.scm:153
+msgid "Done"
+msgstr "Gedaan"
+
+#: app/views/tickets.scm:154
+msgid "Rejected"
+msgstr "Afgewezen"
+
+#: app/views/tickets.scm:159
+msgid "Task"
+msgstr "Taak"
+
+#: app/views/tickets.scm:160
+msgid "Bug"
+msgstr "Fout"
+
+#: app/views/tickets.scm:161
+msgid "Story"
+msgstr "Verhaal"
+
+#: app/views/tickets.scm:162
+msgid "Spike"
+msgstr "Spike"
+
+#: app/views/tickets.scm:163
+msgid "Time Box"
+msgstr "Tijdsbox"
+
+#: app/views/tickets.scm:200
+msgid "saved"
+msgstr "opgeslagen"
+
+#: app/views/tickets.scm:201
+msgid "not saved"
+msgstr "niet opgeslagen"
+
+#: app/views/tickets.scm:202
+msgid "the ticket was left as it was"
+msgstr "het ticket is ongewijzigd gelaten"
+
+#: app/views/tickets.scm:307 app/views/tickets.scm:325
+#: app/views/tickets.scm:875
+msgid "status"
+msgstr "status"
+
+#: app/views/tickets.scm:317 app/views/tickets.scm:328
+#: app/views/tickets.scm:883
+msgid "type"
+msgstr "type"
+
+#: app/views/tickets.scm:353 app/views/tickets.scm:890
+msgid "priority"
+msgstr "prioriteit"
+
+#: app/views/tickets.scm:357 app/views/tickets.scm:899
+msgid "assignee"
+msgstr "toegewezene"
+
+#: app/views/tickets.scm:364
+msgid "edit ticket"
+msgstr "ticket bewerken"
+
+#: app/views/tickets.scm:454
+msgid "Tip: Use Tab to navigate tickets and Enter/Space to expand or collapse cards."
+msgstr "Tip: gebruik Tab om door tickets te gaan en Enter of spatie om kaarten open of dicht te klappen."
+
+#: app/views/tickets.scm:570 app/views/tickets.scm:637
+msgid "done"
+msgstr "gedaan"
+
+#: app/views/tickets.scm:601 app/views/tickets.scm:639
+msgid "rejected"
+msgstr "afgewezen"
+
+#: app/views/tickets.scm:618
+msgid "Wow.. it's really empty here"
+msgstr "Wauw.. het is hier echt leeg"
+
+#: app/views/tickets.scm:635
+msgid "open"
+msgstr "open"
+
+#: app/views/tickets.scm:641
+msgid "total"
+msgstr "totaal"
+
+#: app/views/tickets.scm:645
+msgid "completion"
+msgstr "voltooid"
+
+#: app/views/tickets.scm:688
+msgid "kanban"
+msgstr "kanban"
+
+#: app/views/tickets.scm:729
+msgid "backlog options"
+msgstr "backlogopties"
+
+#: app/views/tickets.scm:752
+msgid "show done?"
+msgstr "gedane tonen?"
+
+#: app/views/tickets.scm:768
+msgid "show rejected?"
+msgstr "afgewezen tonen?"
+
+#: app/views/tickets.scm:851
+msgid "unassigned"
+msgstr "niet toegewezen"
+
+#: app/views/tickets.scm:923
+msgid "submit"
+msgstr "verzenden"
+
+#: lib/lucidplan/html.scm:46
+msgid "lucidplan - free project management for everyone"
+msgstr "lucidplan - vrij projectbeheer voor iedereen"
+
+#: lib/lucidplan/html.scm:48
+msgid "lucidplan is free software, available under the GNU AGPL v3 or newer"
+msgstr "lucidplan is vrije software, beschikbaar onder de GNU AGPL v3 of nieuwer"
+
+#: lib/lucidplan/html.scm:53 lib/lucidplan/html.scm:59
+msgid "find here the:"
+msgstr "vind hier de:"
+
+#: lib/lucidplan/html.scm:63
+msgid "Copyright © Josep Bigorra  &lt;jjbigorra@gmail.com&gt;"
+msgstr "Copyright © Josep Bigorra  &lt;jjbigorra@gmail.com&gt;"
+
+#: lib/lucidplan/html.scm:230
+msgid "LucidPlan"
+msgstr "LucidPlan"
+
+#: lib/lucidplan/html.scm:279
+msgid "me"
+msgstr "ik"
+
+#: lib/lucidplan/html.scm:529
+msgid "Search..."
+msgstr "Zoeken..."
+
+#: lib/lucidplan/html.scm:539
+msgid "search"
+msgstr "zoeken"
+
+#: lib/lucidplan/html.scm:572
+msgid "Title - Ascending"
+msgstr "Titel - oplopend"
+
+#: lib/lucidplan/html.scm:574
+msgid "Title - Descending"
+msgstr "Titel - aflopend"
+
+#: lib/lucidplan/html.scm:577
+msgid "Created - Ascending"
+msgstr "Aangemaakt - oplopend"
+
+#: lib/lucidplan/html.scm:579
+msgid "Created - Descending"
+msgstr "Aangemaakt - aflopend"
+
+#: lib/lucidplan/html.scm:582
+msgid "Last edited - Ascending"
+msgstr "Laatst bewerkt - oplopend"
+
+#: lib/lucidplan/html.scm:584
+msgid "Last edited - Descending"
+msgstr "Laatst bewerkt - aflopend"
+
+#: lib/lucidplan/html.scm:587
+msgid "Priority - Ascending"
+msgstr "Prioriteit - oplopend"
+
+#: lib/lucidplan/html.scm:589
+msgid "Priority - Descending"
+msgstr "Prioriteit - aflopend"
+
+#: lib/lucidplan/html.scm:735
+msgid "language"
+msgstr "taal"

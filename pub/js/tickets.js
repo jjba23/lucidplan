@@ -1,9 +1,23 @@
 let draggedTicket = null;
 
+// A ticket is dragged by its grip, never by its whole card or row: a drag
+// source cannot be read with the mouse, because dragging across its text
+// moves the ticket instead of selecting what it says. The grip is the only
+// element that carries `draggable', so the row it points at is what travels
+// -- both the backlog row and the kanban card mark themselves with
+// `data-ticket-id', and either one is resolved from the grip that was grabbed.
 function dragTicketStart(event) {
-  draggedTicket = event.currentTarget;
+  const row = event.currentTarget.closest('[data-ticket-id]');
+  if (!row) return;
+
+  draggedTicket = row;
   event.dataTransfer.effectAllowed = 'move';
-  event.dataTransfer.setData('text/plain', draggedTicket.id);
+  // The kanban board matches the dropped id against the ids on this page, so
+  // the id that travels is the ticket's human id rather than a DOM id.
+  event.dataTransfer.setData('text/plain', row.getAttribute('data-ticket-id'));
+  // What follows the pointer is the row, not the little grip it was
+  // dragged by.
+  event.dataTransfer.setDragImage(row, 24, 16);
 
   // Disable pointer events on dragged element so mouse events hit the drop targets underneath
   draggedTicket.classList.add('opacity-50', 'pointer-events-none');
@@ -82,11 +96,9 @@ async function dropTicketsItem(event) {
 }
 
 // ==================================
-function handleKanbanDragStart(e) {
-  // Store the human ID of the ticket being dragged
-  e.dataTransfer.setData("text/plain", e.currentTarget.dataset.ticketId);
-  e.dataTransfer.effectAllowed = "move";
-}
+// A kanban card is dragged by the same grip the backlog row uses, so its
+// start is `dragTicketStart' above rather than a second function saying the
+// same thing.
 
 function handleKanbanDragOver(e) {
   e.preventDefault();

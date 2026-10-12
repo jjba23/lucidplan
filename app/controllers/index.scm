@@ -31,16 +31,21 @@
 ;; `app/views/error.scm' for the pages themselves.
 (register-error-pages!)
 
+;; The route reads the `lang' cookie for two things: as the translator it
+;; renders with -- `#:i18n' -- and as the row the language control shows,
+;; which is the language this very page came out in.
 (get "/"
      #:mime 'xml
      #:i18n '(cookie "lang")
-     #:cookies '(names x-bewaking-lucidplan)
+     #:cookies '(names x-bewaking-lucidplan lang)
      (lambda (rc)
        (let* ((project-repo (make-sqlite-project-repository rc))
               (proj (get-projects project-repo)))
          (response-emit (:mime rc
                                (welcome-page (:i18n rc)
                                              #:projects proj
+                                             #:selected-locale (:cookies-value
+                                                                rc "lang")
                                              #:is-logged-in (:cookies-value rc
                                                              "x-bewaking-lucidplan")))))))
 

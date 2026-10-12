@@ -136,37 +136,47 @@
 ;; own is shown as the value itself, so a ladder that grows in the domain
 ;; still renders a row rather than dropping one.
 ;;
+;; A row's label is written as a call of the reader's translator rather than
+;; looked up in a table of plain strings, so that the extractor finds every
+;; one of them: a label that only ever reaches the page as the argument of a
+;; lookup is invisible to `xgettext', and both ladders would then stay in
+;; English inside an otherwise translated page.
+;;
 ;; A row's glyph is a character rather than an icon component: a native menu
 ;; lays out the text of a row and renders nothing nested inside it (see
 ;; `glyph-for-ticket-status').
-(define ticket-status-labels
-  '(("todo" . "To-do")
-    ("work-in-progress" . "Work in Progress")
-    ("in-review" . "In Review")
-    ("done" . "Done")
-    ("rejected" . "Rejected")))
+(define (ticket-status-label G_ status)
+  (cond
+    ((equal? status "todo") (G_ "To-do"))
+    ((equal? status "work-in-progress") (G_ "Work in Progress"))
+    ((equal? status "in-review") (G_ "In Review"))
+    ((equal? status "done") (G_ "Done"))
+    ((equal? status "rejected") (G_ "Rejected"))
+    (else status)))
 
-(define ticket-type-labels
-  '(("task" . "Task")
-    ("bug" . "Bug")
-    ("story" . "Story")
-    ("spike" . "Spike")
-    ("time-box" . "Time Box")))
+(define (ticket-type-label G_ type)
+  (cond
+    ((equal? type "task") (G_ "Task"))
+    ((equal? type "bug") (G_ "Bug"))
+    ((equal? type "story") (G_ "Story"))
+    ((equal? type "spike") (G_ "Spike"))
+    ((equal? type "time-box") (G_ "Time Box"))
+    (else type)))
 
-(define (ticket-choices G_ values labels glyph-for selected)
+(define (ticket-choices G_ values label-for glyph-for selected)
   (map (lambda (value)
          (glyph-option #:value value
                        #:glyph (glyph-for value)
-                       #:content (G_ (or (assoc-ref labels value) value))
+                       #:content (label-for G_ value)
                        #:selected-value selected))
        values))
 
 (define (ticket-status-choices G_ selected)
-  (ticket-choices G_ ticket-statuses ticket-status-labels
+  (ticket-choices G_ ticket-statuses ticket-status-label
                   glyph-for-ticket-status selected))
 
 (define (ticket-type-choices G_ selected)
-  (ticket-choices G_ ticket-types ticket-type-labels
+  (ticket-choices G_ ticket-types ticket-type-label
                   glyph-for-ticket-type selected))
 
 ;; =============================================================================
@@ -396,14 +406,10 @@ column above the pill already says which field this is."
                                                   'id) ticket-assignee))
                               user-names)))
     
-    `(div (@ (class ,(string-append %list-wrapper-face
-                                    " cursor-grab active:cursor-grabbing"))
+    `(div (@ (class ,%list-wrapper-face)
              (id ,item-id)
-             (draggable "true")
              (data-ticket-id ,human-id)
-             (data-priority ,(number->string priority))
-             (ondragstart "dragTicketStart(event)")
-             (ondragend "dragTicketEnd(event)"))
+             (data-priority ,(number->string priority)))
 
           ;; Clickable Header Row
           (div (@ (onclick ,toggle-js)

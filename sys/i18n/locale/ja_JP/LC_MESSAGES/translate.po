@@ -1,0 +1,432 @@
+# Japanese translations for lucidplan package.
+# Copyright (C) 2026 Josep Bigorra <jjbigorra@gmail.com>
+# This file is distributed under the same license as the lucidplan package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: lucidplan\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2026-10-12 20:00+0100\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: app/views/error.scm:106
+msgid "sign in"
+msgstr "サインイン"
+
+#: app/views/error.scm:107 app/views/index.scm:75
+msgid "browse projects"
+msgstr "プロジェクトを見る"
+
+#: app/views/error.scm:154
+msgid "back to the top"
+msgstr "トップに戻る"
+
+#: app/views/index.scm:40
+msgid "Welcome to LucidPlan"
+msgstr "LucidPlan へようこそ"
+
+#: app/views/index.scm:43
+msgid "free and open project management for everyone"
+msgstr "誰にでも開かれた自由なプロジェクト管理"
+
+#: app/views/index.scm:63
+msgid "Take control of your projects with LucidPlan, the open and flexible project management solution built for teams of every shape and size."
+msgstr "LucidPlan は、あらゆる形と規模のチームのための、開かれた柔軟なプロジェクト管理ツールです。プロジェクトを自分の手に。"
+
+#: app/views/index.scm:66
+msgid "We believe powerful tools shouldn't be complicated or restricted, so LucidPlan keeps your workflow simple and approachable."
+msgstr "強力な道具は複雑でも窮屈でもあるべきではありません。だから LucidPlan はワークフローをシンプルで親しみやすく保ちます。"
+
+#: app/views/index.scm:78
+msgid "start a project"
+msgstr "プロジェクトを始める"
+
+#: app/views/index.scm:87 lib/lucidplan/html.scm:301
+msgid "projects"
+msgstr "プロジェクト"
+
+#: app/views/index.scm:89
+msgid "workflow columns"
+msgstr "ワークフローの段階"
+
+#: app/views/kanban.scm:275
+msgid "backlog"
+msgstr "バックログ"
+
+#: app/views/kanban.scm:283 app/views/tickets.scm:698
+msgid "new ticket"
+msgstr "新しいチケット"
+
+#: app/views/login.scm:44 app/views/me.scm:148 app/views/me.scm:276
+#: app/views/me.scm:356
+msgid "email"
+msgstr "メールアドレス"
+
+#: app/views/login.scm:49
+msgid "password"
+msgstr "パスワード"
+
+#: app/views/login.scm:54 app/views/me.scm:134 lib/lucidplan/html.scm:259
+msgid "login"
+msgstr "ログイン"
+
+#: app/views/login.scm:68
+msgid "account to reset (email)"
+msgstr "再設定するアカウント(メールアドレス)"
+
+#: app/views/login.scm:75 app/views/me.scm:249
+msgid "reset"
+msgstr "再設定"
+
+#: app/views/login.scm:88
+msgid "login to lucidplan"
+msgstr "LucidPlan にログイン"
+
+#: app/views/login.scm:93 app/views/me.scm:131
+msgid "reset password"
+msgstr "パスワードの再設定"
+
+#: app/views/me.scm:61
+msgid "my unique id:"
+msgstr "自分の一意の id:"
+
+#: app/views/me.scm:71
+msgid "my permissions (in database):"
+msgstr "自分の権限(データベース内):"
+
+#: app/views/me.scm:82
+msgid "current session permissions (in token):"
+msgstr "現在のセッションの権限(トークン内):"
+
+#: app/views/me.scm:89
+msgid "tip: if your session permissions don't match the DB consider logging out and logging in again"
+msgstr "ヒント: セッションの権限がデータベースと一致しない場合は、一度ログアウトしてから再度ログインしてください"
+
+#: app/views/me.scm:95
+msgid "logged in until"
+msgstr "ログインの有効期限"
+
+#: app/views/me.scm:121
+msgid "go to user management"
+msgstr "ユーザー管理へ"
+
+#: app/views/me.scm:125
+msgid "logout"
+msgstr "ログアウト"
+
+#: app/views/me.scm:142 app/views/me.scm:273 app/views/me.scm:351
+msgid "username"
+msgstr "ユーザー名"
+
+#: app/views/me.scm:153
+msgid "id"
+msgstr "id"
+
+#: app/views/me.scm:159
+msgid "permissions"
+msgstr "権限"
+
+#: app/views/me.scm:171 app/views/projects.scm:115 app/views/tickets.scm:382
+msgid "delete"
+msgstr "削除"
+
+#: app/views/me.scm:177
+msgid "are you sure you want to delete this user?"
+msgstr "このユーザーを削除してもよろしいですか？"
+
+#: app/views/me.scm:186 app/views/me.scm:390
+msgid "edit"
+msgstr "編集"
+
+#: app/views/me.scm:195
+msgid "User management"
+msgstr "ユーザー管理"
+
+#: app/views/me.scm:199
+msgid "new user"
+msgstr "新しいユーザー"
+
+#: app/views/me.scm:217
+msgid "Reset your password"
+msgstr "パスワードを再設定する"
+
+#: app/views/me.scm:220
+msgid "perform a password reset for"
+msgstr "パスワードを再設定する相手"
+
+#: app/views/me.scm:238
+msgid "new password"
+msgstr "新しいパスワード"
+
+#: app/views/me.scm:244
+msgid "confirm password"
+msgstr "パスワードの確認"
+
+#: app/views/me.scm:262
+msgid "New User"
+msgstr "新しいユーザー"
+
+#: app/views/me.scm:281 app/views/me.scm:363
+msgid "user permissions"
+msgstr "ユーザーの権限"
+
+#: app/views/me.scm:296
+msgid "create"
+msgstr "作成"
+
+#: app/views/me.scm:334
+msgid "Edit User"
+msgstr "ユーザーを編集"
+
+#: app/views/projects.scm:99
+msgid "edit project"
+msgstr "プロジェクトを編集"
+
+#: app/views/projects.scm:242
+msgid "Projects"
+msgstr "プロジェクト"
+
+#: app/views/projects.scm:246
+msgid "new project"
+msgstr "新しいプロジェクト"
+
+#: app/views/projects.scm:267
+msgid "Tip: Use Tab to navigate projects and Enter/Space to expand or collapse cards."
+msgstr "ヒント: Tab でプロジェクトを移動し、Enter またはスペースでカードを開いたり閉じたりできます。"
+
+#: app/views/projects.scm:278 app/views/tickets.scm:457
+msgid "Expand All"
+msgstr "すべて開く"
+
+#: app/views/projects.scm:288 app/views/tickets.scm:460
+msgid "Collapse All"
+msgstr "すべて閉じる"
+
+#: app/views/projects.scm:353 app/views/tickets.scm:867
+msgid "title"
+msgstr "タイトル"
+
+#: app/views/projects.scm:357
+msgid "human id"
+msgstr "人が読める id"
+
+#: app/views/projects.scm:361
+msgid "homepage url"
+msgstr "ホームページの url"
+
+#: app/views/projects.scm:366
+msgid "version control url"
+msgstr "バージョン管理の url"
+
+#: app/views/projects.scm:370 app/views/tickets.scm:335
+#: app/views/tickets.scm:905
+msgid "description"
+msgstr "説明"
+
+#: app/views/projects.scm:380
+msgid "save project"
+msgstr "プロジェクトを保存"
+
+#: app/views/projects.scm:386
+msgid "cancel"
+msgstr "キャンセル"
+
+#: app/views/tickets.scm:150
+msgid "To-do"
+msgstr "未着手"
+
+#: app/views/tickets.scm:151
+msgid "Work in Progress"
+msgstr "進行中"
+
+#: app/views/tickets.scm:152
+msgid "In Review"
+msgstr "レビュー中"
+
+#: app/views/tickets.scm:153
+msgid "Done"
+msgstr "完了"
+
+#: app/views/tickets.scm:154
+msgid "Rejected"
+msgstr "却下"
+
+#: app/views/tickets.scm:159
+msgid "Task"
+msgstr "タスク"
+
+#: app/views/tickets.scm:160
+msgid "Bug"
+msgstr "バグ"
+
+#: app/views/tickets.scm:161
+msgid "Story"
+msgstr "ストーリー"
+
+#: app/views/tickets.scm:162
+msgid "Spike"
+msgstr "スパイク"
+
+#: app/views/tickets.scm:163
+msgid "Time Box"
+msgstr "タイムボックス"
+
+#: app/views/tickets.scm:200
+msgid "saved"
+msgstr "保存しました"
+
+#: app/views/tickets.scm:201
+msgid "not saved"
+msgstr "保存できませんでした"
+
+#: app/views/tickets.scm:202
+msgid "the ticket was left as it was"
+msgstr "チケットはそのままにしておきました"
+
+#: app/views/tickets.scm:307 app/views/tickets.scm:325
+#: app/views/tickets.scm:875
+msgid "status"
+msgstr "ステータス"
+
+#: app/views/tickets.scm:317 app/views/tickets.scm:328
+#: app/views/tickets.scm:883
+msgid "type"
+msgstr "種類"
+
+#: app/views/tickets.scm:353 app/views/tickets.scm:890
+msgid "priority"
+msgstr "優先度"
+
+#: app/views/tickets.scm:357 app/views/tickets.scm:899
+msgid "assignee"
+msgstr "担当者"
+
+#: app/views/tickets.scm:364
+msgid "edit ticket"
+msgstr "チケットを編集"
+
+#: app/views/tickets.scm:454
+msgid "Tip: Use Tab to navigate tickets and Enter/Space to expand or collapse cards."
+msgstr "ヒント: Tab でチケットを移動し、Enter またはスペースでカードを開いたり閉じたりできます。"
+
+#: app/views/tickets.scm:570 app/views/tickets.scm:637
+msgid "done"
+msgstr "完了"
+
+#: app/views/tickets.scm:601 app/views/tickets.scm:639
+msgid "rejected"
+msgstr "却下"
+
+#: app/views/tickets.scm:618
+msgid "Wow.. it's really empty here"
+msgstr "おや.. ここは本当に空っぽです"
+
+#: app/views/tickets.scm:635
+msgid "open"
+msgstr "未対応"
+
+#: app/views/tickets.scm:641
+msgid "total"
+msgstr "合計"
+
+#: app/views/tickets.scm:645
+msgid "completion"
+msgstr "達成率"
+
+#: app/views/tickets.scm:688
+msgid "kanban"
+msgstr "カンバン"
+
+#: app/views/tickets.scm:729
+msgid "backlog options"
+msgstr "バックログのオプション"
+
+#: app/views/tickets.scm:752
+msgid "show done?"
+msgstr "完了を表示しますか？"
+
+#: app/views/tickets.scm:768
+msgid "show rejected?"
+msgstr "却下を表示しますか？"
+
+#: app/views/tickets.scm:851
+msgid "unassigned"
+msgstr "未割り当て"
+
+#: app/views/tickets.scm:923
+msgid "submit"
+msgstr "送信"
+
+#: lib/lucidplan/html.scm:46
+msgid "lucidplan - free project management for everyone"
+msgstr "lucidplan - 誰にでも開かれた自由なプロジェクト管理"
+
+#: lib/lucidplan/html.scm:48
+msgid "lucidplan is free software, available under the GNU AGPL v3 or newer"
+msgstr "lucidplan はフリーソフトウェアで、GNU AGPL v3 以降で利用できます"
+
+#: lib/lucidplan/html.scm:53 lib/lucidplan/html.scm:59
+msgid "find here the:"
+msgstr "こちらからどうぞ:"
+
+#: lib/lucidplan/html.scm:63
+msgid "Copyright © Josep Bigorra  &lt;jjbigorra@gmail.com&gt;"
+msgstr "Copyright © Josep Bigorra  &lt;jjbigorra@gmail.com&gt;"
+
+#: lib/lucidplan/html.scm:230
+msgid "LucidPlan"
+msgstr "LucidPlan"
+
+#: lib/lucidplan/html.scm:279
+msgid "me"
+msgstr "自分"
+
+#: lib/lucidplan/html.scm:529
+msgid "Search..."
+msgstr "検索..."
+
+#: lib/lucidplan/html.scm:539
+msgid "search"
+msgstr "検索"
+
+#: lib/lucidplan/html.scm:572
+msgid "Title - Ascending"
+msgstr "タイトル - 昇順"
+
+#: lib/lucidplan/html.scm:574
+msgid "Title - Descending"
+msgstr "タイトル - 降順"
+
+#: lib/lucidplan/html.scm:577
+msgid "Created - Ascending"
+msgstr "作成日 - 昇順"
+
+#: lib/lucidplan/html.scm:579
+msgid "Created - Descending"
+msgstr "作成日 - 降順"
+
+#: lib/lucidplan/html.scm:582
+msgid "Last edited - Ascending"
+msgstr "最終編集 - 昇順"
+
+#: lib/lucidplan/html.scm:584
+msgid "Last edited - Descending"
+msgstr "最終編集 - 降順"
+
+#: lib/lucidplan/html.scm:587
+msgid "Priority - Ascending"
+msgstr "優先度 - 昇順"
+
+#: lib/lucidplan/html.scm:589
+msgid "Priority - Descending"
+msgstr "優先度 - 降順"
+
+#: lib/lucidplan/html.scm:735
+msgid "language"
+msgstr "言語"

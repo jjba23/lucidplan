@@ -239,6 +239,7 @@ event."
                                                        flex-wrap
                                                        items-center
                                                        justify-center
+                                                       md:flex-nowrap
                                                        md:justify-end
                                                        gap-3
                                                        md:gap-4
@@ -258,7 +259,6 @@ event."
                                                   #:content (G_ "login")
                                                   #:size '(text-sm md:text-md)
                                                   #:extra-classes '(py-1
-                                                                    md:py-2
                                                                     px-2
                                                                     md:px-3
                                                                     max-w-prose
@@ -279,7 +279,6 @@ event."
                                                   #:content (G_ "me")
                                                   #:size '(text-sm md:text-md)
                                                   #:extra-classes '(py-1
-                                                                    md:py-2
                                                                     px-2
                                                                     md:px-3
                                                                     max-w-prose
@@ -301,7 +300,7 @@ event."
                               ,(icon-button #:icon 'align-bottom
                                             #:content (G_ "projects")
                                             #:size '(text-sm md:text-md)
-                                            #:extra-classes '(py-1 md:py-2
+                                            #:extra-classes '(py-1
                                                               px-2
                                                               md:px-3
                                                               max-w-prose
@@ -333,7 +332,7 @@ event."
                                             #:color '(text-onyx-900
                                                       dark:text-stone-100)
                                             #:weight '(font-light)
-                                            #:extra-classes '(py-1 md:py-2
+                                            #:extra-classes '(py-1
                                                               px-2
                                                               lg:px-3
                                                               max-w-prose
@@ -349,8 +348,15 @@ event."
                                        dark:border-onyx-100/25)
                  #:tint '(bg-jeans-blue-500/75 dark:bg-jeans-blue-900/75)
                  #:shadow '(shadow-lg)
-                 #:padding '(px-4 py-3)
-                 #:classes '(w-full))))
+                 #:padding '(px-4 py-3 md:py-2)
+                 ;; The bar lays its two ends out itself: stacked on a narrow
+                 ;; screen, where there is no room for both, and a single row
+                 ;; from `md' up, where there is.  Without this the two ends
+                 ;; are block-level siblings and the bar is two rows tall on
+                 ;; every screen, which wastes the width it is given.
+                 #:classes '(w-full flex flex-col md:flex-row
+                                   md:flex-nowrap md:items-center
+                                   md:justify-between md:gap-4))))
       
       ;; Output Page
       (render-page
@@ -413,7 +419,8 @@ event."
                                                 #:footer (page-footer G_))))))))
   (export html-template frosted-tint-classes render-page
           emoji-for-ticket-status emoji-for-ticket-type
-          glyph-for-ticket-status glyph-for-ticket-type))
+          glyph-for-ticket-status glyph-for-ticket-type
+          lucidplan-locales locale-choose-form))
 
 (define-public (emoji-for-ticket-status ticket-status)
   (cond
@@ -667,12 +674,97 @@ function addSearchQueryParam(form) {
       (org->html org)))
   (export org2html))
 
+;;; The handle a ticket is dragged by.  It is the drag source and the row is
+;;; not, which is the whole point: an element marked `draggable' cannot be
+;;; read with the mouse -- a drag that starts anywhere inside it moves the
+;;; ticket instead of selecting the sentence the reader meant to copy -- so
+;;; only this grip carries the attribute, and the script resolves the row to
+;;; move from the grip that was grabbed.  The backlog row and the kanban card
+;;; are both dragged by this same grip, so both start with the one handler.
+;;; It is a value rather than a procedure because that is how the views use
+;;; it: `,grab-indicator' splices what the name holds, and a procedure there
+;;; would splice the procedure itself -- a grip that silently disappears.
 (define-public grab-indicator
   `((div (@ (class ,(mk-class '(text-onyx-100 dark:text-stone-300 cursor-grab
                                               active:cursor-grabbing flex
-                                              items-center))))
+                                              items-center)))
+            (draggable "true")
+            (data-drag-handle "true")
+            (ondragstart "dragTicketStart(event)")
+            (ondragend "dragTicketEnd(event)"))
          (svg (@ (class "w-4 h-4")
                  (fill "currentColor")
                  (viewBox "0 0 16 16"))
               (path (@ (d
                         "M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 6a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 4a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 4a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z")))))))
+
+;;; ===== The language a reader reads the interface in =====
+
+;; The languages this instance answers in: the name of the catalog under
+;; `sys/i18n/locale', and the language as it is written in that language.
+;; The list is the page's -- it is what a reader is offered -- so a catalog
+;; added under that directory is offered here, and one removed stops being
+;; offered.  See `sys/i18n/locale' and `maak i18n-compile'.
+(define-public lucidplan-locales
+  '(("en_US" . "English (US)")
+    ("nl_NL" . "Nederlands")
+    ("es_ES" . "Español")
+    ("ja_JP" . "日本語")))
+
+(define* (locale-choose-form G_
+                             #:key selected-locale return-to)
+  "The control a reader changes the interface's language with.
+
+The choice is posted to @code{/preferences/locale}, which writes it to the
+@code{lang} cookie -- the cookie every route builds its translator from --
+and sends the reader back to the page they were reading.  The language a
+page is *being* read in is the server's to state, since it is the language
+that page was rendered in, so the row the menu shows is the one the caller
+passes rather than one this control guesses."
+  `((form (@ (action "/preferences/locale")
+             (method "POST")
+             (enctype "application/x-www-form-urlencoded")
+             (class ,(mk-class '(flex flex-row flex-wrap
+                                        items-center gap-2))))
+          ,@(if return-to
+                `((input (@ (type "hidden")
+                            (name "return-to")
+                            (value ,return-to))))
+                '())
+          ,(select #:name 'user-lang
+                   #:label (G_ "language")
+                   #:label-css '(sr-only)
+                   ;; No `lowercase' here: a language writes its own name,
+                   ;; and `Nederlands' or `Español' is how it is spelled.
+                   #:select-classes '(text-sm
+                                      font-medium
+                                      font-sans
+                                      text-onyx-900
+                                      dark:text-stone-100
+                                      bg-transparent
+                                      rounded-lg
+                                      border-0
+                                      px-2
+                                      py-1
+                                      outline-none
+                                      cursor-pointer
+                                      hover:bg-stone-300/75
+                                      dark:hover:bg-onyx-700/75
+                                      focus:ring-2)
+                   #:options (map (lambda (locale)
+                                    (option #:value (car locale)
+                                            #:content (cdr locale)
+                                            #:selected-value selected-locale))
+                                  lucidplan-locales))
+          ,(icon-button #:icon 'check
+                        #:content ""
+                        #:type 'submit
+                        #:extra-classes '(py-1
+                                          px-2
+                                          max-w-prose
+                                          cursor-pointer
+                                          text-onyx-700
+                                          dark:text-stone-300)
+                        #:icon-css '(text-md
+                                     text-onyx-700
+                                     dark:text-stone-300)))))

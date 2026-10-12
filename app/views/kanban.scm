@@ -42,11 +42,12 @@
   #:export (render-k-ticket kanban-from-tickets))
 
 (define (render-k-ticket project t)
-  `((div (@ (class ,(mk-class '(w-full cursor-grab active:cursor-grabbing)))
-            (draggable "true")
+  ;; The card is not the drag source, its grip is: a card marked `draggable'
+  ;; cannot have its own text selected with the mouse.  See
+  ;; `grab-indicator'.
+  `((div (@ (class ,(mk-class '(w-full)))
             (data-ticket-id ,(assq-ref t
-                                       'human-id))
-            (ondragstart "handleKanbanDragStart(event)"))
+                                       'human-id)))
 
          (div (@ (class ,(mk-class (append '(rounded-xl
                                              p-3

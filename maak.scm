@@ -45,7 +45,7 @@
   "translate")
 
 (define i18n-locales
-  '(en_US nl_NL es_ES))
+  '(en_US nl_NL es_ES ja_JP))
 
 (define hot-reload-file-types
   '(scm css js))
@@ -206,6 +206,10 @@ for higher concurrent writes to SQLite 3."
 (define (i18n-init-es)
   "Initialize a new translation file for es_ES."
   (i18n-init* 'es_ES))
+
+(define (i18n-init-ja)
+  "Initialize a new translation file for ja_JP."
+  (i18n-init* 'ja_JP))
 
 (define (i18n-merge)
   "Merge translation updates for all locales."

@@ -1,0 +1,432 @@
+# English (US) translations for lucidplan package.
+# Copyright (C) 2026 Josep Bigorra <jjbigorra@gmail.com>
+# This file is distributed under the same license as the lucidplan package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: lucidplan\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2026-10-12 20:00+0100\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: app/views/error.scm:106
+msgid "sign in"
+msgstr "sign in"
+
+#: app/views/error.scm:107 app/views/index.scm:75
+msgid "browse projects"
+msgstr "browse projects"
+
+#: app/views/error.scm:154
+msgid "back to the top"
+msgstr "back to the top"
+
+#: app/views/index.scm:40
+msgid "Welcome to LucidPlan"
+msgstr "Welcome to LucidPlan"
+
+#: app/views/index.scm:43
+msgid "free and open project management for everyone"
+msgstr "free and open project management for everyone"
+
+#: app/views/index.scm:63
+msgid "Take control of your projects with LucidPlan, the open and flexible project management solution built for teams of every shape and size."
+msgstr "Take control of your projects with LucidPlan, the open and flexible project management solution built for teams of every shape and size."
+
+#: app/views/index.scm:66
+msgid "We believe powerful tools shouldn't be complicated or restricted, so LucidPlan keeps your workflow simple and approachable."
+msgstr "We believe powerful tools shouldn't be complicated or restricted, so LucidPlan keeps your workflow simple and approachable."
+
+#: app/views/index.scm:78
+msgid "start a project"
+msgstr "start a project"
+
+#: app/views/index.scm:87 lib/lucidplan/html.scm:301
+msgid "projects"
+msgstr "projects"
+
+#: app/views/index.scm:89
+msgid "workflow columns"
+msgstr "workflow columns"
+
+#: app/views/kanban.scm:275
+msgid "backlog"
+msgstr "backlog"
+
+#: app/views/kanban.scm:283 app/views/tickets.scm:698
+msgid "new ticket"
+msgstr "new ticket"
+
+#: app/views/login.scm:44 app/views/me.scm:148 app/views/me.scm:276
+#: app/views/me.scm:356
+msgid "email"
+msgstr "email"
+
+#: app/views/login.scm:49
+msgid "password"
+msgstr "password"
+
+#: app/views/login.scm:54 app/views/me.scm:134 lib/lucidplan/html.scm:259
+msgid "login"
+msgstr "login"
+
+#: app/views/login.scm:68
+msgid "account to reset (email)"
+msgstr "account to reset (email)"
+
+#: app/views/login.scm:75 app/views/me.scm:249
+msgid "reset"
+msgstr "reset"
+
+#: app/views/login.scm:88
+msgid "login to lucidplan"
+msgstr "login to lucidplan"
+
+#: app/views/login.scm:93 app/views/me.scm:131
+msgid "reset password"
+msgstr "reset password"
+
+#: app/views/me.scm:61
+msgid "my unique id:"
+msgstr "my unique id:"
+
+#: app/views/me.scm:71
+msgid "my permissions (in database):"
+msgstr "my permissions (in database):"
+
+#: app/views/me.scm:82
+msgid "current session permissions (in token):"
+msgstr "current session permissions (in token):"
+
+#: app/views/me.scm:89
+msgid "tip: if your session permissions don't match the DB consider logging out and logging in again"
+msgstr "tip: if your session permissions don't match the DB consider logging out and logging in again"
+
+#: app/views/me.scm:95
+msgid "logged in until"
+msgstr "logged in until"
+
+#: app/views/me.scm:121
+msgid "go to user management"
+msgstr "go to user management"
+
+#: app/views/me.scm:125
+msgid "logout"
+msgstr "logout"
+
+#: app/views/me.scm:142 app/views/me.scm:273 app/views/me.scm:351
+msgid "username"
+msgstr "username"
+
+#: app/views/me.scm:153
+msgid "id"
+msgstr "id"
+
+#: app/views/me.scm:159
+msgid "permissions"
+msgstr "permissions"
+
+#: app/views/me.scm:171 app/views/projects.scm:115 app/views/tickets.scm:382
+msgid "delete"
+msgstr "delete"
+
+#: app/views/me.scm:177
+msgid "are you sure you want to delete this user?"
+msgstr "are you sure you want to delete this user?"
+
+#: app/views/me.scm:186 app/views/me.scm:390
+msgid "edit"
+msgstr "edit"
+
+#: app/views/me.scm:195
+msgid "User management"
+msgstr "User management"
+
+#: app/views/me.scm:199
+msgid "new user"
+msgstr "new user"
+
+#: app/views/me.scm:217
+msgid "Reset your password"
+msgstr "Reset your password"
+
+#: app/views/me.scm:220
+msgid "perform a password reset for"
+msgstr "perform a password reset for"
+
+#: app/views/me.scm:238
+msgid "new password"
+msgstr "new password"
+
+#: app/views/me.scm:244
+msgid "confirm password"
+msgstr "confirm password"
+
+#: app/views/me.scm:262
+msgid "New User"
+msgstr "New User"
+
+#: app/views/me.scm:281 app/views/me.scm:363
+msgid "user permissions"
+msgstr "user permissions"
+
+#: app/views/me.scm:296
+msgid "create"
+msgstr "create"
+
+#: app/views/me.scm:334
+msgid "Edit User"
+msgstr "Edit User"
+
+#: app/views/projects.scm:99
+msgid "edit project"
+msgstr "edit project"
+
+#: app/views/projects.scm:242
+msgid "Projects"
+msgstr "Projects"
+
+#: app/views/projects.scm:246
+msgid "new project"
+msgstr "new project"
+
+#: app/views/projects.scm:267
+msgid "Tip: Use Tab to navigate projects and Enter/Space to expand or collapse cards."
+msgstr "Tip: Use Tab to navigate projects and Enter/Space to expand or collapse cards."
+
+#: app/views/projects.scm:278 app/views/tickets.scm:457
+msgid "Expand All"
+msgstr "Expand All"
+
+#: app/views/projects.scm:288 app/views/tickets.scm:460
+msgid "Collapse All"
+msgstr "Collapse All"
+
+#: app/views/projects.scm:353 app/views/tickets.scm:867
+msgid "title"
+msgstr "title"
+
+#: app/views/projects.scm:357
+msgid "human id"
+msgstr "human id"
+
+#: app/views/projects.scm:361
+msgid "homepage url"
+msgstr "homepage url"
+
+#: app/views/projects.scm:366
+msgid "version control url"
+msgstr "version control url"
+
+#: app/views/projects.scm:370 app/views/tickets.scm:335
+#: app/views/tickets.scm:905
+msgid "description"
+msgstr "description"
+
+#: app/views/projects.scm:380
+msgid "save project"
+msgstr "save project"
+
+#: app/views/projects.scm:386
+msgid "cancel"
+msgstr "cancel"
+
+#: app/views/tickets.scm:150
+msgid "To-do"
+msgstr "To-do"
+
+#: app/views/tickets.scm:151
+msgid "Work in Progress"
+msgstr "Work in Progress"
+
+#: app/views/tickets.scm:152
+msgid "In Review"
+msgstr "In Review"
+
+#: app/views/tickets.scm:153
+msgid "Done"
+msgstr "Done"
+
+#: app/views/tickets.scm:154
+msgid "Rejected"
+msgstr "Rejected"
+
+#: app/views/tickets.scm:159
+msgid "Task"
+msgstr "Task"
+
+#: app/views/tickets.scm:160
+msgid "Bug"
+msgstr "Bug"
+
+#: app/views/tickets.scm:161
+msgid "Story"
+msgstr "Story"
+
+#: app/views/tickets.scm:162
+msgid "Spike"
+msgstr "Spike"
+
+#: app/views/tickets.scm:163
+msgid "Time Box"
+msgstr "Time Box"
+
+#: app/views/tickets.scm:200
+msgid "saved"
+msgstr "saved"
+
+#: app/views/tickets.scm:201
+msgid "not saved"
+msgstr "not saved"
+
+#: app/views/tickets.scm:202
+msgid "the ticket was left as it was"
+msgstr "the ticket was left as it was"
+
+#: app/views/tickets.scm:307 app/views/tickets.scm:325
+#: app/views/tickets.scm:875
+msgid "status"
+msgstr "status"
+
+#: app/views/tickets.scm:317 app/views/tickets.scm:328
+#: app/views/tickets.scm:883
+msgid "type"
+msgstr "type"
+
+#: app/views/tickets.scm:353 app/views/tickets.scm:890
+msgid "priority"
+msgstr "priority"
+
+#: app/views/tickets.scm:357 app/views/tickets.scm:899
+msgid "assignee"
+msgstr "assignee"
+
+#: app/views/tickets.scm:364
+msgid "edit ticket"
+msgstr "edit ticket"
+
+#: app/views/tickets.scm:454
+msgid "Tip: Use Tab to navigate tickets and Enter/Space to expand or collapse cards."
+msgstr "Tip: Use Tab to navigate tickets and Enter/Space to expand or collapse cards."
+
+#: app/views/tickets.scm:570 app/views/tickets.scm:637
+msgid "done"
+msgstr "done"
+
+#: app/views/tickets.scm:601 app/views/tickets.scm:639
+msgid "rejected"
+msgstr "rejected"
+
+#: app/views/tickets.scm:618
+msgid "Wow.. it's really empty here"
+msgstr "Wow.. it's really empty here"
+
+#: app/views/tickets.scm:635
+msgid "open"
+msgstr "open"
+
+#: app/views/tickets.scm:641
+msgid "total"
+msgstr "total"
+
+#: app/views/tickets.scm:645
+msgid "completion"
+msgstr "completion"
+
+#: app/views/tickets.scm:688
+msgid "kanban"
+msgstr "kanban"
+
+#: app/views/tickets.scm:729
+msgid "backlog options"
+msgstr "backlog options"
+
+#: app/views/tickets.scm:752
+msgid "show done?"
+msgstr "show done?"
+
+#: app/views/tickets.scm:768
+msgid "show rejected?"
+msgstr "show rejected?"
+
+#: app/views/tickets.scm:851
+msgid "unassigned"
+msgstr "unassigned"
+
+#: app/views/tickets.scm:923
+msgid "submit"
+msgstr "submit"
+
+#: lib/lucidplan/html.scm:46
+msgid "lucidplan - free project management for everyone"
+msgstr "lucidplan - free project management for everyone"
+
+#: lib/lucidplan/html.scm:48
+msgid "lucidplan is free software, available under the GNU AGPL v3 or newer"
+msgstr "lucidplan is free software, available under the GNU AGPL v3 or newer"
+
+#: lib/lucidplan/html.scm:53 lib/lucidplan/html.scm:59
+msgid "find here the:"
+msgstr "find here the:"
+
+#: lib/lucidplan/html.scm:63
+msgid "Copyright © Josep Bigorra  &lt;jjbigorra@gmail.com&gt;"
+msgstr "Copyright © Josep Bigorra  &lt;jjbigorra@gmail.com&gt;"
+
+#: lib/lucidplan/html.scm:230
+msgid "LucidPlan"
+msgstr "LucidPlan"
+
+#: lib/lucidplan/html.scm:279
+msgid "me"
+msgstr "me"
+
+#: lib/lucidplan/html.scm:529
+msgid "Search..."
+msgstr "Search..."
+
+#: lib/lucidplan/html.scm:539
+msgid "search"
+msgstr "search"
+
+#: lib/lucidplan/html.scm:572
+msgid "Title - Ascending"
+msgstr "Title - Ascending"
+
+#: lib/lucidplan/html.scm:574
+msgid "Title - Descending"
+msgstr "Title - Descending"
+
+#: lib/lucidplan/html.scm:577
+msgid "Created - Ascending"
+msgstr "Created - Ascending"
+
+#: lib/lucidplan/html.scm:579
+msgid "Created - Descending"
+msgstr "Created - Descending"
+
+#: lib/lucidplan/html.scm:582
+msgid "Last edited - Ascending"
+msgstr "Last edited - Ascending"
+
+#: lib/lucidplan/html.scm:584
+msgid "Last edited - Descending"
+msgstr "Last edited - Descending"
+
+#: lib/lucidplan/html.scm:587
+msgid "Priority - Ascending"
+msgstr "Priority - Ascending"
+
+#: lib/lucidplan/html.scm:589
+msgid "Priority - Descending"
+msgstr "Priority - Descending"
+
+#: lib/lucidplan/html.scm:735
+msgid "language"
+msgstr "language"
