@@ -33,6 +33,7 @@
         (lucidplan domain ticket)
         (lucidplan domain ticket-assignee)
         (lucidplan domain user)
+        (lucidplan sqlite util)
         (lucidplan sqlite project)
         (lucidplan sqlite ticket)
         (lucidplan sqlite ticket-assignee)
@@ -123,17 +124,14 @@
                 (query-sort (entity-sort-from-query user-sort))
                 (project-details (get-project-by-human-id project-repo
                                                           (params rc "project")))
-                (my-sort (format #f "~a ~a"
-                                 (car query-sort)
-                                 (cadr query-sort)))
                 (tickets (cond
                            ((eq? #f user-search)
                             (get-tickets ticket-repo
-                                         (params rc "project") my-sort))
+                                         (params rc "project") query-sort))
                            (else (search-tickets ticket-repo
                                                  (params rc "project")
                                                  (html-escape user-search)
-                                                 my-sort))))
+                                                 query-sort))))
                 (ticket-id-to-human-id (map (lambda (t)
                                               `(,(assq-ref t
                                                            'id) unquote
@@ -188,12 +186,12 @@
       (lambda (rc)
         (define (do-delete)
           (let* ((body (alist-from-url-encoded-body (rc-body rc)))
-                 (id (assoc-ref body "id")))
-            (DB-query (DB-open rc)
-                      (->sql update
-                             'ticket set
-                             `((deleted_at ,(current-time)))
-                             (where #:id id)))
+                 (id (assoc-ref body "id"))
+                 (execute-write (db-write (DB-open rc))))
+            (execute-write "soft-delete-ticket"
+                           (sql-update 'ticket
+                                       `((deleted-at unquote (current-time)))
+                                       #:where (list (cons 'id id))))
 
             (redirect-to rc
                          (string->uri (format #f "~a/tickets/~a"

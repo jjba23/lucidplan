@@ -38,10 +38,6 @@
          deleted-at
          priority))
 
-  (define insert-columns
-    (delq 'deleted-at
-          (delq 'updated-at columns)))
-
   (define conn
     (DB-open rc))
 
@@ -51,75 +47,88 @@
   (define execute-read
     (db-read conn))
 
-  (define (get-tickets project-id sort)
-    (let* ((query (format #f
-                   "SELECT ~a
-                   FROM ticket WHERE deleted_at IS NULL
-                   AND project_id = (SELECT id FROM project WHERE human_id = ~a LIMIT 1)
-                   ORDER BY ~a"
-                   (symbols->sql-columns-list columns)
-                   (value->sql-literal project-id) sort)))
-      (execute-read "get-tickets" query)))
+  ;; The public API addresses projects by their human id, but tickets reference
+  ;; the project's internal id.  Resolving it once, here, keeps every ticket
+  ;; statement a plain equality the builders can express -- and lets an unknown
+  ;; project answer with #f (or an empty list) rather than a silently empty
+  ;; subquery.
+  (define (project-id-of project-human-id)
+    (let ((rows (execute-read
+                 "resolve-project-id"
+                 (sql-select 'project
+                             #:columns '(id)
+                             #:where (list (cons 'human-id project-human-id))
+                             #:limit 1))))
+      (and (not (nil? rows))
+           (assq-ref (car rows) 'id))))
 
-  (define (search-tickets project-id q sort)
-    (let* ((query (format #f
-                   "SELECT ~a
-                   FROM ticket WHERE deleted_at IS NULL
-                   AND project_id = (SELECT id FROM project WHERE human_id = ~a LIMIT 1)
-                   AND (title LIKE '%~a%' OR description LIKE '%~a%')
-                   ORDER BY ~a"
-                   (symbols->sql-columns-list columns)
-                   (value->sql-literal project-id)
-                   q
-                   q
-                   sort)))
-      (execute-read "search-tickets" query)))
+  (define (get-tickets project-id order-by)
+    (let ((pid (project-id-of project-id)))
+      (if (not pid) '()
+          (execute-read "get-tickets"
+                        (sql-select 'ticket
+                                    #:columns columns
+                                    #:where (list '(deleted-at is null)
+                                                  (cons 'project-id pid))
+                                    #:order-by order-by)))))
+
+  (define (search-tickets project-id q order-by)
+    ;; title OR description again, so the statement is a template whose three
+    ;; values are bound; only the (controlled) order-by is rendered in.
+    (let ((pid (project-id-of project-id))
+          (pattern (format #f "%~a%" q)))
+      (if (not pid) '()
+          (execute-read
+           "search-tickets"
+           (sql-parameterize
+            (format #f
+                    "SELECT ~a FROM ticket WHERE deleted_at IS NULL AND project_id = ? AND (title LIKE ? OR description LIKE ?)~a"
+                    (quoted-sql-columns columns)
+                    (order-by-sql order-by))
+            (list pid pattern pattern))))))
 
   (define (get-ticket-by-project-human-id-and-human-id project-id human-id)
-    (let* ((query (format #f
-                   "SELECT ~a FROM ticket
-                    WHERE deleted_at IS NULL AND project_id = (SELECT id FROM project WHERE human_id = ~a LIMIT 1)
-                    AND human_id = ~a
-                    LIMIT 1"
-                   (symbols->sql-columns-list columns)
-                   (value->sql-literal project-id)
-                   (value->sql-literal human-id)))
-           (rows (execute-read "get-ticket-by-project-human-id-and-human-id"
-                               query)))
-      (if (nil? rows) #f
-          (car rows))))
+    (let ((pid (project-id-of project-id)))
+      (if (not pid) #f
+          (let ((rows (execute-read
+                       "get-ticket-by-project-human-id-and-human-id"
+                       (sql-select 'ticket
+                                   #:columns columns
+                                   #:where
+                                   (list '(deleted-at is null)
+                                         (cons 'project-id pid)
+                                         (cons 'human-id human-id))
+                                   #:limit 1))))
+            (if (nil? rows) #f
+                (car rows))))))
 
   (define (get-ticket-of-latest-human-id project-id)
-    (let* ((query (format #f
-                   "SELECT ~a FROM ticket
-                    WHERE deleted_at IS NULL AND project_id = (SELECT id FROM project WHERE human_id = ~a LIMIT 1)
-                    ORDER BY human_id DESC
-LIMIT 1 "
-                   (symbols->sql-columns-list columns)
-                   (value->sql-literal project-id)))
-           (rows (execute-read "get-ticket-of-latest-human-id" query)))
-      (if (nil? rows) #f
-          (car rows))))
+    (let ((pid (project-id-of project-id)))
+      (if (not pid) #f
+          (let ((rows (execute-read
+                       "get-ticket-of-latest-human-id"
+                       (sql-select 'ticket
+                                   #:columns columns
+                                   #:where (list '(deleted-at is null)
+                                                 (cons 'project-id pid))
+                                   #:order-by '((human-id desc))
+                                   #:limit 1))))
+            (if (nil? rows) #f
+                (car rows))))))
 
   (define (update-ticket-by-project-human-id-and-human-id project-id human-id
                                                           attrs)
-    (let* ((query (format #f
-                   "UPDATE ticket SET ~a WHERE
-                              project_id = (SELECT id FROM project WHERE human_id = ~a LIMIT 1)
-                              AND human_id = ~a"
-                   (string-join (map pair->sql-assignment attrs) ", ")
-                   (value->sql-literal project-id)
-                   (value->sql-literal human-id))))
-      (execute-write "update-ticket-by-project-human-id-and-human-id" query)))
+    (let ((pid (project-id-of project-id)))
+      (if (not pid) #f
+          (execute-write
+           "update-ticket-by-project-human-id-and-human-id"
+           (sql-update 'ticket attrs
+                       #:where (list (cons 'project-id pid)
+                                     (cons 'human-id human-id)))))))
 
   (define (insert-ticket attrs)
-    (let* ((vals (map (lambda (x)
-                        (value->sql-literal (assq-ref attrs x)))
-                      insert-columns))
-           (query (format #f "INSERT INTO ticket (~a) VALUES (~a)"
-                          (symbols->sql-columns-list insert-columns)
-                          (string-join vals ", "))))
-      (execute-write "insert-ticket" query)))
+    (execute-write "insert-ticket"
+                   (sql-insert 'ticket attrs)))
 
   (mk-ticket-repository #:get-tickets-proc get-tickets
                         #:search-tickets-proc search-tickets

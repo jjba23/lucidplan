@@ -35,7 +35,8 @@
         (lucidplan domain user)
         (lucidplan domain password-reset)
         (lucidplan sqlite password-reset)
-        (bewaking bewaking))
+        (bewaking bewaking)
+        (bewaking password))
 
 (get "/me"
      #:mime 'xml
@@ -197,6 +198,11 @@
                     (error "reset token is found but not valid anymore!")))
                (_ (when (not (equal? new-password confirm-password))
                     (error "password confirmation did not match!")))
+               ;; bewaking >= 0.4.0 scores the candidate itself, so a weak or
+               ;; common password is refused before it ever reaches the salt.
+               (_ (when (not (strong-password? #:password new-password))
+                    (error
+                     "password is too weak, aim for a longer passphrase mixing words and symbols")))
                (user-id (assq-ref tt
                                   'user-id))
                (user-repo (make-sqlite-user-repository rc))

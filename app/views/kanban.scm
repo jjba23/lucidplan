@@ -48,15 +48,15 @@
                                        'human-id))
             (ondragstart "handleKanbanDragStart(event)"))
 
-         (div (@ (class ,(mk-class '(rounded-xl bg-stone-300/25
-                                                dark:bg-onyx-700/50
-                                                p-3
-                                                border-stone-500/75
-                                                dark:border-onyx-100/75
-                                                border-2
-                                                shadow-sm
-                                                hover:shadow-md
-                                                transition-shadow))))
+         (div (@ (class ,(mk-class (append '(rounded-xl
+                                             p-3
+                                             border-stone-500/75
+                                             dark:border-onyx-100/75
+                                             border-2
+                                             shadow-sm
+                                             hover:shadow-md
+                                             transition-shadow)
+                                           frosted-tint-classes))))
               (div (@ (class ,(mk-class '(flex flex-row justify-between
                                                items-center gap-2))))
                    (div (@ (class ,(mk-class '(flex flex-row
@@ -71,7 +71,7 @@
                         ,(emoji-for-ticket-type (assq-ref t
                                                           'ticket-type))
                         (span (@ (class ,(mk-class '(text-sm font-medium
-                                                             break-words pl-1))))
+                                                             wrap-break-word pl-1))))
                               ,(org2html (html-unescape (assq-ref t
                                                                   'title)))))
 
@@ -106,7 +106,7 @@
          (tickets-rej (get-tickets "rejected"))
 
          ;; Consolidate CSS Faces
-         (kanban-wrap-face (mk-class '(flex flex-col gap-3 flex-grow)))
+         (kanban-wrap-face (mk-class '(flex flex-col gap-3 grow)))
          (toolbar-face (mk-class '(flex flex-col
                                         sm:flex-row
                                         gap-3
@@ -131,19 +131,20 @@
                                       px-1
                                       py-3
                                       pb-4)))
-         (std-col-face (mk-class '(flex flex-col
-                                        gap-2
-                                        w-full
-                                        min-h-24
-                                        border-stone-500/25
-                                        dark:border-onyx-100/25
-                                        border-2
-                                        rounded-xl
-                                        py-2
-                                        sm:py-3
-                                        my-2
-                                        px-1
-                                        sm:px-2)))
+         (std-col-face (mk-class (append '(flex flex-col
+                                           gap-2
+                                           w-full
+                                           min-h-24
+                                           border-stone-500/25
+                                           dark:border-onyx-100/25
+                                           border-2
+                                           rounded-xl
+                                           py-2
+                                           sm:py-3
+                                           my-2
+                                           px-1
+                                           sm:px-2)
+                                         frosted-tint-classes)))
 
          (col-title-face (mk-class '(text-md font-bold
                                              flex

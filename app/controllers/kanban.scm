@@ -61,9 +61,7 @@
                 (query-sort (entity-sort-from-query user-sort))
                 (project-tickets (get-tickets ticket-repo
                                               (params rc "project")
-                                              (format #f "~a ~a"
-                                                      (car query-sort)
-                                                      (cadr query-sort))))
+                                              query-sort))
                 (ticket-id-to-human-id (map (lambda (t)
                                               `(,(assq-ref t
                                                            'id) unquote

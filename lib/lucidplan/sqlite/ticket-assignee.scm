@@ -38,32 +38,43 @@
   (define execute-read
     (db-read conn))
 
+  (define (project-id-of project-human-id)
+    (let ((rows (execute-read
+                 "resolve-project-id"
+                 (sql-select 'project
+                             #:columns '(id)
+                             #:where (list (cons 'human-id project-human-id))
+                             #:limit 1))))
+      (and (not (nil? rows))
+           (assq-ref (car rows) 'id))))
+
   (define (get-ticket-assignee-by-project-human-id project-id)
-    (let* ((query (format #f
-                   "SELECT ~a FROM ticket_assignee WHERE project_id =
-                        (SELECT id FROM project WHERE human_id = ~a LIMIT 1)"
-                   (symbols->sql-columns-list columns)
-                   (value->sql-literal project-id))))
-      (execute-read "get-ticket-assignee-by-project-human-id" query)))
+    (let ((pid (project-id-of project-id)))
+      (if (not pid) '()
+          (execute-read "get-ticket-assignee-by-project-human-id"
+                        (sql-select 'ticket_assignee
+                                    #:columns columns
+                                    #:where (list (cons 'project-id pid)))))))
 
   (define (get-ticket-assignee-by-ticket-id ticket-id)
-    (let* ((query (format #f
-                   "SELECT ~a FROM ticket_assignee WHERE ticket_id = ~a LIMIT 1"
-                   (symbols->sql-columns-list columns)
-                   (value->sql-literal ticket-id)))
-           (rows (execute-read "get-ticket-assignee-by-ticket-id" query)))
+    (let ((rows (execute-read
+                 "get-ticket-assignee-by-ticket-id"
+                 (sql-select 'ticket_assignee
+                             #:columns columns
+                             #:where (list (cons 'ticket-id ticket-id))
+                             #:limit 1))))
       (if (nil? rows) #f
           (car rows))))
 
   (define (upsert-ticket-assignee attrs)
-    (let* ((vals (map (lambda (x)
-                        (value->sql-literal (assq-ref attrs x))) columns))
-           (query (format #f
-                   "INSERT INTO ticket_assignee (~a)
-                        VALUES (~a) ON CONFLICT(ticket_id) DO UPDATE SET user_id = excluded.user_id"
-                   (symbols->sql-columns-list columns)
-                   (string-join vals ", "))))
-      (execute-write "upsert-ticket-assignee" query)))
+    ;; The conflict key is the ticket: assigning a ticket that already has an
+    ;; assignee rewrites that row rather than failing on the primary key.
+    (execute-write
+     "upsert-ticket-assignee"
+     (sql-upsert 'ticket_assignee attrs
+                 #:dialect 'sqlite
+                 #:conflict-target 'ticket-id
+                 #:update '(user-id))))
 
   (mk-ticket-assignee-repository
                                  #:get-ticket-assignee-by-project-human-id-proc

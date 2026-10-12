@@ -40,14 +40,17 @@ executing either happy-flow-thunk or unhappy-flow-thunk."
                                                        token-name))
                               #:encryption-key encryption-key
                               #:signing-key signing-key))
-            (has-needed-permissions (has-needed-permissions? #:needed
-                                     needed-permissions
-                                     #:present (assoc-ref t
-                                                          'owner-permissions)))
-            (has-expired (is-token-expired? #:token t)))
+            (has-needed-permissions (and t
+                                         (has-needed-permissions? #:needed
+                                          needed-permissions
+                                          #:present (assoc-ref t
+                                                               'owner-permissions)))))
+       ;; `token-valid?' (bewaking >= 0.4.0) is the payload check and the
+       ;; lifetime check in one place, so a token that is well-formed but has
+       ;; aged out takes the unhappy path here.
        (cond
          ((and has-needed-permissions
-               (not has-expired))
+               (token-valid? #:token t))
           (happy-flow))
          (else (unhappy-flow rc)))))
     (else (unhappy-flow rc))))
@@ -65,14 +68,14 @@ executing either happy-flow-thunk or unhappy-flow-thunk."
      (let* ((t (decrypt-token #:token (get-header rc token-name)
                               #:encryption-key encryption-key
                               #:signing-key signing-key))
-            (has-needed-permissions (has-needed-permissions? #:needed
-                                     needed-permissions
-                                     #:present (assoc-ref t
-                                                          'owner-permissions)))
-            (has-expired (is-token-expired? #:token t)))
+            (has-needed-permissions (and t
+                                         (has-needed-permissions? #:needed
+                                          needed-permissions
+                                          #:present (assoc-ref t
+                                                               'owner-permissions)))))
        (cond
          ((and has-needed-permissions
-               (not has-expired))
+               (token-valid? #:token t))
           (happy-flow))
          (else (unhappy-flow rc)))))
     (else (unhappy-flow rc))))

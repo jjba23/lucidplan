@@ -29,73 +29,60 @@
 
 (define* (welcome-page G_
                        #:key is-logged-in projects)
-  (let ((project-logo `(((div (@ (class ,(mk-class '(bg-stone-300
-                                                     dark:bg-onyx-700
-                                                     rounded-2xl p-4 shadow-md))))
-                              (img (@ (loading lazy)
-                                      (class ,(mk-class '(w-64 h-auto
-                                                               rounded-2xl)))
-                                      (src
-                                       "https://jointhefreeworld.org/static-assets/lucidplan/img/logo.jpg"))))))))
+  (let* ((project-count (length (if (nil? projects) '() projects)))
+         (hero
+          ;; The welcome is a pane of glass with a slow, out-of-phase colour
+          ;; wash drifting behind it -- hygguile's `glass-panel', the same
+          ;; component every frosted surface in the framework is built from.
+          (glass-panel
+           `((div (@ (class ,(mk-class '(flex flex-col gap-4))))
+                  ,(sub-h2 `(div (@ (class ,(mk-class '(flex flex-row gap-2))))
+                                 (span ,(G_ "Welcome to LucidPlan"))
+                                 (span "✨"))
+                           #:weight '(font-light))
+                  ,(em (G_ "free and open project management for everyone")
+                       #:size '(text-md))
+                  ,(p (G_
+                       "Take control of your projects with LucidPlan, the open and flexible project management solution built for teams of every shape and size.")
+                      #:weight '(font-light))
+                  ,(p (G_
+                       "We believe powerful tools shouldn't be complicated or restricted, so LucidPlan keeps your workflow simple and approachable.")
+                      #:weight '(font-light))
+                  (div (@ (class ,(mk-class '(flex flex-row
+                                                    flex-wrap
+                                                    gap-3
+                                                    my-3
+                                                    items-center))))
+                       (a (@ (href "/projects"))
+                          ,(icon-button #:icon 'align-bottom
+                                        #:content (G_ "browse projects")))
+                       (a (@ (href "/projects/new"))
+                          ,(icon-button #:icon 'plus
+                                        #:content (G_ "start a project"))))
+                  (div (@ (class ,(mk-class '(flex flex-row
+                                                    flex-wrap
+                                                    gap-8
+                                                    items-start
+                                                    my-2))))
+                       ,(stat-card #:value (format #f "~a" project-count)
+                                   #:label (G_ "projects"))
+                       ,(stat-card #:value "5"
+                                   #:label (G_ "workflow columns")))))
+           #:washes (list (glass-wash '(w-96 h-96 left-4 top-4
+                                               bg-jeans-blue-500/50)
+                                      #:delay -6)
+                          (glass-wash '(w-96 h-96 right-4 bottom-4
+                                               bg-asparagus-500/50)
+                                      ;; out of phase, and a slower, wider drift
+                                      #:delay -22 #:pace 44 #:distance '(3 -2)))
+           #:drift? #t
+           #:frost 3
+           #:content-classes '(flex flex-col gap-4))))
     (html-template G_
                    #:proj projects
                    #:is-logged-in is-logged-in
-                   #:body `(div (@ (class ,(mk-class '(px-3 md:px-6
-                                                            max-w-prose flex
-                                                            flex-col gap-3))))
-                                ,(sub-h2 `(div (@ (class ,(mk-class '(flex
-                                                                      flex-row
-                                                                      gap-2))))
-                                               (span ,(G_
-                                                       "Welcome to LucidPlan"))
-                                               (span "✨"))
-                                         #:weight '(font-light))
-                                ,(em (G_
-                                      "free and open project management for everyone"))
-                                ((div (@ (class ,(mk-class '(flex flex-row
-                                                             flex-wrap
-                                                             w-full
-                                                             gap-3
-                                                             py-8
-                                                             justify-center
-                                                             items-center
-                                                             align-center))))
-                                      (div (@ (class ,(mk-class '(flex
-                                                                  flex-col
-                                                                  gap-4
-                                                                  max-w-128))))
-                                           (div (@ (class ,(mk-class '(bg-stone-300
-                                                                       dark:bg-onyx-700
-                                                                       rounded-2xl
-                                                                       p-4
-                                                                       shadow-md
-                                                                       flex
-                                                                       flex-col
-                                                                       gap-3))))
-                                                ,(p (G_
-                                                     "Take control of your projects with LucidPlan, the open and flexible project management solution built for teams of every shape and size.")
-                                                    #:weight '(font-light))
-                                                ,(p (G_
-                                                     "We believe powerful tools shouldn't be complicated or restricted. LucidPlan is designed to simplify workflows and make project management accessible to everyone.")
-                                                    #:weight '(font-light)))
-                                           ;; (div (@ (class ,(mk-class '(max-w-prose
-                                           ;; bg-stone-300
-                                           ;; dark:bg-onyx-700
-                                           ;; rounded-2xl
-                                           ;; p-4
-                                           ;; shadow-md
-                                           ;; flex
-                                           ;; flex-col
-                                           ;; gap-3))))
-                                           ;; ,(p (G_
-                                           ;; "Discover how our fast-paced, no-nonsense workflows and deep customizability support Agile methodologies effectively.")
-                                           ;; #:weight '(font-light))
-                                           ;; ,(p (G_
-                                           ;; "Built with the power of Lisp (Guile Scheme), LucidPlan offers a responsive and adaptable experience unlike those frustrating proprietary systems you might be used to.")
-                                           ;; #:weight '(font-light)))
-                                           )
-
-                                      (div ,project-logo)
-
-                                      ))))))
-
+                   #:body `(div (@ (class ,(mk-class '(px-3
+                                                       md:px-6
+                                                       py-6
+                                                       max-w-128))))
+                                ,hero))))

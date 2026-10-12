@@ -31,6 +31,7 @@
   #:use-module (ice-9 threads)
   #:use-module (artanis i18n)
   #:use-module (hygguile hygguile)
+  #:use-module (hygguile sxml)
   #:use-module (artanis i18n sxml)
   #:use-module (kracht prelude)
   #:use-module (artanis i18n locale)
@@ -48,13 +49,13 @@
                                                                             #:size '
                                                                             (text-sm))
             (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
-                                             align-center items-center))))
+                                             items-center items-center))))
                  ,(em (G_ "find here the:"))
                  ,(a "source code"
                      #:href "https://codeberg.org/jjba23/lucidplan"
                      #:size '(text-sm)))
             (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
-                                             align-center items-center))))
+                                             items-center items-center))))
                  ,(em (G_ "find here the:"))
                  ,(a "manual"
                      #:href "https://jointhefreeworld.org/manuals/lucidplan/"
@@ -62,9 +63,9 @@
             ,(em (G_ "Copyright © Josep Bigorra  &lt;jjbigorra@gmail.com&gt;")
                  #:size '(text-sm))
             (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-8
-                                             align-center items-center))))
+                                             items-center items-center))))
                  (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
-                                                  align-center items-center))))
+                                                  items-center items-center))))
                       (a (@ (href "javascript:void(0)")
                             (class ,(mk-class '(no-underline text-onyx-500
                                                 dark:text-stone-300
@@ -75,7 +76,7 @@
                  (div (@ (class ,(mk-class '(flex flex-row
                                                   flex-wrap
                                                   gap-2
-                                                  align-center
+                                                  items-center
                                                   justify-center
                                                   items-center))))
                       ,(em "version:")
@@ -83,6 +84,73 @@
                                      (get-short-commit-sha))
                              #:size '(text-sm)
                              #:weight '(font-light)))))))
+
+;; The classes a surface wears to read as frosted glass.  `hg-frost' is
+;; hygguile's own frost layer: it paints the blur in a rounded layer of the
+;; surface's own, so it survives the corner instead of leaving the square patch
+;; of frost a plain `backdrop-blur' utility does.  It needs something to show
+;; through, so the tint that travels with it is translucent -- a surface that
+;; takes these drops any opaque `bg-...' of its own.
+(define-public frosted-tint-classes
+  '(hg-frost bg-stone-100/75 dark:bg-onyx-900/75))
+
+(define-public (aurora-backdrop)
+  "A fixed, purely decorative wash of colour behind the page.
+
+Nothing here is content: it is the colour the frosted panes above it frost,
+which is what makes them read as glass rather than as flat cards.  It is fixed
+to the viewport, hidden from assistive technology, and never takes a pointer
+event."
+  `((div (@ (aria-hidden "true")
+            (class ,(mk-class '(pointer-events-none
+                                fixed
+                                inset-0
+                                z-0
+                                overflow-hidden))))
+         (div (@ (class ,(mk-class '(absolute
+                                     top-0
+                                     left-0
+                                     w-128
+                                     h-128
+                                     rounded-full
+                                     blur-3xl
+                                     opacity-50
+                                     bg-jeans-blue-500/50
+                                     dark:bg-jeans-blue-700/50)))))
+         (div (@ (class ,(mk-class '(absolute
+                                     top-48
+                                     right-0
+                                     w-128
+                                     h-128
+                                     rounded-full
+                                     blur-3xl
+                                     opacity-50
+                                     bg-asparagus-500/50
+                                     dark:bg-asparagus-700/50)))))
+         (div (@ (class ,(mk-class '(absolute
+                                     bottom-0
+                                     left-64
+                                     w-128
+                                     h-128
+                                     rounded-full
+                                     blur-3xl
+                                     opacity-50
+                                     bg-olive-500/25
+                                     dark:bg-olive-700/50))))))))
+
+;;; ===== The page writer =====
+
+;;; A page is data: every view returns an SXML tree and `html-template' turns
+;;; that tree into the HTML string a response carries.  The writing is
+;;; hygguile's own `(hygguile sxml)' rather than the XML shorthand artanis
+;;; ships, because these pages are served as `text/html' and a browser reading
+;;; that shorthand takes `<div />' for an open tag: every element without
+;;; children would then swallow the rest of the document.  A frosted pane is
+;;; built out of exactly those elements -- the colour washes drifting behind
+;;; it are childless discs -- so the difference is the whole page.
+(define-public (render-page tree)
+  "Serialize the SXML @var{tree} of a whole page to an HTML string."
+  (call-with-output-string (lambda (port) (sxml->xml tree port))))
 
 (begin
   (define* (html-template G_
@@ -99,15 +167,15 @@
                                                                text-stone-900
                                                                dark:text-stone-100
                                                                bg-transparent
-                                                               rounded
+                                                               rounded-lg
                                                                px-2
                                                                py-1
                                                                border-0
                                                                font-medium
                                                                font-sans
                                                                cursor-pointer
-                                                               hover:bg-stone-200/80
-                                                               dark:hover:bg-black/40
+                                                               hover:bg-stone-300/75
+                                                               dark:hover:bg-onyx-700/75
                                                                focus:ring-2
                                                                outline-none))))
                                         (option "🔗 go to")
@@ -127,19 +195,11 @@
                                                                      'title)))
                                                proj))))
            
-           (nav `(nav (@ (class ,(mk-class '(flex flex-col
-                                                  md:flex-row
-                                                  w-full
-                                                  gap-4
-                                                  md:gap-6
-                                                  px-4
-                                                  py-3
-                                                  bg-jeans-blue-500/90
-                                                  dark:bg-jeans-blue-900/50
-                                                  items-center
-                                                  justify-between
-                                                  shadow-lg
-                                                  md:shadow-2xl))))
+           ;; The bar is the framework's frosted glass header: the same pane
+           ;; the cards wear, tinted with the brand blue, pinned to the top,
+           ;; and left square so the dropdown it holds can escape its edge.
+           (nav (glass-panel
+                 `(
 
                       ;; Left Section: Brand/Logo
                       (div (@ (class ,(mk-class '(flex items-center
@@ -158,13 +218,13 @@
                                                             text-stone-300
                                                             dark:text-stone-300
                                                             hover:text-white
-                                                            hover:dark:text-white))
+                                                            dark:hover:text-white))
                                          "&nbsp;"
                                          `(span ,(G_ "LucidPlan")))
                                    #:color '(text-stone-300
                                              dark:text-stone-300
                                              hover:text-white
-                                             hover:dark:text-white)
+                                             dark:hover:text-white)
                                    #:size '(text-xl font-bold))))
 
                       ;; Right Section: Navigation Links & Controls
@@ -274,10 +334,20 @@
                                                               hover:opacity-80
                                                               transition-opacity))
                            ;; Dropdown Select
-                           ,project-select))))
+                           ,project-select))
+                 #:tag 'header
+                 #:position '(sticky top-0 z-48)
+                 #:rounding '()
+                 #:border '(border-b-2 border-stone-500/25
+                                       dark:border-onyx-100/25)
+                 #:tint '(bg-jeans-blue-500/75 dark:bg-jeans-blue-900/75)
+                 #:shadow '(shadow-lg)
+                 #:padding '(px-4 py-3)
+                 #:classes '(w-full))))
       
       ;; Output Page
-      `(,doctype-html (html (@ (lang en))
+      (render-page
+       `(,doctype-html (html (@ (lang en))
                             (head (title "LucidPlan")
                                   ,(hygguile-recommended-meta)
                                   ,(hygguile-recommended-resources #:fonts (custom-fonts))
@@ -309,25 +379,32 @@
                                                       "pub/js/symbanta.js"))
                                   (script ,(assoc-ref asset-library
                                                       "pub/js/tickets.js")))
-                            (body (@ (class ,(mk-class '(bg-stone-100
+                            (body (@ (class ,(mk-class '(min-h-screen
+                                                         bg-stone-100
                                                          dark:bg-onyx-900
-                                                         font-sans))))
+                                                         font-sans
+                                                         relative
+                                                         overflow-x-hidden))))
+                                  ;; The colour the panes above frost.
+                                  ,(aurora-backdrop)
                                   ,notification-tray
                                   ,(with-footer #:main `((div (@ (class ,(mk-class '
                                                                           (flex
                                                                            flex-col
                                                                            justify-between
-                                                                           min-h-96))))
+                                                                           min-h-96
+                                                                           relative
+                                                                           z-10))))
                                                               (div (@ (class ,
                                                                              (mk-class '
                                                                               (flex
                                                                                flex-col
                                                                                gap-8
                                                                                justify-start))))
-                                                                   ,nav
+                                                                   ,@nav
                                                                    ,body)))
-                                                #:footer (page-footer G_)))))))
-  (export html-template))
+                                                #:footer (page-footer G_))))))))
+  (export html-template frosted-tint-classes render-page))
 
 (define-public (emoji-for-ticket-status ticket-status)
   (cond
@@ -396,9 +473,9 @@ function addSearchQueryParam(form) {
            (form (@ (onsubmit "addSearchQueryParam(this)"))
                  (div (@ (class ,(mk-class '(flex flex-row
                                                   flex-wrap
-                                                  align-center
                                                   items-center
-                                                  justify-left
+                                                  items-center
+                                                  justify-start
                                                   gap-2))))
                       ,(input #:label ""
                               #:name "search"
@@ -422,7 +499,7 @@ function addSearchQueryParam(form) {
                                               dark:bg-jeans-blue-900)
                                #:color '(text-stone-300)
                                #:hover-background '(hover:bg-jeans-blue-700
-                                                    hover:dark:bg-jeans-blue-700)))))))
+                                                    dark:hover:bg-jeans-blue-700)))))))
   (export search-box))
 
 (begin
@@ -439,7 +516,11 @@ function addSearchQueryParam(form) {
                                                                   "/tickets/~a?sort=~a"
                                                                   project-id
                                                                   current-sort)))))
-    `((div (@ (class ,(mk-class '(flex flex-col gap-2 w-min))))
+    ;; The control sizes to its own label: hygguile's `select' fills its box
+    ;; (`w-full'), so a wrapper a min-content wide would squeeze the chosen
+    ;; sort -- the one thing a sort control has to say -- down to its
+    ;; chevron.
+    `((div (@ (class ,(mk-class '(flex flex-col gap-2 w-fit))))
            ,(select #:name 'sort-select
                     #:id 'sort-select
                     #:on-change "window.location.href=this.value;"
@@ -475,7 +556,7 @@ function addSearchQueryParam(form) {
     (parameterize ((link-classes '(text-jeans-blue-500
                                    hover:text-jeans-blue-700
                                    dark:text-jeans-blue:300
-                                   hover:dark:text-jeans-blue-100
+                                   dark:hover:text-jeans-blue-100
                                    hover:underline font-bold))
                    (italic-classes '(italic))
                    (ordered-list-classes '(list-decimal ml-3))
@@ -507,7 +588,7 @@ function addSearchQueryParam(form) {
                                              dark:border-onyx-100/50))
                    (paragraph-classes (append extra-paragraph-classes
                                               '(font-sans leading-7 max-w-196
-                                                          break-words)))
+                                                          wrap-break-word)))
                    (bold-classes '(font-bold text-onyx-500 dark:text-stone-500))
                    (example-block-classes '(bg-stone-300/75
                                             dark:bg-onyx-700/75

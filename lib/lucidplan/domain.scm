@@ -35,21 +35,24 @@
                     'ticket-status) "rejected"))
 
 (define-public (entity-sort-from-query user-sort)
+  "Translate a sort keyword taken from the query string into the ORDER BY spec
+kracht's `sql-select' accepts: a list of (column [direction]) pairs.  An
+unknown (or missing) keyword falls back to the most recently edited first."
   (cond
     ((equal? "created-at-desc" user-sort)
-     '(created_at desc))
+     '((created-at desc)))
     ((equal? "created-at-asc" user-sort)
-     '(created_at asc))
+     '((created-at asc)))
     ((equal? "last-edited-at-desc" user-sort)
-     '(updated_at desc))
+     '((updated-at desc)))
     ((equal? "last-edited-at-asc" user-sort)
-     '(updated_at asc))
+     '((updated-at asc)))
     ((equal? "title-desc" user-sort)
-     '(title desc))
+     '((title desc)))
     ((equal? "title-asc" user-sort)
-     '(title asc))
+     '((title asc)))
     ((equal? "priority-desc" user-sort)
-     '(priority desc))
+     '((priority desc)))
     ((equal? "priority-asc" user-sort)
-     '(priority asc))
-    (else '(updated_at desc))))
+     '((priority asc)))
+    (else '((updated-at desc)))))

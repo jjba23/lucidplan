@@ -95,14 +95,14 @@ function handleKanbanDragOver(e) {
   // Highlight drop zone
   const dropZone = e.currentTarget.closest(".ticket-drop-zone");
   if (dropZone) {
-    dropZone.classList.add("bg-stone-300/40", "dark:bg-onyx-600/40");
+    dropZone.classList.add("bg-stone-300/75", "dark:bg-onyx-700/75");
   }
 }
 
 function handleKanbanDragLeave(e) {
   const dropZone = e.currentTarget.closest(".ticket-drop-zone");
   if (dropZone) {
-    dropZone.classList.remove("bg-stone-300/40", "dark:bg-onyx-600/40");
+    dropZone.classList.remove("bg-stone-300/75", "dark:bg-onyx-700/75");
   }
 }
 
@@ -112,7 +112,7 @@ async function handleKanbanDrop(e, project) {
   const dropZone = e.currentTarget.closest(".ticket-drop-zone");
   if (!dropZone) return;
 
-  dropZone.classList.remove("bg-stone-300/40", "dark:bg-onyx-600/40");
+  dropZone.classList.remove("bg-stone-300/75", "dark:bg-onyx-700/75");
 
   const ticketId = e.dataTransfer.getData("text/plain");
   const newStatus = dropZone.dataset.status;

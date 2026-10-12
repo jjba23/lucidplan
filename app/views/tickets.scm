@@ -49,22 +49,21 @@
 ;; =============================================================================
 
 (define %card-face
-  (mk-class '(flex flex-col
-                   gap-2
-                   px-3
-                   sm:px-4
-                   md:px-6
-                   py-4
-                   sm:py-6
-                   md:py-8
-                   bg-stone-100
-                   dark:bg-onyx-900
-                   rounded-xl
-                   md:rounded-2xl
-                   dark:border-onyx-100/75
-                   border-stone-300/75
-                   shadow-md
-                   border-2)))
+  (mk-class (append '(flex flex-col
+                      gap-2
+                      px-3
+                      sm:px-4
+                      md:px-6
+                      py-4
+                      sm:py-6
+                      md:py-8
+                      rounded-xl
+                      md:rounded-2xl
+                      dark:border-onyx-100/75
+                      border-stone-300/75
+                      shadow-md
+                      border-2)
+                    frosted-tint-classes)))
 
 (define %label-face
   (mk-class '(font-sans text-onyx-700 dark:text-stone-300 text-md font-light)))
@@ -80,28 +79,26 @@
   (mk-class '(flex flex-col gap-2)))
 
 (define %list-header-face
-  (mk-class '(flex flex-row
-                   gap-2
-                   items-center
-                   justify-left
-                   bg-stone-300/75
-                   dark:bg-onyx-700
-                   dark:border-onyx-100/75
-                   border-stone-300/75
-                   shadow-md
-                   border-2
-                   py-2
-                   px-4
-                   shadow
-                   cursor-pointer
-                   rounded-xl)))
+  (mk-class (append '(flex flex-row
+                      gap-2
+                      items-center
+                      justify-start
+                      dark:border-onyx-100/75
+                      border-stone-300/75
+                      shadow-md
+                      border-2
+                      py-2
+                      px-4
+                      cursor-pointer
+                      rounded-xl)
+                    frosted-tint-classes)))
 
 (define %list-title-face
   (mk-class '(font-sans text-sm
                         sm:text-md
                         font-bold
-                        break-words
-                        flex-grow
+                        wrap-break-word
+                        grow
                         leading-5
                         line-clamp-2
                         sm:line-clamp-none)))
@@ -141,7 +138,7 @@
                                           text-onyx-700
                                           dark:text-stone-300
                                           hover:text-onyx-900
-                                          hover:dark:text-stone-100)))
+                                          dark:hover:text-stone-100)))
               (onclick ,js-action))
            ,label))
 
@@ -169,7 +166,7 @@
           ;; Header
           (div (@ (class ,(mk-class '(flex flex-row justify-between))))
                ,(h4 (org2html (html-unescape title)))
-               (div (@ (class ,(mk-class '(flex justify-right))))
+               (div (@ (class ,(mk-class '(flex justify-end))))
                     (span (@ (class ,(mk-class '(cursor-pointer)))
                              (onclick ,toggle-js))
                           ,(icon #:type 'x
@@ -178,7 +175,7 @@
 
           ;; Meta Info (Status & Type)
           (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-6
-                                           justify-left))))
+                                           justify-start))))
                ,(render-meta-badge (G_ "status")
                                    (emoji-for-ticket-status status) status)
                ,(render-meta-badge (G_ "type")
@@ -288,7 +285,7 @@
                               #:icon-css '(text-md text-onyx-700
                                            dark:text-stone-300
                                            hover:text-asparagus-500
-                                           hover:dark:text-asparagus-300)))))
+                                           dark:hover:text-asparagus-300)))))
 
           ;; Expandable Details Container
           (div (@ (id ,details-id)
@@ -342,7 +339,7 @@
          ;; CSS Faces
          (header-face (mk-class '(flex flex-row gap-2 items-center)))
          (btn-row-face (mk-class '(flex flex-row flex-wrap gap-1 items-center)))
-         (label-face (mk-class '(text-stone-600 dark:text-stone-300 text-sm)))
+         (label-face (mk-class '(text-onyx-100 dark:text-stone-300 text-sm)))
          (icon-face '(text-onyx-700 dark:text-stone-300 text-2xl))
 
          ;; JS Handlers
@@ -378,9 +375,13 @@
                                                            search-query)))))
 
          ;; List Generators
-         (tickets (filter only-tickets-filter tickets))
-         (done-tickets (filter only-done-tickets-filter tickets))
-         (rejected-tickets (filter only-rejected-tickets-filter tickets))
+         ;; Keep the list as it arrived before it is rebound: the binding below
+         ;; narrows `tickets' to the still-open ones, so the done and rejected
+         ;; partitions must be taken from the untouched list.
+         (all-tickets tickets)
+         (tickets (filter only-tickets-filter all-tickets))
+         (done-tickets (filter only-done-tickets-filter all-tickets))
+         (rejected-tickets (filter only-rejected-tickets-filter all-tickets))
          (ticket-list `((div (@ (id lucidplan-tickets-list)
                                 (data-project-id ,proj-human-id)
                                 (ondragover "allowDrop(event)")
@@ -470,7 +471,38 @@
                                                     rejected-tickets)))
                                    '()))
 
-         (fallback-no-ticket-list `(,(p (G_ "Wow.. it's really empty here")))))
+         (fallback-no-ticket-list `(,(p (G_ "Wow.. it's really empty here"))))
+
+         ;; A one-glance summary of the project: how much is still open, how
+         ;; much is done, and a completion bar -- the friendliest way to see
+         ;; where a project stands without reading every row.
+         (glance
+          (let* ((open-count (length tickets))
+                 (done-count (length done-tickets))
+                 (rejected-count (length rejected-tickets))
+                 (total (+ open-count done-count rejected-count)))
+            (glass-panel
+             `((div (@ (class ,(mk-class '(flex flex-row
+                                                flex-wrap
+                                                gap-8
+                                                items-start
+                                                my-1))))
+                    ,(stat-card #:value (format #f "~a" open-count)
+                                #:label (G_ "open"))
+                    ,(stat-card #:value (format #f "~a" done-count)
+                                #:label (G_ "done"))
+                    ,(stat-card #:value (format #f "~a" rejected-count)
+                                #:label (G_ "rejected"))
+                    ,(stat-card #:value (format #f "~a" total)
+                                #:label (G_ "total")))
+               (div (@ (class ,(mk-class '(my-1))))
+                    ,(progress #:value done-count
+                               #:max (max total 1)
+                               #:label (G_ "completion")
+                               #:show-value #t)))
+             #:frost 3
+             #:padding '(p-5 sm:p-6)
+             #:classes '(flex flex-col gap-2)))))
     
     ;; Build the final HTML View
     (html-template G_
@@ -485,7 +517,7 @@
                                 ((div (@ (class ,(mk-class '(flex flex-col
                                                                   gap-2
                                                                   sm:gap-4
-                                                                  flex-grow))))
+                                                                  grow))))
 
                                       ;; Header Section
                                       (div (@ (class ,(mk-class '(flex
@@ -531,16 +563,19 @@
                                                                                text-onyx-700
                                                                                font-sans
                                                                                dark:text-stone-300
-                                                                               break-words
+                                                                               wrap-break-word
                                                                                line-clamp-3
                                                                                sm:line-clamp-none
                                                                                max-w-full))))
                                                                   ,x))
                                                            proj-desc)
 
+                                      ;; Project at a glance
+                                      ,glance
+
                                       ;; Options (Checkboxes)
                                       (div (details (summary (@ (class ,(mk-class '
-                                                                         (text-stone-600
+                                                                         (text-onyx-100
                                                                           dark:text-stone-300
                                                                           text-sm
                                                                           font-sans

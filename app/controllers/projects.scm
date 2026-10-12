@@ -22,6 +22,7 @@
         (ice-9 string-fun)
         (kracht prelude)
         (lucidplan auth)
+        (lucidplan sqlite util)
         (lucidplan sqlite project)
         (lucidplan domain project)
         (uuid generate)
@@ -77,12 +78,12 @@
       (lambda (rc)
         (define (do-delete)
           (let* ((body (alist-from-url-encoded-body (rc-body rc)))
-                 (id (assoc-ref body "id")))
-            (DB-query (DB-open rc)
-                      (->sql update
-                             'project set
-                             `((deleted_at ,(current-time)))
-                             (where #:id id)))
+                 (id (assoc-ref body "id"))
+                 (execute-write (db-write (DB-open rc))))
+            (execute-write "soft-delete-project"
+                           (sql-update 'project
+                                       `((deleted-at unquote (current-time)))
+                                       #:where (list (cons 'id id))))
 
             (redirect-to rc
                          (string->uri (format #f "~a/projects"

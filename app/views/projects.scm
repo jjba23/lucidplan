@@ -90,7 +90,7 @@
                             'human-id)))
     `(div (@ (class ,(mk-class '(flex flex-wrap
                                       flex-row
-                                      align-center
+                                      items-center
                                       items-center
                                       gap-4
                                       py-1))))
@@ -129,21 +129,20 @@
          (description (proj-ref p
                                 'description))
          (toggle-js (toggle-details-js id)))
-    `((div (@ (class ,(mk-class '(flex flex-col
-                                       gap-2
-                                       px-3
-                                       sm:px-4
-                                       md:px-6
-                                       py-3
-                                       sm:py-6
-                                       md:py-8
-                                       bg-stone-100
-                                       dark:bg-onyx-900
-                                       rounded-2xl
-                                       border-2
-                                       border-stone-300/75
-                                       dark:border-onyx-100/75
-                                       shadow-md))))
+    `((div (@ (class ,(mk-class (append '(flex flex-col
+                                          gap-2
+                                          px-3
+                                          sm:px-4
+                                          md:px-6
+                                          py-3
+                                          sm:py-6
+                                          md:py-8
+                                          rounded-2xl
+                                          border-2
+                                          border-stone-300/75
+                                          dark:border-onyx-100/75
+                                          shadow-md)
+                                        frosted-tint-classes))))
            ;; Header
            (div (@ (class ,(mk-class '(flex flex-row justify-between
                                             items-start gap-2))))
@@ -158,16 +157,16 @@
            ;; Description
            ,(render-if-nestring (lambda (x)
                                   `(p (@ (class ,(mk-class '(text-sm
-                                                             sm:text-base
+                                                             sm:text-md
                                                              py-1
                                                              sm:py-3
-                                                             leading-snug
+                                                             leading-5
                                                              sm:leading-6
                                                              text-onyx-700
                                                              dark:text-stone-300
                                                              whitespace-pre-wrap
                                                              font-medium
-                                                             break-words))))
+                                                             wrap-break-word))))
                                       ,x))
                                 (org2html (html-unescape description)))
 
@@ -185,30 +184,25 @@
          (description (proj-ref p
                                 'description))
          (toggle-js (toggle-details-js id)))
-    `((div (@ (class ,(mk-class '(flex flex-row
-                                       flex-wrap
-                                       gap-1
-                                       sm:gap-4
-                                       items-center
-                                       justify-between
-                                       bg-stone-300/75
-                                       dark:bg-onyx-700
-                                       border-2
-                                       border-stone-300/75
-                                       dark:border-onyx-100/75
-                                       shadow-sm
-                                       sm:shadow-md
-                                       py-2
-                                       px-3
-                                       sm:px-4
-                                       cursor-pointer
-                                       rounded-xl
-                                       w-full
-                                       overflow-hidden
-                                       focus:outline-none
-                                       focus:ring-2
-                                       focus:ring-onyx-900
-                                       dark:focus:ring-stone-300)))
+    `((div (@ (class ,(mk-class (append '(flex flex-row
+                                          flex-wrap
+                                          gap-1
+                                          sm:gap-4
+                                          items-center
+                                          justify-between
+                                          border-2
+                                          border-stone-300/75
+                                          dark:border-onyx-100/75
+                                          shadow-sm
+                                          py-2
+                                          px-3
+                                          sm:px-4
+                                          cursor-pointer
+                                          rounded-xl
+                                          w-full
+                                          focus:outline-none
+                                          focus:ring-2)
+                                        frosted-tint-classes)))
               (tabindex "0")
               (onclick ,toggle-js)
               (onkeydown
@@ -219,7 +213,7 @@
                       #:icon-css '(text-onyx-700 dark:text-stone-300 text-lg))
                (span (@ (class ,(mk-class '(font-sans text-onyx-700
                                                       dark:text-stone-300
-                                                      text-base
+                                                      text-md
                                                       sm:text-lg
                                                       font-bold
                                                       truncate))))
@@ -278,7 +272,7 @@
                                                     text-onyx-700
                                                     dark:text-stone-300
                                                     hover:text-onyx-900
-                                                    hover:dark:text-stone-100)))
+                                                    dark:hover:text-stone-100)))
                         (onclick
                          "document.querySelectorAll('[id^=\"details-\"]').forEach(el => el.hidden = false)"))
                      ,(G_ "Expand All"))
@@ -288,7 +282,7 @@
                                                     text-onyx-700
                                                     dark:text-stone-300
                                                     hover:text-onyx-900
-                                                    hover:dark:text-stone-100)))
+                                                    dark:hover:text-stone-100)))
                         (onclick
                          "document.querySelectorAll('[id^=\"details-\"]').forEach(el => el.hidden = true)"))
                      ,(G_ "Collapse All")))))
@@ -300,7 +294,7 @@
                  #:body `((div (@ (class ,(mk-class '(px-3 pb-6))))
                                ((div (@ (class ,(mk-class '(flex flex-col
                                                                  gap-4
-                                                                 flex-grow))))
+                                                                 grow))))
                                      ,(projects-header-title G_ search-query)
                                      ,(projects-toolbar G_)
                                      (div (@ (id lucidplan-projects-list)

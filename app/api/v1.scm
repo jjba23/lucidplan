@@ -39,7 +39,8 @@
          (let* ((project-repo (make-sqlite-project-repository rc))
                 (ticket-repo (make-sqlite-ticket-repository rc))
                 (tickets (get-tickets ticket-repo
-                                      (params rc "project") "human_id ASC")))
+                                      (params rc "project")
+                                      '((human-id asc)))))
            (:mime rc
                   `((data unquote
                           (list->vector tickets))))))

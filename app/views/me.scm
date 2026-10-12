@@ -22,11 +22,23 @@
   #:use-module (artanis i18n sxml)
   #:use-module (artanis i18n locale)
   #:use-module (hygguile hygguile)
+  #:use-module (bewaking bewaking)
   #:use-module (ice-9 i18n)
   #:use-module (ice-9 textual-ports)
   #:use-module (ice-9 string-fun)
   #:export (me-page users-page reset-password-page new-user-page
                     edit-user-page))
+
+(define (humanise-seconds secs)
+  "Say how long SECS lasts in the largest comfortable unit."
+  (let ((days (quotient secs 86400))
+        (hours (quotient (remainder secs 86400) 3600))
+        (minutes (quotient (remainder secs 3600) 60)))
+    (cond
+      ((>= days 1) (format #f "~a day~a" days (if (= days 1) "" "s"))
+       )
+      ((>= hours 1) (format #f "~a hour~a" hours (if (= hours 1) "" "s")))
+      (else (format #f "~a minute~a" minutes (if (= minutes 1) "" "s"))))))
 
 (define* (me-page G_
                   #:key is-logged-in
@@ -79,12 +91,18 @@
                                         (assq-ref token
                                                   'owner-permissions)))
         (session-duration `((div (@ (class ,(mk-class '(py-8 px-4))))
-                                 ,(em (format #f "~a: ~a"
+                                 ,(em (format #f "~a: ~a (~a)"
                                               (G_ "logged in until")
                                               (strftime "%c"
                                                         (localtime (assq-ref
                                                                     token
-                                                                    'token-expires-at)))))))))
+                                                                    'token-expires-at)))
+                                              ;; bewaking >= 0.4.0 can say how
+                                              ;; long is left on the payload.
+                                              (format #f "~a left"
+                                                      (humanise-seconds
+                                                       (token-remaining-seconds
+                                                        #:token token)))))))))
     (html-template G_
                    #:proj projects
                    #:is-logged-in is-logged-in
@@ -292,7 +310,7 @@
                                                          border-2
                                                          shadow-md))
                                         (label-css '(text-sm font-bold
-                                                     text-stone-600
+                                                     text-onyx-100
                                                      dark:text-stone-300))
                                         (input-flex-css '(my-2 flex flex-row
                                                                gap-1)))

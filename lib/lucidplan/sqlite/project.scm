@@ -36,14 +36,6 @@
          updated-at
          deleted-at))
 
-  (define insert-columns
-    '(id human-id
-         title
-         url
-         vcs-url
-         description
-         created-at))
-
   (define conn
     (DB-open rc))
 
@@ -54,47 +46,44 @@
     (db-read conn))
 
   (define (get-projects)
-    (let* ((query (format #f
-                   "SELECT ~a
-                   FROM project WHERE deleted_at IS NULL
-                   ORDER BY human_id ASC"
-                   (symbols->sql-columns-list columns))))
-      (execute-read "get-projects" query)))
+    (execute-read "get-projects"
+                  (sql-select 'project
+                              #:columns columns
+                              #:where '((deleted-at is null))
+                              #:order-by '((human-id asc)))))
 
   (define (search-projects q)
-    (let* ((query (format #f
-                   "SELECT ~a
-                   FROM project WHERE deleted_at IS NULL
-                   AND (title LIKE '%~a%' OR description LIKE '%~a%')
-                   ORDER BY human_id ASC"
-                   (symbols->sql-columns-list columns) q q)))
-      (execute-read "search-projects" query)))
+    ;; A search matches the title *or* the description, and the builders join
+    ;; their conditions with AND only, so this one statement is written as a
+    ;; template and its two matched patterns are bound with `sql-parameterize'.
+    (let ((pattern (format #f "%~a%" q)))
+      (execute-read
+       "search-projects"
+       (sql-parameterize
+        (format #f
+                "SELECT ~a FROM project WHERE deleted_at IS NULL AND (title LIKE ? OR description LIKE ?) ORDER BY human_id ASC"
+                (quoted-sql-columns columns))
+        (list pattern pattern)))))
 
   (define (get-project-by-human-id human-id)
-    (let* ((query (format #f
-                   "SELECT ~a FROM project
-                    WHERE deleted_at IS NULL AND human_id = ~a
-                    LIMIT 1"
-                   (symbols->sql-columns-list columns)
-                   (value->sql-literal human-id)))
-           (rows (execute-read "get-project-by-human-id" query)))
+    (let ((rows (execute-read
+                 "get-project-by-human-id"
+                 (sql-select 'project
+                             #:columns columns
+                             #:where (list '(deleted-at is null)
+                                           (cons 'human-id human-id))
+                             #:limit 1))))
       (if (nil? rows) #f
           (car rows))))
 
   (define (update-project-by-human-id human-id attrs)
-    (let* ((query (format #f "UPDATE project SET ~a WHERE human_id = ~a"
-                          (string-join (map pair->sql-assignment attrs) ", ")
-                          (value->sql-literal human-id))))
-      (execute-write "update-project-by-human-id" query)))
+    (execute-write "update-project-by-human-id"
+                   (sql-update 'project attrs
+                               #:where (list (cons 'human-id human-id)))))
 
   (define (insert-project attrs)
-    (let* ((vals (map (lambda (x)
-                        (value->sql-literal (assq-ref attrs x)))
-                      insert-columns))
-           (query (format #f "INSERT INTO project (~a) VALUES (~a)"
-                          (symbols->sql-columns-list insert-columns)
-                          (string-join vals ", "))))
-      (execute-write "insert-project" query)))
+    (execute-write "insert-project"
+                   (sql-insert 'project attrs)))
 
   (mk-project-repository #:get-projects-proc get-projects
                          #:search-projects-proc search-projects
