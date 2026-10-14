@@ -62,10 +62,35 @@
     ;; host the request arrived on, which is right for a local development
     ;; server and for an instance behind a single public name.
     (site-url . "")
-    ;; An absolute URL to the image a link preview shows.  Empty leaves the
-    ;; tags out rather than pointing them at an image that does not exist.
-    (site-logo . "https://jointhefreeworld.org/static-assets/lucidplan/img/logo-small.jpg")
+    ;; The image a link preview shows.  It may be written either as an
+    ;; absolute URL or as a path on this instance -- "/img/logo-small.jpg",
+    ;; the project's own mark, which `maak fetch-assets' keeps beside the
+    ;; pages -- and a path is answered on the instance's own address, since a
+    ;; preview image has to be absolute for the service that reads it.  Empty
+    ;; leaves the tags out rather than pointing them at an image that is not
+    ;; there.
+    (site-logo . "/img/logo-small.jpg")
     (site-language . "en")
+
+    ;; -- The address this instance's own files are handed out from ---------
+    ;; The shell wears a theme this instance serves itself: the Lucida faces,
+    ;; the web fonts, the icon face and the stylesheets that describe them all
+    ;; live under `pub/' and are refetched by `maak fetch-assets'.  Left
+    ;; empty, a page names them by path alone -- "/css/fonts.css" -- and the
+    ;; instance that served the page answers for them too, which is what a
+    ;; self-hosted deployment wants.  Set it to an absolute base to hand that
+    ;; work to a static host or a CDN instead: every asset address is then
+    ;; built on this, and nothing else about the pages changes.
+    (asset-url . "")
+
+    ;; -- Page analytics ----------------------------------------------------
+    ;; The address the instance's own page-view script reports to, and how
+    ;; often it reports while a reader stays on the page.  Left empty, the
+    ;; script is not put on the page at all: no request leaves the reader's
+    ;; browser, and nothing about the instance is told to anybody else.
+    (analytics-endpoint
+     . "https://api.symbanta.jointhefreeworld.org/v1/events/register")
+    (analytics-interval . 4000)
 
     ;; -- Who to credit and how to reach them -----------------------------
     (copyright-holder . "Josep Bigorra")

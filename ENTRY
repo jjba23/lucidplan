@@ -30,9 +30,36 @@
 ;; extensions from "pub" before any route is consulted, so "xml" is left out:
 ;; the sitemap is a page this server builds (see /sitemap.xml), and a rule
 ;; that answered it with a missing file would keep the route from running.
+;;
+;; The web fonts are in the list because the theme is this instance's own (see
+;; `pub/css/fonts.css' and `maak fetch-assets'): they are answered from "pub"
+;; like any other file.
 (init-server #:statics '(png gif jpg jpeg ico html js json csv css woff woff2 ttf))
 (add-to-load-path (string-append (current-toplevel) "/lib"))
 ;; Put whatever you want to be called before server running here
+
+;; A font is served with the type the framework knows for its extension, and
+;; the framework knows none for a web font: without this it would hand every
+;; one of them out as `application/octet-stream'.  A browser accepts that for
+;; a face it fetches from the same origin, so this is not what makes the theme
+;; work -- it is so that the file is described as what it is.  The table is
+;; artanis's own, filled additively from its list at start-up, and a type its
+;; list does not name is added to it here -- as a symbol, the way the
+;; framework's own types are written, since a response validates its
+;; `content-type' against the symbols of this table.
+(catch #t
+  (lambda ()
+    (let ((table (variable-ref (module-variable (resolve-module '(artanis mime))
+                                                '*mime-types-table*))))
+      (for-each (lambda (entry)
+                  (hash-set! table (car entry) (cdr entry)))
+                '((woff . font/woff)
+                  (woff2 . font/woff2)
+                  (ttf . font/ttf)))))
+  (lambda (key . args)
+    (display (format #f
+                     "could not teach artanis the font types: ~a: ~a~%"
+                     key args))))
 
 ;; Specify the directory where the MO file is located
 (bindtextdomain "translate" "./sys/i18n/locale")

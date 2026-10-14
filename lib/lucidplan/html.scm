@@ -31,6 +31,9 @@
   #:use-module (ice-9 threads)
   #:use-module (artanis i18n)
   #:use-module (hygguile hygguile)
+  #:use-module (hygguile embed css)
+  #:use-module (hygguile embed js)
+  #:use-module (hygguile js)
   #:use-module (hygguile sxml)
   #:use-module (artanis i18n sxml)
   #:use-module (kracht prelude)
@@ -181,6 +184,21 @@ titled with the instance's name and its tagline."
   "A @code{<meta property=... content=...>} tag, the Open Graph spelling."
   `(meta (@ (property ,property) (content ,content))))
 
+(define (instance-logo)
+  "The image a link preview should show, as an absolute URL, or @code{#f}.
+
+The configured @code{site-logo} may be an absolute URL, in which case it is
+answered as it stands, or a path on this instance -- the project's own mark
+lives at @code{/img/logo-small.jpg} -- which is made absolute against the
+instance's own address.  A preview image is fetched by a service that has
+none of this page's context, so it has to be absolute either way."
+  (let ((configured (config-ref 'site-logo)))
+    (cond
+      ((not (string? configured)) #f)
+      ((string-null? configured) #f)
+      ((string-contains configured "://") configured)
+      (else (absolute-url configured)))))
+
 (define* (seo-meta #:key title description canonical-path)
   "The metadata tags a page carries: a description, a canonical address, an
 Open Graph and Twitter preview, and the JSON-LD that names the application.
@@ -194,8 +212,8 @@ fall back to the instance's own when a page has none of its own."
                    description
                    (config-ref 'site-description)))
          (url (absolute-url (or canonical-path "/")))
-         (logo (config-ref 'site-logo))
-         (has-logo (and (string? logo) (not (string-null? logo))))
+         (logo (instance-logo))
+         (has-logo (and logo #t))
          (keywords (config-ref 'site-keywords))
          (json (scm->json-string
                 `((@context . "https://schema.org")
@@ -229,6 +247,86 @@ fall back to the instance's own when a page has none of its own."
       ,(meta-tag "twitter:title" (page-title title))
       ,(meta-tag "twitter:description" desc)
       (script (@ (type "application/ld+json")) ,json))))
+
+;;; ===== The theme, served by this instance =====
+
+;;; A page used to be assembled partly from other people's servers: the Lucida
+;;; stylesheet was written into every head pointing at jointhefreeworld.org,
+;;; the icon stylesheet was pulled from a CDN, and two Google Fonts hosts were
+;;; woken with a preconnect before either was read.  A self-hosted LucidPlan
+;;; should not depend on hosts its operator does not run, and none of those
+;;; files is large, so they now live under `pub/' as files of this project
+;;; (`maak fetch-assets' refetches them from where they came from) and are
+;;; handed out by the instance itself.
+;;;
+;;; Where they are handed out from is configuration: `asset-url' names a base
+;;; -- a static host, a CDN, another origin -- and every address is built on
+;;; it.  Left empty it is the instance that answered the page, so the
+;;; addresses stay relative and no host has to be written down twice.
+
+(define (asset-href path)
+  "The address of one of this instance's own files.
+
+@var{path} is a path on this instance, e.g. @file{/css/fonts.css}.  With
+@code{asset-url} configured the address is built on it; with it empty the
+path is answered unchanged, which a browser reads against the host that
+served the page and this instance therefore answers itself."
+  (let ((base (config-ref 'asset-url)))
+    (if (and (string? base) (not (string-null? base)))
+        (string-append (if (string-suffix? "/" base)
+                           (substring base 0 (- (string-length base) 1))
+                           base)
+                       (if (string-prefix? "/" path)
+                           path
+                           (string-append "/" path)))
+        path)))
+
+(define (shell-fonts)
+  "The stylesheet that declares the faces the interface is set in.
+
+It carries the Lucida faces and the two web families the theme names after
+them, all of them files of this instance (see @code{maak fetch-assets})."
+  `((link (@ (rel stylesheet) (href ,(asset-href "/css/fonts.css"))))))
+
+(define (shell-icon-stylesheet)
+  "The stylesheet that declares the icon face."
+  `((link (@ (rel stylesheet) (href ,(asset-href "/css/phosphor.css"))))))
+
+(define (shell-resources)
+  "The stylesheets and scripts a page of this shell needs.
+
+This is the framework's own recommended set with the two pieces that
+reached another host replaced: the fonts and the icon face are this
+instance's, and every other piece was already written into the page."
+  (list (shell-fonts)
+        (shell-icon-stylesheet)
+        (fly-out-css)
+        (hygguile-extras-css)
+        `(noscript ,@(no-js-css))
+        (toggle-dark-theme-js)
+        (copy-pre-inner-text-js)
+        (show-notifications-from-url-js)
+        (carousel-button-js)
+        (remember-dark-theme-js)
+        (color-show-js)
+        (fly-out-js)
+        (code-sample-js)
+        (tray-js)))
+
+(define (analytics-script)
+  "The page-view script, as a list of one script or of none.
+
+The script is the instance's own file, so it is written into the page; where
+it reports to and how often are configuration.  With no endpoint configured
+there is nothing for it to report to, so it is left out entirely rather than
+run against a default address somebody else runs."
+  (let ((endpoint (config-ref 'analytics-endpoint)))
+    (if (or (not (string? endpoint)) (string-null? endpoint))
+        '()
+        `((script (@ (data-endpoint ,endpoint)
+                     (data-interval
+                      ,(number->string (config-ref 'analytics-interval))))
+                  ,(assoc-ref asset-library "pub/js/symbanta.js"))))))
 
 (begin
   (define* (html-template G_
@@ -467,17 +565,20 @@ fall back to the instance's own when a page has none of its own."
                                   ,@(seo-meta #:title title
                                               #:description description
                                               #:canonical-path canonical-path)
-                                  ,(hygguile-recommended-resources #:fonts (custom-fonts))
+                                  ;; The theme: every stylesheet and script the
+                                  ;; shell needs, each one this instance's own.
+                                  ,@(shell-resources)
 
                                   (link (@ (rel "shortcut icon")
-                                           (href "/favicon.ico")
+                                           (href ,(asset-href "/favicon.ico"))
                                            (type "image/x-icon")) "")
                                   (link (@ (rel icon)
-                                           (href "/favicon.ico")
+                                           (href ,(asset-href "/favicon.ico"))
                                            (type "image/x-icon")) "")
                                   (link (@ (rel stylesheet)
                                            (href
-                                            "/css/lucidplan.olive.min.css"))
+                                            ,(asset-href
+                                              "/css/lucidplan.olive.min.css")))
                                         "")
 
                                   (script (@ (type speculationrules))
@@ -492,8 +593,9 @@ fall back to the instance's own when a page has none of its own."
   ]
 }
 ")
-                                  (script ,(assoc-ref asset-library
-                                                      "pub/js/symbanta.js"))
+                                  ;; The page-view script, when the instance
+                                  ;; has somewhere of its own to report to.
+                                  ,@(analytics-script)
                                   (script ,(assoc-ref asset-library
                                                       "pub/js/tickets.js"))
                                   (script ,(assoc-ref asset-library
@@ -523,7 +625,7 @@ fall back to the instance's own when a page has none of its own."
                                                                    ,@nav
                                                                    ,body)))
                                                 #:footer (page-footer G_))))))))
-  (export html-template frosted-tint-classes render-page
+  (export html-template frosted-tint-classes render-page asset-href
           emoji-for-ticket-status emoji-for-ticket-type
           glyph-for-ticket-status glyph-for-ticket-type
           lucidplan-locales locale-choose-form))

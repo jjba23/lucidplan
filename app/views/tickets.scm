@@ -413,7 +413,8 @@ at the first of them."
                                  ticket-id-to-human-id
                                  ticket-assignee
                                  user-names
-                                 (editable? #f))
+                                 (editable? #f)
+                                 (reorderable? #f))
   (let* ((t-ref (lambda (k)
                   (assq-ref ticket k)))
          (id (t-ref 'id))
@@ -445,9 +446,14 @@ at the first of them."
                    "if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }")
                   (class ,%list-header-face))
                ;; The grip is what makes a row draggable, and dragging a row
-               ;; reorders the backlog -- a change to the tickets.  It is
-               ;; offered to the same reader the endpoint behind it accepts.
-               ,@(if editable? grab-indicator '())
+               ;; reorders the backlog -- a change to the tickets.  It is read
+               ;; by the endpoint the row reorders, so it is offered only to a
+               ;; reader that endpoint accepts, and only while the list is in
+               ;; an order a drop can hold: a rearrangement is written as the
+               ;; tickets' priorities, and under any other sort the row would
+               ;; slide back into place on the next visit.  Which sorts those
+               ;; are is decided by the page, which knows the list's order.
+               ,@(if reorderable? grab-indicator '())
                ,(emoji-for-ticket-type type)
                (h5 (@ (class ,%list-title-face))
                    ,(org2html (html-unescape title)))
@@ -562,6 +568,16 @@ at the first of them."
          ;; that same endpoint.
          (triage? can-triage?)
 
+         ;; A row's grip writes the ticket's priority, and the backlog can only
+         ;; be shown in the order those priorities describe while it is sorted
+         ;; by them.  Under any other sort a row the reader moved would slide
+         ;; back into place on the next visit, so the grip is offered under
+         ;; exactly the sorts a drop can hold -- the two priority ones -- to
+         ;; the same reader the endpoint behind them accepts.
+         (reorderable? (and can-triage?
+                            (or (equal? "priority-desc" current-sort)
+                                (equal? "priority-asc" current-sort))))
+
          ;; List Generators
          ;; Keep the list as it arrived before it is rebound: the binding below
          ;; narrows `tickets' to the still-open ones, so the done and rejected
@@ -572,6 +588,17 @@ at the first of them."
          (rejected-tickets (filter only-rejected-tickets-filter all-tickets))
          (ticket-list `((div (@ (id lucidplan-tickets-list)
                                 (data-project-id ,proj-human-id)
+                                ;; The number a drop writes is the one that
+                                ;; puts the row back where it now sits under
+                                ;; the order being shown, so the list says
+                                ;; which order that is.
+                                (data-sort ,(if current-sort current-sort ""))
+                                ;; The list answers the drag on the way in as
+                                ;; well as on the way across it: a drop target
+                                ;; is the element whose last `dragenter' or
+                                ;; `dragover' was answered, and Chromium reads
+                                ;; the release against that one element.
+                                (ondragenter "acceptDrag(event)")
                                 (ondragover "allowDrop(event)")
                                 (ondrop "dropTicketsItem(event)")
                                 (class ,(mk-class '(flex flex-col gap-2))))
@@ -596,7 +623,9 @@ at the first of them."
                                         ticket-id-to-human-id
                                         #:ticket-assignee ttt-assignee
                                         #:user-names user-names
-                                        #:editable? triage?))) tickets))))
+                                        #:editable? triage?
+                                        #:reorderable? reorderable?)))
+                                     tickets))))
 
          (done-ticket-list (if with-done
                                `(div (@ (id lucidplan-done-tickets-list)

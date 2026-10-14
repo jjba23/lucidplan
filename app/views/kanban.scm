@@ -200,7 +200,13 @@
                                         ,(format #f " ( ~a ) "
                                                  (length list))))
 
-                             ;; Drop zone container
+                             ;; Drop zone container.  The zone answers the
+                             ;; drag on the way in as well as on the way
+                             ;; across it: a drop target is the element whose
+                             ;; last `dragenter' or `dragover' was answered,
+                             ;; and Chromium reads the release against that
+                             ;; one element, so a card reached over a gap
+                             ;; would otherwise never be a place to drop on.
                              (div (@ (class ,(mk-class '(ticket-drop-zone flex
                                                          flex-col
                                                          gap-2
@@ -209,6 +215,7 @@
                                                          rounded-lg
                                                          transition-colors)))
                                      (data-status ,status)
+                                     (ondragenter "acceptDrag(event)")
                                      (ondragover "handleKanbanDragOver(event)")
                                      (ondragleave
                                       "handleKanbanDragLeave(event)")
@@ -235,6 +242,8 @@
                                                                     list)))))
                                              (div (@ (class ,done-wrap-face)
                                                      (data-status ,status)
+                                                     (ondragenter
+                                                      "acceptDrag(event)")
                                                      (ondragover
                                                       "handleKanbanDragOver(event)")
                                                      (ondragleave

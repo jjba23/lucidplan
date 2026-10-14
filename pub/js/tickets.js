@@ -19,15 +19,35 @@ function dragTicketStart(event) {
   // dragged by.
   event.dataTransfer.setDragImage(row, 24, 16);
 
-  // Disable pointer events on dragged element so mouse events hit the drop targets underneath
-  draggedTicket.classList.add('opacity-50', 'pointer-events-none');
+  // The dragged row is faded, not made untouchable.  Chromium ends a drag
+  // session the moment the node under the pointer stops being hit-testable,
+  // so disabling the dragged element's pointer events here would make the
+  // grip refuse to drag at all.  Every drop target resolves what is under the
+  // cursor with `closest', so a hit on the card or an item inside it still
+  // reaches the list or the zone that owns it.
+  draggedTicket.classList.add('opacity-50');
 }
 
 function dragTicketEnd(event) {
   if (draggedTicket) {
-    draggedTicket.classList.remove('opacity-50', 'pointer-events-none');
+    draggedTicket.classList.remove('opacity-50');
     draggedTicket = null;
   }
+}
+
+// Where a drag is carried over is answered twice: once when the pointer enters
+// the list or the column, and again on every move across it.  Chromium treats
+// the element whose last `dragenter' or `dragover' was answered as the drop
+// target and reads the release against that one element, so a list that only
+// answers `dragover' can be left with no target at all when the pointer
+// reaches it over something else -- the release is then not a drop at all, and
+// the ticket stays where it was.  Both events are answered here, by the drop
+// target itself.
+function acceptDrag(event) {
+    event.preventDefault();
+    if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = 'move';
+    }
 }
 
 function allowDrop(event) {
@@ -69,15 +89,21 @@ async function dropTicketsItem(event) {
     list.appendChild(draggedTicket);
   }
 
-  // Restore pointer events
-  draggedTicket.classList.remove('opacity-50', 'pointer-events-none');
+  // Restore the row's ordinary look
+  draggedTicket.classList.remove('opacity-50');
 
   // Query direct list item children in their NEW DOM order
   const ticketNodes = Array.from(list.querySelectorAll(':scope > [data-ticket-id]'));
 
+  // The list is shown by priority, and it says which way round: under the
+  // ascending order the topmost row carries the smallest number, under the
+  // descending one the largest.  The number written is the one that puts the
+  // row back in the place it was just put, under the order being shown.
+  const ascending = list.getAttribute('data-sort') === 'priority-asc';
+
   const reorderedTickets = ticketNodes.map((node, index) => ({
     id: node.getAttribute('data-ticket-id'),
-    priority: ticketNodes.length - index
+    priority: ascending ? index + 1 : ticketNodes.length - index
   }));
 
   try {

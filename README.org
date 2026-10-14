@@ -59,7 +59,7 @@ LucidPlan provides a comprehensive suite of tools to keep your projects organize
 
 LucidPlan provides several ways to organize and work with tickets directly from the web interface. Ticket management is designed around fast, simple interactions.
 
-Tickets in the backlog can be reordered (in terms of priority) using native browser drag-and-drop. It's recommended to view in ~Priority - Descending~ for this.
+Tickets in the backlog can be reordered (in terms of priority) using native browser drag-and-drop. A rearrangement is written as the tickets' priorities, so the grip is offered while the backlog is sorted by priority -- ~Priority - Descending~ or ~Priority - Ascending~ -- and each direction writes the numbers that keep the rows where they were put. Under any other sort the row would slide back to its old place on the next visit, so no grip is offered there; pick a priority sort to reorder.
 
 Backlog tickets can be expanded and collapsed without navigating away from the page.
 
@@ -132,6 +132,8 @@ guix time-machine -C channels.scm -- shell -m manifest.scm
 
 Everything below is meant to be run inside that shell. The tasks themselves are declared in ~maak.scm~ and run with [[https://codeberg.org/jjba23/maak][maak]]; ~maak --list~ shows them all.
 
+The theme -- the Lucida faces, the web fonts, the icon face and the stylesheets that describe them -- is committed under ~pub/~ and served by the instance, so a fresh clone needs no fetching to run. ~maak fetch-assets~ refreshes those files from their sources when you want them current.
+
 ** Configuring the instance
 
 An instance keeps its private configuration in a module called ~(lucidplan env)~, which LucidPlan loads at start-up from a file named ~env.scm~ in the root of the project. That file is *per-deployment and must not be committed* (it is already in ~.gitignore~). Create it:
@@ -178,8 +180,11 @@ site-tagline           ; "free and open project management for everyone"
 site-description       ; one sentence, used as the meta description and in link previews
 site-keywords          ; a list of strings, used as the page keywords
 site-url               ; canonical base address, e.g. "https://lucidplan.example.org"
-site-logo              ; absolute URL to the image link previews show
+site-logo              ; link-preview image: an absolute URL, or a path on this instance
 site-language          ; the <html lang="..."> value, e.g. "en"
+asset-url              ; host this instance's own stylesheets and fonts are served from
+analytics-endpoint     ; where the page-view script reports, or "" for no analytics
+analytics-interval     ; how often it reports while a reader stays on the page, in ms
 
 ;; Who to credit and how to reach them
 copyright-holder
@@ -340,6 +345,28 @@ For a public instance, point ~host.name~ (in ~conf/production.conf~) at your dom
 
 Search-engine basics are handled for you: every page carries a title, a description, a canonical address and Open Graph/Twitter preview tags, plus a JSON-LD block describing the application. ~/robots.txt~ is generated and points at a ~/sitemap.xml~ that lists the public pages (the front page, the about page, the project list, and each project's backlog and board).
 
+** The theme, and the files it is made of
+
+LucidPlan wears a theme it serves itself. The Lucida faces, the two web font families the stylesheet names after them, the Phosphor icon face, the stylesheets that describe them, and the image a link preview shows are all files of this project, under ~pub/css/~, ~pub/fonts/~ and ~pub/img/~. A page load therefore asks this instance for them and no other host: nothing about your visitors is sent to a CDN or a font service, and nothing about your instance is told to anybody you did not choose.
+
+The files are committed, so a fresh checkout serves them without any extra step. They are refreshed from where they came from by one task, which names each source:
+
+#+begin_src sh
+maak fetch-assets
+#+end_src
+
+Where the instance hands them out is configuration. Left alone, a page names them by path -- ~/css/fonts.css~ -- and the instance that served the page answers for them, which is what a self-hosted deployment wants. Set ~asset-url~ in ~env.scm~ to an absolute base to hand that work to a static host or a CDN instead:
+
+#+begin_src scheme
+(define-public asset-url "https://assets.example.org/lucidplan")
+#+end_src
+
+Page analytics is also yours to decide. The instance's own page-view script reports to ~analytics-endpoint~, and setting it empty means the script is not put on the page at all -- no request leaves the reader's browser:
+
+#+begin_src scheme
+(define-public analytics-endpoint "")
+#+end_src
+
 ** Translations
 
 The interface is translated with gettext. The catalogs live under ~sys/i18n/locale/~. When you add translatable strings (they are written as ~(G_ "...")~), refresh and compile the catalogs:
@@ -464,6 +491,8 @@ See here the [[https://lucidplan.jointhefreeworld.org/tickets/lucidplan][Backlog
 Lucida fonts are proprietary typefaces originally developed by Bigelow & Holmes. They remain a long-time favorite for many people and are very legible in many situations and hardware/software. While they are bundled pre-installed on many operating systems and platforms, they remain proprietary fonts.
 
 You may use these font files under principles of fair use or for local development and non-commercial purposes, provided it is not for profit and used without securing a proper commercial license where required by law. Users and contributors are solely responsible for ensuring their usage complies with applicable software licensing terms and intellectual property rights.
+
+The faces the interface is set in live in ~pub/fonts/~ as files of this project, and are served by the instance itself (see [[*The theme, and the files it is made of][The theme, and the files it is made of]]). An operator who is not licensed to distribute them may drop them from ~pub/fonts/~ and either set ~asset-url~ to a host that serves them, or remove the @font-face rules that name them from ~pub/css/fonts.css~: the stylesheet's families then fall through to whatever the reader's own system offers, and nothing else changes.
 
 ** On Reproducibility: Why GNU Guix?
 
