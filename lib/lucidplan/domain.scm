@@ -45,7 +45,8 @@
 ;;; whose status has been taken off the list stays visible and can be moved
 ;;; back onto it rather than vanishing.
 
-(define *status-buckets* '("open" "done" "rejected"))
+(define *status-buckets*
+  '("open" "done" "rejected"))
 
 (define-public (default-ticket-statuses)
   "Answer the statuses this instance ships with, as configuration defines
@@ -55,15 +56,16 @@ them: the list a project falls back to when it has none of its own."
 ;; One field of one status entry, or FALLBACK when the entry is missing or
 ;; shorter than the field -- which is what a hand-written override may be.
 (define (status-field spec n fallback)
-  (let ((value (and (list? spec) (> (length spec) n) (list-ref spec n))))
+  (let ((value (and (list? spec)
+                    (> (length spec) n)
+                    (list-ref spec n))))
     (if (string? value) value fallback)))
 
 (define-public (ticket-status-spec specs value)
   "Answer the entry of SPECS that describes VALUE, or @code{#f}."
   (find (lambda (spec)
           (and (pair? spec)
-               (equal? (car spec) value)))
-        specs))
+               (equal? (car spec) value))) specs))
 
 (define-public (ticket-status-values specs)
   "Answer the stored values SPECS names, in their order."
@@ -93,7 +95,8 @@ the list."
 
 (define-public (ticket-status-in-bucket? specs value bucket)
   "Is VALUE, as SPECS describes it, in BUCKET?"
-  (equal? bucket (ticket-status-bucket specs value)))
+  (equal? bucket
+          (ticket-status-bucket specs value)))
 
 (define-public (ticket-status-values-in-bucket specs bucket)
   "The values of SPECS that belong to BUCKET, in their order."
@@ -123,32 +126,34 @@ or bucket takes the same default the accessors use (the value itself,
 `circle', nothing, `open'), and text that parses to no entries at all answers
 @code{#f}, which is how a project with no list of its own falls back to the
 instance's."
-  (if (or (not (string? text)) (string-null? (string-trim-both text)))
-      #f
-      (let ((entries
-             (filter-map
-              (lambda (line)
-                (let* ((fields (map string-trim-both
-                                    (string-split (string-trim-both line)
-                                                  #\|)))
-                       (value (car fields))
-                       (field (lambda (n fallback)
-                                (let ((v (and (> (length fields) n)
-                                              (list-ref fields n))))
-                                  (if (and (string? v) (not (string-null? v)))
-                                      v
-                                      fallback)))))
-                  (and (not (string-null? value))
-                       (not (string-prefix? "#" value))
-                       (let ((bucket (field 4 "open")))
-                         (list value
-                               (field 1 value)
-                               (field 2 "circle")
-                               (field 3 "")
-                               (if (member bucket *status-buckets*)
-                                   bucket
-                                   "open"))))))
-              (string-split text #\newline))))
+  (if (or (not (string? text))
+          (string-null? (string-trim-both text))) #f
+      (let ((entries (filter-map (lambda (line)
+                                   (let* ((fields (map string-trim-both
+                                                       (string-split (string-trim-both
+                                                                      line)
+                                                                     #\|)))
+                                          (value (car fields))
+                                          (field (lambda (n fallback)
+                                                   (let ((v (and (> (length
+                                                                     fields) n)
+                                                                 (list-ref
+                                                                  fields n))))
+                                                     (if (and (string? v)
+                                                              (not (string-null?
+                                                                    v))) v
+                                                         fallback)))))
+                                     (and (not (string-null? value))
+                                          (not (string-prefix? "#" value))
+                                          (let ((bucket (field 4 "open")))
+                                            (list value
+                                                  (field 1 value)
+                                                  (field 2 "circle")
+                                                  (field 3 "")
+                                                  (if (member bucket
+                                                       *status-buckets*)
+                                                      bucket "open"))))))
+                                 (string-split text #\newline))))
         (and (pair? entries) entries))))
 
 (define-public (effective-ticket-statuses project)
@@ -159,7 +164,8 @@ project edit page writes -- uses it; any other project uses the instance's
 own list.  PROJECT is a project row as the repository answers it, and may be
 @code{#f}, which is simply a project with no override."
   (or (parse-ticket-statuses (and project
-                                  (assq-ref project 'ticket-statuses)))
+                                  (assq-ref project
+                                            'ticket-statuses)))
       (default-ticket-statuses)))
 
 (define-public (known-user-id user-ids submitted)
@@ -177,8 +183,7 @@ back to nobody, and it answers @code{#f} here because the absence of an
 assignee is the absence of a row rather than a row naming no one."
   (and (string? submitted)
        (not (string-null? submitted))
-       (member submitted user-ids)
-       submitted))
+       (member submitted user-ids) submitted))
 
 ;; The other ladder a ticket is triaged with -- its type -- which is not
 ;; configuration: nothing on a ticket is grouped or counted by its type, so
@@ -198,7 +203,8 @@ or the instance's -- so an inline change is checked against exactly the
 statuses the menu that offered it was built from."
   (cond
     ((equal? field "status")
-     (cons 'ticket-status (ticket-status-values specs)))
+     (cons 'ticket-status
+           (ticket-status-values specs)))
     ((equal? field "type")
      (cons 'ticket-type ticket-types))
     (else #f)))
@@ -225,7 +231,8 @@ a second time which column moves."
          (ladder (ticket-ladder field statuses)))
     (and ladder
          (string? value)
-         (member value (cdr ladder))
+         (member value
+                 (cdr ladder))
          (list (cons (car ladder) value)))))
 
 (define-public (entity-sort-from-query user-sort)

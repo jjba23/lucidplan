@@ -61,22 +61,20 @@
     ;; their conditions with AND only, so this one statement is written as a
     ;; template and its two matched patterns are bound with `sql-parameterize'.
     (let ((pattern (format #f "%~a%" q)))
-      (execute-read
-       "search-projects"
-       (sql-parameterize
-        (format #f
-                "SELECT ~a FROM project WHERE deleted_at IS NULL AND (title LIKE ? OR description LIKE ?) ORDER BY human_id ASC"
-                (quoted-sql-columns columns))
-        (list pattern pattern)))))
+      (execute-read "search-projects"
+                    (sql-parameterize (format #f
+                                       "SELECT ~a FROM project WHERE deleted_at IS NULL AND (title LIKE ? OR description LIKE ?) ORDER BY human_id ASC"
+                                       (quoted-sql-columns columns))
+                                      (list pattern pattern)))))
 
   (define (get-project-by-human-id human-id)
-    (let ((rows (execute-read
-                 "get-project-by-human-id"
-                 (sql-select 'project
-                             #:columns columns
-                             #:where (list '(deleted-at is null)
-                                           (cons 'human-id human-id))
-                             #:limit 1))))
+    (let ((rows (execute-read "get-project-by-human-id"
+                              (sql-select 'project
+                                          #:columns columns
+                                          #:where (list '(deleted-at is null)
+                                                        (cons 'human-id
+                                                              human-id))
+                                          #:limit 1))))
       (if (nil? rows) #f
           (car rows))))
 

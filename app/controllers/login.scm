@@ -40,23 +40,29 @@
      (lambda (rc)
        (let* ((G_ (:i18n rc))
               (flag? (lambda (key)
-                       (equal? "true" (get-from-qstr rc key))))
+                       (equal? "true"
+                               (get-from-qstr rc key))))
               (notices (filter (lambda (notice)
                                  notice)
                                (list (if (flag? "login_failed")
-                                         (G_ "that email and password did not match, please try again")
+                                         (G_
+                                          "that email and password did not match, please try again")
                                          #f)
                                      (if (flag? "has-reset-password")
-                                         (G_ "your password was reset, please sign in with the new one")
+                                         (G_
+                                          "your password was reset, please sign in with the new one")
                                          #f)
                                      (if (flag? "invalid-reset-token")
-                                         (G_ "that password reset link is no longer valid, please request a new one")
+                                         (G_
+                                          "that password reset link is no longer valid, please request a new one")
                                          #f)
                                      (if (flag? "sent-password-reset")
-                                         (G_ "if that account exists, a reset link is on its way to its email address")
+                                         (G_
+                                          "if that account exists, a reset link is on its way to its email address")
                                          #f)))))
          (response-emit (:mime rc
-                               (login-page G_ #:notices notices))))))
+                               (login-page G_
+                                           #:notices notices))))))
 
 (post "/login"
       #:cookies '(names x-bewaking-lucidplan)

@@ -62,12 +62,10 @@
                 ;; The columns the board draws are this project's own statuses:
                 ;; its list if it kept one, the instance's otherwise.
                 (project-details (get-project-by-human-id project-repo
-                                                          (params rc
-                                                                  "project")))
+                                                          (params rc "project")))
                 (statuses (effective-ticket-statuses project-details))
                 (project-tickets (get-tickets ticket-repo
-                                              (params rc "project")
-                                              query-sort))
+                                              (params rc "project") query-sort))
                 (ticket-id-to-human-id (map (lambda (t)
                                               `(,(assq-ref t
                                                            'id) unquote
@@ -92,13 +90,10 @@
                                                       ;; offered to the same reader
                                                       ;; the endpoint that writes it
                                                       ;; accepts.
-                                                      #:can-drag?
-                                                      (session-has-permission?
-                                                       #:rc rc
-                                                       #:token-name
-                                                       'x-bewaking-lucidplan
-                                                       #:permission
-                                                       'lucidplan:ticket-create)
+                                                      #:can-drag? (session-has-permission?
+                                                                   #:rc rc
+                                                                   #:token-name 'x-bewaking-lucidplan
+                                                                   #:permission 'lucidplan:ticket-create)
                                                       #:is-logged-in (:cookies-value
                                                                       rc
                                                                       "x-bewaking-lucidplan"))))))

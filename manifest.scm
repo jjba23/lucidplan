@@ -159,7 +159,6 @@ and compile-time macros.")
     (home-page "https://codeberg.org/jjba23/scriba")
     (license license:lgpl3+)))
 
-
 (define-public guile-veritas
   (package
     (name "guile-veritas")
@@ -178,8 +177,7 @@ and compile-time macros.")
      (list
       #:source-directory "src"))
     (native-inputs (list guile-3.0))
-    (propagated-inputs (list guile-fibers
-                             guile-json-4)) ;; for versions >= 2.0.0
+    (propagated-inputs (list guile-fibers guile-json-4)) ;for versions >= 2.0.0
     (home-page "https://codeberg.org/jjba23/veritas")
     (synopsis "Testing framework for Guile")
     (description
@@ -252,7 +250,7 @@ concurrently by default.")
                               (format #f format-string
                                       (search-input-file inputs
                                                          (string-append "bin/"
-                                                                        program)))))))
+                                                          program)))))))
                         '(("readlink -f " "readlink" "~s -f ")
                           ("realpath " "realpath" "~s ")
                           ("dirname " "dirname" "~s ")
@@ -271,7 +269,6 @@ and SQLite.  It also exposes library functions and can be imported and used
 directly from other Guile code.  Migrations run transactionally, and their
 SHA256 checksums are tracked in a @code{migrations_history} table.")
     (license license:agpl3+)))
-
 
 ;;
 ;; define manifest

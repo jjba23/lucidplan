@@ -130,19 +130,18 @@
                                 'description))
          (toggle-js (toggle-details-js id)))
     `((div (@ (class ,(mk-class (append '(flex flex-col
-                                          gap-2
-                                          px-3
-                                          sm:px-4
-                                          md:px-6
-                                          py-3
-                                          sm:py-6
-                                          md:py-8
-                                          rounded-2xl
-                                          border-2
-                                          border-stone-300/75
-                                          dark:border-onyx-100/75
-                                          shadow-md)
-                                        frosted-tint-classes))))
+                                               gap-2
+                                               px-3
+                                               sm:px-4
+                                               md:px-6
+                                               py-3
+                                               sm:py-6
+                                               md:py-8
+                                               rounded-2xl
+                                               border-2
+                                               border-stone-300/75
+                                               dark:border-onyx-100/75
+                                               shadow-md) frosted-tint-classes))))
            ;; Header
            (div (@ (class ,(mk-class '(flex flex-row justify-between
                                             items-start gap-2))))
@@ -185,23 +184,23 @@
                                 'description))
          (toggle-js (toggle-details-js id)))
     `((div (@ (class ,(mk-class (append '(flex flex-row
-                                          flex-wrap
-                                          gap-1
-                                          sm:gap-4
-                                          items-center
-                                          justify-between
-                                          border-2
-                                          border-stone-300/75
-                                          dark:border-onyx-100/75
-                                          shadow-sm
-                                          py-2
-                                          px-3
-                                          sm:px-4
-                                          cursor-pointer
-                                          rounded-xl
-                                          w-full
-                                          focus:outline-none
-                                          focus:ring-2)
+                                               flex-wrap
+                                               gap-1
+                                               sm:gap-4
+                                               items-center
+                                               justify-between
+                                               border-2
+                                               border-stone-300/75
+                                               dark:border-onyx-100/75
+                                               shadow-sm
+                                               py-2
+                                               px-3
+                                               sm:px-4
+                                               cursor-pointer
+                                               rounded-xl
+                                               w-full
+                                               focus:outline-none
+                                               focus:ring-2)
                                         frosted-tint-classes)))
               (tabindex "0")
               (onclick ,toggle-js)
@@ -295,8 +294,7 @@
                  #:is-logged-in is-logged-in
                  #:body `((div (@ (class ,(mk-class '(px-3 pb-6))))
                                ((div (@ (class ,(mk-class '(flex flex-col
-                                                                 gap-4
-                                                                 grow))))
+                                                                 gap-4 grow))))
                                      ,(projects-header-title G_ search-query)
                                      ,(projects-toolbar G_)
                                      (div (@ (id lucidplan-projects-list)
@@ -331,7 +329,8 @@
                                          'vcs-url)
                      #:description (html-unescape (proj-ref project
                                                             'description))
-                     #:ticket-statuses (proj-ref project 'ticket-statuses)
+                     #:ticket-statuses (proj-ref project
+                                                 'ticket-statuses)
                      #:action (format #f "/projects/id/~a/edit"
                                       (proj-ref project
                                                 'human-id))

@@ -60,11 +60,15 @@ written to.
 A user row carries the name a reader is shown and the address a message goes
 to; a row without an address is not an error -- an account may be made before
 its address is known -- it is simply somebody this instance cannot reach."
-  (let ((address (and user (assq-ref user 'email)))
-        (name (and user (assq-ref user 'username))))
-    (if (and (string? address) (not (string-null? address)))
-        (cons (if (string? name) name "") address)
-        #f)))
+  (let ((address (and user
+                      (assq-ref user
+                                'email)))
+        (name (and user
+                   (assq-ref user
+                             'username))))
+    (if (and (string? address)
+             (not (string-null? address)))
+        (cons (if (string? name) name "") address) #f)))
 
 (define* (project-people #:key user-repo assignee-repo project-human-id
                          (also '()))
@@ -76,16 +80,21 @@ assignee and the person who opened it, which the caller has in hand and this
 function cannot guess.  A user that no longer exists, or that has no address,
 is left out; an address appears once."
   (let* ((assigned (map (lambda (row)
-                          (assq-ref row 'user-id))
-                        (get-ticket-assignee-by-project-human-id
-                         assignee-repo project-human-id)))
+                          (assq-ref row
+                                    'user-id))
+                        (get-ticket-assignee-by-project-human-id assignee-repo
+                         project-human-id)))
          (ids (delete-duplicates (append also assigned))))
     (filter-map (lambda (id)
-                  (person-of (get-user-by-id user-repo id)))
-                ids)))
+                  (person-of (get-user-by-id user-repo id))) ids)))
 
-(define* (notify-new-ticket! #:key user-repo assignee-repo project statuses
-                             ticket author-id assignee-id)
+(define* (notify-new-ticket! #:key user-repo
+                             assignee-repo
+                             project
+                             statuses
+                             ticket
+                             author-id
+                             assignee-id)
   "Tell the people of PROJECT that TICKET has joined it.
 
 @var{project} is the project row the ticket was written under and
@@ -100,36 +109,57 @@ Answer what @code{(lucidplan mail)}'s @code{send-email!} answers:
 @code{#t} when the service took the message, @code{#f} when there was nobody
 to write to or every attempt failed.  Reporting a failure is the caller's
 business, never a reason to refuse the write that asked for the message."
-  (let* ((project-human-id (assq-ref project 'human-id))
-         (human-id (assq-ref ticket 'human-id))
-         (title (html-unescape (or (assq-ref ticket 'title) "")))
-         (description (html-unescape (or (assq-ref ticket 'description) "")))
+  (let* ((project-human-id (assq-ref project
+                                     'human-id))
+         (human-id (assq-ref ticket
+                             'human-id))
+         (title (html-unescape (or (assq-ref ticket
+                                             'title) "")))
+         (description (html-unescape (or (assq-ref ticket
+                                                   'description) "")))
          (status (ticket-status-label statuses
-                                      (assq-ref ticket 'ticket-status)))
-         (author (and author-id (get-user-by-id user-repo author-id)))
-         (assignee (and assignee-id (get-user-by-id user-repo assignee-id)))
+                                      (assq-ref ticket
+                                                'ticket-status)))
+         (author (and author-id
+                      (get-user-by-id user-repo author-id)))
+         (assignee (and assignee-id
+                        (get-user-by-id user-repo assignee-id)))
          (recipients (project-people #:user-repo user-repo
                                      #:assignee-repo assignee-repo
                                      #:project-human-id project-human-id
                                      #:also (list author-id assignee-id))))
-    (send-email!
-     #:template 'lucidplan-new-ticket
-     #:subject (format #f "New ticket in ~a"
-                       (html-unescape (or (assq-ref project 'title)
-                                          project-human-id)))
-     #:recipients recipients
-     #:vars `((system-name . ,(config-ref 'site-name))
-              (project-name . ,(html-unescape (or (assq-ref project 'title)
-                                                  "")))
-              (project-human-id . ,project-human-id)
-              (ticket-human-id . ,human-id)
-              (ticket-title . ,title)
-              (ticket-type . ,(or (assq-ref ticket 'ticket-type) ""))
-              (ticket-status . ,status)
-              (priority . ,(or (assq-ref ticket 'priority) ""))
-              (author . ,(if author (assq-ref author 'username) ""))
-              (assignee . ,(if assignee (assq-ref assignee 'username) ""))
-              (description . ,description)
-              (ticket-url . ,(absolute-url
-                              (format #f "/tickets/~a/id/~a"
-                                      project-human-id human-id)))))))
+    (send-email! #:template 'lucidplan-new-ticket
+                 #:subject (format #f "New ticket in ~a"
+                                   (html-unescape (or (assq-ref project
+                                                                'title)
+                                                      project-human-id)))
+                 #:recipients recipients
+                 #:vars `((system-name unquote
+                                       (config-ref 'site-name))
+                          (project-name unquote
+                                        (html-unescape (or (assq-ref project
+                                                                     'title)
+                                                           "")))
+                          (project-human-id unquote project-human-id)
+                          (ticket-human-id unquote human-id)
+                          (ticket-title unquote title)
+                          (ticket-type unquote
+                                       (or (assq-ref ticket
+                                                     'ticket-type) ""))
+                          (ticket-status unquote status)
+                          (priority unquote
+                                    (or (assq-ref ticket
+                                                  'priority) ""))
+                          (author unquote
+                                  (if author
+                                      (assq-ref author
+                                                'username) ""))
+                          (assignee unquote
+                                    (if assignee
+                                        (assq-ref assignee
+                                                  'username) ""))
+                          (description unquote description)
+                          (ticket-url unquote
+                                      (absolute-url (format #f
+                                                     "/tickets/~a/id/~a"
+                                                     project-human-id human-id)))))))

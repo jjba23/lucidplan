@@ -34,13 +34,25 @@
   #:use-module (scriba auto)
   #:use-module (kracht prelude)
   #:re-export (symbol->sql-column sql-column->symbol
-                                 symbols->sql-columns-list sql-row->scheme-alist
-                                 alist? value->sql-literal pair->sql-assignment
-                                 escape-sql-string quote-sql-identifier
-                                 sql-select sql-insert sql-insert-many
-                                 sql-upsert sql-upsert-many sql-update
-                                 sql-delete sql-parameterize sql-where-fragment
-                                 sql-query? sql-query-sql sql-query-params)
+                                  symbols->sql-columns-list
+                                  sql-row->scheme-alist
+                                  alist?
+                                  value->sql-literal
+                                  pair->sql-assignment
+                                  escape-sql-string
+                                  quote-sql-identifier
+                                  sql-select
+                                  sql-insert
+                                  sql-insert-many
+                                  sql-upsert
+                                  sql-upsert-many
+                                  sql-update
+                                  sql-delete
+                                  sql-parameterize
+                                  sql-where-fragment
+                                  sql-query?
+                                  sql-query-sql
+                                  sql-query-params)
   #:export (quoted-sql-columns order-by-sql sql-query->literal db-read
                                db-write))
 
@@ -53,8 +65,7 @@ statement is not one the builders can express -- a `LIKE ... OR ...' search,
 say.  The names are developer-controlled constants, never user input."
   (string-join (map (lambda (column)
                       (quote-sql-identifier (symbol->sql-column column)))
-                    columns)
-               ", "))
+                    columns) ", "))
 
 (define (order-by-sql order-by)
   "Render ORDER-BY -- a list of `(column [direction])' pairs, as the kracht
@@ -66,21 +77,25 @@ This is the one piece of statement building the builders do not expose, so a
 statement assembled with `sql-parameterize' can still carry an order that comes
 from `entity-sort-from-query'."
   (if (null? order-by) ""
-      (string-append
-       " ORDER BY "
-       (string-join (map (lambda (clause)
-                           (let ((column (quote-sql-identifier
-                                          (symbol->sql-column (car clause))))
-                                 (direction (and (pair? (cdr clause))
-                                                 (cadr clause))))
-                             (case direction
-                               ((#f) column)
-                               ((asc asc!) (string-append column " ASC"))
-                               ((desc desc!) (string-append column " DESC"))
-                               (else (error "order-by-sql: unknown ORDER BY direction"
-                                            direction)))))
-                         order-by)
-                    ", "))))
+      (string-append " ORDER BY "
+                     (string-join (map (lambda (clause)
+                                         (let ((column (quote-sql-identifier (symbol->sql-column
+                                                                              (car
+                                                                               clause))))
+                                               (direction (and (pair? (cdr
+                                                                       clause))
+                                                               (cadr clause))))
+                                           (case direction
+                                             ((#f)
+                                              column)
+                                             ((asc asc!)
+                                              (string-append column " ASC"))
+                                             ((desc desc!)
+                                              (string-append column " DESC"))
+                                             (else (error
+                                                    "order-by-sql: unknown ORDER BY direction"
+                                                    direction))))) order-by)
+                                  ", "))))
 
 (define (sql-query->literal query)
   "Render a kracht <sql-query> as one executable SQL string, with every bound
@@ -93,9 +108,10 @@ the statement instead.  They are still escaped by kracht's `value->sql-literal'
 in, and the shape of the statement is fixed by the template alone.  A template
 must therefore contain exactly as many `?' markers as the query has parameters;
 a mismatch is reported rather than silently mis-compiled."
-  (let loop ((chars (string->list (sql-query-sql query)))
-             (params (sql-query-params query))
-             (out '()))
+  (let loop
+    ((chars (string->list (sql-query-sql query)))
+     (params (sql-query-params query))
+     (out '()))
     (cond
       ((null? chars)
        (unless (null? params)
@@ -114,14 +130,17 @@ a mismatch is reported rather than silently mis-compiled."
              (cdr params)
              (append (reverse (string->list (value->sql-literal (car params))))
                      out)))
-      (else (loop (cdr chars) params (cons (car chars) out))))))
+      (else (loop (cdr chars) params
+                  (cons (car chars) out))))))
 
 (define (query->sql query)
   "Return QUERY as an executable SQL string: a <sql-query> is inlined with
 `sql-query->literal', a plain string is passed through unchanged."
-  (if (sql-query? query) (sql-query->literal query) query))
+  (if (sql-query? query)
+      (sql-query->literal query) query))
 
-(define s (scriba-auto-logger))
+(define s
+  (scriba-auto-logger))
 
 (define (db-read conn)
   (lambda (name query)
@@ -130,8 +149,7 @@ a mismatch is reported rather than silently mis-compiled."
                       (DB-get-all-rows (DB-query conn sql)))))
       (log-debug s "~a query:\n\t~a\n" name sql)
       (log-debug s "~a rows: ~a\n" name
-                 (length rows))
-      rows)))
+                 (length rows)) rows)))
 
 (define (db-write conn)
   (lambda (name query)

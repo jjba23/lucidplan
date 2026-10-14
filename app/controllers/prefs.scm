@@ -44,10 +44,11 @@
                (target (if (and (string? return-to)
                                 (string-prefix? "/" return-to)
                                 (not (string-prefix? "//" return-to)))
-                           return-to
-                           "/")))
-          (when (assoc user-lang (lucidplan-locales))
-            (:cookies-set! rc 'lang "lang" user-lang)
+                           return-to "/")))
+          (when (assoc user-lang
+                       (lucidplan-locales))
+            (:cookies-set! rc
+                           'lang "lang" user-lang)
             (:cookies-setattr! rc
                                'lang
                                #:expires (* 3600 24 365)
@@ -58,4 +59,5 @@
           ;; which is where a language change is easiest to read.  The
           ;; framework turns the path into an absolute address on the
           ;; instance's own name, as it does for every other redirect here.
-          (redirect-to rc target #:status 302))))
+          (redirect-to rc target
+                       #:status 302))))

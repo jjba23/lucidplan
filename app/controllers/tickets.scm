@@ -47,9 +47,9 @@
 ;; handler's own return value a procedure -- and the response would be a 500
 ;; about an invalid body.)
 (define (refuse-json status message)
-  (response-emit (scm->json-string `((error . ,message)))
+  (response-emit (scm->json-string `((error unquote message)))
                  #:status status
-                 #:headers '((content-type . (application/json)))))
+                 #:headers '((content-type application/json))))
 
 ;; A status a form submitted is honoured only when the project's own ladder
 ;; offers it: a status renamed away, or a value typed by hand, falls back to
@@ -57,8 +57,8 @@
 ;; cannot show.
 (define (submitted-status statuses value)
   (if (and (string? value)
-           (member value (ticket-status-values statuses)))
-      value
+           (member value
+                   (ticket-status-values statuses))) value
       (let ((open (ticket-status-values-in-bucket statuses "open")))
         (if (pair? open)
             (car open)
@@ -168,7 +168,7 @@
                 (ticket-assignee (get-ticket-assignee-by-project-human-id
                                   ticket-assignee-repo
                                   (params rc "project"))))
-
+           
            (response-emit (:mime rc
                                  (html-from-tickets (:i18n rc)
                                                     #:is-logged-in
@@ -193,13 +193,10 @@
                                                     ;; controls is the same
                                                     ;; question the endpoint
                                                     ;; behind them answers.
-                                                    #:can-triage?
-                                                    (session-has-permission?
-                                                     #:rc rc
-                                                     #:token-name
-                                                     'x-bewaking-lucidplan
-                                                     #:permission
-                                                     'lucidplan:ticket-create))))))
+                                                    #:can-triage? (session-has-permission?
+                                                                   #:rc rc
+                                                                   #:token-name 'x-bewaking-lucidplan
+                                                                   #:permission 'lucidplan:ticket-create))))))
        (get)))
 
 (get "/tickets/:project/new"
@@ -211,8 +208,7 @@
          (let* ((project-repo (make-sqlite-project-repository rc))
                 (user-repo (make-sqlite-user-repository rc))
                 (project-details (get-project-by-human-id project-repo
-                                                          (params rc
-                                                                  "project"))))
+                                                          (params rc "project"))))
            (response-emit (:mime rc
                                  (html-new-ticket-form (:i18n rc)
                                                        #:is-logged-in (:cookies-value
@@ -222,9 +218,8 @@
                                                                    project-repo)
                                                        #:project (params rc
                                                                   "project")
-                                                       #:statuses
-                                                       (effective-ticket-statuses
-                                                        project-details)
+                                                       #:statuses (effective-ticket-statuses
+                                                                   project-details)
                                                        #:users (get-id-to-username
                                                                 user-repo))))))
        (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
@@ -243,7 +238,8 @@
                  (execute-write (db-write (DB-open rc))))
             (execute-write "soft-delete-ticket"
                            (sql-update 'ticket
-                                       `((deleted-at unquote (current-time)))
+                                       `((deleted-at unquote
+                                                     (current-time)))
                                        #:where (list (cons 'id id))))
 
             (redirect-to rc
@@ -278,20 +274,23 @@
                  (body (alist-from-url-encoded-body (rc-body rc)))
                  (title (html-escape (assoc-ref body "title")))
                  (ticket-status (submitted-status statuses
-                                                  (assoc-ref body "ticket-status")))
+                                                  (assoc-ref body
+                                                             "ticket-status")))
                  (ticket-type (assoc-ref body "ticket-type"))
                  (description (html-escape (assoc-ref body "description")))
-                 (priority (string->number (assoc-ref body "priority")))                (project-id (project-id-from-human-id project-repo
+                 (priority (string->number (assoc-ref body "priority")))
+                 (project-id (project-id-from-human-id project-repo
                                                        (params rc "project")))
-                (new-uuid (string-replace-substring (generate-string-uuid)
-                                                    "\n" ""))
-                (user-repo (make-sqlite-user-repository rc))
-                (user-ids (map (lambda (u)
-                                 (assq-ref u 'id))
-                               (get-id-to-username user-repo)))
-                (submitted-assignee (assoc-ref body "assignee"))
-                (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
-                                       rc)))
+                 (new-uuid (string-replace-substring (generate-string-uuid)
+                                                     "\n" ""))
+                 (user-repo (make-sqlite-user-repository rc))
+                 (user-ids (map (lambda (u)
+                                  (assq-ref u
+                                            'id))
+                                (get-id-to-username user-repo)))
+                 (submitted-assignee (assoc-ref body "assignee"))
+                 (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
+                                        rc)))
             (insert-ticket ticket-repo
                            `((id unquote new-uuid)
                              (human-id unquote new-human-id)
@@ -322,18 +321,16 @@
               ;; session the write came from.  A mail service that cannot be
               ;; reached is logged and answered with #f; it never unmakes the
               ;; ticket, and it never fails the request.
-              (notify-new-ticket!
-               #:user-repo user-repo
-               #:assignee-repo ticket-assignee-repo
-               #:project project
-               #:statuses statuses
-               #:ticket (get-ticket-by-project-human-id-and-human-id
-                         ticket-repo (params rc "project") new-human-id)
-               #:author-id (session-owner-id #:rc rc
-                                             #:token-name
-                                             'x-bewaking-lucidplan)
-               #:assignee-id assignee-id))
-
+              (notify-new-ticket! #:user-repo user-repo
+                                  #:assignee-repo ticket-assignee-repo
+                                  #:project project
+                                  #:statuses statuses
+                                  #:ticket (get-ticket-by-project-human-id-and-human-id
+                                            ticket-repo
+                                            (params rc "project") new-human-id)
+                                  #:author-id (session-owner-id #:rc rc
+                                                                #:token-name 'x-bewaking-lucidplan)
+                                  #:assignee-id assignee-id))
 
             (redirect-to rc
                          (string->uri (format #f "~a/tickets/~a"
@@ -364,8 +361,7 @@
                                                                 (params rc
                                                                  "human-id")))
                 (project-details (get-project-by-human-id project-repo
-                                                          (params rc
-                                                                  "project")))
+                                                          (params rc "project")))
                 (assignee-data (get-ticket-assignee-by-ticket-id
                                 ticket-assignee-repo
                                 (assq-ref t
@@ -379,9 +375,8 @@
                                                         #:project (params rc
                                                                    "project")
                                                         #:t t
-                                                        #:statuses
-                                                        (effective-ticket-statuses
-                                                         project-details)
+                                                        #:statuses (effective-ticket-statuses
+                                                                    project-details)
                                                         #:assignee assignee
                                                         #:users (get-id-to-username
                                                                  user-repo)
@@ -413,7 +408,7 @@
                                          ticket-repo proj human-id
                                          `((priority unquote priority)))))
                                     (vector->list (assoc-ref b "tickets"))) #t)))
-
+            
             (if upd-r
                 (:mime rc
                        '(("result" . "success")))
@@ -440,24 +435,25 @@
                  ;; A card can only be dropped into a column the board drew,
                  ;; so a status the project's own ladder does not name is a
                  ;; request the server refuses rather than one it writes.
-                 (statuses (effective-ticket-statuses
-                            (get-project-by-human-id project-repo proj)))
+                 (statuses (effective-ticket-statuses (get-project-by-human-id
+                                                       project-repo proj)))
                  (raw-b (bytevector->string (rc-body rc) "utf-8"))
                  (b (json-string->scm raw-b))
                  (new-status (assoc-ref b "status")))
-
+            
             (cond
               ((not (and (string? new-status)
                          (member new-status
                                  (ticket-status-values statuses))))
                (refuse-json 400 "Unknown status"))
-              ((update-ticket-by-project-human-id-and-human-id
-                ticket-repo proj human-id
-                `((ticket-status unquote new-status)))
+              ((update-ticket-by-project-human-id-and-human-id ticket-repo
+                                                               proj human-id
+                                                               `((ticket-status
+                                                                  unquote
+                                                                  new-status)))
                (:mime rc
                       '(("result" . "success"))))
-              (else
-               (refuse-json 500 "Failed to update status")))))
+              (else (refuse-json 500 "Failed to update status")))))
         (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
                            #:needed-permissions '(lucidplan:ticket-create)
                            #:rc rc
@@ -479,19 +475,18 @@
                  (human-id (params rc "human-id"))
                  (project-repo (make-sqlite-project-repository rc))
                  (ticket-repo (make-sqlite-ticket-repository rc))
-                 (statuses (effective-ticket-statuses
-                            (get-project-by-human-id project-repo proj)))
+                 (statuses (effective-ticket-statuses (get-project-by-human-id
+                                                       project-repo proj)))
                  (raw-b (bytevector->string (rc-body rc) "utf-8"))
                  (b (json-string->scm raw-b))
                  (change (ticket-field-change (assoc-ref b "field")
-                                              (assoc-ref b "value")
-                                              statuses))
+                                              (assoc-ref b "value") statuses))
                  ;; Ask for the ticket before writing it: an unknown project or
                  ;; human id then answers a plain "no such ticket" rather than
                  ;; resting on what the driver reports for a write that
                  ;; matched no row.
-                 (t (get-ticket-by-project-human-id-and-human-id
-                     ticket-repo proj human-id)))
+                 (t (get-ticket-by-project-human-id-and-human-id ticket-repo
+                                                                 proj human-id)))
             (cond
               ((not change)
                (refuse-json 400 "Unknown field or value"))
@@ -500,9 +495,12 @@
               (else
                ;; A change is an edit, so the ticket's own "last edited" stamp
                ;; moves with it and the backlog can order by it.
-               (update-ticket-by-project-human-id-and-human-id
-                ticket-repo proj human-id
-                (append change `((updated_at unquote (current-time)))))
+               (update-ticket-by-project-human-id-and-human-id ticket-repo
+                                                               proj human-id
+                                                               (append change
+                                                                       `((updated_at
+                                                                          unquote
+                                                                          (current-time)))))
                (:mime rc
                       '(("result" . "success")))))))
         (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
@@ -518,28 +516,31 @@
         (define (do-edit)
           (let* ((ticket-repo (make-sqlite-ticket-repository rc))
                  (project-repo (make-sqlite-project-repository rc))
-                 (statuses (effective-ticket-statuses
-                            (get-project-by-human-id project-repo
-                                                     (params rc "project"))))
+                 (statuses (effective-ticket-statuses (get-project-by-human-id
+                                                       project-repo
+                                                       (params rc "project"))))
                  (body (alist-from-url-encoded-body (rc-body rc)))
                  (title (html-escape (assoc-ref body "title")))
                  (description (html-escape (assoc-ref body "description")))
                  (ticket-status (submitted-status statuses
-                                                  (assoc-ref body "ticket-status")))
+                                                  (assoc-ref body
+                                                             "ticket-status")))
                  (priority (string->number (assoc-ref body "priority")))
                  (ticket-type (assoc-ref body "ticket-type"))
                  (project-id (project-id-from-human-id project-repo
                                                        (params rc "project")))
                  (ticket-id (ticket-id-from-human-id ticket-repo
                                                      (params rc "project")
-                                                     (params rc "human-id")))                (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
-                                       rc))
-                (user-repo (make-sqlite-user-repository rc))
-                (user-ids (map (lambda (u)
-                                 (assq-ref u 'id))
-                               (get-id-to-username user-repo)))
-                (submitted-assignee (assoc-ref body "assignee")))
-
+                                                     (params rc "human-id")))
+                 (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
+                                        rc))
+                 (user-repo (make-sqlite-user-repository rc))
+                 (user-ids (map (lambda (u)
+                                  (assq-ref u
+                                            'id))
+                                (get-id-to-username user-repo)))
+                 (submitted-assignee (assoc-ref body "assignee")))
+            
             (update-ticket-by-project-human-id-and-human-id ticket-repo
                                                             (params rc
                                                                     "project")
@@ -599,8 +600,7 @@
          (let* ((project-repo (make-sqlite-project-repository rc))
                 (proj (get-projects project-repo))
                 (project-details (get-project-by-human-id project-repo
-                                                          (params rc
-                                                                  "project")))
+                                                          (params rc "project")))
                 (user-repo (make-sqlite-user-repository rc))
                 (ticket-repo (make-sqlite-ticket-repository rc))
                 (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
@@ -627,34 +627,35 @@
                 ;; The ticket itself.  Signed out, its status and its type
                 ;; stay the badges they read as at a glance; signed in, each
                 ;; of the two is the small control that posts its own change.
-                (ticket-card (render-ticket
-                              (:i18n rc)
-                              #:project (params rc "project")
-                              #:ticket t
-                              #:statuses
-                              (effective-ticket-statuses project-details)
-                              #:assignee (if (nil? ticket-assignee-user)
-                                             #f
-                                             (assq-ref ticket-assignee-user
-                                                       'username))
-                              ;; The card offers its inline controls to the
-                              ;; same reader the endpoint behind them would
-                              ;; accept: holding the permission, not merely
-                              ;; being signed in.
-                              #:editable? (session-has-permission?
-                                           #:rc rc
-                                           #:token-name
-                                           'x-bewaking-lucidplan
-                                           #:permission
-                                           'lucidplan:ticket-create))))
+                (ticket-card (render-ticket (:i18n rc)
+                                            #:project (params rc "project")
+                                            #:ticket t
+                                            #:statuses (effective-ticket-statuses
+                                                        project-details)
+                                            #:assignee (if (nil?
+                                                            ticket-assignee-user)
+                                                           #f
+                                                           (assq-ref
+                                                            ticket-assignee-user
+                                                            'username))
+                                            ;; The card offers its inline controls to the
+                                            ;; same reader the endpoint behind them would
+                                            ;; accept: holding the permission, not merely
+                                            ;; being signed in.
+                                            #:editable? (session-has-permission?
+                                                         #:rc rc
+                                                         #:token-name 'x-bewaking-lucidplan
+                                                         #:permission 'lucidplan:ticket-create))))
            (response-emit (:mime rc
                                  (html-template (:i18n rc)
-                                                #:title (assq-ref t 'title)
-                                                #:canonical-path
-                                                (format #f
-                                                 "/tickets/~a/id/~a"
-                                                 (params rc "project")
-                                                 (params rc "human-id"))
+                                                #:title (assq-ref t
+                                                                  'title)
+                                                #:canonical-path (format #f
+                                                                  "/tickets/~a/id/~a"
+                                                                  (params rc
+                                                                   "project")
+                                                                  (params rc
+                                                                   "human-id"))
                                                 #:is-logged-in (:cookies-value
                                                                 rc
                                                                 "x-bewaking-lucidplan")
@@ -678,8 +679,10 @@
        ;; a page: the reader is sent back to the backlog they came from
        ;; rather than shown a ticket with nothing in it.
        (let ((ticket-repo (make-sqlite-ticket-repository rc)))
-         (if (get-ticket-by-project-human-id-and-human-id
-              ticket-repo (params rc "project") (params rc "human-id"))
+         (if (get-ticket-by-project-human-id-and-human-id ticket-repo
+                                                          (params rc "project")
+                                                          (params rc
+                                                                  "human-id"))
              (get-single)
              (redirect-to rc
                           (string->uri (format #f "~a/tickets/~a"

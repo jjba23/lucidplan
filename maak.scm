@@ -156,8 +156,13 @@ Args: update? represents whether we should update a template or create a new one
 ;; The faces themselves: Lucida Sans and its typewriter companion, four styles
 ;; each, and the Unicode face the base family falls back to.
 (define lucida-fonts
-  '("LSANS.woff" "LSANSI.woff" "LSANSD.woff" "LSANSDI.woff"
-    "LTYPE.woff" "LTYPEO.woff" "LTYPEB.woff" "LTYPEBO.woff"
+  '("LSANS.woff" "LSANSI.woff"
+    "LSANSD.woff"
+    "LSANSDI.woff"
+    "LTYPE.woff"
+    "LTYPEO.woff"
+    "LTYPEB.woff"
+    "LTYPEBO.woff"
     "l_10646.woff"))
 
 ;; The web families the shell asks for by name: a sans to fall back to when
@@ -189,8 +194,10 @@ Args: update? represents whether we should update a template or create a new one
 ;; so dropping a source means taking the comma before the one that follows,
 ;; and the last source kept keeps its terminating semicolon.
 (define phosphor-font-forms-left-out
-  '(",\n    url(\"../fonts/Phosphor.ttf\") format(\"truetype\")"
-    ",\n    url(\"../fonts/Phosphor.svg#Phosphor\") format(\"svg\")"))
+  '(",
+    url(\"../fonts/Phosphor.ttf\") format(\"truetype\")"
+    ",
+    url(\"../fonts/Phosphor.svg#Phosphor\") format(\"svg\")"))
 
 ;; The mark a link preview shows when the instance has not been given one of
 ;; its own: the project's own, kept as a file of this project so that a fresh
@@ -333,12 +340,10 @@ path, so a test names the module it tests the way the application does."
   ;; the name of a program and the run answers `command not found'.  The
   ;; loader's own defaults agree with both of them; they are said anyway, so a
   ;; run from here is the run that was asked for.
-  (time-machine-manifest-shell
-   (list "env"
-         "VERITAS_TEST_TYPE=unit"
-         "VERITAS_RUN_BENCHMARKS=true"
-         "guile -L . -L lib -L test"
-         "-c '((@ (veritas runner) run-tests))'")))
+  (time-machine-manifest-shell (list "env" "VERITAS_TEST_TYPE=unit"
+                                     "VERITAS_RUN_BENCHMARKS=true"
+                                     "guile -L . -L lib -L test"
+                                     "-c '((@ (veritas runner) run-tests))'")))
 
 (define (hot-reload)
   "Hot-reloading developer's setup."
@@ -386,9 +391,9 @@ never half-migrated, because a migration that fails takes its own statements
 back with it.  The ledger is what makes that possible -- it is the record of
 what has run, and mutastructura is the only thing that writes it -- so the
 migrations are applied here and nowhere else, by hand or otherwise."
-  (time-machine-manifest-shell
-   (list (~ "mutastructura --database ~a --connection ~a --migrations ~a"
-            db-engine lucidplan-db db-migrations-dir))))
+  (time-machine-manifest-shell (list (~
+                                      "mutastructura --database ~a --connection ~a --migrations ~a"
+                                      db-engine lucidplan-db db-migrations-dir))))
 
 (define (init-db)
   "Initialize a new database, migrate it, and enable WAL mode for higher
@@ -396,8 +401,9 @@ concurrent writes to SQLite 3."
   (delete-file-recursively lucidplan-db)
   (delete-file-recursively (~ "~a-shm" lucidplan-db))
   (delete-file-recursively (~ "~a-wal" lucidplan-db))
-  (time-machine-manifest-shell
-   (list (~ "sqlite3 ~a 'PRAGMA journal_mode=WAL;'" lucidplan-db)))
+  (time-machine-manifest-shell (list (~
+                                      "sqlite3 ~a 'PRAGMA journal_mode=WAL;'"
+                                      lucidplan-db)))
   (migrate))
 
 ;; ====== Maak i18n tasks ======
@@ -450,16 +456,21 @@ idempotent, so running it when nothing has changed rewrites the same bytes."
   (define (file-name url)
     "The local name a fetched file is kept under."
     (let* ((clean (let ((hash (string-contains url "#")))
-                    (if hash (substring url 0 hash) url)))
+                    (if hash
+                        (substring url 0 hash) url)))
            (slash (string-rindex clean #\/)))
-      (if slash (substring clean (+ slash 1) (string-length clean)) clean)))
+      (if slash
+          (substring clean
+                     (+ slash 1)
+                     (string-length clean)) clean)))
 
   (define (web-font-name url)
     "The local name of a file a font service hands out.
 
 They are content-addressed and carry no family name, so they are prefixed to
 say where they came from when one is read on its own."
-    (~ "gf-~a" (file-name url)))
+    (~ "gf-~a"
+       (file-name url)))
 
   (define (urls-in css)
     "Every http(s) URL the stylesheet CSS points at, each named once."
@@ -476,39 +487,43 @@ say where they came from when one is read on its own."
            (body (get-string-all port)))
       (close-pipe port)
       (when (string-null? body)
-        (error "fetch-assets: nothing came back from" url))
-      body))
+        (error "fetch-assets: nothing came back from" url)) body))
 
   (define (fetch-all! pairs)
     "Take every (URL . FILE) in PAIRS, in a single run of the fetcher."
-    (when (null? pairs) (error "fetch-assets: nothing to fetch"))
+    (when (null? pairs)
+      (error "fetch-assets: nothing to fetch"))
     ($ (append (list "curl -fsS --fail-early" "-A"
                      (~ "'~a'" asset-user-agent))
                (append-map (lambda (pair)
-                             (list "--output" (~ "'~a'" (cdr pair))
-                                   (~ "'~a'" (car pair))))
-                           pairs))))
+                             (list "--output"
+                                   (~ "'~a'"
+                                      (cdr pair))
+                                   (~ "'~a'"
+                                      (car pair)))) pairs))))
 
   (define (write-asset path text)
-    (call-with-output-file path (lambda (port) (display text port)))
+    (call-with-output-file path
+      (lambda (port)
+        (display text port)))
     (log-info "wrote ~a" path))
 
   ;; A family's stylesheet is captured as the font service wrote it -- the
   ;; @font-face blocks and the subset split are its own -- and then rewritten
   ;; so every file it points at is the copy beside it.
   (define (web-family-css family)
-    (let* ((css (fetch-text (~ "https://fonts.googleapis.com/css2?family=~a&display=swap"
-                               family)))
+    (let* ((css (fetch-text (~
+                             "https://fonts.googleapis.com/css2?family=~a&display=swap"
+                             family)))
            (urls (urls-in css)))
       (fetch-all! (map (lambda (url)
-                         (cons url (~ "~a/~a" asset-font-dir
-                                      (web-font-name url))))
-                       urls))
+                         (cons url
+                               (~ "~a/~a" asset-font-dir
+                                  (web-font-name url)))) urls))
       (fold (lambda (url sheet)
               (string-replace-substring sheet url
-                                         (~ "../fonts/~a"
-                                            (web-font-name url))))
-            css urls)))
+                                        (~ "../fonts/~a"
+                                           (web-font-name url)))) css urls)))
 
   (mkdir-p asset-css-dir)
   (mkdir-p asset-font-dir)
@@ -517,8 +532,7 @@ say where they came from when one is read on its own."
   (log-info "taking the Lucida faces from ~a" lucida-font-base)
   (fetch-all! (map (lambda (f)
                      (cons (~ "~a/~a" lucida-font-base f)
-                           (~ "~a/~a" asset-font-dir f)))
-                   lucida-fonts))
+                           (~ "~a/~a" asset-font-dir f))) lucida-fonts))
 
   ;; -- The two web families ------------------------------------------------
   (log-info "taking the web families from the font service")
@@ -527,16 +541,16 @@ say where they came from when one is read on its own."
     ;; `~' -- an attribute selector like `[class~="ph"]' is one -- and a
     ;; format string would read every one of them as a directive.
     (write-asset (~ "~a/fonts.css" asset-css-dir)
-                 (string-append
-                  (format #f "/* The faces this instance serves itself.
+                 (string-append (format #f
+                                 "/* The faces this instance serves itself.
 
    Written by `maak fetch-assets' -- edit that task, not this file.  The
    Lucida faces are taken from ~a, the families below from the font
    service, and every file is kept beside this sheet in `pub/fonts/'. */
 
-" lucida-font-base)
-                  lucida-font-face-css "\n"
-                  (string-join families "\n") "\n")))  ;; -- The mark a link preview shows --------------------------------------
+"
+                                 lucida-font-base) lucida-font-face-css "\n"
+                                (string-join families "\n") "\n"))) ;-- The mark a link preview shows --------------------------------------
   (log-info "taking the project's own mark from ~a" site-logo-base)
   (mkdir-p "pub/img")
   (fetch-all! (list (cons (~ "~a/~a" site-logo-base site-logo-file)
@@ -546,19 +560,19 @@ say where they came from when one is read on its own."
   (log-info "taking the icon set from ~a" phosphor-font-base)
   (fetch-all! (map (lambda (f)
                      (cons (~ "~a/~a" phosphor-font-base f)
-                           (~ "~a/~a" asset-font-dir f)))
-                   phosphor-fonts))
+                           (~ "~a/~a" asset-font-dir f))) phosphor-fonts))
   (let* ((css (fetch-text (~ "~a/style.css" phosphor-font-base)))
          (local (string-replace-substring css "./Phosphor."
                                           "../fonts/Phosphor."))
          (trimmed (fold (lambda (line sheet)
-                          (string-replace-substring sheet line ""))
-                        local phosphor-font-forms-left-out)))
+                          (string-replace-substring sheet line "")) local
+                        phosphor-font-forms-left-out)))
     ;; A sheet that still pointed at a file this instance does not serve would
     ;; send a browser after it and land a 404, so the trimming is checked
     ;; rather than trusted.
     (when (string-contains trimmed "Phosphor.ttf")
-      (error "fetch-assets: could not drop the TrueType source from the icon sheet"))
+      (error
+       "fetch-assets: could not drop the TrueType source from the icon sheet"))
     (when (string-contains trimmed "Phosphor.svg")
       (error "fetch-assets: could not drop the SVG source from the icon sheet"))
     ;; A separator left dangling is a broken declaration, so the shape of what
@@ -566,8 +580,8 @@ say where they came from when one is read on its own."
     (when (string-contains trimmed ",;")
       (error "fetch-assets: the icon sheet's src list is malformed"))
     (write-asset (~ "~a/phosphor.css" asset-css-dir)
-                 (string-append
-                  (format #f "/* The icon face this instance serves itself (Phosphor ~a).
+                 (string-append (format #f
+                                 "/* The icon face this instance serves itself (Phosphor ~a).
 
    Written by `maak fetch-assets' -- edit that task, not this file.  The
    face and its stylesheet are taken from ~a and kept as written there,
@@ -576,8 +590,8 @@ say where they came from when one is read on its own."
    or woff, and of the two the SVG font alone is three megabytes. */
 
 "
-                         phosphor-version phosphor-font-base)
-                  trimmed "\n")))
+                                 phosphor-version phosphor-font-base) trimmed
+                                "\n")))
 
   (log-info "theme assets refreshed"))
 

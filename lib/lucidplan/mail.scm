@@ -62,8 +62,10 @@
 ;;; sent, and never as a thrown exception that would abandon the request that
 ;;; asked for the message.
 (define (say . parts)
-  (apply format (current-error-port)
-         (string-append "pingwing: " (car parts) "~%")
+  (apply format
+         (current-error-port)
+         (string-append "pingwing: "
+                        (car parts) "~%")
          (cdr parts)))
 
 (define (status-of headers)
@@ -75,9 +77,7 @@ that answer's own lines, status line first, as `HTTP/1.1 201 Created'."
       (let* ((line (car (string-split headers #\newline)))
              (words (string-split line #\space)))
         (if (>= (length words) 2)
-            (string->number (cadr words))
-            #f))
-      #f))
+            (string->number (cadr words)) #f)) #f))
 
 (define (answer-body answer)
   "ANSWER's own words about the refusal, as text, or the empty string.
@@ -86,23 +86,24 @@ The service says why in the body of a refused request, and that body is the
 whole reason the status is read from the answer rather than from curl: a
 message that reports a refusal without repeating it has told the operator
 nothing they can act on."
-  (string-trim-both
-   (cond
-     ;; An answer asked for its headers comes back as the header text and the
-     ;; body beside it, and the body is what curl read: one or more chunks of
-     ;; bytes, which are joined here rather than each said separately.
-     ((pair? answer) (body-text (cdr answer)))
-     (else (body-text answer)))))
+  (string-trim-both (cond
+                      ;; An answer asked for its headers comes back as the header text and the
+                      ;; body beside it, and the body is what curl read: one or more chunks of
+                      ;; bytes, which are joined here rather than each said separately.
+                      ((pair? answer)
+                       (body-text (cdr answer)))
+                      (else (body-text answer)))))
 
 (define (body-text body)
   "BODY -- what curl read of a response -- as text, or the empty string."
   (cond
-    ((bytevector? body) (utf8->string body))
+    ((bytevector? body)
+     (utf8->string body))
     ((list? body)
      (apply string-append
             (map (lambda (chunk)
-                   (if (bytevector? chunk) (utf8->string chunk) ""))
-                 body)))
+                   (if (bytevector? chunk)
+                       (utf8->string chunk) "")) body)))
     (else "")))
 
 (define (pingwing-post body)
@@ -112,53 +113,66 @@ Answer @code{#t} only when the service answered that it took the task, and
 @code{#f} for everything else -- a request that never left, and a request that
 was made and refused, which is the difference the retrying turns on."
   (let ((handle (curl-easy-init)))
-    (dynamic-wind
-     (lambda () #t)
-     (lambda ()
-       (curl-easy-setopt handle 'post #t)
-       (curl-easy-setopt handle 'url
-                         (format #f "~a/api/v1/tasks" pingwing-url))
-       ;; The API takes a JSON object, and curl's own word for a request with a
-       ;; body is `application/x-www-form-urlencoded' -- which is not what is
-       ;; being posted, so it is said here rather than left to a default.
-       (curl-easy-setopt handle 'httpheader
-                         (list "Content-Type: application/json"))
-       (curl-easy-setopt handle 'postfields
-                         (string->utf8 (scm->json-string body)))
-       (curl-easy-setopt handle 'use-ssl 1)
-       (curl-easy-setopt handle 'username pingwing-basic-auth-user)
-       (curl-easy-setopt handle 'password pingwing-basic-auth-password)
-       (let* ((answer (curl-easy-perform handle #t #t))
-              (code (catch #t
-                           (lambda () (curl-error-code))
-                           (lambda _ -1))))
-         (cond
-           ((not (and (number? code) (zero? code)))
-            (say "the request did not go through (curl ~a): ~a"
-                 code
-                 (catch #t
-                        (lambda () (curl-error-string))
-                        (lambda _ "")))
-            #f)
-           ((not (pair? answer))
-            (say "the service answered with no headers this could read")
-            #f)
-           (else
-            (let ((status (status-of (car answer))))
-              (cond
-                ((not status)
-                 (say "the service answered with no status this could read")
-                 #f)
-                ((and (>= status 200) (< status 300))
-                 (say "notification taken (~a)" status)
-                 #t)
-                (else
-                 (let ((why (answer-body answer)))
-                   (say "the service refused it (~a)~a"
-                        status
-                        (if (string-null? why) "" (format #f ": ~a" why))))
-                 #f)))))))
-     (lambda () (curl-easy-cleanup handle)))))
+    (dynamic-wind (lambda ()
+                    #t)
+                  (lambda ()
+                    (curl-easy-setopt handle
+                                      'post #t)
+                    (curl-easy-setopt handle
+                                      'url
+                                      (format #f "~a/api/v1/tasks"
+                                              pingwing-url))
+                    ;; The API takes a JSON object, and curl's own word for a request with a
+                    ;; body is `application/x-www-form-urlencoded' -- which is not what is
+                    ;; being posted, so it is said here rather than left to a default.
+                    (curl-easy-setopt handle
+                                      'httpheader
+                                      (list "Content-Type: application/json"))
+                    (curl-easy-setopt handle
+                                      'postfields
+                                      (string->utf8 (scm->json-string body)))
+                    (curl-easy-setopt handle
+                                      'use-ssl 1)
+                    (curl-easy-setopt handle
+                                      'username pingwing-basic-auth-user)
+                    (curl-easy-setopt handle
+                                      'password pingwing-basic-auth-password)
+                    (let* ((answer (curl-easy-perform handle #t #t))
+                           (code (catch #t
+                                        (lambda ()
+                                          (curl-error-code))
+                                        (lambda _
+                                          -1))))
+                      (cond
+                        ((not (and (number? code)
+                                   (zero? code)))
+                         (say "the request did not go through (curl ~a): ~a"
+                              code
+                              (catch #t
+                                     (lambda ()
+                                       (curl-error-string))
+                                     (lambda _
+                                       ""))) #f)
+                        ((not (pair? answer))
+                         (say
+                          "the service answered with no headers this could read")
+                         #f)
+                        (else (let ((status (status-of (car answer))))
+                                (cond
+                                  ((not status)
+                                   (say
+                                    "the service answered with no status this could read")
+                                   #f)
+                                  ((and (>= status 200)
+                                        (< status 300))
+                                   (say "notification taken (~a)" status) #t)
+                                  (else (let ((why (answer-body answer)))
+                                          (say "the service refused it (~a)~a"
+                                           status
+                                           (if (string-null? why) ""
+                                               (format #f ": ~a" why)))) #f)))))))
+                  (lambda ()
+                    (curl-easy-cleanup handle)))))
 
 (define* (send-to-pingwing #:key body)
   "Hand BODY to the notification service, retrying a few times.
@@ -167,44 +181,53 @@ The number of attempts and the base wait between them are configuration
 (@code{mail-retry-attempts}, @code{mail-retry-delay}); the wait doubles after
 each failed attempt, so a service that is coming back has room to.  Answer
 @code{#t} when a post succeeded and @code{#f} when every attempt failed."
-  (let ((attempts (max 1 (config-ref 'mail-retry-attempts)))
-        (base-delay (max 0 (config-ref 'mail-retry-delay))))
-    (let loop ((attempt 1))
+  (let ((attempts (max 1
+                       (config-ref 'mail-retry-attempts)))
+        (base-delay (max 0
+                         (config-ref 'mail-retry-delay))))
+    (let loop
+      ((attempt 1))
       (let ((ok (catch #t
-                      (lambda () (pingwing-post body))
-                      (lambda (key . args)
-                        (say "attempt ~a threw ~a: ~a" attempt key args)
-                        #f))))
+                       (lambda ()
+                         (pingwing-post body))
+                       (lambda (key . args)
+                         (say "attempt ~a threw ~a: ~a" attempt key args) #f))))
         (cond
           (ok #t)
           ((< attempt attempts)
-           (say "not taken yet (attempt ~a of ~a); waiting ~as"
-                attempt attempts (* base-delay (expt 2 (- attempt 1))))
-           (sleep (* base-delay (expt 2 (- attempt 1))))
+           (say "not taken yet (attempt ~a of ~a); waiting ~as" attempt
+                attempts
+                (* base-delay
+                   (expt 2
+                         (- attempt 1))))
+           (sleep (* base-delay
+                     (expt 2
+                           (- attempt 1))))
            (loop (+ attempt 1)))
-          (else
-           (say "giving up after ~a attempts" attempts)
-           #f))))))
+          (else (say "giving up after ~a attempts" attempts) #f))))))
 
 (define (recipient-list recipients)
   "RECIPIENTS as the service reads them: one object of a name and an address
 for each, and the same address only once, whoever named it."
-  (let loop ((people recipients) (seen '()) (out '()))
+  (let loop
+    ((people recipients)
+     (seen '())
+     (out '()))
     (cond
-      ((null? people) (list->vector (reverse out)))
-      (else
-       (let* ((person (car people))
-              (name (car person))
-              (address (cdr person)))
-         (if (or (not (string? address))
-                 (string-null? address)
-                 (member address seen))
-             (loop (cdr people) seen out)
-             (loop (cdr people)
-                   (cons address seen)
-                   (cons `((name . ,(if (string? name) name ""))
-                           (address . ,address))
-                         out))))))))
+      ((null? people)
+       (list->vector (reverse out)))
+      (else (let* ((person (car people))
+                   (name (car person))
+                   (address (cdr person)))
+              (if (or (not (string? address))
+                      (string-null? address)
+                      (member address seen))
+                  (loop (cdr people) seen out)
+                  (loop (cdr people)
+                        (cons address seen)
+                        (cons `((name unquote
+                                      (if (string? name) name ""))
+                                (address unquote address)) out))))))))
 
 (define* (send-email! #:key template vars subject recipients)
   "Ask the notification service to send one message.
@@ -222,13 +245,15 @@ answers: @code{#t} once the service accepted it, @code{#f} when every attempt
 failed."
   (let ((to (recipient-list recipients)))
     (and (> (vector-length to) 0)
-         (send-to-pingwing
-          #:body `((task-type . send-email)
-                   (template . ,template)
-                   (template-vars ,@vars)
-                   (sender-name . ,(config-ref 'mail-sender-name))
-                   (sender-address . ,(config-ref 'mail-sender-address))
-                   (subject . ,(format #f "~a~a"
-                                       (config-ref 'mail-subject-prefix)
-                                       subject))
-                   (recipients . ,to))))))
+         (send-to-pingwing #:body `((task-type . send-email) (template unquote
+                                                              template)
+                                    (template-vars ,@vars)
+                                    (sender-name unquote
+                                                 (config-ref 'mail-sender-name))
+                                    (sender-address unquote
+                                                    (config-ref 'mail-sender-address))
+                                    (subject unquote
+                                             (format #f "~a~a"
+                                                     (config-ref 'mail-subject-prefix)
+                                                     subject))
+                                    (recipients unquote to))))))

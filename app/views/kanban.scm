@@ -42,7 +42,8 @@
   #:use-module (kracht prelude)
   #:export (render-k-ticket kanban-from-tickets))
 
-(define* (render-k-ticket project t #:key (draggable? #f))
+(define* (render-k-ticket project t
+                          #:key (draggable? #f))
   ;; The card is not the drag source, its grip is: a card marked `draggable'
   ;; cannot have its own text selected with the mouse.  See
   ;; `grab-indicator'.  The grip is offered only to a reader who may change a
@@ -52,8 +53,7 @@
             (data-ticket-id ,(assq-ref t
                                        'human-id)))
 
-         (div (@ (class ,(mk-class (append '(rounded-xl
-                                             p-3
+         (div (@ (class ,(mk-class (append '(rounded-xl p-3
                                              border-stone-500/75
                                              dark:border-onyx-100/75
                                              border-2
@@ -71,11 +71,13 @@
                                                     flex-1
                                                     whitespace-normal
                                                     leading-5))))
-                        ,@(if draggable? grab-indicator '())
+                        ,@(if draggable? grab-indicator
+                              '())
                         ,(emoji-for-ticket-type (assq-ref t
                                                           'ticket-type))
                         (span (@ (class ,(mk-class '(text-sm font-medium
-                                                             wrap-break-word pl-1))))
+                                                             wrap-break-word
+                                                             pl-1))))
                               ,(org2html (html-unescape (assq-ref t
                                                                   'title)))))
 
@@ -97,8 +99,9 @@
                               (can-drag? #f)
                               (statuses (default-ticket-statuses))
                               (current-sort #f))
-
-  (let* (;; Whether a card offers its drag grip is the same question the
+  
+  (let* ( ;Whether a card offers its drag grip is the same question the
+         
          ;; endpoints that move and restatus a ticket answer, so the board
          ;; shows the grip to exactly the readers those endpoints accept.
          (draggable? can-drag?)
@@ -150,19 +153,18 @@
                                       py-3
                                       pb-4)))
          (std-col-face (mk-class (append '(flex flex-col
-                                           gap-2
-                                           w-full
-                                           min-h-24
-                                           border-stone-500/25
-                                           dark:border-onyx-100/25
-                                           border-2
-                                           rounded-xl
-                                           py-2
-                                           sm:py-3
-                                           my-2
-                                           px-1
-                                           sm:px-2)
-                                         frosted-tint-classes)))
+                                                gap-2
+                                                w-full
+                                                min-h-24
+                                                border-stone-500/25
+                                                dark:border-onyx-100/25
+                                                border-2
+                                                rounded-xl
+                                                py-2
+                                                sm:py-3
+                                                my-2
+                                                px-1
+                                                sm:px-2) frosted-tint-classes)))
 
          (col-title-face (mk-class '(text-md font-bold
                                              flex
@@ -229,9 +231,9 @@
                                                "handleKanbanDrop(event, '~a')"
                                                project)))
                                   ,(map (lambda (t)
-                                          (render-k-ticket
-                                           project t #:draggable? draggable?))
-                                        list))))))
+                                          (render-k-ticket project t
+                                                           #:draggable?
+                                                           draggable?)) list))))))
 
          (build-details-col (lambda (status title list)
                               `(div (@ (class ,std-col-face))
@@ -261,8 +263,7 @@
                                                            (render-k-ticket
                                                             project t
                                                             #:draggable?
-                                                            draggable?))
-                                                         list))))))
+                                                            draggable?)) list))))))
 
          ;; Build Main HTML
          (kanban-html `((div (@ (class ,(mk-class '(px-2 py-4))))
@@ -280,8 +281,7 @@
                                             ;; room for the display size.
                                             ,(h1 (format #f "kanban for ~a"
                                                          project)
-                                                 #:size '(text-2xl
-                                                          lg:text-4xl)))
+                                                 #:size '(text-2xl lg:text-4xl)))
 
                                        (div (@ (class ,sort-wrap-face))
                                             ,(sort-select G_
@@ -315,11 +315,11 @@
                              (div (@ (class ,board-face))
                                   ,@(map (lambda (status)
                                            (build-col status
-                                                      (status-label
-                                                       G_ statuses status)
+                                                      (status-label G_
+                                                                    statuses
+                                                                    status)
                                                       (tickets-with-status
-                                                       status)
-                                                      std-col-face))
+                                                       status) std-col-face))
                                          open-statuses))
 
                              )
@@ -327,13 +327,13 @@
                         ;; section each, in the ladder's order.
                         (div (@ (class ,(mk-class '(px-1))))
                              ,@(map (lambda (status)
-                                      (build-details-col
-                                       status
-                                       (status-label G_ statuses status)
-                                       (tickets-with-status status)))
-                                    (append done-statuses
-                                            rejected-statuses))))))
-
+                                      (build-details-col status
+                                                         (status-label G_
+                                                          statuses status)
+                                                         (tickets-with-status
+                                                          status)))
+                                    (append done-statuses rejected-statuses))))))
+    
     ;; Render final template
     (html-template G_
                    #:title (format #f "kanban for ~a" project)

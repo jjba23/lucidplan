@@ -40,9 +40,12 @@
   #:use-module (lucidplan domain)
   #:use-module (hygguile hygguile)
   #:use-module (artanis security nss)
-  #:export (render-ticket render-ticket-listitem html-from-tickets
-                          html-new-ticket-form html-edit-ticket-form
-                          html-ticket-form render-quiet-notice))
+  #:export (render-ticket render-ticket-listitem
+                          html-from-tickets
+                          html-new-ticket-form
+                          html-edit-ticket-form
+                          html-ticket-form
+                          render-quiet-notice))
 
 ;; =============================================================================
 ;; Reusable Styles
@@ -50,20 +53,19 @@
 
 (define %card-face
   (mk-class (append '(flex flex-col
-                      gap-2
-                      px-3
-                      sm:px-4
-                      md:px-6
-                      py-4
-                      sm:py-6
-                      md:py-8
-                      rounded-xl
-                      md:rounded-2xl
-                      dark:border-onyx-100/75
-                      border-stone-300/75
-                      shadow-md
-                      border-2)
-                    frosted-tint-classes)))
+                           gap-2
+                           px-3
+                           sm:px-4
+                           md:px-6
+                           py-4
+                           sm:py-6
+                           md:py-8
+                           rounded-xl
+                           md:rounded-2xl
+                           dark:border-onyx-100/75
+                           border-stone-300/75
+                           shadow-md
+                           border-2) frosted-tint-classes)))
 
 (define %label-face
   (mk-class '(font-sans text-onyx-700 dark:text-stone-300 text-md font-light)))
@@ -85,18 +87,17 @@
   ;; -- because a wider row would either wrap, and stop reading as a line, or
   ;; squeeze the title it exists to show down to a few characters.
   (mk-class (append '(flex flex-row
-                      gap-2
-                      items-center
-                      justify-start
-                      dark:border-onyx-100/75
-                      border-stone-300/75
-                      shadow-md
-                      border-2
-                      py-2
-                      px-4
-                      cursor-pointer
-                      rounded-xl)
-                    frosted-tint-classes)))
+                           gap-2
+                           items-center
+                           justify-start
+                           dark:border-onyx-100/75
+                           border-stone-300/75
+                           shadow-md
+                           border-2
+                           py-2
+                           px-4
+                           cursor-pointer
+                           rounded-xl) frosted-tint-classes)))
 
 (define %list-title-face
   (mk-class '(font-sans text-sm
@@ -154,11 +155,16 @@
 ;; `ticket-status-glyph').
 (define (ticket-type-label G_ type)
   (cond
-    ((equal? type "task") (G_ "Task"))
-    ((equal? type "bug") (G_ "Bug"))
-    ((equal? type "story") (G_ "Story"))
-    ((equal? type "spike") (G_ "Spike"))
-    ((equal? type "time-box") (G_ "Time Box"))
+    ((equal? type "task")
+     (G_ "Task"))
+    ((equal? type "bug")
+     (G_ "Bug"))
+    ((equal? type "story")
+     (G_ "Story"))
+    ((equal? type "spike")
+     (G_ "Spike"))
+    ((equal? type "time-box")
+     (G_ "Time Box"))
     (else type)))
 
 (define (ticket-choices G_ values label-for glyph-for selected)
@@ -166,8 +172,7 @@
          (glyph-option #:value value
                        #:glyph (glyph-for value)
                        #:content (label-for G_ value)
-                       #:selected-value selected))
-       values))
+                       #:selected-value selected)) values))
 
 (define (ticket-status-choices G_ specs selected)
   (map (lambda (value)
@@ -178,8 +183,8 @@
        (ticket-status-values specs)))
 
 (define (ticket-type-choices G_ selected)
-  (ticket-choices G_ ticket-types ticket-type-label
-                  glyph-for-ticket-type selected))
+  (ticket-choices G_ ticket-types ticket-type-label glyph-for-ticket-type
+                  selected))
 
 ;; =============================================================================
 ;;  Changing a ticket in place
@@ -195,7 +200,8 @@
 ;; wording of both a change that was written and one that was not, and the
 ;; field that was changed lends its own name to the sentence -- so no
 ;; sentence is written into the script, where it could not be translated.
-(define %quiet-notice-template-id "lucidplan-quiet-notice")
+(define %quiet-notice-template-id
+  "lucidplan-quiet-notice")
 
 (define (render-quiet-notice G_)
   `((template (@ (id ,%quiet-notice-template-id)
@@ -204,7 +210,12 @@
                  (data-failed-body ,(G_ "the ticket was left as it was")))
               ,@(notification-card))))
 
-(define* (render-inline-choice G_ #:key project human-id field value options
+(define* (render-inline-choice G_
+                               #:key project
+                               human-id
+                               field
+                               value
+                               options
                                (id-suffix ""))
   "A field of a ticket as the small control it is on the ticket's own page.
 
@@ -230,31 +241,29 @@ at the first of them."
            (data-inline-field ,field)
            (data-field-label ,(G_ field))
            (data-current-value ,value))
-        ,@(select #:name (string->symbol (format #f "inline-~a~a"
-                                                    field id-suffix))
-                  #:on-change (format #f "updateTicketField(this, '~a', '~a', '~a')"
-                                      project human-id field)
+        ,@(select #:name (string->symbol (format #f "inline-~a~a" field
+                                                 id-suffix))
+                  #:on-change (format #f
+                               "updateTicketField(this, '~a', '~a', '~a')"
+                               project human-id field)
                   #:label (G_ field)
                   #:label-css '(sr-only)
                   #:options options
                   #:select-classes '(w-auto max-w-full
-                                          bg-transparent
-                                          border-0
-                                          rounded-full
-                                          px-0
-                                          py-0
-                                          text-sm
-                                          font-medium
-                                          font-sans
-                                          text-onyx-700
-                                          dark:text-stone-300
-                                          cursor-pointer
-                                          outline-none
-                                          focus:ring-2)
-                  #:select-flex-css '(flex flex-row
-                                           items-center
-                                           gap-1
-                                           my-0
+                                            bg-transparent
+                                            border-0
+                                            rounded-full
+                                            px-0
+                                            py-0
+                                            text-sm
+                                            font-medium
+                                            font-sans
+                                            text-onyx-700
+                                            dark:text-stone-300
+                                            cursor-pointer
+                                            outline-none
+                                            focus:ring-2)
+                  #:select-flex-css '(flex flex-row items-center gap-1 my-0
                                            w-fit))))
 
 (define (render-field label value val-class)
@@ -275,7 +284,8 @@ at the first of them."
            ,label))
 
 (define* (render-ticket G_
-                        #:key project ticket
+                        #:key project
+                        ticket
                         (assignee #f)
                         (editable? #f)
                         (statuses (default-ticket-statuses))
@@ -343,10 +353,10 @@ at the first of them."
                                                               G_ type))))
                      `(,(render-meta-badge (G_ "status")
                                            (status-icon-node statuses status)
-                                           (status-label G_ statuses status))
-                       ,(render-meta-badge (G_ "type")
-                                           (emoji-for-ticket-type type)
-                                           (ticket-type-label G_ type)))))
+                                           (status-label G_ statuses status)) ,
+                       (render-meta-badge (G_ "type")
+                                          (emoji-for-ticket-type type)
+                                          (ticket-type-label G_ type)))))
 
           ;; Description
           ,(render-if-nestring (lambda (d)
@@ -453,7 +463,8 @@ at the first of them."
                ;; tickets' priorities, and under any other sort the row would
                ;; slide back into place on the next visit.  Which sorts those
                ;; are is decided by the page, which knows the list's order.
-               ,@(if reorderable? grab-indicator '())
+               ,@(if reorderable? grab-indicator
+                     '())
                ,(emoji-for-ticket-type type)
                (h5 (@ (class ,%list-title-face))
                    ,(org2html (html-unescape title)))
@@ -588,13 +599,13 @@ at the first of them."
          ;; Which bucket a ticket belongs to is its own status's business, as
          ;; the page's ladder describes it; a status the ladder does not name
          ;; counts as open, so a ticket carrying one stays reachable.
-         (all-in-bucket
-          (lambda (bucket)
-            (filter (lambda (t)
-                      (ticket-status-in-bucket? statuses
-                                                (assq-ref t 'ticket-status)
-                                                bucket))
-                    all-tickets)))
+         (all-in-bucket (lambda (bucket)
+                          (filter (lambda (t)
+                                    (ticket-status-in-bucket? statuses
+                                                              (assq-ref t
+                                                                        'ticket-status)
+                                                              bucket))
+                                  all-tickets)))
          (tickets (all-in-bucket "open"))
          (done-tickets (all-in-bucket "done"))
          (rejected-tickets (all-in-bucket "rejected"))
@@ -637,8 +648,7 @@ at the first of them."
                                         #:user-names user-names
                                         #:statuses statuses
                                         #:editable? triage?
-                                        #:reorderable? reorderable?)))
-                                     tickets))))
+                                        #:reorderable? reorderable?))) tickets))))
 
          (done-ticket-list (if with-done
                                `(div (@ (id lucidplan-done-tickets-list)
@@ -654,8 +664,8 @@ at the first of them."
                                                                 gap-2
                                                                 my-4))))
                                          ,(bucket-icon-node statuses "done")
-                                         (span ,(bucket-heading
-                                                 G_ statuses "done")))
+                                         (span ,(bucket-heading G_ statuses
+                                                                "done")))
                                      (div (@ (class ,(mk-class '(flex flex-col
                                                                  gap-2))))
                                           ,(map (lambda (t)
@@ -688,9 +698,8 @@ at the first of them."
                                                                     my-4))))
                                              ,(bucket-icon-node statuses
                                                                 "rejected")
-                                             (span ,(bucket-heading
-                                                     G_ statuses
-                                                     "rejected")))
+                                             (span ,(bucket-heading G_
+                                                     statuses "rejected")))
                                          (div (@ (class ,(mk-class '(flex
                                                                      flex-col
                                                                      gap-2))))
@@ -714,33 +723,33 @@ at the first of them."
          ;; A one-glance summary of the project: how much is still open, how
          ;; much is done, and a completion bar -- the friendliest way to see
          ;; where a project stands without reading every row.
-         (glance
-          (let* ((open-count (length tickets))
-                 (done-count (length done-tickets))
-                 (rejected-count (length rejected-tickets))
-                 (total (+ open-count done-count rejected-count)))
-            (glass-panel
-             `((div (@ (class ,(mk-class '(flex flex-row
-                                                flex-wrap
-                                                gap-8
-                                                items-start
-                                                my-1))))
-                    ,(stat-card #:value (format #f "~a" open-count)
-                                #:label (G_ "open"))
-                    ,(stat-card #:value (format #f "~a" done-count)
-                                #:label (G_ "done"))
-                    ,(stat-card #:value (format #f "~a" rejected-count)
-                                #:label (G_ "rejected"))
-                    ,(stat-card #:value (format #f "~a" total)
-                                #:label (G_ "total")))
-               (div (@ (class ,(mk-class '(my-1))))
-                    ,(progress #:value done-count
-                               #:max (max total 1)
-                               #:label (G_ "completion")
-                               #:show-value #t)))
-             #:frost 3
-             #:padding '(p-5 sm:p-6)
-             #:classes '(flex flex-col gap-2)))))
+         (glance (let* ((open-count (length tickets))
+                        (done-count (length done-tickets))
+                        (rejected-count (length rejected-tickets))
+                        (total (+ open-count done-count rejected-count)))
+                   (glass-panel `((div (@ (class ,(mk-class '(flex flex-row
+                                                              flex-wrap gap-8
+                                                              items-start my-1))))
+                                       ,(stat-card #:value (format #f "~a"
+                                                                   open-count)
+                                                   #:label (G_ "open"))
+                                       ,(stat-card #:value (format #f "~a"
+                                                                   done-count)
+                                                   #:label (G_ "done"))
+                                       ,(stat-card #:value (format #f "~a"
+                                                            rejected-count)
+                                                   #:label (G_ "rejected"))
+                                       ,(stat-card #:value (format #f "~a"
+                                                                   total)
+                                                   #:label (G_ "total")))
+                                  (div (@ (class ,(mk-class '(my-1))))
+                                       ,(progress #:value done-count
+                                                  #:max (max total 1)
+                                                  #:label (G_ "completion")
+                                                  #:show-value #t)))
+                                #:frost 3
+                                #:padding '(p-5 sm:p-6)
+                                #:classes '(flex flex-col gap-2)))))
     
     ;; Build the final HTML View
     (html-template G_
@@ -878,7 +887,10 @@ at the first of them."
                                 ,@(render-quiet-notice G_)))))
 
 (define* (html-new-ticket-form G_
-                               #:key projects project users is-logged-in
+                               #:key projects
+                               project
+                               users
+                               is-logged-in
                                (statuses (default-ticket-statuses)))
   (html-ticket-form G_
                     #:is-logged-in is-logged-in
@@ -964,10 +976,11 @@ at the first of them."
                                       #:content (G_ "unassigned")
                                       #:selected-value assignee)
                               (map (lambda (u)
-                                     (option #:value (assq-ref u 'id)
-                                             #:content (assq-ref u 'username)
-                                             #:selected-value assignee))
-                                   users)))
+                                     (option #:value (assq-ref u
+                                                               'id)
+                                             #:content (assq-ref u
+                                                                 'username)
+                                             #:selected-value assignee)) users)))
 
          ;; Build the Form SXML
          (form-sxml `(form (@ (enctype "application/x-www-form-urlencoded")

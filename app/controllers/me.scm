@@ -83,11 +83,13 @@
                 (user-repo (make-sqlite-user-repository rc))
                 (users (get-users user-repo))
                 (notice (lambda (flag text)
-                          (if (equal? "true" (get-from-qstr rc flag))
-                              text #f)))
-                (notices (filter (lambda (n) n)
+                          (if (equal? "true"
+                                      (get-from-qstr rc flag)) text #f)))
+                (notices (filter (lambda (n)
+                                   n)
                                  (list (notice "created"
-                                               (G_ "the account was created and an invite is on its way"))
+                                               (G_
+                                                "the account was created and an invite is on its way"))
                                        (notice "resent"
                                                (G_ "the invite was sent again"))
                                        (notice "edited"
@@ -95,7 +97,8 @@
                                        (notice "deleted"
                                                (G_ "the account was deleted"))
                                        (notice "mail-failed"
-                                               (G_ "the account was saved, but the invite email could not be delivered; try sending it again"))))))
+                                               (G_
+                                                "the account was saved, but the invite email could not be delivered; try sending it again"))))))
            (response-emit (:mime rc
                                  (users-page G_
                                              #:users users
@@ -119,42 +122,54 @@
                          (lambda ()
                            (get-password-reset-by-token password-reset-repo
                                                         token))
-                         (lambda _ #f)))
+                         (lambda _
+                           #f)))
               (now (current-time))
               (expired? (and tt
                              (> now
                                 (+ (password-reset-validity)
-                                   (assq-ref tt 'created-at)))))
+                                   (assq-ref tt
+                                             'created-at)))))
               (user-repo (make-sqlite-user-repository rc))
-              (u (if (and tt (not expired?))
-                     (get-user-by-id user-repo (assq-ref tt 'user-id))
-                     #f)))
+              (u (if (and tt
+                          (not expired?))
+                     (get-user-by-id user-repo
+                                     (assq-ref tt
+                                               'user-id)) #f)))
          (cond
            ;; The link is gone -- used, aged out, or never valid at all.
            ;; Sending the reader to the sign-in page, which carries the
            ;; request form, gives them the one thing that helps: a way to
            ;; ask for a new one.
-           ((or (not tt) expired? (not u))
+           ((or (not tt) expired?
+                (not u))
             (redirect-to rc
                          (string->uri (format #f
-                                              "~a/login?invalid-reset-token=true"
-                                              (current-myhost)))
+                                       "~a/login?invalid-reset-token=true"
+                                       (current-myhost)))
                          #:status 302))
-           (else
-            (response-emit (:mime rc
-                                  (reset-password-page
-                                   G_
-                                   #:token token
-                                   #:email (assq-ref u 'email)
-                                   #:error (cond ((equal? "mismatch"
-                                                           (get-from-qstr rc
-                                                                          "error"))
-                                                  (G_ "the two passwords did not match, please try again"))
-                                                 ((equal? "weak"
-                                                          (get-from-qstr rc
+           (else (response-emit (:mime rc
+                                       (reset-password-page G_
+                                                            #:token token
+                                                            #:email (assq-ref
+                                                                     u
+                                                                     'email)
+                                                            #:error (cond
+                                                                      ((equal?
+                                                                        "mismatch"
+                                                                        (get-from-qstr
+                                                                         rc
                                                                          "error"))
-                                                  (G_ "that password was too weak, aim for a longer passphrase mixing words, case, digits and symbols"))
-                                                 (else #f))))))))))
+                                                                       (G_
+                                                                        "the two passwords did not match, please try again"))
+                                                                      ((equal?
+                                                                        "weak"
+                                                                        (get-from-qstr
+                                                                         rc
+                                                                         "error"))
+                                                                       (G_
+                                                                        "that password was too weak, aim for a longer passphrase mixing words, case, digits and symbols"))
+                                                                      (else #f))))))))))
 
 (define (password-reset-validity)
   "How long a password-reset link stays good, in seconds."
@@ -187,8 +202,8 @@
           (request-password-reset password-reset-repo u)
           (redirect-to rc
                        (string->uri (format #f
-                                            "~a/login?sent-password-reset=true"
-                                            (current-myhost)))
+                                     "~a/login?sent-password-reset=true"
+                                     (current-myhost)))
                        #:status 302))))
 
 (post "/password/do-reset"
@@ -202,29 +217,34 @@
                (token-url (format #f "~a/password/reset/token/~a"
                                   (current-myhost) reset-token))
                (tt (catch #t
-                         (lambda ()
-                           (get-password-reset-by-token password-reset-repo
-                                                        reset-token))
-                         (lambda _ #f)))
+                          (lambda ()
+                            (get-password-reset-by-token password-reset-repo
+                                                         reset-token))
+                          (lambda _
+                            #f)))
                (now (current-time))
                (expired? (and tt
                               (> now
                                  (+ (password-reset-validity)
-                                    (assq-ref tt 'created-at)))))
+                                    (assq-ref tt
+                                              'created-at)))))
                (user-repo (make-sqlite-user-repository rc))
-               (u (if (and tt (not expired?))
-                      (get-user-by-id user-repo (assq-ref tt 'user-id))
-                      #f)))
+               (u (if (and tt
+                           (not expired?))
+                      (get-user-by-id user-repo
+                                      (assq-ref tt
+                                                'user-id)) #f)))
           ;; A reset is refused by sending the reader back to the form with
           ;; the reason, not by throwing: a mistyped confirmation or a
           ;; password that is too weak is something to fix, not a server
           ;; error, and the link they hold is still theirs to use.
           (cond
-            ((or (not tt) expired? (not u))
+            ((or (not tt) expired?
+                 (not u))
              (redirect-to rc
                           (string->uri (format #f
-                                               "~a/login?invalid-reset-token=true"
-                                               (current-myhost)))
+                                        "~a/login?invalid-reset-token=true"
+                                        (current-myhost)))
                           #:status 302))
             ((not (and (string? new-password)
                        (not (string-null? new-password))))
@@ -233,39 +253,43 @@
                           #:status 302))
             ((not (equal? new-password confirm-password))
              (redirect-to rc
-                          (string->uri (format #f "~a?error=mismatch" token-url))
+                          (string->uri (format #f "~a?error=mismatch"
+                                               token-url))
                           #:status 302))
             ;; bewaking scores the candidate itself, so a weak or common
             ;; password is refused before it ever reaches the salt.  The
             ;; score the server insists on is configuration.
             ((not (strong-password? #:password new-password
-                                    #:min-score
-                                    (config-ref 'password-min-score)))
+                                    #:min-score (config-ref 'password-min-score)))
              (redirect-to rc
                           (string->uri (format #f "~a?error=weak" token-url))
                           #:status 302))
-            (else
-             (let* ((new-salt (generate-string-uuid))
-                    (h (string->sha-256 (string-append new-password new-salt)))
-                    (_ (update-user-by-id user-repo
-                                          (assq-ref u 'id)
-                                          `((salt unquote new-salt)
-                                            (password unquote h))))
-                    (_ (delete-password-reset-by-user-id password-reset-repo
-                                                         (assq-ref u 'id))))
-               (:cookies-set! rc
-                              'x-bewaking-lucidplan "x-bewaking-lucidplan" "")
-               (:cookies-setattr! rc
-                                  'x-bewaking-lucidplan
-                                  #:expires 1
-                                  #:path "/"
-                                  #:secure #t
-                                  #:http-only #t)
-               (redirect-to rc
-                            (string->uri (format #f
-                                          "~a/login?has-reset-password=true"
-                                          (current-myhost)))
-                            #:status 302)))))))
+            (else (let* ((new-salt (generate-string-uuid))
+                         (h (string->sha-256 (string-append new-password
+                                                            new-salt)))
+                         (_ (update-user-by-id user-repo
+                                               (assq-ref u
+                                                         'id)
+                                               `((salt unquote new-salt)
+                                                 (password unquote h))))
+                         (_ (delete-password-reset-by-user-id
+                             password-reset-repo
+                             (assq-ref u
+                                       'id))))
+                    (:cookies-set! rc
+                                   'x-bewaking-lucidplan
+                                   "x-bewaking-lucidplan" "")
+                    (:cookies-setattr! rc
+                                       'x-bewaking-lucidplan
+                                       #:expires 1
+                                       #:path "/"
+                                       #:secure #t
+                                       #:http-only #t)
+                    (redirect-to rc
+                                 (string->uri (format #f
+                                               "~a/login?has-reset-password=true"
+                                               (current-myhost)))
+                                 #:status 302)))))))
 
 (define (request-password-reset password-reset-repo u)
   "Create a fresh password-reset link for U and hand it to the mail service.
@@ -275,31 +299,37 @@ when it could not be delivered after retrying, so a caller can tell the
 reader their link is on its way -- or is not.  A user that does not exist
 answers @code{#f} without writing a token, which is what lets the reset
 request stay silent about whether an account exists at all."
-  (if (not u)
-      #f
+  (if (not u) #f
       (let* ((_ (delete-password-reset-by-user-id password-reset-repo
-                                                  (assq-ref u 'id)))
+                                                  (assq-ref u
+                                                            'id)))
              (reset-token (base16-encode (format #f "~a-~a-~a"
                                                  (generate-string-uuid)
                                                  (generate-string-uuid)
                                                  (generate-string-uuid))))
              (_ (insert-password-reset password-reset-repo
-                                       `((user-id unquote (assq-ref u 'id))
+                                       `((user-id unquote
+                                                  (assq-ref u
+                                                            'id))
                                          (reset-token unquote reset-token)
                                          (created-at unquote
                                                      (current-time)))))
-             (mailed?
-              (send-email!
-               #:template 'password-reset
-               #:subject "Password Reset"
-               #:recipients (list (cons (assq-ref u 'username)
-                                       (assq-ref u 'email)))
-               #:vars `((system-name . ,(config-ref 'site-name))
-                        (user . ,(assq-ref u 'email))
-                        (reset-link . ,(format #f
-                                        "~a/password/reset/token/~a"
-                                        (current-myhost)
-                                        reset-token))))))
+             (mailed? (send-email! #:template 'password-reset
+                                   #:subject "Password Reset"
+                                   #:recipients (list (cons (assq-ref u
+                                                                      'username)
+                                                            (assq-ref u
+                                                                      'email)))
+                                   #:vars `((system-name unquote
+                                                         (config-ref 'site-name))
+                                            (user unquote
+                                                  (assq-ref u
+                                                            'email))
+                                            (reset-link unquote
+                                                        (format #f
+                                                         "~a/password/reset/token/~a"
+                                                         (current-myhost)
+                                                         reset-token))))))
         mailed?)))
 
 (get "/users/new"
@@ -309,13 +339,18 @@ request stay silent about whether an account exists at all."
      (lambda (rc)
        (define (go-to-new-user)
          (let* ((G_ (:i18n rc))
-                (error (cond ((equal? "missing" (get-from-qstr rc "error"))
-                              (G_ "a username and an email are both needed to create an account"))
-                             ((equal? "email-taken" (get-from-qstr rc "error"))
-                              (G_ "an account with that email already exists"))
-                             (else #f))))
+                (error (cond
+                         ((equal? "missing"
+                                  (get-from-qstr rc "error"))
+                          (G_
+                           "a username and an email are both needed to create an account"))
+                         ((equal? "email-taken"
+                                  (get-from-qstr rc "error"))
+                          (G_ "an account with that email already exists"))
+                         (else #f))))
            (response-emit (:mime rc
-                                 (new-user-page G_ #:error error)))))
+                                 (new-user-page G_
+                                                #:error error)))))
 
        (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
                           #:needed-permissions '(lucidplan:modify-permissions)
@@ -374,11 +409,12 @@ request stay silent about whether an account exists at all."
                                        rc))
                  (existing (get-user-by-email user-repo email)))
             (cond
-              ((or (string-null? username) (string-null? email))
+              ((or (string-null? username)
+                   (string-null? email))
                (redirect-to rc
                             (string->uri (format #f
-                                          "~a/users/new?error=missing"
-                                          (current-myhost)))
+                                                 "~a/users/new?error=missing"
+                                                 (current-myhost)))
                             #:status 302))
               ((not (equal? #f existing))
                (redirect-to rc
@@ -386,26 +422,26 @@ request stay silent about whether an account exists at all."
                                           "~a/users/new?error=email-taken"
                                           (current-myhost)))
                             #:status 302))
-              (else
-               (let* ((new-id (generate-string-uuid))
-                      (_ (insert-user user-repo
-                                      `((id unquote new-id)
-                                        (username unquote username)
-                                        (email unquote email)
-                                        (password . "")
-                                        (salt . "")
-                                        (permissions unquote
-                                                     (format #f "`~s"
-                                                             permissions)))))
-                      (u (get-user-by-id user-repo new-id))
-                      (mailed? (request-password-reset password-reset-repo u)))
-                 (redirect-to rc
-                              (string->uri (format #f
-                                            "~a/users/manage/?created=true~a"
-                                            (current-myhost)
-                                            (if mailed? ""
-                                                "&mail-failed=true")))
-                              #:status 302))))))
+              (else (let* ((new-id (generate-string-uuid))
+                           (_ (insert-user user-repo
+                                           `((id unquote new-id)
+                                             (username unquote username)
+                                             (email unquote email)
+                                             (password . "")
+                                             (salt . "")
+                                             (permissions unquote
+                                                          (format #f "`~s"
+                                                                  permissions)))))
+                           (u (get-user-by-id user-repo new-id))
+                           (mailed? (request-password-reset
+                                     password-reset-repo u)))
+                      (redirect-to rc
+                                   (string->uri (format #f
+                                                 "~a/users/manage/?created=true~a"
+                                                 (current-myhost)
+                                                 (if mailed? ""
+                                                     "&mail-failed=true")))
+                                   #:status 302))))))
         (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
                            #:needed-permissions '(lucidplan:modify-permissions)
                            #:rc rc
@@ -423,7 +459,8 @@ request stay silent about whether an account exists at all."
                  (user-repo (make-sqlite-user-repository rc))
                  (password-reset-repo (make-sqlite-password-reset-repository
                                        rc))
-                 (u (get-user-by-id user-repo (assoc-ref body "id")))
+                 (u (get-user-by-id user-repo
+                                    (assoc-ref body "id")))
                  (mailed? (request-password-reset password-reset-repo u)))
             (redirect-to rc
                          (string->uri (format #f

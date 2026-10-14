@@ -49,14 +49,21 @@
 ;; deliberately the values the pages used to carry inline, so turning them into
 ;; configuration changes nothing until an operator changes one.
 (define default-config
-  `(
-    ;; -- What the instance is called -------------------------------------
-    (site-name . "LucidPlan")
+  `(;; -- What the instance is called -------------------------------------
+     (site-name . "LucidPlan")
     (site-tagline . "free and open project management for everyone")
     (site-description . "LucidPlan is free and open project management for teams of every shape and size: multi-project workspaces, backlog management, kanban boards and fine-grained, Lisp-based permissions.")
-    (site-keywords
-     . ("project management" "kanban" "backlog" "agile" "scrum" "issue tracker"
-        "free software" "self-hosted" "scheme" "guile" "gnu guix"))
+    (site-keywords "project management"
+                   "kanban"
+                   "backlog"
+                   "agile"
+                   "scrum"
+                   "issue tracker"
+                   "free software"
+                   "self-hosted"
+                   "scheme"
+                   "guile"
+                   "gnu guix")
     ;; The canonical base address of the instance, e.g.
     ;; "https://lucidplan.example.org".  Left empty, the pages fall back to the
     ;; host the request arrived on, which is right for a local development
@@ -88,8 +95,7 @@
     ;; often it reports while a reader stays on the page.  Left empty, the
     ;; script is not put on the page at all: no request leaves the reader's
     ;; browser, and nothing about the instance is told to anybody else.
-    (analytics-endpoint
-     . "https://api.symbanta.jointhefreeworld.org/v1/events/register")
+    (analytics-endpoint . "https://api.symbanta.jointhefreeworld.org/v1/events/register")
     (analytics-interval . 4000)
 
     ;; -- Who to credit and how to reach them -----------------------------
@@ -101,51 +107,28 @@
     ;; A list of (label . url) pairs shown on the about page.  Empty by
     ;; default; an operator advertises their chat or social presence by
     ;; setting it.
-    (social-links . ())
+    (social-links)
 
     ;; -- What the about page says ----------------------------------------
     ;; Org-mode text, rendered to HTML on the about page.  It is a string so
     ;; an operator can replace it wholesale with their own account of the
     ;; instance, its purpose and its rules.
-    (about-org . "#+begin_quote
-LucidPlan is project management for teams of all sizes, done the free-software way.
-#+end_quote
-
-LucidPlan enhances the use of Agile work methodologies in teams thanks to its fast-paced, no-nonsense workflows and deep customizability -- and thanks to being written in Lisp.
-
-It is the fruit of years of experience using bloated proprietary systems, and of the frustrations they bring.
-
-* What it does
-
-- *Multi-project workspaces*: manage dozens of projects from one dashboard.
-- *Backlog management*: a clean, sortable, drag-and-drop list of every task.
-- *Kanban boards*: track tickets as they move through =To-do=, =Work in Progress=, =In Review= and beyond.
-- *Org-mode everywhere*: write titles and descriptions in Org syntax and see them rendered as rich HTML.
-- *Granular permissions*: an ACL written as plain Lisp lists, so exactly what each user may do is explicit and programmatic.
-- *Free software*: licensed under the GNU AGPL v3 or newer, hackable end to end in Scheme.
-
-* Who runs this instance
-
-This is a self-hosted deployment. Its operator may have added their own notes, contacts and rules below.
-
-* Contributing
-
-Contributions, issues and ideas are welcome at the project's repository.")
+    (about-org . "#+begin_quote\nLucidPlan is project management for teams of all sizes, done the free-software way.\n#+end_quote\n\nLucidPlan enhances the use of Agile work methodologies in teams thanks to its fast-paced, no-nonsense workflows and deep customizability -- and thanks to being written in Lisp.\n\nIt is the fruit of years of experience using bloated proprietary systems, and of the frustrations they bring.\n\n* What it does\n\n- *Multi-project workspaces*: manage dozens of projects from one dashboard.\n- *Backlog management*: a clean, sortable, drag-and-drop list of every task.\n- *Kanban boards*: track tickets as they move through =To-do=, =Work in Progress=, =In Review= and beyond.\n- *Org-mode everywhere*: write titles and descriptions in Org syntax and see them rendered as rich HTML.\n- *Granular permissions*: an ACL written as plain Lisp lists, so exactly what each user may do is explicit and programmatic.\n- *Free software*: licensed under the GNU AGPL v3 or newer, hackable end to end in Scheme.\n\n* Who runs this instance\n\nThis is a self-hosted deployment. Its operator may have added their own notes, contacts and rules below.\n\n* Contributing\n\nContributions, issues and ideas are welcome at the project's repository.")
 
     ;; -- The statuses a ticket moves through -----------------------------
     ;; Each entry is (value label icon glyph bucket):
     ;;
-    ;;   value   what the schema stores, e.g. "todo";
-    ;;   label   what a reader is shown, e.g. "To-do".  The shipped labels
-    ;;           are translation keys, so an instance that keeps them keeps
-    ;;           their translations; a label of the operator's own is shown
-    ;;           as written, since nothing can translate it.
-    ;;   icon    the name of a Phosphor icon, e.g. "anchor" (the class is
-    ;;           built from it, so it is the name after `ph-');
-    ;;   glyph   one character, for the native menus a page cannot dress;
-    ;;   bucket  "open", "done" or "rejected".  Open statuses are the
-    ;;           board's columns and the backlog's live list; the closed
-    ;;           ones become their own sections and their own counts.
+    ;; value   what the schema stores, e.g. "todo";
+    ;; label   what a reader is shown, e.g. "To-do".  The shipped labels
+    ;; are translation keys, so an instance that keeps them keeps
+    ;; their translations; a label of the operator's own is shown
+    ;; as written, since nothing can translate it.
+    ;; icon    the name of a Phosphor icon, e.g. "anchor" (the class is
+    ;; built from it, so it is the name after `ph-');
+    ;; glyph   one character, for the native menus a page cannot dress;
+    ;; bucket  "open", "done" or "rejected".  Open statuses are the
+    ;; board's columns and the backlog's live list; the closed
+    ;; ones become their own sections and their own counts.
     ;;
     ;; The order here is the order the board and the menus show.  Editing
     ;; the list adds statuses, drops statuses and renames them (a rename
@@ -153,39 +136,35 @@ Contributions, issues and ideas are welcome at the project's repository.")
     ;; theirs); a value no longer listed is treated as open rather than
     ;; hidden.  A project may override the whole list for itself -- see the
     ;; project edit page.
-    (ticket-statuses
-     . (("todo" "To-do" "anchor" "⚓" "open")
-        ("work-in-progress" "Work in Progress" "gear-fine" "⚙️" "open")
-        ("in-review" "In Review" "list-magnifying-glass" "🔍" "open")
-        ("done" "Done" "check" "✅" "done")
-        ("rejected" "Rejected" "x" "❌" "rejected")))
+    (ticket-statuses ("todo" "To-do" "anchor" "⚓" "open")
+                     ("work-in-progress" "Work in Progress" "gear-fine" "⚙️"
+                      "open")
+                     ("in-review" "In Review" "list-magnifying-glass" "🔍"
+                      "open")
+                     ("done" "Done" "check" "✅" "done")
+                     ("rejected" "Rejected" "x" "❌" "rejected"))
 
     ;; -- What the front page says about the software ----------------------
     ;; The landing page's feature grid and the line that introduces it, and
     ;; the heading over the little board it draws: an operator changes any
     ;; of it without touching the view.  Each feature is (icon label text),
     ;; where icon names a Phosphor icon and label is the card's title.
-    (landing-features-title
-     . "everything a team needs, nothing it does not")
-    (landing-features-intro
-     . "LucidPlan keeps the workflow simple and approachable while giving teams of every shape and size the structure they need.")
-    (landing-features
-     . (("squares-four" "multi-project workspaces"
-         "Run dozens of projects from one dashboard and switch between them without losing your place.")
-        ("list-checks" "backlog management"
-         "A clean, sortable backlog where every task can be dragged into the order it should be done in.")
-        ("kanban" "kanban boards"
-         "Track tickets as they move through To-do, Work in Progress, In Review and beyond.")
-        ("file-text" "org-mode everywhere"
-         "Write titles and descriptions in Org syntax and see them rendered as rich HTML.")
-        ("shield-check" "granular permissions"
-         "An access control list written as plain Lisp lists, so exactly what each user may do is explicit.")
-        ("heart" "free software"
-         "Licensed under the GNU AGPL v3 or newer and hackable end to end in Scheme.")))
-    (landing-workflow-title
-     . "a workflow that fits how your team works")
-    (landing-workflow-intro
-     . "Every ticket is a row on a board: move it along the columns as the work moves, and let the state of the board tell you where the project stands.")
+    (landing-features-title . "everything a team needs, nothing it does not")
+    (landing-features-intro . "LucidPlan keeps the workflow simple and approachable while giving teams of every shape and size the structure they need.")
+    (landing-features ("squares-four" "multi-project workspaces"
+                       "Run dozens of projects from one dashboard and switch between them without losing your place.")
+                      ("list-checks" "backlog management"
+                       "A clean, sortable backlog where every task can be dragged into the order it should be done in.")
+                      ("kanban" "kanban boards"
+                       "Track tickets as they move through To-do, Work in Progress, In Review and beyond.")
+                      ("file-text" "org-mode everywhere"
+                       "Write titles and descriptions in Org syntax and see them rendered as rich HTML.")
+                      ("shield-check" "granular permissions"
+                       "An access control list written as plain Lisp lists, so exactly what each user may do is explicit.")
+                      ("heart" "free software"
+                       "Licensed under the GNU AGPL v3 or newer and hackable end to end in Scheme."))
+    (landing-workflow-title . "a workflow that fits how your team works")
+    (landing-workflow-intro . "Every ticket is a row on a board: move it along the columns as the work moves, and let the state of the board tell you where the project stands.")
 
     ;; -- Mail -------------------------------------------------------------
     ;; The name and address a notification is sent from, and the subject
@@ -201,7 +180,8 @@ Contributions, issues and ideas are welcome at the project's repository.")
 
     ;; -- Accounts and passwords ------------------------------------------
     ;; How long a password-reset link stays good, in seconds (one week).
-    (password-reset-validity . ,(* 24 7 3600))
+    (password-reset-validity unquote
+                             (* 24 7 3600))
     ;; The strength score at which a new password is accepted.  It is
     ;; bewaking's own scale: 0 very weak .. 4 very strong, so 3 means
     ;; "strong".
@@ -210,10 +190,10 @@ Contributions, issues and ideas are welcome at the project's repository.")
     ;; -- The languages the interface offers ------------------------------
     ;; Each entry is (catalog-name . the-language-as-it-names-itself).  The
     ;; catalog must exist under `sys/i18n/locale'.  See `maak i18n-compile'.
-    (locales . (("en_US" . "English (US)")
-                ("nl_NL" . "Nederlands")
-                ("es_ES" . "Español")
-                ("ja_JP" . "日本語")))))
+    (locales ("en_US" . "English (US)")
+             ("nl_NL" . "Nederlands")
+             ("es_ES" . "Español")
+             ("ja_JP" . "日本語"))))
 
 ;;; ===== The lookup =====
 
@@ -224,7 +204,8 @@ module, or @code{#f} when the module is absent or KEY is not defined in it.
 The env module is loaded from the deployment's own @code{env.scm} at start-up
 (see @code{ENTRY}); it may or may not exist, and it need not mention every key,
 so both absences are ordinary and answer @code{#f} rather than failing."
-  (let ((module (resolve-module '(lucidplan env) #:ensure #f)))
+  (let ((module (resolve-module '(lucidplan env)
+                                #:ensure #f)))
     (and module
          (let ((variable (module-variable module key)))
            (and variable
@@ -240,10 +221,12 @@ is a programming mistake rather than a missing setting, so it raises."
   (let ((override (env-override key)))
     (cond
       (override override)
-      ((assoc key default-config) => cdr)
+      ((assoc key default-config)
+       => cdr)
       (else (error "config-ref: unknown configuration key" key)))))
 
-(define* (absolute-url path #:optional base-url)
+(define* (absolute-url path
+                       #:optional base-url)
   "Answer PATH as an absolute URL on the instance's own address.
 
 The base is the configured @code{site-url} unless one is passed, and the host
@@ -251,17 +234,20 @@ the request arrived on when no base is configured -- which is what a local
 development server, or an instance reached by a single public name, wants.
 When even that cannot be determined, PATH is answered unchanged rather than
 prefixed with a broken address."
-  (let* ((configured (or base-url (config-ref 'site-url)))
+  (let* ((configured (or base-url
+                         (config-ref 'site-url)))
          (base (cond
-                 ((and (string? configured) (not (string-null? configured)))
+                 ((and (string? configured)
+                       (not (string-null? configured)))
                   configured)
-                 (else
-                  (catch #t
-                         (lambda () (current-myhost))
-                         (lambda _ "")))))
+                 (else (catch #t
+                              (lambda ()
+                                (current-myhost))
+                              (lambda _
+                                "")))))
          (trimmed (if (string-suffix? "/" base)
-                      (substring base 0 (- (string-length base) 1))
-                      base))
+                      (substring base 0
+                                 (- (string-length base) 1)) base))
          (suffix (if (string-prefix? "/" path) path
                      (string-append "/" path))))
     (if (string-null? trimmed) suffix

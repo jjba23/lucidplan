@@ -53,41 +53,47 @@
 ;; instance's own name and the addresses it points at are the operator's, so
 ;; they come from the configuration rather than from this file.
 (define-public (page-footer G_)
-  (footer
-   `(div (@ (class ,(mk-class '(flex flex-col
-                                     items-center
-                                     gap-2
-                                     px-4 py-6
-                                     text-center))))
-         ,(em (format #f "~a - ~a"
-                        (config-ref 'site-name)
-                        (G_ "free and open project management for everyone"))
-                #:size '(text-sm))
-         (div (@ (class ,(mk-class '(flex flex-row flex-wrap
-                                          items-center justify-center
-                                          gap-x-4 gap-y-1))))
-              ,(a (G_ "about") #:href "/about" #:size '(text-sm))
-              ,(a (G_ "source code")
-                  #:href (config-ref 'source-url)
-                  #:size '(text-sm))
-              ,(a (G_ "manual")
-                  #:href (config-ref 'manual-url)
-                  #:size '(text-sm))
-              (a (@ (href "javascript:void(0)")
-                    (class ,(mk-class '(no-underline
-                                        text-onyx-500
-                                        dark:text-stone-300
-                                        cursor-pointer
-                                        text-sm)))
-                    (onclick "window.scrollTo({ top: 0, behavior: 'smooth' })"))
-                 ,(G_ "back to top")))
-         ,(em (format #f "© ~a - ~a"
-                        (config-ref 'copyright-holder)
-                        (G_ "GNU AGPL v3 or newer"))
-                #:size '(text-sm))
-         ,(mono (format #f "~a" (get-short-commit-sha))
-                #:size '(text-sm)
-                #:weight '(font-light)))))
+  (footer `(div (@ (class ,(mk-class '(flex flex-col
+                                            items-center
+                                            gap-2
+                                            px-4
+                                            py-6
+                                            text-center))))
+                ,(em (format #f "~a - ~a"
+                             (config-ref 'site-name)
+                             (G_
+                              "free and open project management for everyone"))
+                     #:size '(text-sm))
+                (div (@ (class ,(mk-class '(flex flex-row
+                                                 flex-wrap
+                                                 items-center
+                                                 justify-center
+                                                 gap-x-4
+                                                 gap-y-1))))
+                     ,(a (G_ "about")
+                         #:href "/about"
+                         #:size '(text-sm))
+                     ,(a (G_ "source code")
+                         #:href (config-ref 'source-url)
+                         #:size '(text-sm))
+                     ,(a (G_ "manual")
+                         #:href (config-ref 'manual-url)
+                         #:size '(text-sm))
+                     (a (@ (href "javascript:void(0)")
+                           (class ,(mk-class '(no-underline text-onyx-500
+                                               dark:text-stone-300
+                                               cursor-pointer text-sm)))
+                           (onclick
+                            "window.scrollTo({ top: 0, behavior: 'smooth' })"))
+                        ,(G_ "back to top")))
+                ,(em (format #f "© ~a - ~a"
+                             (config-ref 'copyright-holder)
+                             (G_ "GNU AGPL v3 or newer"))
+                     #:size '(text-sm))
+                ,(mono (format #f "~a"
+                               (get-short-commit-sha))
+                       #:size '(text-sm)
+                       #:weight '(font-light)))))
 
 ;; The classes a surface wears to read as frosted glass.  `hg-frost' is
 ;; hygguile's own frost layer: it paints the blur in a rounded layer of the
@@ -106,41 +112,35 @@ which is what makes them read as glass rather than as flat cards.  It is fixed
 to the viewport, hidden from assistive technology, and never takes a pointer
 event."
   `((div (@ (aria-hidden "true")
-            (class ,(mk-class '(pointer-events-none
-                                fixed
-                                inset-0
-                                z-0
-                                overflow-hidden))))
-         (div (@ (class ,(mk-class '(absolute
-                                     top-0
-                                     left-0
-                                     w-128
-                                     h-128
-                                     rounded-full
-                                     blur-3xl
-                                     opacity-50
-                                     bg-jeans-blue-500/50
-                                     dark:bg-jeans-blue-700/50)))))
-         (div (@ (class ,(mk-class '(absolute
-                                     top-48
-                                     right-0
-                                     w-128
-                                     h-128
-                                     rounded-full
-                                     blur-3xl
-                                     opacity-50
-                                     bg-asparagus-500/50
-                                     dark:bg-asparagus-700/50)))))
-         (div (@ (class ,(mk-class '(absolute
-                                     bottom-0
-                                     left-64
-                                     w-128
-                                     h-128
-                                     rounded-full
-                                     blur-3xl
-                                     opacity-50
-                                     bg-olive-500/25
-                                     dark:bg-olive-700/50))))))))
+            (class ,(mk-class '(pointer-events-none fixed inset-0 z-0
+                                                    overflow-hidden))))
+         (div (@ (class ,(mk-class '(absolute top-0
+                                              left-0
+                                              w-128
+                                              h-128
+                                              rounded-full
+                                              blur-3xl
+                                              opacity-50
+                                              bg-jeans-blue-500/50
+                                              dark:bg-jeans-blue-700/50)))))
+         (div (@ (class ,(mk-class '(absolute top-48
+                                              right-0
+                                              w-128
+                                              h-128
+                                              rounded-full
+                                              blur-3xl
+                                              opacity-50
+                                              bg-asparagus-500/50
+                                              dark:bg-asparagus-700/50)))))
+         (div (@ (class ,(mk-class '(absolute bottom-0
+                                              left-64
+                                              w-128
+                                              h-128
+                                              rounded-full
+                                              blur-3xl
+                                              opacity-50
+                                              bg-olive-500/25
+                                              dark:bg-olive-700/50))))))))
 
 ;;; ===== The page writer =====
 
@@ -154,7 +154,8 @@ event."
 ;;; it are childless discs -- so the difference is the whole page.
 (define-public (render-page tree)
   "Serialize the SXML @var{tree} of a whole page to an HTML string."
-  (call-with-output-string (lambda (port) (sxml->xml tree port))))
+  (call-with-output-string (lambda (port)
+                             (sxml->xml tree port))))
 
 ;;; ===== What a page says about itself to a machine =====
 
@@ -172,18 +173,24 @@ instance's name.  A page with no title of its own, and the front page, is
 titled with the instance's name and its tagline."
   (let ((name (config-ref 'site-name)))
     (cond
-      ((or (not title) (not (string? title)) (string-null? title))
-       (format #f "~a - ~a" name (config-ref 'site-tagline)))
-      ((string=? title name) name)
+      ((or (not title)
+           (not (string? title))
+           (string-null? title))
+       (format #f "~a - ~a" name
+               (config-ref 'site-tagline)))
+      ((string=? title name)
+       name)
       (else (format #f "~a · ~a" title name)))))
 
 (define (meta-tag name content)
   "A @code{<meta name=... content=...>} tag."
-  `(meta (@ (name ,name) (content ,content))))
+  `(meta (@ (name ,name)
+            (content ,content))))
 
 (define (property-tag property content)
   "A @code{<meta property=... content=...>} tag, the Open Graph spelling."
-  `(meta (@ (property ,property) (content ,content))))
+  `(meta (@ (property ,property)
+            (content ,content))))
 
 (define (instance-logo)
   "The image a link preview should show, as an absolute URL, or @code{#f}.
@@ -195,9 +202,12 @@ instance's own address.  A preview image is fetched by a service that has
 none of this page's context, so it has to be absolute either way."
   (let ((configured (config-ref 'site-logo)))
     (cond
-      ((not (string? configured)) #f)
-      ((string-null? configured) #f)
-      ((string-contains configured "://") configured)
+      ((not (string? configured))
+       #f)
+      ((string-null? configured)
+       #f)
+      ((string-contains configured "://")
+       configured)
       (else (absolute-url configured)))))
 
 (define* (seo-meta #:key title description canonical-path)
@@ -209,45 +219,52 @@ an absolute URL against the configured @code{site-url} (or the host the
 request arrived on) by @code{absolute-url}.  @var{title} and @var{description}
 fall back to the instance's own when a page has none of its own."
   (let* ((name (config-ref 'site-name))
-         (desc (if (and (string? description) (not (string-null? description)))
-                   description
+         (desc (if (and (string? description)
+                        (not (string-null? description))) description
                    (config-ref 'site-description)))
          (url (absolute-url (or canonical-path "/")))
          (logo (instance-logo))
          (has-logo (and logo #t))
          (keywords (config-ref 'site-keywords))
-         (json (scm->json-string
-                `((@context . "https://schema.org")
-                  (@type . "WebApplication")
-                  (name . ,name)
-                  (url . ,url)
-                  (description . ,desc)
-                  (applicationCategory . "BusinessApplication")
-                  (operatingSystem . "Any")
-                  (license . "https://www.gnu.org/licenses/agpl-3.0.html")
-                  (offers . ((@type . "Offer")
-                             (price . "0")
-                             (priceCurrency . "EUR")))))))
-    `(,(meta-tag "description" desc)
-      ,(meta-tag "keywords"
-                 (if (list? keywords) (string-join keywords ", ") keywords))
-      ,(meta-tag "author" (config-ref 'copyright-holder))
-      (link (@ (rel "canonical") (href ,url)))
+         (json (scm->json-string `((@context . "https://schema.org")
+                                   (@type . "WebApplication")
+                                   (name unquote name)
+                                   (url unquote url)
+                                   (description unquote desc)
+                                   (applicationCategory . "BusinessApplication")
+                                   (operatingSystem . "Any")
+                                   (license . "https://www.gnu.org/licenses/agpl-3.0.html")
+                                   (offers (@type . "Offer")
+                                           (price . "0")
+                                           (priceCurrency . "EUR"))))))
+    `(,(meta-tag "description" desc) ,(meta-tag "keywords"
+                                                (if (list? keywords)
+                                                    (string-join keywords ", ")
+                                                    keywords))
+      ,(meta-tag "author"
+                 (config-ref 'copyright-holder))
+      (link (@ (rel "canonical")
+               (href ,url)))
       ,(property-tag "og:type" "website")
       ,(property-tag "og:site_name" name)
-      ,(property-tag "og:title" (page-title title))
+      ,(property-tag "og:title"
+                     (page-title title))
       ,(property-tag "og:description" desc)
       ,(property-tag "og:url" url)
-      ,(property-tag "og:locale" (config-ref 'site-language))
+      ,(property-tag "og:locale"
+                     (config-ref 'site-language))
       ,@(if has-logo
-            `(,(property-tag "og:image" logo)
-              ,(property-tag "og:image:alt" name)
+            `(,(property-tag "og:image" logo) ,(property-tag "og:image:alt"
+                                                             name)
               ,(meta-tag "twitter:image" logo))
             '())
-      ,(meta-tag "twitter:card" (if has-logo "summary_large_image" "summary"))
-      ,(meta-tag "twitter:title" (page-title title))
+      ,(meta-tag "twitter:card"
+                 (if has-logo "summary_large_image" "summary"))
+      ,(meta-tag "twitter:title"
+                 (page-title title))
       ,(meta-tag "twitter:description" desc)
-      (script (@ (type "application/ld+json")) ,json))))
+      (script (@ (type "application/ld+json"))
+              ,json))))
 
 ;;; ===== The theme, served by this instance =====
 
@@ -273,25 +290,26 @@ fall back to the instance's own when a page has none of its own."
 path is answered unchanged, which a browser reads against the host that
 served the page and this instance therefore answers itself."
   (let ((base (config-ref 'asset-url)))
-    (if (and (string? base) (not (string-null? base)))
+    (if (and (string? base)
+             (not (string-null? base)))
         (string-append (if (string-suffix? "/" base)
-                           (substring base 0 (- (string-length base) 1))
-                           base)
-                       (if (string-prefix? "/" path)
-                           path
-                           (string-append "/" path)))
-        path)))
+                           (substring base 0
+                                      (- (string-length base) 1)) base)
+                       (if (string-prefix? "/" path) path
+                           (string-append "/" path))) path)))
 
 (define (shell-fonts)
   "The stylesheet that declares the faces the interface is set in.
 
 It carries the Lucida faces and the two web families the theme names after
 them, all of them files of this instance (see @code{maak fetch-assets})."
-  `((link (@ (rel stylesheet) (href ,(asset-href "/css/fonts.css"))))))
+  `((link (@ (rel stylesheet)
+             (href ,(asset-href "/css/fonts.css"))))))
 
 (define (shell-icon-stylesheet)
   "The stylesheet that declares the icon face."
-  `((link (@ (rel stylesheet) (href ,(asset-href "/css/phosphor.css"))))))
+  `((link (@ (rel stylesheet)
+             (href ,(asset-href "/css/phosphor.css"))))))
 
 (define (shell-resources)
   "The stylesheets and scripts a page of this shell needs.
@@ -322,11 +340,11 @@ it reports to and how often are configuration.  With no endpoint configured
 there is nothing for it to report to, so it is left out entirely rather than
 run against a default address somebody else runs."
   (let ((endpoint (config-ref 'analytics-endpoint)))
-    (if (or (not (string? endpoint)) (string-null? endpoint))
+    (if (or (not (string? endpoint))
+            (string-null? endpoint))
         '()
         `((script (@ (data-endpoint ,endpoint)
-                     (data-interval
-                      ,(number->string (config-ref 'analytics-interval))))
+                     (data-interval ,(number->string (config-ref 'analytics-interval))))
                   ,(assoc-ref asset-library "pub/js/symbanta.js"))))))
 
 (begin
@@ -363,8 +381,7 @@ run against a default address somebody else runs."
                                         ;; without one answers with its own
                                         ;; text, and choosing it would then
                                         ;; navigate to `/🔗 go to'.
-                                        (option (@ (value ""))
-                                                "🔗 go to")
+                                        (option (@ (value "")) "🔗 go to")
                                         ,@(map (lambda (p)
                                                  `(option (@ (value ,(format
                                                                              #f
@@ -384,206 +401,228 @@ run against a default address somebody else runs."
            ;; The bar is the framework's frosted glass header: the same pane
            ;; the cards wear, tinted with the brand blue, pinned to the top,
            ;; and left square so the dropdown it holds can escape its edge.
-           (nav (glass-panel
-                 `(
-
-                      ;; Left Section: Brand/Logo
-                      (div (@ (class ,(mk-class '(flex items-center
-                                                       justify-center
-                                                       md:justify-start w-full
-                                                       md:w-auto))))
-                           (a (@ (href "/")
-                                 (class ,(mk-class '(flex flex-row
-                                                          gap-2
-                                                          items-center
-                                                          no-underline
-                                                          hover:opacity-80
-                                                          transition-opacity))))
-                              ,(h4 (list (icon #:type 'scroll
-                                               #:icon-css '(text-xl
-                                                            text-stone-300
-                                                            dark:text-stone-300
-                                                            hover:text-white
-                                                            dark:hover:text-white))
-                                         "&nbsp;"
-                                         `(span ,(config-ref 'site-name)))
-                                   #:color '(text-stone-300
-                                             dark:text-stone-300
-                                             hover:text-white
-                                             dark:hover:text-white)
-                                   #:size '(text-xl font-bold))))
-
-                      ;; Right Section: Navigation Links & Controls
-                      (div (@ (class ,(mk-class '(flex flex-row
-                                                       flex-wrap
-                                                       items-center
-                                                       justify-center
-                                                       md:flex-nowrap
-                                                       md:justify-end
-                                                       gap-3
-                                                       md:gap-4
-                                                       w-full
-                                                       md:w-auto))))
-
-                           ;; Auth Link
-                           ,(if (not is-logged-in)
-                                `(a (@ (class ,(mk-class '(lowercase font-sans
-                                                           font-medium
-                                                           flex
-                                                           items-center
-                                                           no-underline
-                                                           hover:opacity-80)))
-                                       (href "/login"))
-                                    ,(icon-button #:icon 'sign-in
-                                                  #:content (G_ "login")
-                                                  #:size '(text-sm md:text-md)
-                                                  #:extra-classes '(py-1
-                                                                    px-2
-                                                                    md:px-3
-                                                                    max-w-prose
-                                                                    cursor-pointer
-                                                                    text-onyx-700
-                                                                    dark:text-stone-300)
-                                                  #:icon-css '(text-md
-                                                               text-onyx-700
-                                                               dark:text-stone-300)))
-                                `(a (@ (class ,(mk-class '(lowercase font-sans
-                                                           font-medium
-                                                           flex
-                                                           items-center
-                                                           no-underline
-                                                           hover:opacity-80)))
-                                       (href "/me"))
-                                    ,(icon-button #:icon 'user-circle
-                                                  #:content (G_ "me")
-                                                  #:size '(text-sm md:text-md)
-                                                  #:extra-classes '(py-1
-                                                                    px-2
-                                                                    md:px-3
-                                                                    max-w-prose
-                                                                    cursor-pointer
-                                                                    text-onyx-700
-                                                                    dark:text-stone-300)
-                                                  #:icon-css '(text-md
-                                                               text-onyx-700
-                                                               dark:text-stone-300))))
-
-                           ;; Projects Link
-                           (a (@ (class ,(mk-class '(lowercase no-underline
-                                                     font-sans
-                                                     font-medium
-                                                     flex
-                                                     items-center
-                                                     hover:opacity-80)))
-                                 (href "/projects"))
-                              ,(icon-button #:icon 'align-bottom
-                                            #:content (G_ "projects")
-                                            #:size '(text-sm md:text-md)
-                                            #:extra-classes '(py-1
-                                                              px-2
-                                                              md:px-3
-                                                              max-w-prose
-                                                              cursor-pointer
-                                                              text-onyx-700
-                                                              dark:text-stone-300)
-                                            #:icon-css '(text-md text-onyx-700
-                                                         dark:text-stone-300)))
-
-                           ;; About Link
-                           (a (@ (class ,(mk-class '(lowercase no-underline
-                                                     font-sans
-                                                     font-medium
-                                                     flex
-                                                     items-center
-                                                     hover:opacity-80)))
-                                 (href "/about"))
-                              ,(icon-button #:icon 'info
-                                            #:content (G_ "about")
-                                            #:size '(text-sm md:text-md)
-                                            #:extra-classes '(py-1
-                                                              px-2
-                                                              md:px-3
-                                                              max-w-prose
-                                                              cursor-pointer
-                                                              text-onyx-700
-                                                              dark:text-stone-300)
-                                            #:icon-css '(text-md text-onyx-700
-                                                         dark:text-stone-300)))
-
-                           ;; Theme Toggle
-                           ,(ui-mode-button #:icon ""
-                                            #:size '(text-md)
-                                            #:icon-css '(text-onyx-300
-                                                         dark:text-stone-300
-                                                         text-md)
-                                            #:family '(font-sans)
-                                            #:content `((div ,(icon #:type 'sun
-                                                                    #:icon-css '
-                                                                    (text-md
-                                                                     lg:text-lg
-                                                                     text-onyx-300
-                                                                     dark:text-stone-300))
-                                                             ,(icon #:type 'moon
-                                                                    #:icon-css '
-                                                                    (text-md
-                                                                     lg:text-lg
-                                                                     text-onyx-300
-                                                                     dark:text-stone-300))))
-                                            #:color '(text-onyx-900
-                                                      dark:text-stone-100)
-                                            #:weight '(font-light)
-                                            #:extra-classes '(py-1
-                                                              px-2
-                                                              lg:px-3
-                                                              max-w-prose
-                                                              cursor-pointer
+           (nav (glass-panel `(
+                               
+                               ;; Left Section: Brand/Logo
+                               (div (@ (class ,(mk-class '(flex items-center
+                                                           justify-center
+                                                           md:justify-start
+                                                           w-full md:w-auto))))
+                                    (a (@ (href "/")
+                                          (class ,(mk-class '(flex flex-row
+                                                              gap-2
+                                                              items-center
+                                                              no-underline
                                                               hover:opacity-80
-                                                              transition-opacity))
-                           ;; Dropdown Select
-                           ,project-select))
-                 #:tag 'header
-                 #:position '(sticky top-0 z-48)
-                 #:rounding '()
-                 #:border '(border-b-2 border-stone-500/25
-                                       dark:border-onyx-100/25)
-                 #:tint '(bg-jeans-blue-500/75 dark:bg-jeans-blue-900/75)
-                 #:shadow '(shadow-lg)
-                 #:padding '(px-4 py-3 md:py-2)
-                 ;; The bar lays its two ends out itself: stacked on a narrow
-                 ;; screen, where there is no room for both, and a single row
-                 ;; from `md' up, where there is.  Without this the two ends
-                 ;; are block-level siblings and the bar is two rows tall on
-                 ;; every screen, which wastes the width it is given.
-                 #:classes '(w-full flex flex-col md:flex-row
-                                   md:flex-nowrap md:items-center
-                                   md:justify-between md:gap-4))))
+                                                              transition-opacity))))
+                                       ,(h4 (list (icon #:type 'scroll
+                                                        #:icon-css '(text-xl
+                                                                     text-stone-300
+                                                                     dark:text-stone-300
+                                                                     hover:text-white
+                                                                     dark:hover:text-white))
+                                                  "&nbsp;"
+                                                  `(span ,(config-ref 'site-name)))
+                                            #:color '(text-stone-300
+                                                      dark:text-stone-300
+                                                      hover:text-white
+                                                      dark:hover:text-white)
+                                            #:size '(text-xl font-bold))))
+
+                               ;; Right Section: Navigation Links & Controls
+                               (div (@ (class ,(mk-class '(flex flex-row
+                                                           flex-wrap
+                                                           items-center
+                                                           justify-center
+                                                           md:flex-nowrap
+                                                           md:justify-end
+                                                           gap-3
+                                                           md:gap-4
+                                                           w-full
+                                                           md:w-auto))))
+
+                                    ;; Auth Link
+                                    ,(if (not is-logged-in)
+                                         `(a (@ (class ,(mk-class '(lowercase
+                                                                    font-sans
+                                                                    font-medium
+                                                                    flex
+                                                                    items-center
+                                                                    no-underline
+                                                                    hover:opacity-80)))
+                                                (href "/login"))
+                                             ,(icon-button #:icon 'sign-in
+                                                           #:content (G_
+                                                                      "login")
+                                                           #:size '(text-sm
+                                                                    md:text-md)
+                                                           #:extra-classes '(py-1
+                                                                             px-2
+                                                                             md:px-3
+                                                                             max-w-prose
+                                                                             cursor-pointer
+                                                                             text-onyx-700
+                                                                             dark:text-stone-300)
+                                                           #:icon-css '(text-md
+                                                                        text-onyx-700
+                                                                        dark:text-stone-300)))
+                                         `(a (@ (class ,(mk-class '(lowercase
+                                                                    font-sans
+                                                                    font-medium
+                                                                    flex
+                                                                    items-center
+                                                                    no-underline
+                                                                    hover:opacity-80)))
+                                                (href "/me"))
+                                             ,(icon-button #:icon 'user-circle
+                                                           #:content (G_ "me")
+                                                           #:size '(text-sm
+                                                                    md:text-md)
+                                                           #:extra-classes '(py-1
+                                                                             px-2
+                                                                             md:px-3
+                                                                             max-w-prose
+                                                                             cursor-pointer
+                                                                             text-onyx-700
+                                                                             dark:text-stone-300)
+                                                           #:icon-css '(text-md
+                                                                        text-onyx-700
+                                                                        dark:text-stone-300))))
+
+                                    ;; Projects Link
+                                    (a (@ (class ,(mk-class '(lowercase
+                                                              no-underline
+                                                              font-sans
+                                                              font-medium
+                                                              flex
+                                                              items-center
+                                                              hover:opacity-80)))
+                                          (href "/projects"))
+                                       ,(icon-button #:icon 'align-bottom
+                                                     #:content (G_ "projects")
+                                                     #:size '(text-sm
+                                                              md:text-md)
+                                                     #:extra-classes '(py-1
+                                                                       px-2
+                                                                       md:px-3
+                                                                       max-w-prose
+                                                                       cursor-pointer
+                                                                       text-onyx-700
+                                                                       dark:text-stone-300)
+                                                     #:icon-css '(text-md
+                                                                  text-onyx-700
+                                                                  dark:text-stone-300)))
+
+                                    ;; About Link
+                                    (a (@ (class ,(mk-class '(lowercase
+                                                              no-underline
+                                                              font-sans
+                                                              font-medium
+                                                              flex
+                                                              items-center
+                                                              hover:opacity-80)))
+                                          (href "/about"))
+                                       ,(icon-button #:icon 'info
+                                                     #:content (G_ "about")
+                                                     #:size '(text-sm
+                                                              md:text-md)
+                                                     #:extra-classes '(py-1
+                                                                       px-2
+                                                                       md:px-3
+                                                                       max-w-prose
+                                                                       cursor-pointer
+                                                                       text-onyx-700
+                                                                       dark:text-stone-300)
+                                                     #:icon-css '(text-md
+                                                                  text-onyx-700
+                                                                  dark:text-stone-300)))
+
+                                    ;; Theme Toggle
+                                    ,(ui-mode-button #:icon ""
+                                                     #:size '(text-md)
+                                                     #:icon-css '(text-onyx-300
+                                                                  dark:text-stone-300
+                                                                  text-md)
+                                                     #:family '(font-sans)
+                                                     #:content `((div ,(icon
+                                                                             #:type 'sun
+                                                                             #:icon-css '
+                                                                             (text-md
+                                                                              lg:text-lg
+                                                                              text-onyx-300
+                                                                              dark:text-stone-300))
+                                                                      ,(icon
+                                                                             #:type 'moon
+                                                                             #:icon-css '
+                                                                             (text-md
+                                                                              lg:text-lg
+                                                                              text-onyx-300
+                                                                              dark:text-stone-300))))
+                                                     #:color '(text-onyx-900
+                                                               dark:text-stone-100)
+                                                     #:weight '(font-light)
+                                                     #:extra-classes '(py-1
+                                                                       px-2
+                                                                       lg:px-3
+                                                                       max-w-prose
+                                                                       cursor-pointer
+                                                                       hover:opacity-80
+                                                                       transition-opacity))
+                                    ;; Dropdown Select
+                                    ,project-select))
+                             #:tag 'header
+                             #:position '(sticky top-0 z-48)
+                             #:rounding '()
+                             #:border '(border-b-2 border-stone-500/25
+                                                   dark:border-onyx-100/25)
+                             #:tint '(bg-jeans-blue-500/75
+                                      dark:bg-jeans-blue-900/75)
+                             #:shadow '(shadow-lg)
+                             #:padding '(px-4 py-3 md:py-2)
+                             ;; The bar lays its two ends out itself: stacked on a narrow
+                             ;; screen, where there is no room for both, and a single row
+                             ;; from `md' up, where there is.  Without this the two ends
+                             ;; are block-level siblings and the bar is two rows tall on
+                             ;; every screen, which wastes the width it is given.
+                             #:classes '(w-full flex
+                                                flex-col
+                                                md:flex-row
+                                                md:flex-nowrap
+                                                md:items-center
+                                                md:justify-between
+                                                md:gap-4))))
       
       ;; Output Page
-      (render-page
-       `(,doctype-html (html (@ (lang ,(config-ref 'site-language)))
-                            (head (title ,(page-title title))
-                                  ,(hygguile-recommended-meta)
-                                  ,@(seo-meta #:title title
-                                              #:description description
-                                              #:canonical-path canonical-path)
-                                  ;; The theme: every stylesheet and script the
-                                  ;; shell needs, each one this instance's own.
-                                  ,@(shell-resources)
+      (render-page `(,doctype-html (html (@ (lang ,(config-ref 'site-language)))
+                                         (head (title ,(page-title title))
+                                               ,(hygguile-recommended-meta)
+                                               ,@(seo-meta #:title title
+                                                           #:description
+                                                           description
+                                                           #:canonical-path
+                                                           canonical-path)
+                                               ;; The theme: every stylesheet and script the
+                                               ;; shell needs, each one this instance's own.
+                                               ,@(shell-resources)
 
-                                  (link (@ (rel "shortcut icon")
-                                           (href ,(asset-href "/favicon.ico"))
-                                           (type "image/x-icon")) "")
-                                  (link (@ (rel icon)
-                                           (href ,(asset-href "/favicon.ico"))
-                                           (type "image/x-icon")) "")
-                                  (link (@ (rel stylesheet)
-                                           (href
-                                            ,(asset-href
-                                              "/css/lucidplan.olive.min.css")))
-                                        "")
+                                               (link (@ (rel "shortcut icon")
+                                                        (href ,(asset-href
+                                                                "/favicon.ico"))
+                                                        (type "image/x-icon"))
+                                                     "")
+                                               (link (@ (rel icon)
+                                                        (href ,(asset-href
+                                                                "/favicon.ico"))
+                                                        (type "image/x-icon"))
+                                                     "")
+                                               (link (@ (rel stylesheet)
+                                                        (href ,(asset-href
+                                                                "/css/lucidplan.olive.min.css")))
+                                                     "")
 
-                                  (script (@ (type speculationrules))
-                                          "
+                                               (script (@ (type
+                                                           speculationrules))
+                                                "
 {
   \"prerender\": [
     {
@@ -594,43 +633,58 @@ run against a default address somebody else runs."
   ]
 }
 ")
-                                  ;; The page-view script, when the instance
-                                  ;; has somewhere of its own to report to.
-                                  ,@(analytics-script)
-                                  (script ,(assoc-ref asset-library
-                                                      "pub/js/tickets.js"))
-                                  (script ,(assoc-ref asset-library
-                                                      "pub/js/password-strength.js")))
-                            (body (@ (class ,(mk-class '(min-h-screen
-                                                         bg-stone-100
-                                                         dark:bg-onyx-900
-                                                         font-sans
-                                                         relative
-                                                         overflow-x-hidden))))
-                                  ;; The colour the panes above frost.
-                                  ,(aurora-backdrop)
-                                  ,notification-tray
-                                  ,(with-footer #:main `((div (@ (class ,(mk-class '
-                                                                          (flex
-                                                                           flex-col
-                                                                           justify-between
-                                                                           min-h-96
-                                                                           relative
-                                                                           z-10))))
-                                                              (div (@ (class ,
-                                                                             (mk-class '
-                                                                              (flex
-                                                                               flex-col
-                                                                               gap-8
-                                                                               justify-start))))
-                                                                   ,@nav
-                                                                   ,body)))
-                                                #:footer (page-footer G_))))))))
-  (export html-template frosted-tint-classes render-page asset-href
-          emoji-for-ticket-status emoji-for-ticket-type
-          glyph-for-ticket-status glyph-for-ticket-type
-          status-label status-icon-node bucket-heading bucket-icon-node
-          lucidplan-locales locale-choose-form))
+                                               ;; The page-view script, when the instance
+                                               ;; has somewhere of its own to report to.
+                                               ,@(analytics-script)
+                                               (script ,(assoc-ref
+                                                         asset-library
+                                                         "pub/js/tickets.js"))
+                                               (script ,(assoc-ref
+                                                         asset-library
+                                                         "pub/js/password-strength.js")))
+                                         (body (@ (class ,(mk-class '(min-h-screen
+                                                                      bg-stone-100
+                                                                      dark:bg-onyx-900
+                                                                      font-sans
+                                                                      relative
+                                                                      overflow-x-hidden))))
+                                               ;; The colour the panes above frost.
+                                               ,(aurora-backdrop)
+                                               ,notification-tray
+                                               ,(with-footer #:main `((div (@ (class ,
+                                                                               (mk-class '
+                                                                                (flex
+                                                                                 flex-col
+                                                                                 justify-between
+                                                                                 min-h-96
+                                                                                 relative
+                                                                                 z-10))))
+                                                                           (div
+                                                                            (@
+                                                                             (class ,
+                                                                              (mk-class '
+                                                                               (flex
+                                                                                flex-col
+                                                                                gap-8
+                                                                                justify-start))))
+                                                                            ,@nav
+                                                                            ,body)))
+                                                             #:footer (page-footer
+                                                                       G_))))))))
+  (export html-template
+          frosted-tint-classes
+          render-page
+          asset-href
+          emoji-for-ticket-status
+          emoji-for-ticket-type
+          glyph-for-ticket-status
+          glyph-for-ticket-type
+          status-label
+          status-icon-node
+          bucket-heading
+          bucket-icon-node
+          lucidplan-locales
+          locale-choose-form))
 
 ;;; ===== How a status is drawn, from the status itself =====
 ;;;
@@ -649,17 +703,23 @@ run against a default address somebody else runs."
 ;;; it.
 (define (translate-status-label G_ label)
   (cond
-    ((equal? label "To-do") (G_ "To-do"))
-    ((equal? label "Work in Progress") (G_ "Work in Progress"))
-    ((equal? label "In Review") (G_ "In Review"))
-    ((equal? label "Done") (G_ "Done"))
-    ((equal? label "Rejected") (G_ "Rejected"))
+    ((equal? label "To-do")
+     (G_ "To-do"))
+    ((equal? label "Work in Progress")
+     (G_ "Work in Progress"))
+    ((equal? label "In Review")
+     (G_ "In Review"))
+    ((equal? label "Done")
+     (G_ "Done"))
+    ((equal? label "Rejected")
+     (G_ "Rejected"))
     (else label)))
 
 (define-public (status-label G_ specs status)
   "The label a reader is shown for STATUS, resolved through SPECS and
 translated when it is one of the shipped labels."
-  (translate-status-label G_ (ticket-status-label specs status)))
+  (translate-status-label G_
+                          (ticket-status-label specs status)))
 
 (define-public (status-icon-node specs status)
   "The mark STATUS wears on a card or a heading, as an SXML node."
@@ -671,17 +731,22 @@ translated when it is one of the shipped labels."
 ;; own name when it holds several, since there is then no one name to borrow.
 (define-public (bucket-heading G_ specs bucket)
   (let ((values (ticket-status-values-in-bucket specs bucket)))
-    (if (and (pair? values) (null? (cdr values)))
-        (status-label G_ specs (car values))
+    (if (and (pair? values)
+             (null? (cdr values)))
+        (status-label G_ specs
+                      (car values))
         (G_ bucket))))
 
 (define-public (bucket-icon-node specs bucket)
   (let ((values (ticket-status-values-in-bucket specs bucket)))
-    (if (and (pair? values) (null? (cdr values)))
-        (status-icon-node specs (car values))
-        (list (icon #:type (if (equal? bucket "rejected") 'x 'check)
-                    #:icon-css '(text-onyx-300 dark:text-stone-300
-                                 text-xl))))))
+    (if (and (pair? values)
+             (null? (cdr values)))
+        (status-icon-node specs
+                          (car values))
+        (list (icon #:type (if (equal? bucket "rejected")
+                               'x
+                               'check)
+                    #:icon-css '(text-onyx-300 dark:text-stone-300 text-xl))))))
 
 ;; The two the landing page and the ticket badges answer without a project in
 ;; hand: they are drawn from the instance's own ladder.
@@ -721,11 +786,16 @@ translated when it is one of the shipped labels."
 
 (define-public (glyph-for-ticket-type ticket-type)
   (cond
-    ((equal? "task" ticket-type) "🔧")
-    ((equal? "bug" ticket-type) "🐛")
-    ((equal? "story" ticket-type) "📖")
-    ((equal? "spike" ticket-type) "🧪")
-    ((equal? "time-box" ticket-type) "⏳")
+    ((equal? "task" ticket-type)
+     "🔧")
+    ((equal? "bug" ticket-type)
+     "🐛")
+    ((equal? "story" ticket-type)
+     "📖")
+    ((equal? "spike" ticket-type)
+     "🧪")
+    ((equal? "time-box" ticket-type)
+     "⏳")
     (else "")))
 
 (begin
@@ -976,17 +1046,19 @@ reaches assistive technology as well."
   `((form (@ (action "/preferences/locale")
              (method "POST")
              (enctype "application/x-www-form-urlencoded")
-             (class ,(mk-class (append '(flex flex-row flex-wrap
+             (class ,(mk-class (append '(flex flex-row
+                                              flex-wrap
                                               items-center
                                               gap-1
-                                              pl-2 pr-1 py-1
+                                              pl-2
+                                              pr-1
+                                              py-1
                                               w-fit
                                               rounded-full
                                               border-2
                                               border-jeans-blue-500/50
                                               dark:border-jeans-blue-300/25
-                                              shadow-md)
-                                        frosted-tint-classes))))
+                                              shadow-md) frosted-tint-classes))))
           ,@(if return-to
                 `((input (@ (type "hidden")
                             (name "return-to")
@@ -994,11 +1066,8 @@ reaches assistive technology as well."
                 '())
           ,(icon #:type 'translate
                  #:icon-css '(text-lg text-jeans-blue-700
-                                     dark:text-jeans-blue-300))
-          (label (@ (class ,(mk-class '(text-md
-                                                font-medium
-                                                font-sans
-                                                px-1
+                                      dark:text-jeans-blue-300))
+          (label (@ (class ,(mk-class '(text-md font-medium font-sans px-1
                                                 text-onyx-700
                                                 dark:text-stone-300)))
                     (for user-lang))
@@ -1006,25 +1075,21 @@ reaches assistive technology as well."
           ,(select #:name 'user-lang
                    ;; No `lowercase' here: a language writes its own name,
                    ;; and `Nederlands' or `Español' is how it is spelled.
-                   #:select-classes '(text-md
-                                      font-medium
-                                      font-sans
-                                      text-onyx-900
-                                      dark:text-stone-100
-                                      bg-transparent
-                                      rounded-lg
-                                      border-0
-                                      px-2
-                                      py-1
-                                      outline-none
-                                      cursor-pointer
-                                      hover:bg-stone-300/75
-                                      dark:hover:bg-onyx-700/75
-                                      focus:ring-2)
-                   #:select-flex-css '(flex flex-row
-                                             items-center
-                                             my-0
-                                             w-fit)
+                   #:select-classes '(text-md font-medium
+                                              font-sans
+                                              text-onyx-900
+                                              dark:text-stone-100
+                                              bg-transparent
+                                              rounded-lg
+                                              border-0
+                                              px-2
+                                              py-1
+                                              outline-none
+                                              cursor-pointer
+                                              hover:bg-stone-300/75
+                                              dark:hover:bg-onyx-700/75
+                                              focus:ring-2)
+                   #:select-flex-css '(flex flex-row items-center my-0 w-fit)
                    #:options (map (lambda (locale)
                                     (option #:value (car locale)
                                             #:content (cdr locale)
@@ -1033,12 +1098,7 @@ reaches assistive technology as well."
           ,(icon-button #:icon 'check
                         #:content ""
                         #:type 'submit
-                        #:extra-classes '(py-1
-                                          px-2
-                                          max-w-prose
-                                          cursor-pointer
-                                          text-onyx-700
-                                          dark:text-stone-300)
-                        #:icon-css '(text-lg
-                                     text-onyx-700
-                                     dark:text-stone-300)))))
+                        #:extra-classes '(py-1 px-2 max-w-prose cursor-pointer
+                                               text-onyx-700
+                                               dark:text-stone-300)
+                        #:icon-css '(text-lg text-onyx-700 dark:text-stone-300)))))

@@ -21,9 +21,12 @@
   #:use-module (artanis route)
   #:use-module (bewaking bewaking)
   #:use-module (lucidplan env)
-  #:export (back-to-login unauthorized-api-message bewaking-endpoint
-                          bewaking-api-endpoint session-has-permission?
-                          session-permissions session-owner-id))
+  #:export (back-to-login unauthorized-api-message
+                          bewaking-endpoint
+                          bewaking-api-endpoint
+                          session-has-permission?
+                          session-permissions
+                          session-owner-id))
 
 (define* (bewaking-endpoint #:key token-name
                             needed-permissions
@@ -97,18 +100,24 @@ it carries no valid session.
 @var{token-name} is the cookie name the token travels in, as the guards name
 it.  A missing, malformed or expired token is not an error here -- it is a
 reader who is simply signed out -- so it answers the empty list."
-  (let ((raw (:cookies-value rc (symbol->string token-name))))
-    (if (or (not (string? raw)) (string-null? raw))
+  (let ((raw (:cookies-value rc
+                             (symbol->string token-name))))
+    (if (or (not (string? raw))
+            (string-null? raw))
         '()
         (catch #t
                (lambda ()
                  (let ((t (decrypt-token #:token raw
                                          #:encryption-key encryption-key
                                          #:signing-key signing-key)))
-                   (if (and t (token-valid? #:token t))
-                       (or (assoc-ref t 'owner-permissions) '())
+                   (if (and t
+                            (token-valid? #:token t))
+                       (or (assoc-ref t
+                                      'owner-permissions)
+                           '())
                        '())))
-               (lambda _ '())))))
+               (lambda _
+                 '())))))
 
 (define* (session-has-permission? #:key rc token-name permission)
   "Answer @code{#t} when the request's session holds @var{permission}.
@@ -131,17 +140,21 @@ say) can ask here instead of decrypting the cookie a second time.  A
 missing, malformed or expired token answers @code{#f}, exactly as it does
 for @code{session-permissions}: a reader who is simply signed out is not an
 error."
-  (let ((raw (:cookies-value rc (symbol->string token-name))))
-    (if (or (not (string? raw)) (string-null? raw))
-        #f
+  (let ((raw (:cookies-value rc
+                             (symbol->string token-name))))
+    (if (or (not (string? raw))
+            (string-null? raw)) #f
         (catch #t
                (lambda ()
                  (let ((t (decrypt-token #:token raw
                                          #:encryption-key encryption-key
                                          #:signing-key signing-key)))
-                   (and t (token-valid? #:token t)
-                        (assq-ref t 'owner-id))))
-               (lambda _ #f)))))
+                   (and t
+                        (token-valid? #:token t)
+                        (assq-ref t
+                                  'owner-id))))
+               (lambda _
+                 #f)))))
 
 (define (unauthorized-api-message rc)
   (response-emit '((error . "You must be authenticated to use this API endpoint"))

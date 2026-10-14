@@ -29,7 +29,8 @@
   (define columns
     '(user-id reset-token created-at))
 
-  (define conn (DB-open rc))
+  (define conn
+    (DB-open rc))
 
   (define execute-write
     (db-write conn))
@@ -42,12 +43,12 @@
   ;; earlier shape, a bare `(token . user-id)' cons, dropped the timestamp the
   ;; caller then looked for, so every reset link answered as invalid.
   (define (get-password-reset-by-token token)
-    (let ((rows (execute-read
-                 "get-password-reset-by-token"
-                 (sql-select 'password_reset
-                             #:columns columns
-                             #:where (list (cons 'reset-token token))
-                             #:limit 1))))
+    (let ((rows (execute-read "get-password-reset-by-token"
+                              (sql-select 'password_reset
+                                          #:columns columns
+                                          #:where (list (cons 'reset-token
+                                                              token))
+                                          #:limit 1))))
       (if (nil? rows) #f
           (car rows))))
 

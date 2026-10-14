@@ -79,25 +79,25 @@
               (paths (append '("/" "/about" "/projects")
                              (map (lambda (p)
                                     (format #f "/tickets/~a"
-                                            (assq-ref p 'human-id)))
-                                  projects)
+                                            (assq-ref p
+                                                      'human-id))) projects)
                              (map (lambda (p)
                                     (format #f "/kanban/~a"
-                                            (assq-ref p 'human-id)))
-                                  projects))))
+                                            (assq-ref p
+                                                      'human-id))) projects))))
          ;; The document is serialized here and sent with its own XML
          ;; content-type rather than through `:mime': a sitemap is XML, and
          ;; the HTML rendering the route would otherwise carry would be a
          ;; document a crawler is entitled to reject.
-         (response-emit
-          (string-append
-           "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-           (render-page
-            `(urlset (@ (xmlns "http://www.sitemaps.org/schemas/sitemap/0.9"))
-                     ,@(map (lambda (path)
-                              `(url (loc ,(absolute-url path))))
-                            paths))))
-          #:headers '((content-type . (application/xml)))))))
+         (response-emit (string-append
+                         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                         (render-page `(urlset (@ (xmlns
+                                                   "http://www.sitemaps.org/schemas/sitemap/0.9"))
+                                               ,@(map (lambda (path)
+                                                        `(url (loc ,(absolute-url
+                                                                     path))))
+                                                      paths))))
+                        #:headers '((content-type application/xml))))))
 
 ;; The robots file is built rather than shipped as a file so that the sitemap
 ;; it points at is the instance's own absolute address, and so the paths that
@@ -105,15 +105,15 @@
 (get "/robots.txt"
      #:mime 'xml
      (lambda (rc)
-       (response-emit
-        (string-append
-         "User-agent: *\n"
-         "Allow: /\n"
-         "Disallow: /users\n"
-         "Disallow: /me\n"
-         "Disallow: /password\n"
-         "Disallow: /logout\n\n"
-         "Sitemap: " (absolute-url "/sitemap.xml") "\n")
-        #:headers '((content-type . (text/plain))))))
+       (response-emit (string-append "User-agent: *\n"
+                                     "Allow: /\n"
+                                     "Disallow: /users\n"
+                                     "Disallow: /me\n"
+                                     "Disallow: /password\n"
+                                     "Disallow: /logout\n\n"
+                                     "Sitemap: "
+                                     (absolute-url "/sitemap.xml")
+                                     "\n")
+                      #:headers '((content-type text/plain)))))
 
 (get "/favicon.ico" static-page-emitter)

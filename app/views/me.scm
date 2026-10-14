@@ -36,10 +36,14 @@
         (hours (quotient (remainder secs 86400) 3600))
         (minutes (quotient (remainder secs 3600) 60)))
     (cond
-      ((>= days 1) (format #f "~a day~a" days (if (= days 1) "" "s"))
-       )
-      ((>= hours 1) (format #f "~a hour~a" hours (if (= hours 1) "" "s")))
-      (else (format #f "~a minute~a" minutes (if (= minutes 1) "" "s"))))))
+      ((>= days 1)
+       (format #f "~a day~a" days
+               (if (= days 1) "" "s")))
+      ((>= hours 1)
+       (format #f "~a hour~a" hours
+               (if (= hours 1) "" "s")))
+      (else (format #f "~a minute~a" minutes
+                    (if (= minutes 1) "" "s"))))))
 
 (define* (me-page G_
                   #:key is-logged-in
@@ -92,7 +96,8 @@
                                         (assq-ref token
                                                   'owner-permissions)))
         (session-duration `((div (@ (class ,(mk-class '(py-8 px-4))))
-                                 ,(em (format #f "~a: ~a (~a)"
+                                 ,(em (format #f
+                                              "~a: ~a (~a)"
                                               (G_ "logged in until")
                                               (strftime "%c"
                                                         (localtime (assq-ref
@@ -101,9 +106,9 @@
                                               ;; bewaking >= 0.4.0 can say how
                                               ;; long is left on the payload.
                                               (format #f "~a left"
-                                                      (humanise-seconds
-                                                       (token-remaining-seconds
-                                                        #:token token)))))))))
+                                                      (humanise-seconds (token-remaining-seconds
+                                                                         #:token
+                                                                         token)))))))))
     (html-template G_
                    #:title (G_ "me")
                    #:canonical-path "/me"
@@ -202,7 +207,8 @@
     ,(hr)))
 
 (define* (users-page G_
-                     #:key users projects (notices '()))
+                     #:key users projects
+                     (notices '()))
   (html-template G_
                  #:title (G_ "user management")
                  #:canonical-path "/users/manage"
@@ -211,8 +217,7 @@
                  #:body `(div (@ (class ,(mk-class '(px-4 py-4))))
                               ,(h2 (G_ "User management"))
                               ,@(map (lambda (notice)
-                                       `(div (@ (class ,(mk-class '(my-2
-                                                                    px-4
+                                       `(div (@ (class ,(mk-class '(my-2 px-4
                                                                     py-2
                                                                     max-w-prose
                                                                     rounded-xl
@@ -220,9 +225,8 @@
                                                                     border-jeans-blue-500/50
                                                                     text-onyx-700
                                                                     dark:text-stone-300)))
-                                               (role "status"))
-                                            ,notice))
-                                     notices)
+                                                (role "status"))
+                                             ,notice)) notices)
                               (div (@ (class ,(mk-class '(my-6))))
                                    (a (@ (href "/users/new"))
                                       ,(icon-button #:icon 'user-plus
@@ -239,7 +243,8 @@
                                            (render-user G_ u)) users)))))
 
 (define* (reset-password-page G_
-                              #:key token email (error #f))
+                              #:key token email
+                              (error #f))
   (html-template G_
                  #:title (G_ "reset password")
                  #:canonical-path "/password/reset"
@@ -255,17 +260,16 @@
                                ;; or a password that is too weak -- comes
                                ;; back here with the reason, above the form.
                                ,@(if error
-                                     `((div (@ (class ,(mk-class '(my-2
-                                                                  px-4
-                                                                  py-2
-                                                                  max-w-prose
-                                                                  rounded-xl
-                                                                  border-2
-                                                                  border-redwood-700/50
-                                                                  text-onyx-700
-                                                                  dark:text-stone-300)))
-                                             (role "alert"))
-                                          ,error))
+                                     `((div (@ (class ,(mk-class '(my-2 px-4
+                                                                   py-2
+                                                                   max-w-prose
+                                                                   rounded-xl
+                                                                   border-2
+                                                                   border-redwood-700/50
+                                                                   text-onyx-700
+                                                                   dark:text-stone-300)))
+                                               (role "alert"))
+                                            ,error))
                                      '())
                                (form (@ (method POST)
                                         (action "/password/do-reset"))
@@ -292,25 +296,35 @@
                                           ;; they can be translated.
                                           (div (@ (data-password-strength "")
                                                   (data-min-score ,(number->string
-                                                                    (config-ref
-                                                                     'password-min-score)))
-                                                  (data-strength-label-0 ,(G_ "very weak"))
-                                                  (data-strength-label-1 ,(G_ "weak"))
-                                                  (data-strength-label-2 ,(G_ "fair"))
-                                                  (data-strength-label-3 ,(G_ "strong"))
-                                                  (data-strength-label-4 ,(G_ "very strong"))
-                                                  (data-strength-hint ,(G_ "aim for 12 or more characters, mixing words, upper and lower case, digits and symbols")))
-                                               ,(input #:label (G_ "new password")
+                                                                    (config-ref 'password-min-score)))
+                                                  (data-strength-label-0 ,(G_
+                                                                           "very weak"))
+                                                  (data-strength-label-1 ,(G_
+                                                                           "weak"))
+                                                  (data-strength-label-2 ,(G_
+                                                                           "fair"))
+                                                  (data-strength-label-3 ,(G_
+                                                                           "strong"))
+                                                  (data-strength-label-4 ,(G_
+                                                                           "very strong"))
+                                                  (data-strength-hint ,(G_
+                                                                        "aim for 12 or more characters, mixing words, upper and lower case, digits and symbols")))
+                                               ,(input #:label (G_
+                                                                "new password")
                                                        #:name "new-password"
                                                        #:value ""
                                                        #:type 'password
-                                                       #:autocomplete "new-password"
+                                                       #:autocomplete
+                                                       "new-password"
                                                        #:required #t)
-                                               ,(input #:label (G_ "confirm password")
-                                                       #:name "confirm-password"
+                                               ,(input #:label (G_
+                                                                "confirm password")
+                                                       #:name
+                                                       "confirm-password"
                                                        #:value ""
                                                        #:type 'password
-                                                       #:autocomplete "new-password"
+                                                       #:autocomplete
+                                                       "new-password"
                                                        #:required #t))
                                           (div ,(submit-button (G_ "reset")))))))))
 
@@ -320,7 +334,8 @@
                  #:label (format #f "~a" p)
                  #:name (format #f "~a" p)))))
 
-(define* (new-user-page G_ #:key (error #f))
+(define* (new-user-page G_
+                        #:key (error #f))
   (html-template G_
                  #:title (G_ "new user")
                  #:canonical-path "/users/new"
@@ -331,17 +346,16 @@
                                ;; name or an address already in use -- says
                                ;; so here, above the form.
                                ,@(if error
-                                     `((div (@ (class ,(mk-class '(my-2
-                                                                  px-4
-                                                                  py-2
-                                                                  max-w-prose
-                                                                  rounded-xl
-                                                                  border-2
-                                                                  border-redwood-700/50
-                                                                  text-onyx-700
-                                                                  dark:text-stone-300)))
-                                             (role "alert"))
-                                          ,error))
+                                     `((div (@ (class ,(mk-class '(my-2 px-4
+                                                                   py-2
+                                                                   max-w-prose
+                                                                   rounded-xl
+                                                                   border-2
+                                                                   border-redwood-700/50
+                                                                   text-onyx-700
+                                                                   dark:text-stone-300)))
+                                               (role "alert"))
+                                            ,error))
                                      '())
                                (div (@ (class ,(mk-class '(flex flex-col
                                                            gap-4

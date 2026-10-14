@@ -46,72 +46,62 @@
   (let* ((name (config-ref 'site-name))
          (contact (config-ref 'contact-email))
          (social (config-ref 'social-links))
-         (links
-          `(div (@ (class ,(mk-class '(flex flex-row
-                                             flex-wrap
-                                             items-center
-                                             gap-3
-                                             my-4))))
-                (a (@ (class ,(mk-class '(no-underline)))
-                      (href "/projects"))
-                   ,(icon-button #:icon 'align-bottom
-                                 #:content (G_ "browse projects")))
-                ,(external-link (G_ "source code")
-                                (config-ref 'source-url)
-                                'code)
-                ,(external-link (G_ "manual")
-                                (config-ref 'manual-url)
-                                'book-open)))
-         (social-row
-          (if (or (null? social) (not (list? social)))
-              '()
-              `(div (@ (class ,(mk-class '(flex flex-row
-                                                 flex-wrap
-                                                 items-center
-                                                 gap-3
-                                                 my-2))))
-                    ,@(map (lambda (entry)
-                             `(a (@ (class ,(mk-class '(no-underline)))
-                                    (href ,(cdr entry)))
-                                 ,(icon-button #:icon 'link
-                                               #:content (car entry))))
-                           social))))
-         (contact-row
-          `(div (@ (class ,(mk-class '(flex flex-row
-                                             flex-wrap
-                                             items-center
-                                             gap-2
-                                             my-2))))
-                ,(em (G_ "write to us at"))
-                (a (@ (class ,(mk-class '(no-underline
-                                          text-jeans-blue-700
-                                          dark:text-jeans-blue-300)))
-                      (href ,(format #f "mailto:~a" contact)))
-                   ,contact))))
+         (links `(div (@ (class ,(mk-class '(flex flex-row flex-wrap
+                                                  items-center gap-3 my-4))))
+                      (a (@ (class ,(mk-class '(no-underline)))
+                            (href "/projects"))
+                         ,(icon-button #:icon 'align-bottom
+                                       #:content (G_ "browse projects")))
+                      ,(external-link (G_ "source code")
+                                      (config-ref 'source-url)
+                                      'code)
+                      ,(external-link (G_ "manual")
+                                      (config-ref 'manual-url)
+                                      'book-open)))
+         (social-row (if (or (null? social)
+                             (not (list? social)))
+                         '()
+                         `(div (@ (class ,(mk-class '(flex flex-row flex-wrap
+                                                           items-center gap-3
+                                                           my-2))))
+                               ,@(map (lambda (entry)
+                                        `(a (@ (class ,(mk-class '(no-underline)))
+                                               (href ,(cdr entry)))
+                                            ,(icon-button #:icon 'link
+                                                          #:content (car entry))))
+                                      social))))
+         (contact-row `(div (@ (class ,(mk-class '(flex flex-row flex-wrap
+                                                        items-center gap-2
+                                                        my-2))))
+                            ,(em (G_ "write to us at"))
+                            (a (@ (class ,(mk-class '(no-underline
+                                                      text-jeans-blue-700
+                                                      dark:text-jeans-blue-300)))
+                                  (href ,(format #f "mailto:~a" contact)))
+                               ,contact))))
     (html-template G_
                    #:title (G_ "about")
                    #:description (config-ref 'site-description)
                    #:canonical-path "/about"
                    #:proj projects
                    #:is-logged-in is-logged-in
-                   #:body
-                   `(div (@ (class ,(mk-class '(px-3
-                                                md:px-6
-                                                py-6
-                                                max-w-256))))
-                         ,(glass-panel
-                           `((div (@ (class ,(mk-class '(flex flex-col
-                                                               gap-1))))
-                                  ,(h1 (G_ "About"))
-                                  ,(sub-h2 name #:weight '(font-light))
-                                  ,(em (config-ref 'site-tagline)
-                                       #:size '(text-sm)))
-                             (div (@ (class ,(mk-class '(max-w-prose
-                                                         my-2))))
-                                  ,(org2html (config-ref 'about-org)))
-                             ,links
-                             ,social-row
-                             ,contact-row)
-                           #:frost 3
-                           #:padding '(p-6 sm:p-10)
-                           #:classes '(flex flex-col gap-4 w-full))))))
+                   #:body `(div (@ (class ,(mk-class '(px-3 md:px-6 py-6
+                                                            max-w-256))))
+                                ,(glass-panel `((div (@ (class ,(mk-class '(flex
+                                                                            flex-col
+                                                                            gap-1))))
+                                                     ,(h1 (G_ "About"))
+                                                     ,(sub-h2 name
+                                                              #:weight '(font-light))
+                                                     ,(em (config-ref 'site-tagline)
+                                                          #:size '(text-sm)))
+                                                (div (@ (class ,(mk-class '(max-w-prose
+                                                                            my-2))))
+                                                     ,(org2html (config-ref 'about-org)))
+                                                ,links
+                                                ,social-row
+                                                ,contact-row)
+                                              #:frost 3
+                                              #:padding '(p-6 sm:p-10)
+                                              #:classes '(flex flex-col gap-4
+                                                               w-full))))))

@@ -53,18 +53,20 @@
   ;; project answer with #f (or an empty list) rather than a silently empty
   ;; subquery.
   (define (project-id-of project-human-id)
-    (let ((rows (execute-read
-                 "resolve-project-id"
-                 (sql-select 'project
-                             #:columns '(id)
-                             #:where (list (cons 'human-id project-human-id))
-                             #:limit 1))))
+    (let ((rows (execute-read "resolve-project-id"
+                              (sql-select 'project
+                                          #:columns '(id)
+                                          #:where (list (cons 'human-id
+                                                         project-human-id))
+                                          #:limit 1))))
       (and (not (nil? rows))
-           (assq-ref (car rows) 'id))))
+           (assq-ref (car rows)
+                     'id))))
 
   (define (get-tickets project-id order-by)
     (let ((pid (project-id-of project-id)))
-      (if (not pid) '()
+      (if (not pid)
+          '()
           (execute-read "get-tickets"
                         (sql-select 'ticket
                                     #:columns columns
@@ -77,15 +79,14 @@
     ;; values are bound; only the (controlled) order-by is rendered in.
     (let ((pid (project-id-of project-id))
           (pattern (format #f "%~a%" q)))
-      (if (not pid) '()
-          (execute-read
-           "search-tickets"
-           (sql-parameterize
-            (format #f
-                    "SELECT ~a FROM ticket WHERE deleted_at IS NULL AND project_id = ? AND (title LIKE ? OR description LIKE ?)~a"
-                    (quoted-sql-columns columns)
-                    (order-by-sql order-by))
-            (list pid pattern pattern))))))
+      (if (not pid)
+          '()
+          (execute-read "search-tickets"
+                        (sql-parameterize (format #f
+                                           "SELECT ~a FROM ticket WHERE deleted_at IS NULL AND project_id = ? AND (title LIKE ? OR description LIKE ?)~a"
+                                           (quoted-sql-columns columns)
+                                           (order-by-sql order-by))
+                                          (list pid pattern pattern))))))
 
   (define (get-ticket-by-project-human-id-and-human-id project-id human-id)
     (let ((pid (project-id-of project-id)))
@@ -94,10 +95,9 @@
                        "get-ticket-by-project-human-id-and-human-id"
                        (sql-select 'ticket
                                    #:columns columns
-                                   #:where
-                                   (list '(deleted-at is null)
-                                         (cons 'project-id pid)
-                                         (cons 'human-id human-id))
+                                   #:where (list '(deleted-at is null)
+                                                 (cons 'project-id pid)
+                                                 (cons 'human-id human-id))
                                    #:limit 1))))
             (if (nil? rows) #f
                 (car rows))))))
@@ -105,14 +105,15 @@
   (define (get-ticket-of-latest-human-id project-id)
     (let ((pid (project-id-of project-id)))
       (if (not pid) #f
-          (let ((rows (execute-read
-                       "get-ticket-of-latest-human-id"
-                       (sql-select 'ticket
-                                   #:columns columns
-                                   #:where (list '(deleted-at is null)
-                                                 (cons 'project-id pid))
-                                   #:order-by '((human-id desc))
-                                   #:limit 1))))
+          (let ((rows (execute-read "get-ticket-of-latest-human-id"
+                                    (sql-select 'ticket
+                                                #:columns columns
+                                                #:where (list '(deleted-at is
+                                                                null)
+                                                              (cons 'project-id
+                                                                    pid))
+                                                #:order-by '((human-id desc))
+                                                #:limit 1))))
             (if (nil? rows) #f
                 (car rows))))))
 
@@ -120,11 +121,10 @@
                                                           attrs)
     (let ((pid (project-id-of project-id)))
       (if (not pid) #f
-          (execute-write
-           "update-ticket-by-project-human-id-and-human-id"
-           (sql-update 'ticket attrs
-                       #:where (list (cons 'project-id pid)
-                                     (cons 'human-id human-id)))))))
+          (execute-write "update-ticket-by-project-human-id-and-human-id"
+                         (sql-update 'ticket attrs
+                                     #:where (list (cons 'project-id pid)
+                                                   (cons 'human-id human-id)))))))
 
   (define (insert-ticket attrs)
     (execute-write "insert-ticket"

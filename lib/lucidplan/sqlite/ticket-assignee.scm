@@ -39,42 +39,44 @@
     (db-read conn))
 
   (define (project-id-of project-human-id)
-    (let ((rows (execute-read
-                 "resolve-project-id"
-                 (sql-select 'project
-                             #:columns '(id)
-                             #:where (list (cons 'human-id project-human-id))
-                             #:limit 1))))
+    (let ((rows (execute-read "resolve-project-id"
+                              (sql-select 'project
+                                          #:columns '(id)
+                                          #:where (list (cons 'human-id
+                                                         project-human-id))
+                                          #:limit 1))))
       (and (not (nil? rows))
-           (assq-ref (car rows) 'id))))
+           (assq-ref (car rows)
+                     'id))))
 
   (define (get-ticket-assignee-by-project-human-id project-id)
     (let ((pid (project-id-of project-id)))
-      (if (not pid) '()
+      (if (not pid)
+          '()
           (execute-read "get-ticket-assignee-by-project-human-id"
                         (sql-select 'ticket_assignee
                                     #:columns columns
                                     #:where (list (cons 'project-id pid)))))))
 
   (define (get-ticket-assignee-by-ticket-id ticket-id)
-    (let ((rows (execute-read
-                 "get-ticket-assignee-by-ticket-id"
-                 (sql-select 'ticket_assignee
-                             #:columns columns
-                             #:where (list (cons 'ticket-id ticket-id))
-                             #:limit 1))))
+    (let ((rows (execute-read "get-ticket-assignee-by-ticket-id"
+                              (sql-select 'ticket_assignee
+                                          #:columns columns
+                                          #:where (list (cons 'ticket-id
+                                                              ticket-id))
+                                          #:limit 1))))
       (if (nil? rows) #f
           (car rows))))
 
   (define (upsert-ticket-assignee attrs)
     ;; The conflict key is the ticket: assigning a ticket that already has an
     ;; assignee rewrites that row rather than failing on the primary key.
-    (execute-write
-     "upsert-ticket-assignee"
-     (sql-upsert 'ticket_assignee attrs
-                 #:dialect 'sqlite
-                 #:conflict-target 'ticket-id
-                 #:update '(user-id))))
+    (execute-write "upsert-ticket-assignee"
+                   (sql-upsert 'ticket_assignee
+                               attrs
+                               #:dialect 'sqlite
+                               #:conflict-target 'ticket-id
+                               #:update '(user-id))))
 
   (define (unassign-ticket-assignee ticket-id)
     (execute-write "unassign-ticket-assignee"

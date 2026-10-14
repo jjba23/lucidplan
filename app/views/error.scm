@@ -42,29 +42,28 @@
 ;; fine, the blue of a door to come in through, plain ink for nothing at all,
 ;; and the red the framework already marks an error with.
 (define error-notes
-  '((400 . (plugs
-            (text-asparagus-700 dark:text-asparagus-300)
-            "that request did not arrive whole"
-            "Something about the request LucidPlan received did not add up, so it was left unread and nothing was changed. Going back a page and trying again usually settles it."))
-    (401 . (lock-key
-            (text-jeans-blue-700 dark:text-jeans-blue-300)
-            "this page is for signed-in readers"
-            "Projects stay behind a sign-in, and the session this request arrived with is missing, has aged out, or was never recognised. Sign in again and your projects will be waiting."))
-    (404 . (magnifying-glass
-            (text-onyx-500 dark:text-stone-300)
-            "there is nothing at this address"
-            "The page you asked for is not here. It may have been moved or renamed, or the link that brought you here may be out of date. Everything else is a click away."))
+  '((400 plugs
+     (text-asparagus-700 dark:text-asparagus-300)
+     "that request did not arrive whole"
+     "Something about the request LucidPlan received did not add up, so it was left unread and nothing was changed. Going back a page and trying again usually settles it.")
+    (401 lock-key
+     (text-jeans-blue-700 dark:text-jeans-blue-300)
+     "this page is for signed-in readers"
+     "Projects stay behind a sign-in, and the session this request arrived with is missing, has aged out, or was never recognised. Sign in again and your projects will be waiting.")
+    (404 magnifying-glass
+     (text-onyx-500 dark:text-stone-300) "there is nothing at this address"
+     "The page you asked for is not here. It may have been moved or renamed, or the link that brought you here may be out of date. Everything else is a click away.")
     ;; A request kept so long that the server gave up on it is a refusal the
     ;; framework raises itself, and the page it answers with is empty: a
     ;; reader who waited gets nothing at all unless there is a page here.
-    (408 . (arrow-clockwise
-            (text-asparagus-700 dark:text-asparagus-300)
-            "that request took too long to arrive"
-            "The request was still on its way when LucidPlan stopped waiting for it, so it was left unread and nothing was changed. Sending it again usually settles it."))
-    (500 . (warning
-            (text-redwood-700 dark:text-redwood-300)
-            "something came loose on our side"
-            "LucidPlan hit an error while handling that page and could not finish it. The error has been written to the server's log; nothing you had open was changed. Trying again in a moment often works."))))
+    (408 arrow-clockwise
+     (text-asparagus-700 dark:text-asparagus-300)
+     "that request took too long to arrive"
+     "The request was still on its way when LucidPlan stopped waiting for it, so it was left unread and nothing was changed. Sending it again usually settles it.")
+    (500 warning
+     (text-redwood-700 dark:text-redwood-300)
+     "something came loose on our side"
+     "LucidPlan hit an error while handling that page and could not finish it. The error has been written to the server's log; nothing you had open was changed. Trying again in a moment often works.")))
 
 (define (error-note status)
   "Answer the @code{(glyph tone headline explanation)} a @var{status} is read
@@ -80,7 +79,8 @@ rendered for it would mean."
   (let ((row (assv status error-notes)))
     (cond
       (row (cdr row))
-      ((and (>= status 400) (< status 500))
+      ((and (>= status 400)
+            (< status 500))
        (cdr (assv 400 error-notes)))
       (else (cdr (assv 500 error-notes))))))
 
@@ -103,66 +103,80 @@ sign in."
          ;; A 401 is not a wrong turn, it is a locked door: the first thing
          ;; it should offer is the key, not a map.
          (primary (if (= status 401)
-                      (list "/login" (G_ "sign in") 'sign-in)
-                      (list "/projects" (G_ "browse projects") 'map-trifold))))
+                      (list "/login"
+                            (G_ "sign in")
+                            'sign-in)
+                      (list "/projects"
+                            (G_ "browse projects")
+                            'map-trifold))))
     (html-template G_
                    #:title (format #f "~a" status)
                    #:is-logged-in #f
                    #:proj '()
-                   #:body
-                   `((div (@ (class ,(mk-class '(flex flex-col
-                                                 items-center
-                                                 justify-center
-                                                 gap-6
-                                                 px-3 sm:px-6
-                                                 py-8))))
-                          ,(glass-panel
-                            `((div (@ (class ,(mk-class '(flex flex-row
-                                                          items-center
-                                                          gap-4))))
-                                   ,(icon #:type glyph
-                                          #:icon-css (append tone
-                                                             '(text-5xl)))
-                                   (span (@ (class ,(mk-class
-                                                     (append '(font-sans
-                                                               font-black
-                                                               text-5xl
-                                                               leading-none
-                                                               tracking-tight)
-                                                             tone))))
-                                         ,(format #f "~a" status)))
-                              ,(h1 (G_ headline)
-                                   #:size '(text-2xl)
-                                   #:color '(hg-gradient-text))
-                              ,(p (G_ explanation)
-                                  #:size '(text-md)
-                                  #:weight '(font-light))
-                              (div (@ (class ,(mk-class '(flex flex-row
-                                                          flex-wrap
-                                                          gap-3
-                                                          pt-2))))
-                                   (a (@ (href ,(car primary))
-                                         (class ,(mk-class '(no-underline))))
-                                      ,(icon-button #:icon (caddr primary)
-                                                    #:content (cadr primary)))
-                                   ;; The framework's own `light-button' hands
-                                   ;; `button' a bare symbol where a class
-                                   ;; list is wanted, which makes `mk-class'
-                                   ;; fail on an improper list, so the light
-                                   ;; weight is asked for directly.
-                                   (a (@ (href "/")
-                                         (class ,(mk-class '(no-underline))))
-                                      ,(button (G_ "back to the top")
-                                               #:weight '(font-light)))))
-                            #:frost 3
-                            #:padding '(p-6 sm:p-10)
-                            ;; The card is as wide as the measure the
-                            ;; framework reads prose at, and no wider: a
-                            ;; refusal is a few lines, not a page.
-                            #:classes '(flex flex-col
-                                             gap-5
-                                             w-full
-                                             max-w-prose)))))))
+                   #:body `((div (@ (class ,(mk-class '(flex flex-col
+                                                             items-center
+                                                             justify-center
+                                                             gap-6
+                                                             px-3
+                                                             sm:px-6
+                                                             py-8))))
+                                 ,(glass-panel `((div (@ (class ,(mk-class '(flex
+                                                                             flex-row
+                                                                             items-center
+                                                                             gap-4))))
+                                                      ,(icon #:type glyph
+                                                             #:icon-css (append
+                                                                         tone
+                                                                         '(text-5xl)))
+                                                      (span (@ (class ,(mk-class
+                                                                        (append '
+                                                                         (font-sans
+                                                                          font-black
+                                                                          text-5xl
+                                                                          leading-none
+                                                                          tracking-tight)
+                                                                         tone))))
+                                                            ,(format #f "~a"
+                                                                     status)))
+                                                 ,(h1 (G_ headline)
+                                                      #:size '(text-2xl)
+                                                      #:color '(hg-gradient-text))
+                                                 ,(p (G_ explanation)
+                                                     #:size '(text-md)
+                                                     #:weight '(font-light))
+                                                 (div (@ (class ,(mk-class '(flex
+                                                                             flex-row
+                                                                             flex-wrap
+                                                                             gap-3
+                                                                             pt-2))))
+                                                      (a (@ (href ,(car
+                                                                    primary))
+                                                            (class ,(mk-class '
+                                                                              (no-underline))))
+                                                         ,(icon-button #:icon (caddr
+                                                                               primary)
+                                                                       #:content
+                                                                       (cadr
+                                                                        primary)))
+                                                      ;; The framework's own `light-button' hands
+                                                      ;; `button' a bare symbol where a class
+                                                      ;; list is wanted, which makes `mk-class'
+                                                      ;; fail on an improper list, so the light
+                                                      ;; weight is asked for directly.
+                                                      (a (@ (href "/")
+                                                            (class ,(mk-class '
+                                                                              (no-underline))))
+                                                         ,(button (G_
+                                                                   "back to the top")
+                                                                  #:weight '(font-light)))))
+                                               #:frost 3
+                                               #:padding '(p-6 sm:p-10)
+                                               ;; The card is as wide as the measure the
+                                               ;; framework reads prose at, and no wider: a
+                                               ;; refusal is a few lines, not a page.
+                                               #:classes '(flex flex-col gap-5
+                                                                w-full
+                                                                max-w-prose)))))))
 
 (define (error-page-html status)
   "The whole page for @var{status} as the one string the framework asks a
@@ -175,10 +189,10 @@ is the translator `make-i18n-handler' builds under an empty language and
 which answers every key with the key itself.  That is the same page an
 untranslated LucidPlan shows anywhere else, and the navigation it carries is
 the one a signed-out reader sees, which is who is met by a refusal."
-  (let ((G_ (parameterize ((current-lang "")) (make-i18n-handler))))
-    (call-with-output-string
-     (lambda (port)
-       (sxml->xml (error-page G_ status) port)))))
+  (let ((G_ (parameterize ((current-lang ""))
+              (make-i18n-handler))))
+    (call-with-output-string (lambda (port)
+                               (sxml->xml (error-page G_ status) port)))))
 
 (define (register-error-pages!)
   "Give the four refusals a reader can meet LucidPlan's own page.
@@ -198,5 +212,7 @@ A refusal a proxy in front of LucidPlan writes itself -- a 502 while the
 service restarts, say -- is the proxy's page to write, since it never reaches
 this process at all."
   (for-each (lambda (status)
-              (http-status status (lambda () (error-page-html status))))
+              (http-status status
+                           (lambda ()
+                             (error-page-html status))))
             '(400 401 404 408 500)))

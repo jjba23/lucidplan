@@ -89,7 +89,8 @@
                  (execute-write (db-write (DB-open rc))))
             (execute-write "soft-delete-project"
                            (sql-update 'project
-                                       `((deleted-at unquote (current-time)))
+                                       `((deleted-at unquote
+                                                     (current-time)))
                                        #:where (list (cons 'id id))))
 
             (redirect-to rc
@@ -132,8 +133,7 @@
                               (vcs-url unquote vcs-url)
                               (ticket-statuses unquote
                                                (if ticket-statuses
-                                                   ticket-statuses
-                                                   ""))
+                                                   ticket-statuses ""))
                               (created-at unquote
                                           (current-time))))
             (redirect-to rc
@@ -200,8 +200,7 @@
                                           (title unquote title)
                                           (ticket-statuses unquote
                                                            (if ticket-statuses
-                                                               ticket-statuses
-                                                               ""))
+                                                            ticket-statuses ""))
                                           (updated-at unquote
                                                       (current-time))))
 

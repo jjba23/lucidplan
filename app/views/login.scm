@@ -27,19 +27,19 @@
   #:use-module (ice-9 string-fun)
   #:export (login-page))
 
-(define* (login-page G_ #:key (notices '()))
-  (let* (         (login-form `(form (@ (action "/login")
-                               (class ,(mk-class (append
-                                                  '(w-full rounded-xl
-                                                    p-4
-                                                    flex
-                                                    flex-row
-                                                    flex-wrap
-                                                    items-center
-                                                    align-middle
-                                                    gap-4
-                                                    shadow-md)
-                                                  frosted-tint-classes)))
+(define* (login-page G_
+                     #:key (notices '()))
+  (let* ((login-form `(form (@ (action "/login")
+                               (class ,(mk-class (append '(w-full rounded-xl
+                                                           p-4
+                                                           flex
+                                                           flex-row
+                                                           flex-wrap
+                                                           items-center
+                                                           align-middle
+                                                           gap-4
+                                                           shadow-md)
+                                                         frosted-tint-classes)))
                                (method "POST"))
                             ,(input #:label (G_ "email")
                                     #:name "email"
@@ -55,16 +55,15 @@
                                     #:required #t)
                             (div ,(submit-button (G_ "login")))))
          (reset-form `((form (@ (action "/password/reset")
-                                (class ,(mk-class (append
-                                                   '(w-full rounded-xl
-                                                     p-4
-                                                     flex
-                                                     flex-row
-                                                     flex-wrap
-                                                     items-center
-                                                     items-center
-                                                     gap-4
-                                                     shadow-md)
+                                (class ,(mk-class (append '(w-full rounded-xl
+                                                            p-4
+                                                            flex
+                                                            flex-row
+                                                            flex-wrap
+                                                            items-center
+                                                            items-center
+                                                            gap-4
+                                                            shadow-md)
                                                    frosted-tint-classes)))
                                 (method POST))
                              ,(input #:label (G_ "account to reset (email)")
@@ -99,9 +98,8 @@
                                                                        border-jeans-blue-500/50
                                                                        text-onyx-700
                                                                        dark:text-stone-300)))
-                                                  (role "status"))
-                                               ,notice))
-                                        notices)
+                                                   (role "status"))
+                                                ,notice)) notices)
                                  (div (@ (class ,(mk-class '(w-full flex
                                                                     flex-row
                                                                     flex-wrap
