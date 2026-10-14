@@ -290,6 +290,8 @@
 (define* (html-from-projects G_
                              #:key projects is-logged-in search-query)
   (html-template G_
+                 #:title (G_ "projects")
+                 #:canonical-path "/projects"
                  #:is-logged-in is-logged-in
                  #:body `((div (@ (class ,(mk-class '(px-3 pb-6))))
                                ((div (@ (class ,(mk-class '(flex flex-col
@@ -311,6 +313,8 @@
                                 #:key projects is-logged-in)
   (html-project-form G_
                      #:projects projects
+                     #:page-title (G_ "new project")
+                     #:canonical-path "/projects/new"
                      #:is-logged-in is-logged-in))
 
 (define* (html-edit-project-form G_
@@ -330,6 +334,8 @@
                      #:action (format #f "/projects/id/~a/edit"
                                       (proj-ref project
                                                 'human-id))
+                     #:page-title (G_ "edit project")
+                     #:canonical-path "/projects"
                      #:projects projects))
 
 (define* (html-project-form G_
@@ -340,8 +346,12 @@
                             (vcs-url "")
                             (action "/projects/new")
                             (projects '())
+                            (page-title "")
+                            (canonical-path "/projects")
                             (is-logged-in #f))
   (html-template G_
+                 #:title (if (string-null? page-title) #f page-title)
+                 #:canonical-path canonical-path
                  #:is-logged-in is-logged-in
                  #:body `(div (@ (class ,(mk-class '(px-4 py-4))))
                               (div (form (@ (class ,(mk-class '(flex flex-col

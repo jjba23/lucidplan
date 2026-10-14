@@ -46,7 +46,7 @@
                                 (not (string-prefix? "//" return-to)))
                            return-to
                            "/")))
-          (when (assoc user-lang lucidplan-locales)
+          (when (assoc user-lang (lucidplan-locales))
             (:cookies-set! rc 'lang "lang" user-lang)
             (:cookies-setattr! rc
                                'lang

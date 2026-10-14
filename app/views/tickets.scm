@@ -444,7 +444,10 @@ at the first of them."
                   (onkeydown
                    "if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }")
                   (class ,%list-header-face))
-               ,grab-indicator
+               ;; The grip is what makes a row draggable, and dragging a row
+               ;; reorders the backlog -- a change to the tickets.  It is
+               ;; offered to the same reader the endpoint behind it accepts.
+               ,@(if editable? grab-indicator '())
                ,(emoji-for-ticket-type type)
                (h5 (@ (class ,%list-title-face))
                    ,(org2html (html-unescape title)))
@@ -495,6 +498,7 @@ at the first of them."
 
 (define* (html-from-tickets G_
                             #:key is-logged-in
+                            (can-triage? #f)
                             (current-sort #f)
                             projects
                             project-details
@@ -551,11 +555,12 @@ at the first of them."
                                                            #:search-query
                                                            search-query)))))
 
-         ;; A reader who is signed in triages a ticket from the row it is
-         ;; listed in, exactly as they do from the ticket's own page: it is
-         ;; the same control, offered to the same reader, and it posts to the
-         ;; same endpoint.
-         (triage? (not (nil? is-logged-in)))
+         ;; A reader who may change a ticket triages one from the row it is
+         ;; listed in, exactly as they do from the ticket's own page: the
+         ;; control is offered to the same reader the endpoint would accept
+         ;; -- one who holds the ticket-create permission -- and it posts to
+         ;; that same endpoint.
+         (triage? can-triage?)
 
          ;; List Generators
          ;; Keep the list as it arrived before it is rebound: the binding below
@@ -692,6 +697,8 @@ at the first of them."
     
     ;; Build the final HTML View
     (html-template G_
+                   #:title (format #f "backlog of ~a" proj-title)
+                   #:canonical-path (format #f "/tickets/~a" proj-human-id)
                    #:is-logged-in is-logged-in
                    #:proj projects
                    #:body `(div (@ (class ,(mk-class '(px-2 sm:px-4
@@ -830,6 +837,8 @@ at the first of them."
                     #:project project
                     #:projects projects
                     #:users users
+                    #:page-title (G_ "new ticket")
+                    #:canonical-path (format #f "/tickets/~a/new" project)
                     #:action (format #f "/tickets/~a/new" project)))
 
 (define* (html-edit-ticket-form G_
@@ -855,6 +864,8 @@ at the first of them."
                     #:users users
                     #:priority (assq-ref t
                                          'priority)
+                    #:page-title (G_ "edit ticket")
+                    #:canonical-path (format #f "/tickets/~a" project)
                     #:action (format #f "/tickets/~a/id/~a/edit" project
                                      (assq-ref t
                                                'human-id))
@@ -872,6 +883,8 @@ at the first of them."
                            (is-edit #f)
                            (projects '())
                            (users '())
+                           (page-title "")
+                           (canonical-path "/tickets")
                            (is-logged-in #f))
   
   (let* ( ;Consolidate Reusable CSS Classes
@@ -972,6 +985,8 @@ at the first of them."
     
     ;; Render final template
     (html-template G_
+                   #:title (if (string-null? page-title) #f page-title)
+                   #:canonical-path canonical-path
                    #:is-logged-in is-logged-in
                    #:body `((div (@ (class ,(mk-class '(px-4 py-4))))
                                  ,form-sxml))

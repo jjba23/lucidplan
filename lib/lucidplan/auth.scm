@@ -22,7 +22,8 @@
   #:use-module (bewaking bewaking)
   #:use-module (lucidplan env)
   #:export (back-to-login unauthorized-api-message bewaking-endpoint
-                          bewaking-api-endpoint))
+                          bewaking-api-endpoint session-has-permission?
+                          session-permissions))
 
 (define* (bewaking-endpoint #:key token-name
                             needed-permissions
@@ -79,6 +80,46 @@ executing either happy-flow-thunk or unhappy-flow-thunk."
           (happy-flow))
          (else (unhappy-flow rc)))))
     (else (unhappy-flow rc))))
+
+;; A page and the guards on it must agree about who may do what.  The guard a
+;; writing endpoint is wrapped in refuses a request that does not hold the
+;; permission the write needs, but a page that *offers* the write -- a form,
+;; or the small inline control on a ticket -- is rendered before any request
+;; is made, so it has to ask the same question itself: whose permissions the
+;; session carries.  These two answer that, from the same cookie and the same
+;; token the guard would read, so a control is shown exactly when the endpoint
+;; behind it would accept it.
+
+(define* (session-permissions #:key rc token-name)
+  "Answer the permissions of the request's session, or the empty list when
+it carries no valid session.
+
+@var{token-name} is the cookie name the token travels in, as the guards name
+it.  A missing, malformed or expired token is not an error here -- it is a
+reader who is simply signed out -- so it answers the empty list."
+  (let ((raw (:cookies-value rc (symbol->string token-name))))
+    (if (or (not (string? raw)) (string-null? raw))
+        '()
+        (catch #t
+               (lambda ()
+                 (let ((t (decrypt-token #:token raw
+                                         #:encryption-key encryption-key
+                                         #:signing-key signing-key)))
+                   (if (and t (token-valid? #:token t))
+                       (or (assoc-ref t 'owner-permissions) '())
+                       '())))
+               (lambda _ '())))))
+
+(define* (session-has-permission? #:key rc token-name permission)
+  "Answer @code{#t} when the request's session holds @var{permission}.
+
+The question is asked of @code{session-permissions}, so it is the same
+subset test the guards perform, and a page can decide whether to offer a
+control by the same rule that decides whether the endpoint would honour it."
+  (has-needed-permissions? #:needed (list permission)
+                           #:present (session-permissions #:rc rc
+                                                          #:token-name
+                                                          token-name)))
 
 (define (unauthorized-api-message rc)
   (response-emit '((error . "You must be authenticated to use this API endpoint"))

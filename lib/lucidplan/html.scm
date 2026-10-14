@@ -37,53 +37,53 @@
   #:use-module (artanis i18n locale)
   #:use-module (ice-9 textual-ports)
   #:use-module (orgwebalchemy html)
+  #:use-module (lucidplan config)
   #:use-module (artanis route))
 
 (define-public asset-library
-  (build-asset-library '("pub/js/tickets.js" "pub/js/symbanta.js")))
+  (build-asset-library '("pub/js/tickets.js" "pub/js/symbanta.js"
+                         "pub/js/password-strength.js")))
 
+;; The footer says only what a footer is for: what this instance is, under
+;; which licence, where to read more, and how to get back to the top.  The
+;; instance's own name and the addresses it points at are the operator's, so
+;; they come from the configuration rather than from this file.
 (define-public (page-footer G_)
-  (footer `(,(em (G_ "lucidplan - free project management for everyone")) ,(em
-                                                                            (G_
-                                                                             "lucidplan is free software, available under the GNU AGPL v3 or newer")
-                                                                            #:size '
-                                                                            (text-sm))
-            (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
-                                             items-center items-center))))
-                 ,(em (G_ "find here the:"))
-                 ,(a "source code"
-                     #:href "https://codeberg.org/jjba23/lucidplan"
-                     #:size '(text-sm)))
-            (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
-                                             items-center items-center))))
-                 ,(em (G_ "find here the:"))
-                 ,(a "manual"
-                     #:href "https://jointhefreeworld.org/manuals/lucidplan/"
-                     #:size '(text-sm)))
-            ,(em (G_ "Copyright © Josep Bigorra  &lt;jjbigorra@gmail.com&gt;")
-                 #:size '(text-sm))
-            (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-8
-                                             items-center items-center))))
-                 (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
-                                                  items-center items-center))))
-                      (a (@ (href "javascript:void(0)")
-                            (class ,(mk-class '(no-underline text-onyx-500
-                                                dark:text-stone-300
-                                                cursor-pointer font-light)))
-                            (onclick
-                             "window.scrollTo({ top: 0, behavior: 'smooth' })"))
-                         "⬆️ back to the top"))
-                 (div (@ (class ,(mk-class '(flex flex-row
-                                                  flex-wrap
-                                                  gap-2
-                                                  items-center
-                                                  justify-center
-                                                  items-center))))
-                      ,(em "version:")
-                      ,(mono (format #f "~a"
-                                     (get-short-commit-sha))
-                             #:size '(text-sm)
-                             #:weight '(font-light)))))))
+  (footer
+   `(div (@ (class ,(mk-class '(flex flex-col
+                                     items-center
+                                     gap-2
+                                     px-4 py-6
+                                     text-center))))
+         ,(em (format #f "~a - ~a"
+                        (config-ref 'site-name)
+                        (G_ "free and open project management for everyone"))
+                #:size '(text-sm))
+         (div (@ (class ,(mk-class '(flex flex-row flex-wrap
+                                          items-center justify-center
+                                          gap-x-4 gap-y-1))))
+              ,(a (G_ "about") #:href "/about" #:size '(text-sm))
+              ,(a (G_ "source code")
+                  #:href (config-ref 'source-url)
+                  #:size '(text-sm))
+              ,(a (G_ "manual")
+                  #:href (config-ref 'manual-url)
+                  #:size '(text-sm))
+              (a (@ (href "javascript:void(0)")
+                    (class ,(mk-class '(no-underline
+                                        text-onyx-500
+                                        dark:text-stone-300
+                                        cursor-pointer
+                                        text-sm)))
+                    (onclick "window.scrollTo({ top: 0, behavior: 'smooth' })"))
+                 ,(G_ "back to top")))
+         ,(em (format #f "© ~a - ~a"
+                        (config-ref 'copyright-holder)
+                        (G_ "GNU AGPL v3 or newer"))
+                #:size '(text-sm))
+         ,(mono (format #f "~a" (get-short-commit-sha))
+                #:size '(text-sm)
+                #:weight '(font-light)))))
 
 ;; The classes a surface wears to read as frosted glass.  `hg-frost' is
 ;; hygguile's own frost layer: it paints the blur in a rounded layer of the
@@ -152,9 +152,89 @@ event."
   "Serialize the SXML @var{tree} of a whole page to an HTML string."
   (call-with-output-string (lambda (port) (sxml->xml tree port))))
 
+;;; ===== What a page says about itself to a machine =====
+
+;;; Search engines and link previews read a page through a few tags rather
+;;; than through its prose: a title, a description, a canonical address, the
+;;; Open Graph and Twitter cards that turn a shared link into a preview, and a
+;;; block of JSON-LD that says what the application is.  They are built from
+;;; the instance's configuration rather than written into every view, so a
+;;; self-hosted LucidPlan describes itself in its own name and on its own
+;;; address -- and a page only has to say what makes it that page.
+
+(define (page-title title)
+  "Compose the @code{<title>} of a page from its own @var{title} and the
+instance's name.  A page with no title of its own, and the front page, is
+titled with the instance's name and its tagline."
+  (let ((name (config-ref 'site-name)))
+    (cond
+      ((or (not title) (not (string? title)) (string-null? title))
+       (format #f "~a - ~a" name (config-ref 'site-tagline)))
+      ((string=? title name) name)
+      (else (format #f "~a · ~a" title name)))))
+
+(define (meta-tag name content)
+  "A @code{<meta name=... content=...>} tag."
+  `(meta (@ (name ,name) (content ,content))))
+
+(define (property-tag property content)
+  "A @code{<meta property=... content=...>} tag, the Open Graph spelling."
+  `(meta (@ (property ,property) (content ,content))))
+
+(define* (seo-meta #:key title description canonical-path)
+  "The metadata tags a page carries: a description, a canonical address, an
+Open Graph and Twitter preview, and the JSON-LD that names the application.
+
+@var{canonical-path} is the page's path on this instance; it is turned into
+an absolute URL against the configured @code{site-url} (or the host the
+request arrived on) by @code{absolute-url}.  @var{title} and @var{description}
+fall back to the instance's own when a page has none of its own."
+  (let* ((name (config-ref 'site-name))
+         (desc (if (and (string? description) (not (string-null? description)))
+                   description
+                   (config-ref 'site-description)))
+         (url (absolute-url (or canonical-path "/")))
+         (logo (config-ref 'site-logo))
+         (has-logo (and (string? logo) (not (string-null? logo))))
+         (keywords (config-ref 'site-keywords))
+         (json (scm->json-string
+                `((@context . "https://schema.org")
+                  (@type . "WebApplication")
+                  (name . ,name)
+                  (url . ,url)
+                  (description . ,desc)
+                  (applicationCategory . "BusinessApplication")
+                  (operatingSystem . "Any")
+                  (license . "https://www.gnu.org/licenses/agpl-3.0.html")
+                  (offers . ((@type . "Offer")
+                             (price . "0")
+                             (priceCurrency . "EUR")))))))
+    `(,(meta-tag "description" desc)
+      ,(meta-tag "keywords"
+                 (if (list? keywords) (string-join keywords ", ") keywords))
+      ,(meta-tag "author" (config-ref 'copyright-holder))
+      (link (@ (rel "canonical") (href ,url)))
+      ,(property-tag "og:type" "website")
+      ,(property-tag "og:site_name" name)
+      ,(property-tag "og:title" (page-title title))
+      ,(property-tag "og:description" desc)
+      ,(property-tag "og:url" url)
+      ,(property-tag "og:locale" (config-ref 'site-language))
+      ,@(if has-logo
+            `(,(property-tag "og:image" logo)
+              ,(property-tag "og:image:alt" name)
+              ,(meta-tag "twitter:image" logo))
+            '())
+      ,(meta-tag "twitter:card" (if has-logo "summary_large_image" "summary"))
+      ,(meta-tag "twitter:title" (page-title title))
+      ,(meta-tag "twitter:description" desc)
+      (script (@ (type "application/ld+json")) ,json))))
+
 (begin
   (define* (html-template G_
-                          #:key (title "LucidPlan")
+                          #:key (title #f)
+                          (description #f)
+                          (canonical-path "/")
                           body
                           (proj '())
                           (is-logged-in #f))
@@ -227,7 +307,7 @@ event."
                                                             hover:text-white
                                                             dark:hover:text-white))
                                          "&nbsp;"
-                                         `(span ,(G_ "LucidPlan")))
+                                         `(span ,(config-ref 'site-name)))
                                    #:color '(text-stone-300
                                              dark:text-stone-300
                                              hover:text-white
@@ -310,6 +390,27 @@ event."
                                             #:icon-css '(text-md text-onyx-700
                                                          dark:text-stone-300)))
 
+                           ;; About Link
+                           (a (@ (class ,(mk-class '(lowercase no-underline
+                                                     font-sans
+                                                     font-medium
+                                                     flex
+                                                     items-center
+                                                     hover:opacity-80)))
+                                 (href "/about"))
+                              ,(icon-button #:icon 'info
+                                            #:content (G_ "about")
+                                            #:size '(text-sm md:text-md)
+                                            #:extra-classes '(py-1
+                                                              px-2
+                                                              md:px-3
+                                                              max-w-prose
+                                                              cursor-pointer
+                                                              text-onyx-700
+                                                              dark:text-stone-300)
+                                            #:icon-css '(text-md text-onyx-700
+                                                         dark:text-stone-300)))
+
                            ;; Theme Toggle
                            ,(ui-mode-button #:icon ""
                                             #:size '(text-md)
@@ -360,9 +461,12 @@ event."
       
       ;; Output Page
       (render-page
-       `(,doctype-html (html (@ (lang en))
-                            (head (title "LucidPlan")
+       `(,doctype-html (html (@ (lang ,(config-ref 'site-language)))
+                            (head (title ,(page-title title))
                                   ,(hygguile-recommended-meta)
+                                  ,@(seo-meta #:title title
+                                              #:description description
+                                              #:canonical-path canonical-path)
                                   ,(hygguile-recommended-resources #:fonts (custom-fonts))
 
                                   (link (@ (rel "shortcut icon")
@@ -391,7 +495,9 @@ event."
                                   (script ,(assoc-ref asset-library
                                                       "pub/js/symbanta.js"))
                                   (script ,(assoc-ref asset-library
-                                                      "pub/js/tickets.js")))
+                                                      "pub/js/tickets.js"))
+                                  (script ,(assoc-ref asset-library
+                                                      "pub/js/password-strength.js")))
                             (body (@ (class ,(mk-class '(min-h-screen
                                                          bg-stone-100
                                                          dark:bg-onyx-900
@@ -705,11 +811,15 @@ function addSearchQueryParam(form) {
 ;; The list is the page's -- it is what a reader is offered -- so a catalog
 ;; added under that directory is offered here, and one removed stops being
 ;; offered.  See `sys/i18n/locale' and `maak i18n-compile'.
-(define-public lucidplan-locales
-  '(("en_US" . "English (US)")
-    ("nl_NL" . "Nederlands")
-    ("es_ES" . "Español")
-    ("ja_JP" . "日本語")))
+(define-public (lucidplan-locales)
+  "Answer the languages this instance offers its readers, as a list of
+@code{(catalog-name . the-language-as-it-names-itself)} pairs.
+
+The list is configuration: a deployment sets @code{locales} in its env module
+and so changes what the language control offers, or leaves the languages that
+ship with LucidPlan.  Every catalog named here must exist under
+@code{sys/i18n/locale}; see @code{maak i18n-compile}."
+  (config-ref 'locales))
 
 (define* (locale-choose-form G_
                              #:key selected-locale return-to)
@@ -784,7 +894,7 @@ reaches assistive technology as well."
                                     (option #:value (car locale)
                                             #:content (cdr locale)
                                             #:selected-value selected-locale))
-                                  lucidplan-locales))
+                                  (lucidplan-locales)))
           ,(icon-button #:icon 'check
                         #:content ""
                         #:type 'submit

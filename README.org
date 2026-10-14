@@ -1,9 +1,8 @@
-#+title: LucidPlan
+#+title: LucidPlan - Manual & Documentation
 #+author: Josep Bigorra
 #+email: jjbigorra@gmail.com
 #+language: en
-#+options: toc:nil
-
+#+options: toc:2
 
 [[https://jointhefreeworld.org/ggg/dist/scheme-guile.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-guix.svg]]   [[https://jointhefreeworld.org/ggg/dist/maak.svg]]
 [[https://jointhefreeworld.org/ggg/dist/license-agpl3+.svg]]    [[https://jointhefreeworld.org/ggg/dist/license-fdl13+.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-artanis.svg]] [[https://jointhefreeworld.org/ggg/dist/jointhefreeworld-org.svg]]
@@ -13,13 +12,17 @@
 
 LucidPlan is a project management for teams of all sizes and jobs.
 
-It's a flexible system made to simplify everyone's life, accessbile to all kinds of users.
+It's a flexible system made to simplify everyone's life, accessible to all kinds of users.
 
 If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
 
----------------
+This is both the project's README and its manual: the two documents were merged into one, so there is a single place to read and a single place to keep in step. The published HTML manual at [[https://jointhefreeworld.org/manuals/lucidplan/index.html]] is this file exported.
 
-LucidPlan enhances the use of Agile work methodologies in teams due to its fast-paced no nonesense-workflows and customizability, also thanks to being written in Lisp.
+------------------
+
+* Overview
+
+LucidPlan enhances the use of Agile work methodologies in teams thanks to its fast-paced, no-nonsense workflows and deep customizability, also thanks to being written in Lisp.
 
 This tool is the fruit of years of experience using bloated proprietary systems like Jira/Trello, and experiencing the insane frustrations they bring.
 
@@ -30,6 +33,10 @@ This is free software (free as in freedom), licensed under the GNU Affero Genera
 
 Built with [[https://www.gnu.org/software/guile/][Guile Scheme]] and [[https://artanis.dev/][GNU Artanis]], [[https://sqlite.org/][SQLite]], [[https://codeberg.org/jjba23/olive-css][Olive CSS]] and some small sprinkles of vanilla JavaScript.
 
+------------------
+
+* Features
+
 LucidPlan provides a comprehensive suite of tools to keep your projects organized:
 
 - *Multi-Project Workspaces*: Easily manage dozens of repositories or projects from a single unified dashboard. Features a quick-access "go to" dropdown and search functionality to navigate between contexts instantly.
@@ -37,16 +44,18 @@ LucidPlan provides a comprehensive suite of tools to keep your projects organize
 - *Kanban Boards*: Visualize your workflow with built-in Kanban boards. Effortlessly track tickets and drag and drop as they move through columns like =To-do=, =Work in Progress=, and =In Review=.
 - *Clean and Distraction-Free UI*: A minimalist and accessible interface built with [[https://codeberg.org/jjba23/olive-css][Olive CSS]], featuring global search, quick project creation, and a toggleable light/dark mode to suit your preferences.
 - *Granular User Management*: Add, edit, and manage team members with ease. Permissions are handled using native Lisp lists (e.g., =`(lucidplan:ticket-create lucidplan:project-delete)=), allowing for incredibly fine-grained, programmatic access control, effectively providing an easy to use ACL with which you can control exactly what each user can/cannot do.
-- *Org mode support* : Titles and descriptions can be written using Org mode syntax, which enables more advanced media. This Org text gets automatically rendered to attractive HTML.
-- *Fully Customizable:* Hack the behavior and content of everything with simple Lisp (Scheme) code.
-- *Cross-platform:* Runs anywhere that Guile Scheme can run, and exposes web endpoints, and is thus accessible from computers, phones, etc.
+- *Org mode support*: Titles and descriptions can be written using Org mode syntax, which enables more advanced media. This Org text gets automatically rendered to attractive HTML.
+- *Fully Customizable*: Everything an instance says about itself -- its name, its description, its footer, the address mail is sent from -- is configuration, and the behaviour and content of everything else can be hacked with simple Lisp (Scheme) code.
+- *Cross-platform*: Runs anywhere that Guile Scheme can run, and exposes web endpoints, and is thus accessible from computers, phones, etc.
 - *Free Software*: Contribute to its development or extend it with your own custom features.
 
 [[https://jointhefreeworld.org/static-assets/lucidplan/lucidplan-showcase.gif]]
 
 ------
 
-* Backlog Management
+* Using LucidPlan
+
+** Backlog Management
 
 LucidPlan provides several ways to organize and work with tickets directly from the web interface. Ticket management is designed around fast, simple interactions.
 
@@ -64,7 +73,7 @@ Each ticket contains an expandable details section containing information such a
 - project/ticket identifier;
 - edit and delete actions.
 
-* Kanban Management
+** Kanban Management
 
 The Kanban board also provides a drag-and-drop interaction. Dragging a ticket onto another Kanban column changes its status.
 
@@ -74,12 +83,331 @@ For example, a ticket can be moved from:
 To-do → Work in Progress → In Review → Done
 #+end_example
 
-
-* Keyboard Accessibility
+** Keyboard Accessibility
 
 Ticket and project lists are fully keyboard accessible using =Tab= navigation with ~Enter~ or ~Space~ for toggling visibility. The UI aims to be accessible to all kinds of users and usage patterns.
 
----------------
+** Practical usage tips
+
+Using LucidPlan is made to be easy and simple; here are some tips that might help you out.
+
+In any ~title~ or ~description~ field you can use the Org mode syntax (like in the Emacs Org mode) and LucidPlan will automatically convert your markup to pretty HTML.
+
+** How the pages treat a reader who is not signed in
+
+LucidPlan is readable before it is writable. A signed-out reader can browse the front page, the about page, every project's backlog and board, and each ticket -- but every page that exists to submit or change something is behind the permission that change actually needs, and turns the reader away *before* they fill in a form that could only ever refuse them.
+
+The pages that create or edit something ask for the same permission their write does:
+
+- creating or editing a project -- ~lucidplan:project-create~;
+- creating or editing a ticket -- ~lucidplan:ticket-create~;
+- managing users -- ~lucidplan:modify-permissions~.
+
+The small inline controls on a ticket (its status and type) are shown to exactly the readers the endpoint behind them would accept, so a reader who holds the permission sees the control and a reader who does not sees the read-only badge.
+
+------------------
+
+* Running LucidPlan yourself
+
+If you are thinking of running LucidPlan yourself and hosting it on your own, this section walks through it from an empty machine to a working instance with a first user and their team.
+
+** Prerequisites
+
+LucidPlan is built with [[https://www.gnu.org/software/guile/][GNU Guile]] and [[https://artanis.dev/][GNU Artanis]], and the project is developed and deployed with [[https://guix.gnu.org/][GNU Guix]]. Guix is the easy way in: the repository ships a ~manifest.scm~ that pins every dependency, including the Scheme libraries LucidPlan is built on ([[https://codeberg.org/jjba23/hygguile][hygguile]], [[https://codeberg.org/jjba23/kracht][kracht]], [[https://codeberg.org/jjba23/scriba][scriba]], [[https://codeberg.org/jjba23/bewaking][bewaking]] and [[https://codeberg.org/jjba23/orgwebalchemy][orgwebalchemy]]).
+
+Make sure you have the Guix package manager, whether as a standalone distro (Guix System) or on top of any other GNU/Linux distribution.
+
+If you want to run without Guix, read ~manifest.scm~ anyway: it lists exactly the packages you need. In some systems and situations you might also need to set a locale variable, like ~LC_ALL="en_US.utf8"~.
+
+** Getting the code and entering the environment
+
+#+begin_src sh
+git clone https://codeberg.org/jjba23/lucidplan.git
+cd lucidplan
+# Open a shell with every dependency the project pins:
+guix shell -m manifest.scm
+# ...or, to build from the exact Guix revision the project is tested against:
+guix time-machine -C channels.scm -- shell -m manifest.scm
+#+end_src
+
+Everything below is meant to be run inside that shell. The tasks themselves are declared in ~maak.scm~ and run with [[https://codeberg.org/jjba23/maak][maak]]; ~maak --list~ shows them all.
+
+** Configuring the instance
+
+An instance keeps its private configuration in a module called ~(lucidplan env)~, which LucidPlan loads at start-up from a file named ~env.scm~ in the root of the project. That file is *per-deployment and must not be committed* (it is already in ~.gitignore~). Create it:
+
+#+begin_src scheme
+(define-module (lucidplan env))
+
+;; -- Secrets: unique to this deployment ------------------------------
+
+;; Encrypts the session token. Generate a fresh UUID for each key.
+(define-public encryption-key "a2ebe4c5-4a78-4490-af83-cfb05a285bf9")
+(define-public signing-key "8d3a5bcc-973e-4f80-aa3d-33be33d6631c")
+
+;; -- Mail: how password resets and invites are delivered ---------------
+;; Pingwing is a mail and notification service written in Guile Scheme,
+;; also part of the jointhefreeworld project. Find it at
+;; https://codeberg.org/jjba23/pingwing -- without it, invites and
+;; password resets cannot be delivered.
+(define-public pingwing-url "https://pingwing.example.org")
+(define-public pingwing-basic-auth-user "my-user")
+(define-public pingwing-basic-auth-password "my-password")
+
+;; -- Site: what this instance says about itself ------------------------
+;; Every value below is optional; omit any line to keep LucidPlan's
+;; default. See the table further down for the whole list.
+(define-public site-name "LucidPlan")
+(define-public site-url "https://lucidplan.example.org")
+(define-public contact-email "admin@example.org")
+(define-public copyright-holder "Your Name or Organisation")
+#+end_src
+
+Every key above is read by ~(lucidplan config)~ at start-up: a value defined in the env module wins, and anything you leave out falls back to the default that ships with LucidPlan. See [[*Instance configuration keys][Instance configuration keys]] for the full list.
+
+If you run LucidPlan locally, it is recommended to use ~localhost~ rather than ~127.0.0.1~, as this works better with the authentication, authorization and other cookies.
+
+** Instance configuration keys
+
+All of these may be set in ~env.scm~ as ~define-public~ values of the same name.
+
+#+begin_src scheme
+;; What the instance is called and how it introduces itself
+site-name              ; "LucidPlan"
+site-tagline           ; "free and open project management for everyone"
+site-description       ; one sentence, used as the meta description and in link previews
+site-keywords          ; a list of strings, used as the page keywords
+site-url               ; canonical base address, e.g. "https://lucidplan.example.org"
+site-logo              ; absolute URL to the image link previews show
+site-language          ; the <html lang="..."> value, e.g. "en"
+
+;; Who to credit and how to reach them
+copyright-holder
+contact-email
+source-url             ; link to this instance's source code
+manual-url             ; link to this instance's documentation
+donate-url
+social-links           ; a list of (label . url) pairs shown on the about page
+
+;; What the about page says (Org-mode text)
+about-org
+
+;; Mail
+mail-sender-name       ; "No Reply - LucidPlan"
+mail-sender-address    ; the address notifications are sent from
+mail-subject-prefix    ; e.g. "LucidPlan - "
+mail-retry-attempts    ; how many times to try handing a message over
+mail-retry-delay       ; seconds to wait before the first retry (doubles each try)
+
+;; Accounts and passwords
+password-reset-validity  ; how long a reset link stays good, in seconds
+password-min-score       ; accepted password strength, 0 (very weak) .. 4 (very strong)
+
+;; The languages the interface offers, as (catalog-name . name-in-that-language)
+locales
+#+end_src
+
+** The database
+
+LucidPlan needs a database in the root folder of the project (alongside ~app~, ~lib~, etc.). It uses SQLite by default, and is also compatible with PostgreSQL and MySQL.
+
+If you use SQLite you should enable WAL mode for concurrent writes. The ~maak~ task does that for you (and creates the file):
+
+#+begin_src sh
+maak init-db
+#+end_src
+
+Schema migrations are managed with [[https://codeberg.org/jjba23/mutastructura][mutastructura]]. See ~resources/migrations/sqlite/~ for the migration files. A migration is plain SQL, applied in filename order:
+
+#+begin_src sh
+# Apply the migrations, e.g.:
+for f in resources/migrations/sqlite/*.sql; do
+  sqlite3 lucidplan.db < "$f"
+done
+#+end_src
+
+** Creating the first super-user
+
+A brand-new LucidPlan has no users at all, and the user-management pages need a user to reach them -- so the very first account is seeded directly into the database, by hand.
+
+A super-user is simply a user whose permission list contains ~lucidplan:modify-permissions~: that permission lets its holder grant every other permission to themselves and to others, so it is the root of the whole ACL.
+
+1. Pick a password and a salt (any string works; the salt just has to be kept with the account).
+2. Compute the stored password, which is the *SHA-256 of =password + salt=* (password first, salt appended, no separator). You can compute it from the same shell you run the project in:
+
+#+begin_src sh
+# With the exact Guile the project uses (inside `guix shell -m manifest.scm`):
+guile -c '(use-modules (artanis security nss)) (display (string->sha-256 (string-append "my-password" "my-personal-salt"))) (newline)'
+#+end_src
+
+3. Insert the row:
+
+#+begin_src sql
+INSERT INTO "user" (
+    id,           -- any unique UUID for this account
+    username,
+    email,        -- the address you will sign in with
+    password,     -- the SHA-256 computed above
+    salt,         -- the salt you used above
+    permissions   -- a back-quoted Lisp list of symbols
+) VALUES (
+    '2f6a4d3e-1c2b-4a5f-9e8d-0b7c6a5d4e3f',
+    'Joe',
+    'you@example.org',
+    'the-sha256-you-computed',
+    'my-personal-salt',
+    '`(lucidplan:modify-permissions lucidplan:ticket-create lucidplan:ticket-delete lucidplan:project-create lucidplan:project-delete lucidplan:user-create lucidplan:user-delete)'
+);
+#+end_src
+
+The ~permissions~ column is read back with Lisp's ~eval-string~, so it must be the *text of a back-quoted list* -- that is, it starts with a backtick (`` ` ``) and contains a Scheme list of the ~lucidplan:...~ symbols. The list above is the full set; give the super-user all of them.
+
+#+begin_src sh
+sqlite3 lucidplan.db "INSERT INTO \"user\" (id, username, email, password, salt, permissions) VALUES ('2f6a4d3e-1c2b-4a5f-9e8d-0b7c6a5d4e3f','Joe','you@example.org','THE_SHA256','my-personal-salt','\`(lucidplan:modify-permissions lucidplan:ticket-create lucidplan:ticket-delete lucidplan:project-create lucidplan:project-delete lucidplan:user-create lucidplan:user-delete)');"
+#+end_src
+
+** Running it
+
+If you are hacking away at the project, use the development target: it runs the server with hot-reloading, using the default ~artanis.conf~ where hostname, database path, etc. are configured.
+
+#+begin_src sh
+maak dev      # hot-reloading development server (alias: maak hr)
+maak server   # plain server with the default configuration
+#+end_src
+
+For production, use the production configuration (which sets the real host name) and, ideally, run LucidPlan as a Shepherd service so it starts on boot and is restarted if it falls over.
+
+#+begin_src sh
+maak production-server
+#+end_src
+
+Here follows an example Shepherd service for a Guix System:
+
+#+begin_src scheme
+(define-module (wolk-jjba lucidplan)
+  #:use-module (gnu)
+  #:use-module (guix))
+
+(use-service-modules shepherd)
+
+(define-public (wolk-jjba-lucidplan-service config)
+  (list (shepherd-service (documentation "Run lucidplan as a daemon")
+                          (provision '(lucidplan))
+                          (requirement '())
+                          (start #~(make-forkexec-constructor '("maak"
+                                                                "production-server")
+                                    #:directory
+                                    "/etc/lucidplan/job-clone/lucidplan/trunk"
+                                    #:environment-variables '("GUILE_LOAD_PATH=/run/current-system/profile/share/guile/site/3.0"
+                                                              "GUILE_DBD_PATH=/run/current-system/profile/lib"
+                                                              "C_INCLUDE_PATH=/run/current-system/profile/include"
+                                                              "GUILE_LOAD_COMPILED_PATH=/run/current-system/profile/lib/guile/3.0/site-ccache:/run/current-system/profile/share/guile/site/3.0"
+                                                              "LIBRARY_PATH=/run/current-system/profile/lib"
+                                                              "GIT_SSL_NO_VERIFY=1"
+                                                              "PATH=/run/privileged/bin:/run/current-system/profile/bin:/run/current-system/profile/sbin")))
+                          (stop #~(make-kill-destructor))
+                          (auto-start? #t)
+                          (respawn? #t))))
+
+(define-public wolk-jjba-lucidplan-service-type
+  (service-type (name 'lucidplan)
+                (description "Run lucidplan as a daemon")
+                (extensions (list (service-extension
+                                   shepherd-root-service-type
+                                   wolk-jjba-lucidplan-service)))
+                (default-value '())))
+
+
+#+end_src
+
+** Creating the other users
+
+Once you can sign in as the super-user, the rest of the team is created from the interface, not from SQL:
+
+1. Sign in at ~/login~ with the super-user you seeded.
+2. Open *user management* (the ~/users/manage~ page, linked from your profile page at ~/me~).
+3. Press *new user*, give the account a username and an email, tick the permissions it should hold, and create it.
+
+A new account is created with *no password*. Instead, LucidPlan sends its owner an email containing a one-time link (a password reset) with which they set their own password. An account is therefore created by the operator and *claimed* by its owner -- the operator never chooses somebody else's password.
+
+For that email to arrive, the mail service (~pingwing-url~ and its credentials, above) has to be configured and reachable. If a message could not be delivered, the account still exists and the invite can be sent again: on the user-management page every account has a *resend invite* button, and the page tells you plainly when a message failed to go out. Messages are also retried a few times before giving up.
+
+To give a single person the ability to manage users, tick ~lucidplan:modify-permissions~ for them. To let someone create and edit tickets but nothing else, tick only ~lucidplan:ticket-create~.
+
+** Host name, TLS and search engines
+
+For a public instance, point ~host.name~ (in ~conf/production.conf~) at your domain and put LucidPlan behind a reverse proxy that terminates TLS, since the session cookie is set ~secure~ and will not be stored over plain HTTP. Set ~site-url~ in ~env.scm~ to the public address so the canonical links and preview images are absolute.
+
+Search-engine basics are handled for you: every page carries a title, a description, a canonical address and Open Graph/Twitter preview tags, plus a JSON-LD block describing the application. ~/robots.txt~ is generated and points at a ~/sitemap.xml~ that lists the public pages (the front page, the about page, the project list, and each project's backlog and board).
+
+** Translations
+
+The interface is translated with gettext. The catalogs live under ~sys/i18n/locale/~. When you add translatable strings (they are written as ~(G_ "...")~), refresh and compile the catalogs:
+
+#+begin_src sh
+maak i18n-update-template   # collect new strings into the .pot template
+maak i18n-merge             # merge the template into every .po
+maak i18n-compile           # compile the .po files into the .mo the server reads
+#+end_src
+
+The languages offered in the interface are configuration: set ~locales~ in ~env.scm~ to the catalogs you actually have.
+
+------------------
+
+* Authentication, Authorization, User management
+
+[[https://codeberg.org/jjba23/bewaking][bewaking]] 🔗 is a nice library to help you secure your web applications with Guile Scheme.
+
+With bewaking we use secure tokens encrypted and stored in secure cookies (for browsers) and headers (for REST API) as well as authentication and authorization, with ACLs (access control list) and fine-grained permissions.
+
+If you want to be a super user/root user in lucidplan your token's permissions list will need to contain the ~lucidplan:modify-permissions~ permission, effectively meaning you can give yourself and others all wanted permissions and do everything.
+
+LucidPlan's permission model ACL:
+- ~lucidplan:ticket-create~
+- ~lucidplan:ticket-delete~
+- ~lucidplan:project-create~
+- ~lucidplan:project-delete~
+- ~lucidplan:user-create~
+- ~lucidplan:user-delete~
+- ~lucidplan:modify-permissions~
+
+LucidPlan requires an authenticated session for performing administrative tasks such as creating/deleting tickets and projects. For web browsers you can simply use the login page; for scripts and headless usage, use the ~/api/v1/login~ endpoint and take the ~x-bewaking-lucidplan~ response header.
+
+** Useful query
+
+#+begin_src sql
+-- INSERT INTO "user" (
+--     username,
+--     email,
+--     password,
+--     salt,
+--     permissions
+-- ) VALUES (
+--     'Joe',
+--     'jjbigorra@gmail.com',
+--
+-- you should compute a
+-- SHA-256 hash of (password + salt)
+--
+--     'e3b0c44298fc1c149afbf4c.....5',
+--     'my-personal-salt',
+--
+-- here we pass the list of permissions
+-- as a backquoted Lisp list of symbols
+--
+--     '`(lucidplan:modify-permissions lucidplan:ticket-create lucidplan:ticket-delete lucidplan:project-create lucidplan:project-delete lucidplan:user-create lucidplan:user-delete)'
+-- );
+#+end_src
+
+------------------
+
+* On accessibility
+
+We believe creating accessible websites for everyone, including people with disabilities, is crucial for equality and helps provide a good user experience.
+
+LucidPlan chooses lots of its UI to appeal to the widest public possible by default, but is very configurable to allow extensibility.
+
+------------------
 
 * Licensing
 
@@ -91,16 +419,7 @@ The documentation and examples, including this document, which are provided with
 
 https://www.gnu.org/licenses/fdl-1.3.html
 
---------
-
-* LucidPlan Manuals
-
-I strive to provide proper and extensive documentation on LucidPlan, available at your convenience.
-
-- Org format [[file:docs/manual/en.org]]
-- Online HTML: https://jointhefreeworld.org/manuals/lucidplan/index.html
-
---------
+------------------
 
 * AI Policy
 
@@ -122,27 +441,23 @@ https://jointhefreeworld.org/blog/articles/personal/jointhefreeworld-code-of-con
 
 In summary, we foster an inclusive, respectful, and cooperative environment for all contributors and users of this free software project. Inspired by the ideals of the GNU Project, we strive to uphold freedom, equality, and community as guiding principles. We believe that collaboration in a community of mutual respect is essential to creating excellent free software.
 
---------
-
-[[https://jointhefreeworld.org/static-assets/lucidplan/img/logo-small.jpg]]
-
--------
+------------------
 
 * About this Project and Contributing
 
 Contributing to free software (as in freedom) is a uniquely beautiful act because it embodies principles of generosity, collaboration, and empowerment.
 
-Feel free to open an issue on this [[https://codeberg.org/jjba23/lucidplan][repository's homepage]] or in LucidPlan
+Feel free to open an issue on this [[https://codeberg.org/jjba23/lucidplan][repository's homepage]] or in LucidPlan.
 
 We welcome everyone to feel invited to the LucidPlan Project.
 
-We encourage active contribution in all forms, to improve it and/or suggest improvements, report issues, brainstorm with me, make it more modular/flexible, etc,
+We encourage active contribution in all forms, to improve it and/or suggest improvements, report issues, brainstorm with me, make it more modular/flexible, etc.
 
-Feel free to open issue on tracker, on Git / Codeberg repository, or mail me <jjbigorra@gmail.com> to chat, discuss or report feedback.
+Feel free to open an issue on the tracker, on the Git / Codeberg repository, or mail me <jjbigorra@gmail.com> to chat, discuss or report feedback.
 
-See here the [[https://lucidplan.jointhefreeworld.org/tickets/lucidplan][Backlog and Kanban]]  for this project.
+See here the [[https://lucidplan.jointhefreeworld.org/tickets/lucidplan][Backlog and Kanban]] for this project.
 
--------
+[[https://jointhefreeworld.org/static-assets/lucidplan/img/logo-small.jpg]]
 
 ** On Lucida fonts
 
@@ -150,9 +465,7 @@ Lucida fonts are proprietary typefaces originally developed by Bigelow & Holmes.
 
 You may use these font files under principles of fair use or for local development and non-commercial purposes, provided it is not for profit and used without securing a proper commercial license where required by law. Users and contributors are solely responsible for ensuring their usage complies with applicable software licensing terms and intellectual property rights.
 
--------
-
-* On Reproducibility: Why GNU Guix?
+** On Reproducibility: Why GNU Guix?
 
 A build should never fail because "it worked on my machine." Reliable software development requires explicit, bit-for-bit reproducibility and a functional approach to package management and system deployment.
 
@@ -167,3 +480,29 @@ A build should never fail because "it worked on my machine." Reliable software d
 - *Time Travel:* Rebuild the exact system state from any point in git history using ~guix time-machine~.
 - *Atomic Operations:* Instantly upgrade or roll back environments without leaving orphaned dependencies or broken states.
 - *Unified Tooling:* One tool manages development shells, isolated containers, package builds, and full system configurations.
+
+** On GNU Artanis
+
+Find the documentation for Artanis here: https://www.gnu.org/software/artanis/manual/
+
+GNU Artanis is the first production-level modern Web framework of the Scheme programming language.
+
+It is designed and maintained to be robust, fast, and easy to use for professional web development.
+
+Here lies not just a framework, but a canvas where your ideas take flight with remarkable speed and grace. Artanis isn't about wrestling with complexity; it's about the joy of creation.
+
+It's about harnessing the power of a robust and mature language to build something truly your own, something beautiful, nimble, flexible, powerful, efficient, understandable and maintainable. GNU Artanis was Certificated as Awesome Project at 2013 Lisp in summer projects.
+
+One day, the folks at GNU were discussing what language they would write the GNU website in - and many chose Python. But I found that strange, because the official extension language of GNU is GNU Guile. And I wondered aloud - why not start a brand new project to provide a web framework written with GNU Guile? To which RMS said, "It's cool, I like this idea."
+
+But at that time, it was just an idea without a plan.
+
+Fortunately, a few months later, the Guile community held a hack-potluck to celebrate Guile2 turning two - which is a contest to write a cool program in a few weeks. And so, Artanis was born.
+
+History:
+
+    February 2013 - Artanis born at the GNU Guile hack-potluck.
+    2013 - Artanis submitted to "Lisp In Summer Projects" contest. Received "Certificated awesome project" award in 2014.
+    1st January, 2015 - the first stable version Artanis-0.0.1 was released.
+    19th January, 2015 - offers Artanis to FSF/GNU, and RMS inducts it as an official GNU project. Artanis becomes GNU Artanis.
+    29 December 2021 - GNU Artanis donates to HardenedLinux community to connect with product environment more tightly.

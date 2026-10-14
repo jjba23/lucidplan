@@ -37,20 +37,19 @@
   (define execute-read
     (db-read conn))
 
+  ;; The row is answered whole: a caller needs the user the token belongs to
+  ;; *and* when the token was made, and the two are read back by name -- the
+  ;; earlier shape, a bare `(token . user-id)' cons, dropped the timestamp the
+  ;; caller then looked for, so every reset link answered as invalid.
   (define (get-password-reset-by-token token)
-    (let* ((rows (execute-read
-                  "get-password-reset-by-token"
-                  (sql-select 'password_reset
-                              #:columns columns
-                              #:where (list (cons 'reset-token token))
-                              #:limit 1)))
-           (mapped-rows (map (lambda (r)
-                               (cons (assq-ref r
-                                               'reset-token)
-                                     (assq-ref r
-                                               'user-id))) rows)))
-      (if (nil? mapped-rows) #f
-          (car mapped-rows))))
+    (let ((rows (execute-read
+                 "get-password-reset-by-token"
+                 (sql-select 'password_reset
+                             #:columns columns
+                             #:where (list (cons 'reset-token token))
+                             #:limit 1))))
+      (if (nil? rows) #f
+          (car rows))))
 
   (define (delete-password-reset-by-user-id user-id)
     (execute-write "delete-password-reset-by-user-id"

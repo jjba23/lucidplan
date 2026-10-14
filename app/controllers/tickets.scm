@@ -159,7 +159,19 @@
                                                     #:with-done with-done
                                                     #:with-rejected
                                                     with-rejected
-                                                    #:search-query user-search)))))
+                                                    #:search-query user-search
+                                                    ;; Whether a ticket's row
+                                                    ;; offers its inline triage
+                                                    ;; controls is the same
+                                                    ;; question the endpoint
+                                                    ;; behind them answers.
+                                                    #:can-triage?
+                                                    (session-has-permission?
+                                                     #:rc rc
+                                                     #:token-name
+                                                     'x-bewaking-lucidplan
+                                                     #:permission
+                                                     'lucidplan:ticket-create))))))
        (get)))
 
 (get "/tickets/:project/new"
@@ -181,7 +193,11 @@
                                                                   "project")
                                                        #:users (get-id-to-username
                                                                 user-repo))))))
-       (get-new)))
+       (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                          #:needed-permissions '(lucidplan:ticket-create)
+                          #:rc rc
+                          #:happy-flow get-new
+                          #:unhappy-flow back-to-login)))
 
 (post "/tickets/:project/delete"
       #:mime 'xml
@@ -308,7 +324,11 @@
                                                         #:is-logged-in (:cookies-value
                                                                         rc
                                                                         "x-bewaking-lucidplan"))))))
-       (get-edit)))
+       (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                          #:needed-permissions '(lucidplan:ticket-create)
+                          #:rc rc
+                          #:happy-flow get-edit
+                          #:unhappy-flow back-to-login)))
 
 (post "/tickets/:project/reorder"
       #:mime 'json
@@ -541,11 +561,24 @@
                                              #f
                                              (assq-ref ticket-assignee-user
                                                        'username))
-                              #:editable? (:cookies-value
-                                           rc
-                                           "x-bewaking-lucidplan"))))
+                              ;; The card offers its inline controls to the
+                              ;; same reader the endpoint behind them would
+                              ;; accept: holding the permission, not merely
+                              ;; being signed in.
+                              #:editable? (session-has-permission?
+                                           #:rc rc
+                                           #:token-name
+                                           'x-bewaking-lucidplan
+                                           #:permission
+                                           'lucidplan:ticket-create))))
            (response-emit (:mime rc
                                  (html-template (:i18n rc)
+                                                #:title (assq-ref t 'title)
+                                                #:canonical-path
+                                                (format #f
+                                                 "/tickets/~a/id/~a"
+                                                 (params rc "project")
+                                                 (params rc "human-id"))
                                                 #:is-logged-in (:cookies-value
                                                                 rc
                                                                 "x-bewaking-lucidplan")
@@ -565,4 +598,15 @@
                                                                           (p-2))))
                                                               ,ticket-card)
                                                          ,@quiet-notice))))))
-       (get-single)))
+       ;; An address naming a ticket that does not exist is a wrong turn, not
+       ;; a page: the reader is sent back to the backlog they came from
+       ;; rather than shown a ticket with nothing in it.
+       (let ((ticket-repo (make-sqlite-ticket-repository rc)))
+         (if (get-ticket-by-project-human-id-and-human-id
+              ticket-repo (params rc "project") (params rc "human-id"))
+             (get-single)
+             (redirect-to rc
+                          (string->uri (format #f "~a/tickets/~a"
+                                               (current-myhost)
+                                               (params rc "project")))
+                          #:status 302)))))

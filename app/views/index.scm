@@ -17,6 +17,7 @@
 
 (define-module (app views index)
   #:use-module (lucidplan html)
+  #:use-module (lucidplan config)
   #:use-module (artanis artanis)
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
@@ -133,6 +134,12 @@
            #:drift? #t
            #:content-classes '(flex flex-col gap-6))))
     (html-template G_
+                   ;; The front page is titled with the instance's own name
+                   ;; and described with its own description: it is the page
+                   ;; a search engine and a link preview meet first.
+                   #:title (config-ref 'site-name)
+                   #:description (config-ref 'site-description)
+                   #:canonical-path "/"
                    #:proj projects
                    #:is-logged-in is-logged-in
                    #:body `(div (@ (class ,(mk-class '(px-3

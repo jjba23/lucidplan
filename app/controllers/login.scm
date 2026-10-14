@@ -29,12 +29,34 @@
         (lucidplan domain user)
         (app views login))
 
+;; The sign-in page is also where the outcome of an attempt is read: a wrong
+;; password, a reset that went through, a reset link that had aged out, or a
+;; request that may or may not have matched an account.  Each is written as a
+;; short notice above the forms rather than as a redirect to a bare page, so
+;; the reader is told what happened and can try again without losing the page.
 (get "/login"
      #:mime 'xml
      #:i18n '(cookie "lang")
      (lambda (rc)
-       (response-emit (:mime rc
-                             (login-page (:i18n rc))))))
+       (let* ((G_ (:i18n rc))
+              (flag? (lambda (key)
+                       (equal? "true" (get-from-qstr rc key))))
+              (notices (filter (lambda (notice)
+                                 notice)
+                               (list (if (flag? "login_failed")
+                                         (G_ "that email and password did not match, please try again")
+                                         #f)
+                                     (if (flag? "has-reset-password")
+                                         (G_ "your password was reset, please sign in with the new one")
+                                         #f)
+                                     (if (flag? "invalid-reset-token")
+                                         (G_ "that password reset link is no longer valid, please request a new one")
+                                         #f)
+                                     (if (flag? "sent-password-reset")
+                                         (G_ "if that account exists, a reset link is on its way to its email address")
+                                         #f)))))
+         (response-emit (:mime rc
+                               (login-page G_ #:notices notices))))))
 
 (post "/login"
       #:cookies '(names x-bewaking-lucidplan)

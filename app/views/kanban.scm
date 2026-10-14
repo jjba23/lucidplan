@@ -41,10 +41,12 @@
   #:use-module (kracht prelude)
   #:export (render-k-ticket kanban-from-tickets))
 
-(define (render-k-ticket project t)
+(define* (render-k-ticket project t #:key (draggable? #f))
   ;; The card is not the drag source, its grip is: a card marked `draggable'
   ;; cannot have its own text selected with the mouse.  See
-  ;; `grab-indicator'.
+  ;; `grab-indicator'.  The grip is offered only to a reader who may change a
+  ;; ticket, so a board read by somebody the endpoint behind it would refuse
+  ;; does not present a control that could only fail.
   `((div (@ (class ,(mk-class '(w-full)))
             (data-ticket-id ,(assq-ref t
                                        'human-id)))
@@ -68,7 +70,7 @@
                                                     flex-1
                                                     whitespace-normal
                                                     leading-5))))
-                        ,grab-indicator
+                        ,@(if draggable? grab-indicator '())
                         ,(emoji-for-ticket-type (assq-ref t
                                                           'ticket-type))
                         (span (@ (class ,(mk-class '(text-sm font-medium
@@ -91,9 +93,14 @@
                               tickets
                               ticket-id-to-human-id
                               is-logged-in
+                              (can-drag? #f)
                               (current-sort #f))
 
-  (let* ((get-tickets (lambda (status-str)
+  (let* (;; Whether a card offers its drag grip is the same question the
+         ;; endpoints that move and restatus a ticket answer, so the board
+         ;; shows the grip to exactly the readers those endpoints accept.
+         (draggable? can-drag?)
+         (get-tickets (lambda (status-str)
                         (filter (lambda (x)
                                   (string=? status-str
                                             (assq-ref x
@@ -209,7 +216,9 @@
                                                "handleKanbanDrop(event, '~a')"
                                                project)))
                                   ,(map (lambda (t)
-                                          (render-k-ticket project t)) list))))))
+                                          (render-k-ticket
+                                           project t #:draggable? draggable?))
+                                        list))))))
 
          (build-details-col (lambda (status title list)
                               `(div (@ (class ,std-col-face))
@@ -235,7 +244,10 @@
                                                                project)))
                                                   ,@(map (lambda (t)
                                                            (render-k-ticket
-                                                            project t)) list))))))
+                                                            project t
+                                                            #:draggable?
+                                                            draggable?))
+                                                         list))))))
 
          ;; Build Main HTML
          (kanban-html `((div (@ (class ,(mk-class '(px-2 py-4))))
@@ -303,6 +315,8 @@
 
     ;; Render final template
     (html-template G_
+                   #:title (format #f "kanban for ~a" project)
+                   #:canonical-path (format #f "/kanban/~a" project)
                    #:is-logged-in is-logged-in
                    #:body kanban-html
                    #:proj projects)))

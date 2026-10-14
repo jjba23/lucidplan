@@ -78,6 +78,20 @@
                                                       #:current-sort user-sort
                                                       #:ticket-id-to-human-id
                                                       ticket-id-to-human-id
+                                                      ;; The board lets a reader
+                                                      ;; drag a card into another
+                                                      ;; column, which is a change
+                                                      ;; to the ticket: the grip is
+                                                      ;; offered to the same reader
+                                                      ;; the endpoint that writes it
+                                                      ;; accepts.
+                                                      #:can-drag?
+                                                      (session-has-permission?
+                                                       #:rc rc
+                                                       #:token-name
+                                                       'x-bewaking-lucidplan
+                                                       #:permission
+                                                       'lucidplan:ticket-create)
                                                       #:is-logged-in (:cookies-value
                                                                       rc
                                                                       "x-bewaking-lucidplan"))))))

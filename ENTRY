@@ -26,7 +26,11 @@
              (artanis utils))
 ;; Put whatever you want to be called before server initilization here
 
-(init-server #:statics '(png gif jpg jpeg ico html js json csv xml css woff woff2 ttf))
+;; The static-file rule answers any request whose path ends in one of these
+;; extensions from "pub" before any route is consulted, so "xml" is left out:
+;; the sitemap is a page this server builds (see /sitemap.xml), and a rule
+;; that answered it with a missing file would keep the route from running.
+(init-server #:statics '(png gif jpg jpeg ico html js json csv css woff woff2 ttf))
 (add-to-load-path (string-append (current-toplevel) "/lib"))
 ;; Put whatever you want to be called before server running here
 

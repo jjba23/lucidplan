@@ -17,6 +17,7 @@
 
 (define-module (app views me)
   #:use-module (lucidplan html)
+  #:use-module (lucidplan config)
   #:use-module (artanis artanis)
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
@@ -104,6 +105,8 @@
                                                        (token-remaining-seconds
                                                         #:token token)))))))))
     (html-template G_
+                   #:title (G_ "me")
+                   #:canonical-path "/me"
                    #:proj projects
                    #:is-logged-in is-logged-in
                    #:body `(div (@ (class ,(mk-class '(px-4 py-4))))
@@ -183,16 +186,43 @@
                                         (assq-ref u
                                                   'id))))
                       ,(icon-button #:icon 'pencil
-                                    #:content (G_ "edit"))))))
+                                    #:content (G_ "edit")))
+                   ;; A new account is claimed by its owner through an
+                   ;; emailed link, and a link that never arrived should be
+                   ;; sendable again without recreating the account.
+                   (form (@ (method POST)
+                            (action "/users/resend-invite"))
+                         (input (@ (name id)
+                                   (value ,(assq-ref u
+                                                     'id))
+                                   (hidden "")))
+                         ,(icon-button #:icon 'envelope
+                                       #:type 'submit
+                                       #:content (G_ "resend invite"))))))
     ,(hr)))
 
 (define* (users-page G_
-                     #:key users projects)
+                     #:key users projects (notices '()))
   (html-template G_
+                 #:title (G_ "user management")
+                 #:canonical-path "/users/manage"
                  #:proj projects
                  #:is-logged-in #t
                  #:body `(div (@ (class ,(mk-class '(px-4 py-4))))
                               ,(h2 (G_ "User management"))
+                              ,@(map (lambda (notice)
+                                       `(div (@ (class ,(mk-class '(my-2
+                                                                    px-4
+                                                                    py-2
+                                                                    max-w-prose
+                                                                    rounded-xl
+                                                                    border-2
+                                                                    border-jeans-blue-500/50
+                                                                    text-onyx-700
+                                                                    dark:text-stone-300)))
+                                               (role "status"))
+                                            ,notice))
+                                     notices)
                               (div (@ (class ,(mk-class '(my-6))))
                                    (a (@ (href "/users/new"))
                                       ,(icon-button #:icon 'user-plus
@@ -209,8 +239,10 @@
                                            (render-user G_ u)) users)))))
 
 (define* (reset-password-page G_
-                              #:key token email)
+                              #:key token email (error #f))
   (html-template G_
+                 #:title (G_ "reset password")
+                 #:canonical-path "/password/reset"
                  #:proj '()
                  #:is-logged-in #f
                  #:body `((div (@ (class ,(mk-class '(py-6 px-4))))
@@ -219,6 +251,22 @@
                                                 (G_
                                                  "perform a password reset for")
                                                 email))
+                               ;; A refused reset -- a mistyped confirmation
+                               ;; or a password that is too weak -- comes
+                               ;; back here with the reason, above the form.
+                               ,@(if error
+                                     `((div (@ (class ,(mk-class '(my-2
+                                                                  px-4
+                                                                  py-2
+                                                                  max-w-prose
+                                                                  rounded-xl
+                                                                  border-2
+                                                                  border-redwood-700/50
+                                                                  text-onyx-700
+                                                                  dark:text-stone-300)))
+                                             (role "alert"))
+                                          ,error))
+                                     '())
                                (form (@ (method POST)
                                         (action "/password/do-reset"))
                                      (div (@ (class ,(mk-class '(rounded-xl
@@ -235,17 +283,35 @@
                                           (input (@ (hidden true)
                                                     (name reset-token)
                                                     (value ,token)) "")
-                                          ,(input #:label (G_ "new password")
-                                                  #:name "new-password"
-                                                  #:value ""
-                                                  #:type 'password
-                                                  #:required #t)
-                                          ,(input #:label (G_
-                                                           "confirm password")
-                                                  #:name "confirm-password"
-                                                  #:value ""
-                                                  #:type 'password
-                                                  #:required #t)
+                                          ;; The strength meter reads the
+                                          ;; field it wraps and says how
+                                          ;; strong the password being typed
+                                          ;; is, by the same measure the
+                                          ;; server enforces.  Its words are
+                                          ;; handed to the script as data so
+                                          ;; they can be translated.
+                                          (div (@ (data-password-strength "")
+                                                  (data-min-score ,(number->string
+                                                                    (config-ref
+                                                                     'password-min-score)))
+                                                  (data-strength-label-0 ,(G_ "very weak"))
+                                                  (data-strength-label-1 ,(G_ "weak"))
+                                                  (data-strength-label-2 ,(G_ "fair"))
+                                                  (data-strength-label-3 ,(G_ "strong"))
+                                                  (data-strength-label-4 ,(G_ "very strong"))
+                                                  (data-strength-hint ,(G_ "aim for 12 or more characters, mixing words, upper and lower case, digits and symbols")))
+                                               ,(input #:label (G_ "new password")
+                                                       #:name "new-password"
+                                                       #:value ""
+                                                       #:type 'password
+                                                       #:autocomplete "new-password"
+                                                       #:required #t)
+                                               ,(input #:label (G_ "confirm password")
+                                                       #:name "confirm-password"
+                                                       #:value ""
+                                                       #:type 'password
+                                                       #:autocomplete "new-password"
+                                                       #:required #t))
                                           (div ,(submit-button (G_ "reset")))))))))
 
 (define (make-permission-checkbox p)
@@ -254,12 +320,29 @@
                  #:label (format #f "~a" p)
                  #:name (format #f "~a" p)))))
 
-(define* (new-user-page G_)
+(define* (new-user-page G_ #:key (error #f))
   (html-template G_
-                 #:title "lucidplan"
+                 #:title (G_ "new user")
+                 #:canonical-path "/users/new"
                  #:is-logged-in #t
                  #:body `((div (@ (class ,(mk-class '(px-4 py-4))))
                                (div ,(h2 (G_ "New User")))
+                               ;; A creation that was refused -- a missing
+                               ;; name or an address already in use -- says
+                               ;; so here, above the form.
+                               ,@(if error
+                                     `((div (@ (class ,(mk-class '(my-2
+                                                                  px-4
+                                                                  py-2
+                                                                  max-w-prose
+                                                                  rounded-xl
+                                                                  border-2
+                                                                  border-redwood-700/50
+                                                                  text-onyx-700
+                                                                  dark:text-stone-300)))
+                                             (role "alert"))
+                                          ,error))
+                                     '())
                                (div (@ (class ,(mk-class '(flex flex-col
                                                            gap-4
                                                            my-8
@@ -272,10 +355,12 @@
                                              (action "/users/new"))
                                           (div ,(input #:label (G_ "username")
                                                        #:name 'username
+                                                       #:autocomplete "off"
                                                        #:required #t))
                                           (div ,(input #:label (G_ "email")
                                                        #:name 'email
                                                        #:type 'email
+                                                       #:autocomplete "email"
                                                        #:required #t))
                                           (div (@ (class ,(mk-class '(my-6))))
                                                ,(sub-h4 (G_ "user permissions"))
@@ -328,7 +413,8 @@
 
 (define* (edit-user-page G_ u)
   (html-template G_
-                 #:title "lucidplan"
+                 #:title (G_ "edit user")
+                 #:canonical-path "/users/manage"
                  #:is-logged-in #t
                  #:body `((div (@ (class ,(mk-class '(px-4 py-4))))
                                (div ,(h2 (G_ "Edit User")))

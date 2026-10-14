@@ -56,6 +56,9 @@
                                                      is-logged-in)))))
        (get-p)))
 
+;; The page that offers to create a project asks for the same permission the
+;; write behind it does, so a reader who may not create a project is turned
+;; away before they fill in a form that could only ever refuse them.
 (get "/projects/new"
      #:mime 'xml
      #:i18n '(cookie "lang")
@@ -70,7 +73,11 @@
                                                                         "x-bewaking-lucidplan")
                                                         #:projects (get-projects
                                                                     project-repo))))))
-       (get-new)))
+       (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                          #:needed-permissions '(lucidplan:project-create)
+                          #:rc rc
+                          #:happy-flow get-new
+                          #:unhappy-flow back-to-login)))
 
 (post "/projects/delete"
       #:mime 'xml
@@ -129,6 +136,9 @@
                            #:happy-flow do-new
                            #:unhappy-flow back-to-login)))
 
+;; Editing a project is guarded with the permission that writes it -- there
+;; is no separate project-edit permission -- so the form and the endpoint it
+;; posts to answer to exactly the same rule.
 (get "/projects/id/:human-id/edit"
      #:mime 'xml
      #:i18n '(cookie "lang")
@@ -146,8 +156,11 @@
                                                          #:projects (get-projects
                                                                      project-repo)
                                                          #:project p)))))
-
-       (get-edit)))
+       (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                          #:needed-permissions '(lucidplan:project-create)
+                          #:rc rc
+                          #:happy-flow get-edit
+                          #:unhappy-flow back-to-login)))
 
 (post "/projects/id/:human-id/edit"
       #:mime 'xml

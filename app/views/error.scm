@@ -106,6 +106,7 @@ sign in."
                       (list "/login" (G_ "sign in") 'sign-in)
                       (list "/projects" (G_ "browse projects") 'map-trifold))))
     (html-template G_
+                   #:title (format #f "~a" status)
                    #:is-logged-in #f
                    #:proj '()
                    #:body

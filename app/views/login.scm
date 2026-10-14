@@ -27,7 +27,7 @@
   #:use-module (ice-9 string-fun)
   #:export (login-page))
 
-(define (login-page G_)
+(define* (login-page G_ #:key (notices '()))
   (let* (         (login-form `(form (@ (action "/login")
                                (class ,(mk-class (append
                                                   '(w-full rounded-xl
@@ -45,11 +45,13 @@
                                     #:name "email"
                                     #:type 'email
                                     #:value ""
+                                    #:autocomplete "email"
                                     #:required #t)
                             ,(input #:label (G_ "password")
                                     #:name "password"
                                     #:type 'password
                                     #:value ""
+                                    #:autocomplete "current-password"
                                     #:required #t)
                             (div ,(submit-button (G_ "login")))))
          (reset-form `((form (@ (action "/password/reset")
@@ -69,6 +71,7 @@
                                      #:name "email"
                                      #:type 'email
                                      #:value ""
+                                     #:autocomplete "email"
                                      #:required #t)
                              (div ,(icon-button #:icon 'password
                                                 #:type 'submit
@@ -77,7 +80,28 @@
                                                              text-onyx-700
                                                              dark:text-stone-300)))))))
     (html-template G_
+                   #:title (G_ "login")
+                   #:canonical-path "/login"
                    #:body `((div (@ (class ,(mk-class '(px-4 pt-4 pb-24))))
+                                 ;; What happened on the last attempt -- a
+                                 ;; failed sign-in, a reset that went
+                                 ;; through or a link that had aged out --
+                                 ;; is said here, above the forms, in a live
+                                 ;; region, so a reader is told before they
+                                 ;; fill anything in again.
+                                 ,@(map (lambda (notice)
+                                          `(div (@ (class ,(mk-class '(my-2
+                                                                       px-4
+                                                                       py-2
+                                                                       max-w-prose
+                                                                       rounded-xl
+                                                                       border-2
+                                                                       border-jeans-blue-500/50
+                                                                       text-onyx-700
+                                                                       dark:text-stone-300)))
+                                                  (role "status"))
+                                               ,notice))
+                                        notices)
                                  (div (@ (class ,(mk-class '(w-full flex
                                                                     flex-row
                                                                     flex-wrap

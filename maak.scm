@@ -50,9 +50,12 @@
 (define hot-reload-file-types
   '(scm css js))
 
-;; The Emacs Lisp script to run for publishing the manual.
+;; The Emacs Lisp script to run for publishing the manual.  The manual is the
+;; README: the two documents were merged into one, so the HTML the project's
+;; site serves is that document exported, not a second file kept in step with
+;; it by hand.
 (define emacs-lisp-manual-publish-cmd
-  '(progn (find-file "./docs/manual/en.org")
+  '(progn (find-file "./README.org")
           (org-html-export-to-html)
           (message "finished publishing Lucidplan manual")))
 
@@ -137,7 +140,7 @@ Args: update? represents whether we should update a template or create a new one
   (build-manual)
   (mkdir-p (~ "~a/manuals/lucidplan" deploy-dir))
   (delete-file-recursively (~ "~a/manuals/lucidplan/index.html" deploy-dir))
-  (mv "docs/manual/en.html"
+  (mv "README.html"
       (~ "~a/manuals/lucidplan/index.html" deploy-dir)))
 
 (define (fmt)
