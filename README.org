@@ -105,6 +105,16 @@ The pages that create or edit something ask for the same permission their write 
 
 The small inline controls on a ticket (its status and type) are shown to exactly the readers the endpoint behind them would accept, so a reader who holds the permission sees the control and a reader who does not sees the read-only badge.
 
+** What the mail service is asked to send
+
+An instance that has been given a [[https://codeberg.org/jjba23/pingwing][pingwing]] address (~pingwing-url~ and its two credentials, see [[*Configuring the instance][Configuring the instance]]) writes to the people of a project when a ticket is created in it -- the news that a board moved is worth having even when nobody is looking at it.
+
+Who hears it is everyone who takes part in the project: every user the project has assigned a ticket to, together with the ticket's own assignee and the person who opened it. LucidPlan keeps no membership list, so participation is read from the work itself; a user with no email address is passed over, and an address is written to once however many times it comes up.
+
+The message is pingwing's ~lucidplan-new-ticket~ template, filled with the project, the ticket's number and title, its type, its status as the project's own board names it, its priority, the assignee and the author, the description, and a link to the ticket on ~site-url~. The subject is the instance's own ~mail-subject-prefix~ and then ~New ticket in <project>~; the sender is ~mail-sender-name~ and ~mail-sender-address~.
+
+Nothing about this can fail a write: a mail service that is unreachable, or that refuses the task, is tried again a few times (~mail-retry-attempts~, ~mail-retry-delay~) and then given up on with a line in the log that repeats what the service said, and the ticket is already saved either way. A message counts as sent only when the service answers that it took it: a request that arrived and was refused is a message that did not go, and is treated as one.
+
 ------------------
 
 * Running LucidPlan yourself
@@ -281,14 +291,34 @@ If you use SQLite you should enable WAL mode for concurrent writes. The ~maak~ t
 maak init-db
 #+end_src
 
-Schema migrations are managed with [[https://codeberg.org/jjba23/mutastructura][mutastructura]]. See ~resources/migrations/sqlite/~ for the migration files. A migration is plain SQL, applied in filename order:
+Schema migrations are managed with [[https://codeberg.org/jjba23/mutastructura][mutastructura]], and they are applied with one task:
 
 #+begin_src sh
-# Apply the migrations, e.g.:
+maak migrate
+#+end_src
+
+~maak init-db~ makes a fresh database and migrates it in one go, so a new instance never has to think about this. On a database that already exists, ~maak migrate~ applies whatever it has not seen and leaves the rest alone -- running it twice in a row is a no-op, and running it on a current database prints ~NOTHING TO DO!~.
+
+A migration is a plain SQL file under ~resources/migrations/sqlite/~, named ~YYYY-MM-DD_HH:MM:SS_something.sql~: mutastructura applies the files it has not seen in filename order, each in its own transaction, so a migration that fails leaves the schema where it was rather than half-moved. What it has seen is kept in a ~migrations_history~ table -- the ledger -- with the SHA-256 of each file, so editing a migration that has already run is reported as a ~WARNING: Checksum mismatch~ instead of being applied a second time. The ledger is the reason migrations are applied by ~maak migrate~ and not by hand: a database migrated by hand has no ledger, and its schema can no longer be compared with the migrations.
+
+An existing deployment that was set up before LucidPlan used mutastructura has one of those unledgered databases. Bring it up to date once, by hand, by recording what is already applied -- the migration files are not re-run, and nothing in the database changes:
+
+#+begin_src sh
+# Run this once, on an instance that was migrated by hand:
+sqlite3 lucidplan.db "CREATE TABLE IF NOT EXISTS migrations_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(255) NOT NULL,
+    checksum VARCHAR(64) NOT NULL,
+    applied_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (name, checksum))"
 for f in resources/migrations/sqlite/*.sql; do
-  sqlite3 lucidplan.db < "$f"
+  sqlite3 lucidplan.db "INSERT OR IGNORE INTO migrations_history (name, checksum) VALUES (
+      '$(basename "$f")',
+      '$(sha256sum "$f" | cut -d' ' -f1)'))"
 done
 #+end_src
+
+After that, ~maak migrate~ answers ~NOTHING TO DO!~ and every later migration is applied by the one task.
 
 ** Creating the first super-user
 
@@ -425,6 +455,16 @@ Page analytics is also yours to decide. The instance's own page-view script repo
 #+begin_src scheme
 (define-public analytics-endpoint "")
 #+end_src
+
+** Tests
+
+Tests are run with [[https://codeberg.org/jjba23/veritas][veritas]]:
+
+#+begin_src sh
+maak test
+#+end_src
+
+They live under ~test/veritas/~: ~unit/~ for the tests that run on every change, and ~benchmark/~ for those that measure rather than assert. A test is a module like any other and is loaded with the application's own directories on the path, so it can ~use-modules~ what it tests.
 
 ** Translations
 

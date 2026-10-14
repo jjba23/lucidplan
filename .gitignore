@@ -1,5 +1,6 @@
 tmp/cache/route.cache
 lucidplan.db*
+reports/
 tmp/*
 *.log
 en-GB.html

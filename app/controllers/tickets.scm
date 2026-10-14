@@ -27,6 +27,7 @@
         (uuid generate)
         (lucidplan html)
         (lucidplan domain)
+        (lucidplan notifications)
         (json)
         (artanis security nss)
         (lucidplan domain project)
@@ -262,9 +263,9 @@
       (lambda (rc)
         (define (do-new)
           (let* ((project-repo (make-sqlite-project-repository rc))
-                 (statuses (effective-ticket-statuses
-                            (get-project-by-human-id project-repo
-                                                     (params rc "project"))))
+                 (project (get-project-by-human-id project-repo
+                                                   (params rc "project")))
+                 (statuses (effective-ticket-statuses project))
                  (ticket-repo (make-sqlite-ticket-repository rc))
                  (latest-ticket (get-ticket-of-latest-human-id ticket-repo
                                                                (params rc
@@ -311,7 +312,27 @@
                 (upsert-ticket-assignee ticket-assignee-repo
                                         `((project-id unquote project-id)
                                           (ticket-id unquote new-uuid)
-                                          (user-id unquote assignee-id)))))
+                                          (user-id unquote assignee-id))))
+
+              ;; Everyone who takes part in the project hears that the board
+              ;; moved.  The ticket is read back rather than described from
+              ;; the submitted body, so the message says what was actually
+              ;; written -- the number the schema gave it, the status the
+              ;; project's own ladder settled on -- and the author is the
+              ;; session the write came from.  A mail service that cannot be
+              ;; reached is logged and answered with #f; it never unmakes the
+              ;; ticket, and it never fails the request.
+              (notify-new-ticket!
+               #:user-repo user-repo
+               #:assignee-repo ticket-assignee-repo
+               #:project project
+               #:statuses statuses
+               #:ticket (get-ticket-by-project-human-id-and-human-id
+                         ticket-repo (params rc "project") new-human-id)
+               #:author-id (session-owner-id #:rc rc
+                                             #:token-name
+                                             'x-bewaking-lucidplan)
+               #:assignee-id assignee-id))
 
 
             (redirect-to rc

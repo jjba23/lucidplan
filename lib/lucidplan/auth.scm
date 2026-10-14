@@ -23,7 +23,7 @@
   #:use-module (lucidplan env)
   #:export (back-to-login unauthorized-api-message bewaking-endpoint
                           bewaking-api-endpoint session-has-permission?
-                          session-permissions))
+                          session-permissions session-owner-id))
 
 (define* (bewaking-endpoint #:key token-name
                             needed-permissions
@@ -120,6 +120,28 @@ control by the same rule that decides whether the endpoint would honour it."
                            #:present (session-permissions #:rc rc
                                                           #:token-name
                                                           token-name)))
+
+(define* (session-owner-id #:key rc token-name)
+  "Answer the id of the user the request's session belongs to, or @code{#f}.
+
+A signed-in request already carries the account it was granted to -- the
+id is part of the token the guard below reads -- so a page or an endpoint
+that has to name the reader in a row it writes (as the author of a thing,
+say) can ask here instead of decrypting the cookie a second time.  A
+missing, malformed or expired token answers @code{#f}, exactly as it does
+for @code{session-permissions}: a reader who is simply signed out is not an
+error."
+  (let ((raw (:cookies-value rc (symbol->string token-name))))
+    (if (or (not (string? raw)) (string-null? raw))
+        #f
+        (catch #t
+               (lambda ()
+                 (let ((t (decrypt-token #:token raw
+                                         #:encryption-key encryption-key
+                                         #:signing-key signing-key)))
+                   (and t (token-valid? #:token t)
+                        (assq-ref t 'owner-id))))
+               (lambda _ #f)))))
 
 (define (unauthorized-api-message rc)
   (response-emit '((error . "You must be authenticated to use this API endpoint"))

@@ -37,6 +37,17 @@
 (define lucidplan-db
   "lucidplan.db")
 
+;; The engine mutastructura is pointed at, and the directory holding the
+;; migrations it applies to it.  The migrations are plain SQL files, run in
+;; filename order, so the name of a file is its place in the queue: the
+;; `YYYY-MM-DD_HH:MM:SS_some-name.sql' shape the project uses sorts the way
+;; the schema grew.  A second engine would bring its own directory here.
+(define db-engine
+  "sqlite3")
+
+(define db-migrations-dir
+  "./resources/migrations/sqlite")
+
 ;; The main copyright holders of the project.
 (define copyright-holders
   '("Josep Bigorra"))
@@ -308,6 +319,27 @@ Args: update? represents whether we should update a template or create a new one
   "Format Scheme source code files according to the Guix style guide."
   ($ '("find . -maxdepth 8 -name '*.scm'" "-type f -exec guix style -f {} \\;")))
 
+(define (test)
+  "Run the test suite with veritas.
+
+The tests live under `test/veritas/': `unit/' for the ones that run on every
+change, and `benchmark/' for the ones that measure rather than assert, which
+veritas keeps apart because they answer a different question and take a
+different amount of time.  The application's own directories are on the load
+path, so a test names the module it tests the way the application does."
+  ;; The two settings the run is described by are handed over with `env' rather
+  ;; than written in front of `guile': what follows the `--' of a guix shell is
+  ;; exec'd, not read by a shell, so an assignment written there is taken for
+  ;; the name of a program and the run answers `command not found'.  The
+  ;; loader's own defaults agree with both of them; they are said anyway, so a
+  ;; run from here is the run that was asked for.
+  (time-machine-manifest-shell
+   (list "env"
+         "VERITAS_TEST_TYPE=unit"
+         "VERITAS_RUN_BENCHMARKS=true"
+         "guile -L . -L lib -L test"
+         "-c '((@ (veritas runner) run-tests))'")))
+
 (define (hot-reload)
   "Hot-reloading developer's setup."
   (time-machine-manifest-shell (list "watchexec"
@@ -344,14 +376,29 @@ Args: update? represents whether we should update a template or create a new one
   (kill-server)
   (time-machine-manifest-shell '("art work -c conf/production.conf")))
 
+(define (migrate)
+  "Bring the database up to the schema the migrations describe.
+
+Every migration in the migrations directory that the ledger has not recorded
+yet is applied, in filename order, each inside its own transaction; a
+database that is already up to date is left alone, and one that is not is
+never half-migrated, because a migration that fails takes its own statements
+back with it.  The ledger is what makes that possible -- it is the record of
+what has run, and mutastructura is the only thing that writes it -- so the
+migrations are applied here and nowhere else, by hand or otherwise."
+  (time-machine-manifest-shell
+   (list (~ "mutastructura --database ~a --connection ~a --migrations ~a"
+            db-engine lucidplan-db db-migrations-dir))))
+
 (define (init-db)
-  "Initialize a new database and enable WAL mode
-for higher concurrent writes to SQLite 3."
+  "Initialize a new database, migrate it, and enable WAL mode for higher
+concurrent writes to SQLite 3."
   (delete-file-recursively lucidplan-db)
   (delete-file-recursively (~ "~a-shm" lucidplan-db))
   (delete-file-recursively (~ "~a-wal" lucidplan-db))
-  (time-machine-manifest-shell (~ "sqlite3 ~a 'PRAGMA journal_mode=WAL;'"
-                                  lucidplan-db)))
+  (time-machine-manifest-shell
+   (list (~ "sqlite3 ~a 'PRAGMA journal_mode=WAL;'" lucidplan-db)))
+  (migrate))
 
 ;; ====== Maak i18n tasks ======
 

@@ -19,14 +19,20 @@ If you like my work, please support me by [[https://bmc.link/jjbigorra][buying m
 
 ---------------------------
 
-You can run migrations on your SQLite database with the following, or any other way you choose:
+Schema migrations are [[https://codeberg.org/jjba23/mutastructura][mutastructura]]'s, and one task applies them:
 #+begin_src sh
-sqlite3 database.db "INSERT INTO table VALUES (something)"
+maak migrate
 #+end_src
 
 ----------------------------------
 
 * v1.8.0
+
+New tickets are announced by email. When a ticket is created, [[https://codeberg.org/jjba23/pingwing][pingwing]] is asked for the ~lucidplan-new-ticket~ template and it goes to everyone who takes part in the project -- every user the project has assigned a ticket to, the ticket's assignee and the person who opened it. A message counts as sent only when the service answers that it took it: a service that cannot be reached, or that refuses the task, is retried, logged with what it said, and never fails the write. See ~What the mail service is asked to send~ in the README.
+
+Migrations are applied by mutastructura through ~maak migrate~ (and by ~maak init-db~ on a fresh database), and are tracked in a ~migrations_history~ ledger. The hand-rolled ~for f in resources/migrations/sqlite/*.sql; do sqlite3 ...~ loop is gone. *A database that was migrated by hand needs its ledger written once*, by recording the migrations already applied, before ~maak migrate~ is used on it; the README's ~The database~ section has the commands.
+
+Tests are run with veritas -- ~maak test~ -- and live under ~test/veritas/~, with ~unit/~ and ~benchmark/~ beneath it.
 
 Added ~ticket_statuses~ column to the ~project~ table:
 

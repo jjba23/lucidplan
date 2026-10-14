@@ -19,16 +19,14 @@
 
 (import (lucidplan html)
         (lucidplan config)
+        (lucidplan mail)
         (web uri)
         (ice-9 string-fun)
-        (curl)
         (lucidplan env)
         (kracht prelude)
         (lucidplan auth)
         (app views me)
         (uuid generate)
-        (rnrs bytevectors)
-        (json)
         (artanis security nss)
         (lucidplan sqlite project)
         (lucidplan domain project)
@@ -157,77 +155,6 @@
                                                                          "error"))
                                                   (G_ "that password was too weak, aim for a longer passphrase mixing words, case, digits and symbols"))
                                                  (else #f))))))))))
-
-;;; ===== Handing a notification to the mail service =====
-
-;; Pingwing is the mail and notification service this instance speaks to, and
-;; it is a network service: it can be restarting, slow, or briefly
-;; unreachable.  A password reset or a new-user invite that quietly never
-;; arrives is worse than one that is tried again, so a message is posted with
-;; a few attempts and a growing wait between them, and only after the last
-;; attempt fails is the failure reported -- never as an exception that would
-;; abandon the request that asked for it, but as a value its caller can act
-;; on.
-
-(define (pingwing-post body)
-  "Post BODY to the notification service once.  Answer @code{#t} on success."
-  (let ((handle (curl-easy-init)))
-    (dynamic-wind
-     (lambda () #t)
-     (lambda ()
-       (curl-easy-setopt handle 'post #t)
-       (curl-easy-setopt handle 'url
-                         (format #f "~a/api/v1/tasks" pingwing-url))
-       (curl-easy-setopt handle 'postfields
-                         (string->utf8 (scm->json-string body)))
-       (curl-easy-setopt handle 'use-ssl 1)
-       (curl-easy-setopt handle 'username pingwing-basic-auth-user)
-       (curl-easy-setopt handle 'password pingwing-basic-auth-password)
-       (let* ((r (curl-easy-perform handle #t))
-              (code (catch #t
-                           (lambda () (curl-error-code))
-                           (lambda _ -1))))
-         (if (= code 0)
-             (begin
-               (display (format #f "pingwing: notification sent (~a)~a~%"
-                                code
-                                (catch #t
-                                       (lambda ()
-                                         (format #f ": ~a" (utf8->string r)))
-                                       (lambda _ ""))))
-               #t)
-             (begin
-               (display (format #f "pingwing: request failed (curl ~a)~%"
-                                code))
-               #f))))
-     (lambda () (curl-easy-cleanup handle)))))
-
-(define* (send-to-pingwing #:key body)
-  "Hand BODY to the notification service, retrying a few times.
-
-The number of attempts and the base wait between them are configuration
-(@code{mail-retry-attempts}, @code{mail-retry-delay}); the wait doubles after
-each failed attempt, so a service that is coming back has room to.  Answer
-@code{#t} when a post succeeded and @code{#f} when every attempt failed."
-  (let ((attempts (max 1 (config-ref 'mail-retry-attempts)))
-        (base-delay (max 0 (config-ref 'mail-retry-delay))))
-    (let loop ((attempt 1))
-      (let ((ok (catch #t
-                       (lambda () (pingwing-post body))
-                       (lambda (key . args)
-                         (display (format #f
-                                          "pingwing: attempt ~a threw ~a: ~a~%"
-                                          attempt key args))
-                         #f))))
-        (cond
-          (ok #t)
-          ((< attempt attempts)
-           (sleep (* base-delay (expt 2 (- attempt 1))))
-           (loop (+ attempt 1)))
-          (else
-           (display (format #f "pingwing: giving up after ~a attempts~%"
-                            attempts))
-           #f))))))
 
 (define (password-reset-validity)
   "How long a password-reset link stays good, in seconds."
@@ -361,25 +288,19 @@ request stay silent about whether an account exists at all."
                                          (reset-token unquote reset-token)
                                          (created-at unquote
                                                      (current-time)))))
-             (mail-payload `((task-type . send-email)
-                             (template . password-reset)
-                             (template-vars
-                              (system-name . ,(config-ref 'site-name))
-                              (user . ,(assq-ref u 'email))
-                              (reset-link . ,(format #f
-                                             "~a/password/reset/token/~a"
-                                             (current-myhost)
-                                             reset-token)))
-                             (sender-name . ,(config-ref 'mail-sender-name))
-                             (sender-address
-                              . ,(config-ref 'mail-sender-address))
-                             (subject
-                              . ,(format #f "~aPassword Reset"
-                                         (config-ref 'mail-subject-prefix)))
-                             (recipients . #(((name . ,(assq-ref u 'username))
-                                              (address
-                                               . ,(assq-ref u 'email))))))))
-        (send-to-pingwing #:body mail-payload))))
+             (mailed?
+              (send-email!
+               #:template 'password-reset
+               #:subject "Password Reset"
+               #:recipients (list (cons (assq-ref u 'username)
+                                       (assq-ref u 'email)))
+               #:vars `((system-name . ,(config-ref 'site-name))
+                        (user . ,(assq-ref u 'email))
+                        (reset-link . ,(format #f
+                                        "~a/password/reset/token/~a"
+                                        (current-myhost)
+                                        reset-token))))))
+        mailed?)))
 
 (get "/users/new"
      #:mime 'xml
