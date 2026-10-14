@@ -210,7 +210,66 @@ password-min-score       ; accepted password strength, 0 (very weak) .. 4 (very 
 
 ;; The languages the interface offers, as (catalog-name . name-in-that-language)
 locales
+
+;; What a ticket moves through: one entry per status, and the order below is
+;; the order the board and the menus show. See "Renaming or changing the
+;; ticket statuses".
+ticket-statuses        ; ((value label icon glyph bucket) ...)
+
+;; What the front page says about the software: the heading and line over the
+;; feature grid, the cards themselves, and the heading and line over the
+;; little board it draws. Each feature is (icon label text).
+landing-features-title
+landing-features-intro
+landing-features       ; ((icon label text) ...)
+landing-workflow-title
+landing-workflow-intro
 #+end_src
+
+** Renaming or changing the ticket statuses
+
+Which statuses a ticket moves through is configuration, not code: an instance that does not use every status drops the ones it does not need, gives the ones it keeps the names its team says, and adds any that are missing.
+
+The key is ~ticket-statuses~, a list of entries. Each entry names one status and means ~(value label icon glyph bucket)~:
+
+- ~value~ -- what the database stores, e.g. ~"todo"~. Keep it stable: renaming a status means changing its ~label~;
+- ~label~ -- what a reader is shown, e.g. ~"To-do"~;
+- ~icon~ -- the name of a [[https://phosphoricons.com/][Phosphor icon]], e.g. ~"anchor"~;
+- ~glyph~ -- one character, used in the menus a page cannot dress;
+- ~bucket~ -- ~"open"~, ~"done"~ or ~"rejected"~. Open statuses are the board's columns and the backlog's live list; the closed ones become their own sections and their own counts.
+
+So an instance whose team works in a speak-now-or-forever flow might say:
+
+#+begin_src scheme
+(define-public ticket-statuses
+  '(("backlog" "Backlog" "tray" "📥" "open")
+    ("doing" "Doing" "gear-fine" "⚙️" "open")
+    ("review" "In Review" "list-magnifying-glass" "🔍" "open")
+    ("blocked" "Blocked" "prohibit" "🚫" "open")
+    ("shipped" "Shipped" "check" "✅" "done")
+    ("wontfix" "Won't Fix" "x" "❌" "rejected")))
+#+end_src
+
+Two things follow from the list being the instance's:
+
+- the *order* of the entries is the order of the board's columns and of every status menu;
+- a status that is dropped from the list does not make its tickets disappear. A ticket carrying a value the list does not name is treated as open, so it stays on the board and can be dragged back onto a status that exists.
+
+A status whose label is one of the shipped ones ([[*Instance configuration keys][the list above]] keeps ~"To-do"~, ~"Work in Progress"~ and so on) is a translation key and is shown in the reader's own language; a label of your own is shown exactly as written.
+
+** A project with its own statuses
+
+A single instance can host very different projects, and one team's board is not always another's. So the instance's ~ticket-statuses~ is a *default*: any project may override the whole list for itself, from its own edit page, in the same one-status-to-a-line format:
+
+#+begin_example
+todo | Backlog | anchor | ⚓ | open
+work-in-progress | Doing | gear-fine | ⚙️ | open
+done | Shipped | check | ✅ | done
+#+end_example
+
+The fields are ~value | label | icon | glyph | bucket~, in that order, and everything but the value may be left out -- the value is then also the label, the icon is a dot and the bucket is ~open~. A line beginning with ~#~ is a comment, so the editor is also a place to leave a note. Leaving the field empty gives the project back the instance's list.
+
+Nothing else has to change: the project's backlog, its board, its ticket pages and its status menus are all built from whichever list the project ends up with.
 
 ** The database
 

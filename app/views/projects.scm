@@ -331,6 +331,7 @@
                                          'vcs-url)
                      #:description (html-unescape (proj-ref project
                                                             'description))
+                     #:ticket-statuses (proj-ref project 'ticket-statuses)
                      #:action (format #f "/projects/id/~a/edit"
                                       (proj-ref project
                                                 'human-id))
@@ -342,6 +343,7 @@
                             #:key (title "")
                             (human-id "")
                             (description "")
+                            (ticket-statuses "")
                             (url "")
                             (vcs-url "")
                             (action "/projects/new")
@@ -381,6 +383,26 @@
                                                     #:name 'description
                                                     #:value description
                                                     #:required #f)
+                                         ;; The statuses this project's own
+                                         ;; tickets move through.  Left
+                                         ;; empty, the project uses the
+                                         ;; instance's statuses, which is
+                                         ;; what every project does until it
+                                         ;; is given a list here.  The
+                                         ;; format is the one the domain
+                                         ;; reads back: one status to a
+                                         ;; line, its five fields separated
+                                         ;; by `|'.
+                                         ,(textarea #:label (G_
+                                                             "ticket statuses")
+                                                    #:name 'ticket-statuses
+                                                    #:value ticket-statuses
+                                                    #:required #f)
+                                         (p (@ (class ,(mk-class '(text-sm
+                                                                   text-onyx-500
+                                                                   dark:text-stone-500))))
+                                            ,(G_
+                                              "One status to a line: value | label | icon | glyph | bucket, where bucket is open, done or rejected. Leave empty to use the instance's statuses."))
                                          (div (@ (class ,(mk-class '(flex
                                                                      flex-row
                                                                      gap-3

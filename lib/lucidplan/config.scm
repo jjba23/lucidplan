@@ -132,6 +132,61 @@ This is a self-hosted deployment. Its operator may have added their own notes, c
 
 Contributions, issues and ideas are welcome at the project's repository.")
 
+    ;; -- The statuses a ticket moves through -----------------------------
+    ;; Each entry is (value label icon glyph bucket):
+    ;;
+    ;;   value   what the schema stores, e.g. "todo";
+    ;;   label   what a reader is shown, e.g. "To-do".  The shipped labels
+    ;;           are translation keys, so an instance that keeps them keeps
+    ;;           their translations; a label of the operator's own is shown
+    ;;           as written, since nothing can translate it.
+    ;;   icon    the name of a Phosphor icon, e.g. "anchor" (the class is
+    ;;           built from it, so it is the name after `ph-');
+    ;;   glyph   one character, for the native menus a page cannot dress;
+    ;;   bucket  "open", "done" or "rejected".  Open statuses are the
+    ;;           board's columns and the backlog's live list; the closed
+    ;;           ones become their own sections and their own counts.
+    ;;
+    ;; The order here is the order the board and the menus show.  Editing
+    ;; the list adds statuses, drops statuses and renames them (a rename
+    ;; changes the label, not the stored value, so existing tickets keep
+    ;; theirs); a value no longer listed is treated as open rather than
+    ;; hidden.  A project may override the whole list for itself -- see the
+    ;; project edit page.
+    (ticket-statuses
+     . (("todo" "To-do" "anchor" "⚓" "open")
+        ("work-in-progress" "Work in Progress" "gear-fine" "⚙️" "open")
+        ("in-review" "In Review" "list-magnifying-glass" "🔍" "open")
+        ("done" "Done" "check" "✅" "done")
+        ("rejected" "Rejected" "x" "❌" "rejected")))
+
+    ;; -- What the front page says about the software ----------------------
+    ;; The landing page's feature grid and the line that introduces it, and
+    ;; the heading over the little board it draws: an operator changes any
+    ;; of it without touching the view.  Each feature is (icon label text),
+    ;; where icon names a Phosphor icon and label is the card's title.
+    (landing-features-title
+     . "everything a team needs, nothing it does not")
+    (landing-features-intro
+     . "LucidPlan keeps the workflow simple and approachable while giving teams of every shape and size the structure they need.")
+    (landing-features
+     . (("squares-four" "multi-project workspaces"
+         "Run dozens of projects from one dashboard and switch between them without losing your place.")
+        ("list-checks" "backlog management"
+         "A clean, sortable backlog where every task can be dragged into the order it should be done in.")
+        ("kanban" "kanban boards"
+         "Track tickets as they move through To-do, Work in Progress, In Review and beyond.")
+        ("file-text" "org-mode everywhere"
+         "Write titles and descriptions in Org syntax and see them rendered as rich HTML.")
+        ("shield-check" "granular permissions"
+         "An access control list written as plain Lisp lists, so exactly what each user may do is explicit.")
+        ("heart" "free software"
+         "Licensed under the GNU AGPL v3 or newer and hackable end to end in Scheme.")))
+    (landing-workflow-title
+     . "a workflow that fits how your team works")
+    (landing-workflow-intro
+     . "Every ticket is a row on a board: move it along the columns as the work moves, and let the state of the board tell you where the project stands.")
+
     ;; -- Mail -------------------------------------------------------------
     ;; The name and address a notification is sent from, and the subject
     ;; prefix that marks it as this instance's.

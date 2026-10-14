@@ -32,6 +32,10 @@
          url
          vcs-url
          description
+         ;; The statuses this project's own tickets move through, as the text
+         ;; its edit page was given, or nothing -- in which case the project
+         ;; uses the instance's statuses.  See `effective-ticket-statuses'.
+         ticket-statuses
          created-at
          updated-at
          deleted-at))

@@ -59,6 +59,12 @@
                               (:cookies-value rc "lucidplan-ticket-sort"))
                              (else "last-edited-at-desc")))
                 (query-sort (entity-sort-from-query user-sort))
+                ;; The columns the board draws are this project's own statuses:
+                ;; its list if it kept one, the instance's otherwise.
+                (project-details (get-project-by-human-id project-repo
+                                                          (params rc
+                                                                  "project")))
+                (statuses (effective-ticket-statuses project-details))
                 (project-tickets (get-tickets ticket-repo
                                               (params rc "project")
                                               query-sort))
@@ -75,6 +81,7 @@
                                                                  "project")
                                                       #:tickets
                                                       project-tickets
+                                                      #:statuses statuses
                                                       #:current-sort user-sort
                                                       #:ticket-id-to-human-id
                                                       ticket-id-to-human-id

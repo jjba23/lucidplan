@@ -113,6 +113,12 @@
                  (url (uri-encode (assoc-ref body "url")))
                  (vcs-url (uri-encode (assoc-ref body "vcs-url")))
                  (human-id (assoc-ref body "human-id"))
+                 ;; The statuses this project's own tickets move through, as
+                 ;; the operator wrote them -- the same field the edit page
+                 ;; offers, so a project can be created with its own ladder
+                 ;; rather than only given one afterwards.  Nothing here
+                 ;; means the project uses the instance's statuses.
+                 (ticket-statuses (assoc-ref body "ticket-statuses"))
                  (new-uuid (string-replace-substring (generate-string-uuid)
                                                      "\n" ""))
                  (project-repo (make-sqlite-project-repository rc)))
@@ -124,6 +130,10 @@
                               (description unquote description)
                               (url unquote url)
                               (vcs-url unquote vcs-url)
+                              (ticket-statuses unquote
+                                               (if ticket-statuses
+                                                   ticket-statuses
+                                                   ""))
                               (created-at unquote
                                           (current-time))))
             (redirect-to rc
@@ -173,6 +183,13 @@
                  (url (uri-encode (assoc-ref body "url")))
                  (vcs-url (uri-encode (assoc-ref body "vcs-url")))
                  (human-id (assoc-ref body "human-id"))
+                 ;; The statuses this project's own tickets move through, as
+                 ;; the operator wrote them, or nothing -- which is the row a
+                 ;; project that uses the instance's statuses keeps.  The
+                 ;; text is stored as it was typed, so the editor round-trips
+                 ;; exactly what was entered, and it is the domain that reads
+                 ;; it back (see `parse-ticket-statuses').
+                 (ticket-statuses (assoc-ref body "ticket-statuses"))
                  (project-repo (make-sqlite-project-repository rc)))
             (update-project-by-human-id project-repo
                                         (params rc "human-id")
@@ -181,6 +198,10 @@
                                           (vcs-url unquote vcs-url)
                                           (description unquote description)
                                           (title unquote title)
+                                          (ticket-statuses unquote
+                                                           (if ticket-statuses
+                                                               ticket-statuses
+                                                               ""))
                                           (updated-at unquote
                                                       (current-time))))
 

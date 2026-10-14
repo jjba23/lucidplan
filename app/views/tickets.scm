@@ -135,30 +135,23 @@
 ;; =============================================================================
 
 ;; The form and the ticket's own page offer the same rows, so the rows are
-;; built in one place -- and the rows a ladder offers are the values the
-;; schema holds (`ticket-statuses', `ticket-types'), with the label and the
-;; glyph a reader is shown hung off them here.  A value with no label of its
-;; own is shown as the value itself, so a ladder that grows in the domain
-;; still renders a row rather than dropping one.
+;; built in one place -- and the rows a ladder offers are the statuses the
+;; page was built with (`specs': a project's own list, or the instance's) and
+;; the values the schema holds for types, with the label and the glyph a
+;; reader is shown hung off them here.  A value with no label of its own is
+;; shown as the value itself, so a ladder that grows still renders a row
+;; rather than dropping one.
 ;;
-;; A row's label is written as a call of the reader's translator rather than
-;; looked up in a table of plain strings, so that the extractor finds every
-;; one of them: a label that only ever reaches the page as the argument of a
-;; lookup is invisible to `xgettext', and both ladders would then stay in
-;; English inside an otherwise translated page.
+;; A row's label and its mark are resolved by the shared helpers in
+;; `(lucidplan html)' -- `status-label' is the label a reader sees, translated
+;; when it is one of the shipped labels, and `status-icon-node' is the mark --
+;; and both read the ladder the page was built with, so this file only has to
+;; say which ladder that is.
 ;;
 ;; A row's glyph is a character rather than an icon component: a native menu
-;; lays out the text of a row and renders nothing nested inside it (see
-;; `glyph-for-ticket-status').
-(define (ticket-status-label G_ status)
-  (cond
-    ((equal? status "todo") (G_ "To-do"))
-    ((equal? status "work-in-progress") (G_ "Work in Progress"))
-    ((equal? status "in-review") (G_ "In Review"))
-    ((equal? status "done") (G_ "Done"))
-    ((equal? status "rejected") (G_ "Rejected"))
-    (else status)))
-
+;; lays out the text of a row and renders nothing nested inside it, so the
+;; character comes from the ladder the page was built with (see
+;; `ticket-status-glyph').
 (define (ticket-type-label G_ type)
   (cond
     ((equal? type "task") (G_ "Task"))
@@ -176,9 +169,13 @@
                        #:selected-value selected))
        values))
 
-(define (ticket-status-choices G_ selected)
-  (ticket-choices G_ ticket-statuses ticket-status-label
-                  glyph-for-ticket-status selected))
+(define (ticket-status-choices G_ specs selected)
+  (map (lambda (value)
+         (glyph-option #:value value
+                       #:glyph (ticket-status-glyph specs value)
+                       #:content (status-label G_ specs value)
+                       #:selected-value selected))
+       (ticket-status-values specs)))
 
 (define (ticket-type-choices G_ selected)
   (ticket-choices G_ ticket-types ticket-type-label
@@ -281,6 +278,7 @@ at the first of them."
                         #:key project ticket
                         (assignee #f)
                         (editable? #f)
+                        (statuses (default-ticket-statuses))
                         (id-suffix ""))
   (let* ((t-ref (lambda (k)
                   (assq-ref ticket k)))
@@ -330,7 +328,8 @@ at the first of them."
                                                    #:value status
                                                    #:id-suffix id-suffix
                                                    #:options (ticket-status-choices
-                                                              G_ status)))
+                                                              G_ statuses
+                                                              status)))
                        (div (@ (class ,(mk-class '(flex flex-col gap-3))))
                             (small (@ (class ,%label-face))
                                    ,(G_ "type"))
@@ -343,8 +342,8 @@ at the first of them."
                                                    #:options (ticket-type-choices
                                                               G_ type))))
                      `(,(render-meta-badge (G_ "status")
-                                           (emoji-for-ticket-status status)
-                                           (ticket-status-label G_ status))
+                                           (status-icon-node statuses status)
+                                           (status-label G_ statuses status))
                        ,(render-meta-badge (G_ "type")
                                            (emoji-for-ticket-type type)
                                            (ticket-type-label G_ type)))))
@@ -413,6 +412,7 @@ at the first of them."
                                  ticket-id-to-human-id
                                  ticket-assignee
                                  user-names
+                                 (statuses (default-ticket-statuses))
                                  (editable? #f)
                                  (reorderable? #f))
   (let* ((t-ref (lambda (k)
@@ -479,6 +479,7 @@ at the first of them."
                                ;; other rows carry; the page says which row
                                ;; by naming it.
                                #:editable? editable?
+                               #:statuses statuses
                                #:id-suffix (format #f "-row-~a" human-id)
                                #:assignee (if (nil? assignee-user) #f
                                               (assq-ref assignee-user
@@ -514,6 +515,7 @@ at the first of them."
                             ticket-assignee
                             with-done
                             with-rejected
+                            (statuses (default-ticket-statuses))
                             search-query)
   (let* ( ;Core Data
           (proj-human-id (assq-ref project-details
@@ -583,9 +585,19 @@ at the first of them."
          ;; narrows `tickets' to the still-open ones, so the done and rejected
          ;; partitions must be taken from the untouched list.
          (all-tickets tickets)
-         (tickets (filter only-tickets-filter all-tickets))
-         (done-tickets (filter only-done-tickets-filter all-tickets))
-         (rejected-tickets (filter only-rejected-tickets-filter all-tickets))
+         ;; Which bucket a ticket belongs to is its own status's business, as
+         ;; the page's ladder describes it; a status the ladder does not name
+         ;; counts as open, so a ticket carrying one stays reachable.
+         (all-in-bucket
+          (lambda (bucket)
+            (filter (lambda (t)
+                      (ticket-status-in-bucket? statuses
+                                                (assq-ref t 'ticket-status)
+                                                bucket))
+                    all-tickets)))
+         (tickets (all-in-bucket "open"))
+         (done-tickets (all-in-bucket "done"))
+         (rejected-tickets (all-in-bucket "rejected"))
          (ticket-list `((div (@ (id lucidplan-tickets-list)
                                 (data-project-id ,proj-human-id)
                                 ;; The number a drop writes is the one that
@@ -623,6 +635,7 @@ at the first of them."
                                         ticket-id-to-human-id
                                         #:ticket-assignee ttt-assignee
                                         #:user-names user-names
+                                        #:statuses statuses
                                         #:editable? triage?
                                         #:reorderable? reorderable?)))
                                      tickets))))
@@ -640,8 +653,9 @@ at the first of them."
                                                                 flex-row
                                                                 gap-2
                                                                 my-4))))
-                                         ,(emoji-for-ticket-status "done")
-                                         (span ,(G_ "done")))
+                                         ,(bucket-icon-node statuses "done")
+                                         (span ,(bucket-heading
+                                                 G_ statuses "done")))
                                      (div (@ (class ,(mk-class '(flex flex-col
                                                                  gap-2))))
                                           ,(map (lambda (t)
@@ -653,6 +667,7 @@ at the first of them."
                                                    #:ticket-assignee
                                                    ticket-assignee
                                                    #:user-names user-names
+                                                   #:statuses statuses
                                                    #:editable? triage?))
                                                 done-tickets)))
                                '()))
@@ -671,9 +686,11 @@ at the first of them."
                                                                     flex-row
                                                                     gap-2
                                                                     my-4))))
-                                             ,(emoji-for-ticket-status
-                                               "rejected")
-                                             (span ,(G_ "rejected")))
+                                             ,(bucket-icon-node statuses
+                                                                "rejected")
+                                             (span ,(bucket-heading
+                                                     G_ statuses
+                                                     "rejected")))
                                          (div (@ (class ,(mk-class '(flex
                                                                      flex-col
                                                                      gap-2))))
@@ -687,6 +704,7 @@ at the first of them."
                                                        #:ticket-assignee
                                                        ticket-assignee
                                                        #:user-names user-names
+                                                       #:statuses statuses
                                                        #:editable? triage?))
                                                     rejected-tickets)))
                                    '()))
@@ -860,11 +878,13 @@ at the first of them."
                                 ,@(render-quiet-notice G_)))))
 
 (define* (html-new-ticket-form G_
-                               #:key projects project users is-logged-in)
+                               #:key projects project users is-logged-in
+                               (statuses (default-ticket-statuses)))
   (html-ticket-form G_
                     #:is-logged-in is-logged-in
                     #:project project
                     #:projects projects
+                    #:statuses statuses
                     #:users users
                     #:page-title (G_ "new ticket")
                     #:canonical-path (format #f "/tickets/~a/new" project)
@@ -876,11 +896,13 @@ at the first of them."
                                 t
                                 assignee
                                 users
-                                is-logged-in)
+                                is-logged-in
+                                (statuses (default-ticket-statuses)))
   (html-ticket-form G_
                     #:is-logged-in is-logged-in
                     #:project project
                     #:is-edit #t
+                    #:statuses statuses
                     #:title (assq-ref t
                                       'title)
                     #:description (assq-ref t
@@ -905,6 +927,7 @@ at the first of them."
                            (title "")
                            (description "")
                            (ticket-status "")
+                           (statuses (default-ticket-statuses))
                            (ticket-type "")
                            (priority 0)
                            (assignee "")
@@ -927,7 +950,7 @@ at the first of them."
          (safe-prio (or priority 0))
 
          ;; The two ladders every triage control in the app shares
-         (status-opts (ticket-status-choices G_ ticket-status))
+         (status-opts (ticket-status-choices G_ statuses ticket-status))
 
          (type-opts (ticket-type-choices G_ ticket-type))
 

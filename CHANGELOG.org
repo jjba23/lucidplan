@@ -26,6 +26,18 @@ sqlite3 database.db "INSERT INTO table VALUES (something)"
 
 ----------------------------------
 
+* v1.8.0
+
+Added ~ticket_statuses~ column to the ~project~ table:
+
+#+begin_src sh
+sqlite3 database.db 'ALTER TABLE "project" ADD COLUMN "ticket_statuses" varchar(4096)'
+#+end_src
+
+The statuses a ticket moves through are no longer fixed in the code. An instance sets ~ticket-statuses~ in its ~env.scm~ to rename, add, remove and reorder them, and any project may override the whole list for itself from its own edit page. The README has a section on both, ~Renaming or changing the ticket statuses~ and ~A project with its own statuses~.
+
+What the front page says about the software -- the two headings, the lines under them and the feature cards -- moved into configuration too, as ~landing-features-title~, ~landing-features-intro~, ~landing-features~, ~landing-workflow-title~ and ~landing-workflow-intro~.
+
 * v0.7.1
 
 Had to remake the users table, so as to accomodate the bewaking permission system.

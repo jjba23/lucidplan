@@ -36,6 +36,7 @@
   #:use-module (artanis i18n locale)
   #:use-module (ice-9 i18n)
   #:use-module (lucidplan html)
+  #:use-module (lucidplan domain)
   #:use-module (hygguile hygguile)
   #:use-module (artanis route)
   #:use-module (kracht prelude)
@@ -94,24 +95,29 @@
                               ticket-id-to-human-id
                               is-logged-in
                               (can-drag? #f)
+                              (statuses (default-ticket-statuses))
                               (current-sort #f))
 
   (let* (;; Whether a card offers its drag grip is the same question the
          ;; endpoints that move and restatus a ticket answer, so the board
          ;; shows the grip to exactly the readers those endpoints accept.
          (draggable? can-drag?)
-         (get-tickets (lambda (status-str)
-                        (filter (lambda (x)
-                                  (string=? status-str
-                                            (assq-ref x
-                                                      'ticket-status)))
-                                tickets)))
+         (tickets-with-status (lambda (status)
+                                (filter (lambda (x)
+                                          (string=? status
+                                                    (assq-ref x
+                                                              'ticket-status)))
+                                        tickets)))
 
-         (tickets-todo (get-tickets "todo"))
-         (tickets-wip (get-tickets "work-in-progress"))
-         (tickets-rev (get-tickets "in-review"))
-         (tickets-done (get-tickets "done"))
-         (tickets-rej (get-tickets "rejected"))
+         ;; Which statuses the board is drawn from is the page's ladder: the
+         ;; open ones are the columns, in the ladder's order, and the closed
+         ;; ones are the sections under the board.  A status an instance adds
+         ;; therefore gets a column (or a section) of its own without the
+         ;; board being told about it.
+         (open-statuses (ticket-status-values-in-bucket statuses "open"))
+         (done-statuses (ticket-status-values-in-bucket statuses "done"))
+         (rejected-statuses (ticket-status-values-in-bucket statuses
+                                                            "rejected"))
 
          ;; Consolidate CSS Faces
          (kanban-wrap-face (mk-class '(flex flex-col gap-3 grow)))
@@ -194,8 +200,8 @@
          (build-col (lambda (status title list face)
                       `((div (@ (class ,face))
                              (div (@ (class ,col-title-face))
-                                  ,(emoji-for-ticket-status status)
-                                  ,(sub-h3 (G_ title))
+                                  ,(status-icon-node statuses status)
+                                  ,(sub-h3 title)
                                   (span (@ (class ,count-face))
                                         ,(format #f " ( ~a ) "
                                                  (length list))))
@@ -232,9 +238,9 @@
                                     (details (@ (class ,(mk-class '(cursor-pointer))))
                                              (summary (@ (class ,summary-face))
                                                       (div (@ (class ,col-title-face))
-                                                           ,(emoji-for-ticket-status
-                                                             status)
-                                                           ,(sub-h3 (G_ title))
+                                                           ,(status-icon-node
+                                                             statuses status)
+                                                           ,(sub-h3 title)
                                                            (span (@ (class ,count-face))
                                                                  ,(format #f
                                                                    " ( ~a ) "
@@ -307,20 +313,26 @@
 
                              ;; Main Board
                              (div (@ (class ,board-face))
-                                  ,(build-col "todo" "To-do" tickets-todo
-                                              std-col-face)
-                                  ,(build-col "work-in-progress"
-                                              "Work in Progress" tickets-wip
-                                              std-col-face)
-                                  ,(build-col "in-review" "In Review"
-                                              tickets-rev std-col-face))
+                                  ,@(map (lambda (status)
+                                           (build-col status
+                                                      (status-label
+                                                       G_ statuses status)
+                                                      (tickets-with-status
+                                                       status)
+                                                      std-col-face))
+                                         open-statuses))
 
                              )
+                        ;; The closed statuses sit under the board, one
+                        ;; section each, in the ladder's order.
                         (div (@ (class ,(mk-class '(px-1))))
-                             ,(build-details-col "done" "Done" tickets-done)
-
-                             ,(build-details-col "rejected" "Rejected"
-                                                 tickets-rej)))))
+                             ,@(map (lambda (status)
+                                      (build-details-col
+                                       status
+                                       (status-label G_ statuses status)
+                                       (tickets-with-status status)))
+                                    (append done-statuses
+                                            rejected-statuses))))))
 
     ;; Render final template
     (html-template G_

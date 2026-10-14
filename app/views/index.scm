@@ -33,6 +33,7 @@
 (define-module (app views index)
   #:use-module (lucidplan html)
   #:use-module (lucidplan config)
+  #:use-module (lucidplan domain)
   #:use-module (artanis artanis)
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
@@ -57,40 +58,15 @@
             border-stone-500/25
             dark:border-onyx-100/25)))
 
-;; What the software does, one promise to a card, each with the glyph for what
-;; it says.  The claims are the project's own -- the same ones the about page
-;; lists -- kept short enough to be taken in at a glance rather than read as a
-;; paragraph, which is the whole point of putting them on the front page.
-(define landing-promises
-  '((squares-four
-     "multi-project workspaces"
-     "Run dozens of projects from one dashboard and switch between them without losing your place.")
-    (list-checks
-     "backlog management"
-     "A clean, sortable backlog where every task can be dragged into the order it should be done in.")
-    (kanban
-     "kanban boards"
-     "Track tickets as they move through To-do, Work in Progress, In Review and beyond.")
-    (file-text
-     "org-mode everywhere"
-     "Write titles and descriptions in Org syntax and see them rendered as rich HTML.")
-    (shield-check
-     "granular permissions"
-     "An access control list written as plain Lisp lists, so exactly what each user may do is explicit.")
-    (heart
-     "free software"
-     "Licensed under the GNU AGPL v3 or newer and hackable end to end in Scheme.")))
-
-;; The columns a ticket moves through, in the order the board shows them.  The
-;; names are the ones the board translates its own columns with, and the keys
-;; are the statuses it stores, so the mock on the front page cannot drift from
-;; the board behind it.
-(define landing-workflow-columns
-  '(("todo" . "To-do")
-    ("work-in-progress" . "Work in Progress")
-    ("in-review" . "In Review")
-    ("done" . "Done")
-    ("rejected" . "Rejected")))
+;; One field of one configured feature, or FALLBACK: the front page's copy is
+;; configuration (see `(lucidplan config)'), and a hand-written entry is not a
+;; promise about its own shape, so every field is read as text and a feature
+;; with no icon of its own still draws one.
+(define (landing-feature-field feature n fallback)
+  (let ((value (and (list? feature)
+                    (> (length feature) n)
+                    (list-ref feature n))))
+    (if (string? value) value fallback)))
 
 (define* (welcome-page G_
                        #:key is-logged-in projects selected-locale)
@@ -230,15 +206,17 @@
 ;; The promises, on the page a visitor lands on rather than only on the page
 ;; they would have to go looking for: what a stranger wants after "what is
 ;; this" is "what does it do", and the answer is short enough to be glanced at.
-;; One promise to a card, each with the glyph for what it says, so the six can
-;; be taken in at a glance instead of read as six sentences in a row.
+;; One feature to a card, each with the glyph for what it says, so the six can
+;; be taken in at a glance instead of read as six sentences in a row.  The
+;; heading, the line under it and the features themselves are configuration
+;; (see `(lucidplan config)'), so an instance says what it does in its own
+;; words without this view being edited.
 (define (landing-features G_)
   `(section (@ (class ,(mk-class '(flex flex-col gap-4))))
-            ,(h2 (G_ "everything a team needs, nothing it does not")
+            ,(h2 (G_ (config-ref 'landing-features-title))
                  #:weight '(font-bold)
                  #:size '(text-2xl md:text-3xl))
-            ,(p (G_
-                 "LucidPlan keeps the workflow simple and approachable while giving teams of every shape and size the structure they need.")
+            ,(p (G_ (config-ref 'landing-features-intro))
                 #:weight '(font-light)
                 #:size '(text-md))
             (ul (@ (class ,(mk-class '(list-none
@@ -248,50 +226,53 @@
                                        sm:grid-cols-2
                                        lg:grid-cols-3
                                        gap-4))))
-                ,@(map (lambda (promise)
+                ,@(map (lambda (feature)
                          `(li (@ (class ,(mk-class (append landing-card-classes
                                                           '(p-5
                                                             flex
                                                             flex-col
                                                             gap-3)))))
-                              ,(icon #:type (car promise)
+                              ,(icon #:type (string->symbol
+                                             (landing-feature-field
+                                              feature 0 "circle"))
                                      #:icon-css '(text-3xl
                                                   text-jeans-blue-700
                                                   dark:text-jeans-blue-300))
-                              ,(h4 (G_ (cadr promise)))
-                              ,(p (G_ (caddr promise))
+                              ,(h4 (G_ (landing-feature-field feature 1 "")))
+                              ,(p (G_ (landing-feature-field feature 2 ""))
                                   #:weight '(font-light)
                                   #:size '(text-sm))))
-                       landing-promises))))
+                       (config-ref 'landing-features)))))
 
 ;;; ====== A board, drawn from the board ======
 
 ;; The one picture the page shows of itself, and it is not a screenshot: the
-;; columns are the ones the board renders, in the order and under the names it
-;; renders them, drawn from the same helper that draws the board's own column
-;; headings.  The bars under each heading are decoration -- a suggestion of
-;; the cards that would be there -- so they are hidden from assistive
-;; technology and the headings carry the meaning.
+;; columns are the open statuses the instance configured, in the order the
+;; board shows them and under the names it gives them, drawn from the same
+;; helpers that draw the board's own column headings.  The bars under each
+;; heading are decoration -- a suggestion of the cards that would be there --
+;; so they are hidden from assistive technology and the headings carry the
+;; meaning.
 (define (landing-workflow G_)
-  `(section (@ (class ,(mk-class '(flex flex-col gap-4))))
-            ,(h2 (G_ "a workflow that fits how your team works")
-                 #:weight '(font-bold)
-                 #:size '(text-2xl md:text-3xl))
-            ,(p (G_
-                 "Every ticket is a row on a board: move it along the columns as the work moves, and let the state of the board tell you where the project stands.")
-                #:weight '(font-light)
-                #:size '(text-md))
-            (div (@ (class ,(mk-class '(flex flex-row
-                                              flex-wrap
-                                              items-stretch
-                                              gap-3))))
-                 ,@(map (lambda (column)
-                          (landing-workflow-column (car column) (G_ (cdr column))))
-                        landing-workflow-columns))))
+  (let ((specs (default-ticket-statuses)))
+    `(section (@ (class ,(mk-class '(flex flex-col gap-4))))
+              ,(h2 (G_ (config-ref 'landing-workflow-title))
+                   #:weight '(font-bold)
+                   #:size '(text-2xl md:text-3xl))
+              ,(p (G_ (config-ref 'landing-workflow-intro))
+                  #:weight '(font-light)
+                  #:size '(text-md))
+              (div (@ (class ,(mk-class '(flex flex-row
+                                                flex-wrap
+                                                items-stretch
+                                                gap-3))))
+                   ,@(map (lambda (status)
+                            (landing-workflow-column G_ specs status))
+                          (ticket-status-values-in-bucket specs "open"))))))
 
-;; One column of that board: its heading carries the status glyph and the name
-;; the board gives it, and the bars below suggest the cards it would hold.
-(define (landing-workflow-column status label)
+;; One column of that board: its heading carries the status's own mark and the
+;; name the board gives it, and the bars below suggest the cards it would hold.
+(define (landing-workflow-column G_ specs status)
   `(div (@ (class ,(mk-class (append landing-card-classes
                                      '(flex-1
                                        min-w-32
@@ -301,8 +282,9 @@
                                        flex-col
                                        gap-2)))))
         (div (@ (class ,(mk-class '(flex flex-row gap-2 items-center))))
-             ,(emoji-for-ticket-status status)
-             (span (@ (class ,(mk-class '(font-medium text-sm)))) ,label))
+             ,(status-icon-node specs status)
+             (span (@ (class ,(mk-class '(font-medium text-sm))))
+                   ,(status-label G_ specs status)))
         ,(landing-board-bar 100)
         ,(landing-board-bar 72)
         ,(landing-board-bar 45)))

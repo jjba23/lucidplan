@@ -41,6 +41,7 @@
   #:use-module (ice-9 textual-ports)
   #:use-module (orgwebalchemy html)
   #:use-module (lucidplan config)
+  #:use-module (lucidplan domain)
   #:use-module (artanis route))
 
 (define-public asset-library
@@ -628,26 +629,64 @@ run against a default address somebody else runs."
   (export html-template frosted-tint-classes render-page asset-href
           emoji-for-ticket-status emoji-for-ticket-type
           glyph-for-ticket-status glyph-for-ticket-type
+          status-label status-icon-node bucket-heading bucket-icon-node
           lucidplan-locales locale-choose-form))
 
-(define-public (emoji-for-ticket-status ticket-status)
+;;; ===== How a status is drawn, from the status itself =====
+;;;
+;;; What marks a status on a page, what it is called and how a closed bucket
+;;; is titled are all read from the status ladder the page was built with --
+;;; a project's own list or the instance's -- rather than from tables kept
+;;; here beside them, so a status an instance adds, renames or removes is
+;;; drawn by the same one lookup the rest of the application uses.
+;;;
+;;; The shipped labels are written as calls of the reader's translator rather
+;;; than looked up in a table of plain strings, so that the extractor finds
+;;; every one of them: a label that only ever reaches the page as the
+;;; argument of a lookup is invisible to `xgettext', and the ladder would
+;;; then stay in English inside an otherwise translated page.  A label an
+;;; operator wrote is shown exactly as written, since nothing can translate
+;;; it.
+(define (translate-status-label G_ label)
   (cond
-    ((equal? "todo" ticket-status)
-     `((i (@ (class ,(mk-class '(ph ph-anchor text-onyx-300
-                                    dark:text-stone-300 text-xl)))) "")))
-    ((equal? "work-in-progress" ticket-status)
-     `((i (@ (class ,(mk-class '(ph ph-gear-fine text-onyx-300
-                                    dark:text-stone-300 text-xl)))) "")))
-    ((equal? "in-review" ticket-status)
-     `((i (@ (class ,(mk-class '(ph ph-list-magnifying-glass text-onyx-300
-                                    dark:text-stone-300 text-xl)))) "")))
-    ((equal? "done" ticket-status)
-     `((i (@ (class ,(mk-class '(ph ph-check text-onyx-300 dark:text-stone-300
-                                    text-xl)))) "")))
-    ((equal? "rejected" ticket-status)
-     `((i (@ (class ,(mk-class '(ph ph-x text-onyx-300 dark:text-stone-300
-                                    text-xl)))) "")))
-    (else "")))
+    ((equal? label "To-do") (G_ "To-do"))
+    ((equal? label "Work in Progress") (G_ "Work in Progress"))
+    ((equal? label "In Review") (G_ "In Review"))
+    ((equal? label "Done") (G_ "Done"))
+    ((equal? label "Rejected") (G_ "Rejected"))
+    (else label)))
+
+(define-public (status-label G_ specs status)
+  "The label a reader is shown for STATUS, resolved through SPECS and
+translated when it is one of the shipped labels."
+  (translate-status-label G_ (ticket-status-label specs status)))
+
+(define-public (status-icon-node specs status)
+  "The mark STATUS wears on a card or a heading, as an SXML node."
+  (list (icon #:type (string->symbol (ticket-status-icon specs status))
+              #:icon-css '(text-onyx-300 dark:text-stone-300 text-xl))))
+
+;; A closed bucket is titled by the status inside it when it holds exactly
+;; one -- so renaming that status renames the section -- and by the bucket's
+;; own name when it holds several, since there is then no one name to borrow.
+(define-public (bucket-heading G_ specs bucket)
+  (let ((values (ticket-status-values-in-bucket specs bucket)))
+    (if (and (pair? values) (null? (cdr values)))
+        (status-label G_ specs (car values))
+        (G_ bucket))))
+
+(define-public (bucket-icon-node specs bucket)
+  (let ((values (ticket-status-values-in-bucket specs bucket)))
+    (if (and (pair? values) (null? (cdr values)))
+        (status-icon-node specs (car values))
+        (list (icon #:type (if (equal? bucket "rejected") 'x 'check)
+                    #:icon-css '(text-onyx-300 dark:text-stone-300
+                                 text-xl))))))
+
+;; The two the landing page and the ticket badges answer without a project in
+;; hand: they are drawn from the instance's own ladder.
+(define-public (emoji-for-ticket-status ticket-status)
+  (status-icon-node (default-ticket-statuses) ticket-status))
 
 (define-public (emoji-for-ticket-type ticket-type)
   (cond
@@ -678,13 +717,7 @@ run against a default address somebody else runs."
 ;;; for the same thing its Phosphor icon does, so a status reads the same
 ;;; whichever control is showing it.
 (define-public (glyph-for-ticket-status ticket-status)
-  (cond
-    ((equal? "todo" ticket-status) "⚓")
-    ((equal? "work-in-progress" ticket-status) "⚙️")
-    ((equal? "in-review" ticket-status) "🔍")
-    ((equal? "done" ticket-status) "✅")
-    ((equal? "rejected" ticket-status) "❌")
-    (else "")))
+  (ticket-status-glyph (default-ticket-statuses) ticket-status))
 
 (define-public (glyph-for-ticket-type ticket-type)
   (cond

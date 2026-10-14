@@ -40,6 +40,29 @@
         (lucidplan sqlite user)
         (hygguile hygguile))
 
+;; A refused change is answered as JSON, with the status that says which kind
+;; of refusal it was.  (`http-status' cannot do this: it *registers* the
+;; handler a status is rendered with, so calling it here would make the
+;; handler's own return value a procedure -- and the response would be a 500
+;; about an invalid body.)
+(define (refuse-json status message)
+  (response-emit (scm->json-string `((error . ,message)))
+                 #:status status
+                 #:headers '((content-type . (application/json)))))
+
+;; A status a form submitted is honoured only when the project's own ladder
+;; offers it: a status renamed away, or a value typed by hand, falls back to
+;; the first open status, so a ticket is never left in a state its own board
+;; cannot show.
+(define (submitted-status statuses value)
+  (if (and (string? value)
+           (member value (ticket-status-values statuses)))
+      value
+      (let ((open (ticket-status-values-in-bucket statuses "open")))
+        (if (pair? open)
+            (car open)
+            (car (ticket-status-values statuses))))))
+
 (get "/tickets/:project"
      #:mime 'xml
      #:i18n '(cookie "lang")
@@ -124,6 +147,9 @@
                 (query-sort (entity-sort-from-query user-sort))
                 (project-details (get-project-by-human-id project-repo
                                                           (params rc "project")))
+                ;; The statuses this project's tickets move through: its own
+                ;; list if it kept one, the instance's otherwise.
+                (statuses (effective-ticket-statuses project-details))
                 (tickets (cond
                            ((eq? #f user-search)
                             (get-tickets ticket-repo
@@ -159,6 +185,7 @@
                                                     #:with-done with-done
                                                     #:with-rejected
                                                     with-rejected
+                                                    #:statuses statuses
                                                     #:search-query user-search
                                                     ;; Whether a ticket's row
                                                     ;; offers its inline triage
@@ -181,7 +208,10 @@
      (lambda (rc)
        (define (get-new)
          (let* ((project-repo (make-sqlite-project-repository rc))
-                (user-repo (make-sqlite-user-repository rc)))
+                (user-repo (make-sqlite-user-repository rc))
+                (project-details (get-project-by-human-id project-repo
+                                                          (params rc
+                                                                  "project"))))
            (response-emit (:mime rc
                                  (html-new-ticket-form (:i18n rc)
                                                        #:is-logged-in (:cookies-value
@@ -191,6 +221,9 @@
                                                                    project-repo)
                                                        #:project (params rc
                                                                   "project")
+                                                       #:statuses
+                                                       (effective-ticket-statuses
+                                                        project-details)
                                                        #:users (get-id-to-username
                                                                 user-repo))))))
        (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
@@ -229,6 +262,9 @@
       (lambda (rc)
         (define (do-new)
           (let* ((project-repo (make-sqlite-project-repository rc))
+                 (statuses (effective-ticket-statuses
+                            (get-project-by-human-id project-repo
+                                                     (params rc "project"))))
                  (ticket-repo (make-sqlite-ticket-repository rc))
                  (latest-ticket (get-ticket-of-latest-human-id ticket-repo
                                                                (params rc
@@ -240,7 +276,8 @@
                  (_ (write new-human-id))
                  (body (alist-from-url-encoded-body (rc-body rc)))
                  (title (html-escape (assoc-ref body "title")))
-                 (ticket-status (assoc-ref body "ticket-status"))
+                 (ticket-status (submitted-status statuses
+                                                  (assoc-ref body "ticket-status")))
                  (ticket-type (assoc-ref body "ticket-type"))
                  (description (html-escape (assoc-ref body "description")))
                  (priority (string->number (assoc-ref body "priority")))                (project-id (project-id-from-human-id project-repo
@@ -305,6 +342,9 @@
                                                                  "project")
                                                                 (params rc
                                                                  "human-id")))
+                (project-details (get-project-by-human-id project-repo
+                                                          (params rc
+                                                                  "project")))
                 (assignee-data (get-ticket-assignee-by-ticket-id
                                 ticket-assignee-repo
                                 (assq-ref t
@@ -318,6 +358,9 @@
                                                         #:project (params rc
                                                                    "project")
                                                         #:t t
+                                                        #:statuses
+                                                        (effective-ticket-statuses
+                                                         project-details)
                                                         #:assignee assignee
                                                         #:users (get-id-to-username
                                                                  user-repo)
@@ -371,21 +414,29 @@
         (define (do-re-status)
           (let* ((proj (params rc "project"))
                  (human-id (params rc "human-id"))
+                 (project-repo (make-sqlite-project-repository rc))
                  (ticket-repo (make-sqlite-ticket-repository rc))
+                 ;; A card can only be dropped into a column the board drew,
+                 ;; so a status the project's own ladder does not name is a
+                 ;; request the server refuses rather than one it writes.
+                 (statuses (effective-ticket-statuses
+                            (get-project-by-human-id project-repo proj)))
                  (raw-b (bytevector->string (rc-body rc) "utf-8"))
                  (b (json-string->scm raw-b))
                  (new-status (assoc-ref b "status")))
 
-            (if (and new-status
-                     (update-ticket-by-project-human-id-and-human-id
-                      ticket-repo proj human-id
-                      `((ticket-status unquote new-status))))
-                (:mime rc
-                       '(("result" . "success")))
-                (http-status 500
-                             (lambda ()
-                               (:mime rc
-                                      '(("error" . "Failed to update status"))))))))
+            (cond
+              ((not (and (string? new-status)
+                         (member new-status
+                                 (ticket-status-values statuses))))
+               (refuse-json 400 "Unknown status"))
+              ((update-ticket-by-project-human-id-and-human-id
+                ticket-repo proj human-id
+                `((ticket-status unquote new-status)))
+               (:mime rc
+                      '(("result" . "success"))))
+              (else
+               (refuse-json 500 "Failed to update status")))))
         (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
                            #:needed-permissions '(lucidplan:ticket-create)
                            #:rc rc
@@ -402,23 +453,18 @@
       #:from-post 'json
       #:cookies '(names x-bewaking-lucidplan)
       (lambda (rc)
-        ;; A refused change is answered as JSON, with the status that says
-        ;; which kind of refusal it was.  (`http-status' cannot do this: it
-        ;; *registers* the handler a status is rendered with, so calling it
-        ;; here would make the handler's own return value a procedure -- and
-        ;; the response would be a 500 about an invalid body.)
-        (define (refuse status message)
-          (response-emit (scm->json-string `((error . ,message)))
-                         #:status status
-                         #:headers '((content-type . (application/json)))))
         (define (do-field-change)
           (let* ((proj (params rc "project"))
                  (human-id (params rc "human-id"))
+                 (project-repo (make-sqlite-project-repository rc))
                  (ticket-repo (make-sqlite-ticket-repository rc))
+                 (statuses (effective-ticket-statuses
+                            (get-project-by-human-id project-repo proj)))
                  (raw-b (bytevector->string (rc-body rc) "utf-8"))
                  (b (json-string->scm raw-b))
                  (change (ticket-field-change (assoc-ref b "field")
-                                              (assoc-ref b "value")))
+                                              (assoc-ref b "value")
+                                              statuses))
                  ;; Ask for the ticket before writing it: an unknown project or
                  ;; human id then answers a plain "no such ticket" rather than
                  ;; resting on what the driver reports for a write that
@@ -427,9 +473,9 @@
                      ticket-repo proj human-id)))
             (cond
               ((not change)
-               (refuse 400 "Unknown field or value"))
+               (refuse-json 400 "Unknown field or value"))
               ((not t)
-               (refuse 404 "No such ticket"))
+               (refuse-json 404 "No such ticket"))
               (else
                ;; A change is an edit, so the ticket's own "last edited" stamp
                ;; moves with it and the backlog can order by it.
@@ -451,10 +497,14 @@
         (define (do-edit)
           (let* ((ticket-repo (make-sqlite-ticket-repository rc))
                  (project-repo (make-sqlite-project-repository rc))
+                 (statuses (effective-ticket-statuses
+                            (get-project-by-human-id project-repo
+                                                     (params rc "project"))))
                  (body (alist-from-url-encoded-body (rc-body rc)))
                  (title (html-escape (assoc-ref body "title")))
                  (description (html-escape (assoc-ref body "description")))
-                 (ticket-status (assoc-ref body "ticket-status"))
+                 (ticket-status (submitted-status statuses
+                                                  (assoc-ref body "ticket-status")))
                  (priority (string->number (assoc-ref body "priority")))
                  (ticket-type (assoc-ref body "ticket-type"))
                  (project-id (project-id-from-human-id project-repo
@@ -527,6 +577,9 @@
        (define (get-single)
          (let* ((project-repo (make-sqlite-project-repository rc))
                 (proj (get-projects project-repo))
+                (project-details (get-project-by-human-id project-repo
+                                                          (params rc
+                                                                  "project")))
                 (user-repo (make-sqlite-user-repository rc))
                 (ticket-repo (make-sqlite-ticket-repository rc))
                 (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
@@ -557,6 +610,8 @@
                               (:i18n rc)
                               #:project (params rc "project")
                               #:ticket t
+                              #:statuses
+                              (effective-ticket-statuses project-details)
                               #:assignee (if (nil? ticket-assignee-user)
                                              #f
                                              (assq-ref ticket-assignee-user
