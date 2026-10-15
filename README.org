@@ -19,6 +19,7 @@ It's a flexible system made to simplify everyone's life, accessible to all kinds
 of users -- and free software (free as in freedom), licensed under the
 GNU Affero General Public License v3 or newer.
 
+#+name: lucidplan-showcase
 #+caption: The front page, the projects dashboard, a card dragged across a board, the backlog with a ticket opened, and the same board in the dark theme.
 [[https://codeberg.org/jjba23/lucidplan/raw/branch/trunk/docs/lucidplan-showcase.gif]]
 
@@ -42,6 +43,9 @@ is this file exported.
 ------------------
 
 * What LucidPlan is
+:PROPERTIES:
+:CUSTOM_ID: what-lucidplan-is
+:END:
 
 LucidPlan enhances the use of Agile work methodologies in teams thanks to its
 fast-paced, no-nonsense workflows and deep customizability, also thanks to being
@@ -51,6 +55,9 @@ This tool is the fruit of years of experience using bloated proprietary systems
 like Jira and Trello, and experiencing the insane frustrations they bring.
 
 ** Who it is for
+:PROPERTIES:
+:CUSTOM_ID: who-it-is-for
+:END:
 
 - *Small teams* that want a board and a backlog today, not a six-week rollout.
 - *Dozens of projects at once*: one workspace, one dashboard, one search box.
@@ -60,12 +67,18 @@ like Jira and Trello, and experiencing the insane frustrations they bring.
   machine, under their own licence, without an account anywhere else.
 
 ** What it is built with
+:PROPERTIES:
+:CUSTOM_ID: what-it-is-built-with
+:END:
 
 Built with [[https://www.gnu.org/software/guile/][Guile Scheme]] and [[https://artanis.dev/][GNU Artanis]], [[https://sqlite.org/][SQLite]], [[https://codeberg.org/jjba23/olive-css][Olive CSS]] and some small sprinkles of vanilla JavaScript.
 
 ------------------
 
 * Features
+:PROPERTIES:
+:CUSTOM_ID: features
+:END:
 
 LucidPlan provides a comprehensive suite of tools to keep your projects
 organized:
@@ -87,17 +100,17 @@ organized:
   Permissions are handled using native Lisp lists (e.g.,
   ~`(lucidplan:ticket-create lucidplan:project-delete)~), allowing for
   incredibly fine-grained, programmatic access control, effectively providing an
-  easy to use ACL with which you can control exactly what each user can/cannot
+  easy to use [[https://en.wikipedia.org/wiki/Access-control_list][ACL]] with which you can control exactly what each user can/cannot
   do.
 - *Org mode support*: Titles and descriptions can be written using Org mode
   syntax, which enables more advanced media. This Org text gets automatically
-  rendered to attractive HTML.
+  rendered to attractive [[https://html.spec.whatwg.org/multipage/][HTML]].
 - *Flexible statuses*: the statuses a ticket moves through are configuration,
   not code -- rename them, drop the ones your team does not use, add your own,
   or give a single project its own board.
 - *Email notifications*: a new ticket is announced to everyone taking part in
   the project.
-- *A REST API*: =/api/v1= hands tickets and projects to your scripts, with the
+- *A [[https://en.wikipedia.org/wiki/Representational_state_transfer][REST]] [[https://en.wikipedia.org/wiki/API][API]]*: =/api/v1= hands tickets and projects to your scripts, with the
   same permissions the web interface uses.
 - *Fully Customizable*: Everything an instance says about itself -- its name,
   its description, its footer, the address mail is sent from -- is
@@ -109,17 +122,26 @@ organized:
   custom features.
 
 ** Two ways to start
+:PROPERTIES:
+:CUSTOM_ID: two-ways-to-start
+:END:
 
 |----------------------------------+----------------------------------------------------------------|
 | *Just want to look around?*      | Browse [[https://lucidplan.jointhefreeworld.org/][the public instance]] -- reading needs no account. |
-| *Want your own instance?*        | [[*Quick start (the impatient path)][Quick start]], then [[*Running LucidPlan yourself][Running LucidPlan yourself]]. |
+| *Want your own instance?*        | [[#quick-start-the-impatient-path][Quick start]], then [[#running-lucidplan-yourself][Running LucidPlan yourself]]. |
 |----------------------------------+----------------------------------------------------------------|
 
 ------
 
 * Using LucidPlan
+:PROPERTIES:
+:CUSTOM_ID: using-lucidplan
+:END:
 
 ** Backlog Management
+:PROPERTIES:
+:CUSTOM_ID: backlog-management
+:END:
 
 LucidPlan provides several ways to organize and work with tickets directly from
 the web interface. Ticket management is designed around fast, simple
@@ -152,29 +174,39 @@ are open, done and rejected, how many there are in total, and a completion
 bar -- plus a sort menu and a search box.
 
 ** Kanban Management
+:PROPERTIES:
+:CUSTOM_ID: kanban-management
+:END:
 
 The Kanban board also provides a drag-and-drop interaction. Dragging a ticket
 onto another Kanban column changes its status.
 
 For example, a ticket can be moved from:
 
+#+name: status-flow
 #+begin_example
 To-do → Work in Progress → In Review → Done
 #+end_example
 
 ** Keyboard Accessibility
+:PROPERTIES:
+:CUSTOM_ID: keyboard-accessibility
+:END:
 
 Ticket and project lists are fully keyboard accessible using =Tab= navigation
 with ~Enter~ or ~Space~ for toggling visibility. The UI aims to be accessible to
 all kinds of users and usage patterns.
 
 ** Practical usage tips
+:PROPERTIES:
+:CUSTOM_ID: practical-usage-tips
+:END:
 
 Using LucidPlan is made to be easy and simple; here are some tips that might
 help you out.
 
 - In any ~title~ or ~description~ field you can use the Org mode syntax (like in
-  the Emacs Org mode) and LucidPlan will automatically convert your markup to
+  the [[https://www.gnu.org/software/emacs/][Emacs]] Org mode) and LucidPlan will automatically convert your markup to
   pretty HTML.
 - The theme button in the header switches between light and dark, and remembers
   your choice.
@@ -183,6 +215,9 @@ help you out.
   itself, so that selecting the text of a ticket still means selecting it.
 
 ** How the pages treat a reader who is not signed in
+:PROPERTIES:
+:CUSTOM_ID: how-the-pages-treat-a-reader-who-is-not-signed-in
+:END:
 
 LucidPlan is readable before it is writable. A signed-out reader can browse the
 front page, the about page, every project's backlog and board, and each
@@ -202,9 +237,12 @@ the readers the endpoint behind them would accept, so a reader who holds the
 permission sees the control and a reader who does not sees the read-only badge.
 
 ** What the mail service is asked to send
+:PROPERTIES:
+:CUSTOM_ID: what-the-mail-service-is-asked-to-send
+:END:
 
 An instance that has been given a [[https://codeberg.org/jjba23/pingwing][pingwing]] address (~pingwing-url~ and its two
-credentials, see [[*Configuring the instance][Configuring the instance]]) writes to the people of a project when a
+credentials, see [[#configuring-the-instance][Configuring the instance]]) writes to the people of a project when a
 ticket is created in it -- the news that a board moved is worth having even when
 nobody is looking at it.
 
@@ -231,12 +269,18 @@ was refused is a message that did not go, and is treated as one.
 ------------------
 
 * Running LucidPlan yourself
+:PROPERTIES:
+:CUSTOM_ID: running-lucidplan-yourself
+:END:
 
 If you are thinking of running LucidPlan yourself and hosting it on your own,
 this section walks through it from an empty machine to a working instance with a
 first user and their team.
 
 ** Quick start (the impatient path)
+:PROPERTIES:
+:CUSTOM_ID: quick-start-the-impatient-path
+:END:
 
 If you already have [[https://guix.gnu.org/][GNU Guix]], this is the whole thing:
 
@@ -248,17 +292,20 @@ maak init-db                          # create the database and migrate it
 maak dev                              # hot-reloading server on localhost:50025
 #+end_src
 
-Then seed yourself a first account ([[*Creating the first super-user][Creating the first super-user]] has the details)
+Then seed yourself a first account ([[#creating-the-first-super-user][Creating the first super-user]] has the details)
 and sign in at [[http://localhost:50025/login]]. ~maak --list~ shows every other task.
 
 ** Prerequisites
+:PROPERTIES:
+:CUSTOM_ID: prerequisites
+:END:
 
 LucidPlan is built with [[https://www.gnu.org/software/guile/][GNU Guile]] and [[https://artanis.dev/][GNU Artanis]], and the project is developed
 and deployed with [[https://guix.gnu.org/][GNU Guix]]. Guix is the easy way in: the repository ships a
 ~manifest.scm~ that pins every dependency, including the Scheme libraries
 LucidPlan is built on ([[https://codeberg.org/jjba23/hygguile][hygguile]], [[https://codeberg.org/jjba23/kracht][kracht]], [[https://codeberg.org/jjba23/scriba][scriba]], [[https://codeberg.org/jjba23/bewaking][bewaking]] and [[https://codeberg.org/jjba23/orgwebalchemy][orgwebalchemy]]).
 
-Make sure you have the Guix package manager, whether as a standalone distro
+Make sure you have the [[https://guix.gnu.org/][Guix]] package manager, whether as a standalone distro
 (Guix System) or on top of any other GNU/Linux distribution.
 
 If you want to run without Guix, read ~manifest.scm~ anyway: it lists exactly the
@@ -266,6 +313,9 @@ packages you need. In some systems and situations you might also need to set a
 locale variable, like ~LC_ALL="en_US.utf8"~.
 
 ** Getting the code and entering the environment
+:PROPERTIES:
+:CUSTOM_ID: getting-the-code-and-entering-the-environment
+:END:
 
 #+begin_src sh
 git clone https://codeberg.org/jjba23/lucidplan.git
@@ -279,12 +329,15 @@ guix time-machine -C channels.scm -- shell -m manifest.scm
 Everything below is meant to be run inside that shell. The tasks themselves are
 declared in ~maak.scm~ and run with [[https://codeberg.org/jjba23/maak][maak]]; ~maak --list~ shows them all.
 
-The theme -- the Lucida faces, the web fonts, the icon face and the stylesheets
+The theme -- the [[https://en.wikipedia.org/wiki/Lucida][Lucida]] faces, the web fonts, the icon face and the stylesheets
 that describe them -- is committed under ~pub/~ and served by the instance, so a
 fresh clone needs no fetching to run. ~maak fetch-assets~ refreshes those files
 from their sources when you want them current.
 
 ** Configuring the instance
+:PROPERTIES:
+:CUSTOM_ID: configuring-the-instance
+:END:
 
 An instance keeps its private configuration in a module called ~(lucidplan env)~,
 which LucidPlan loads at start-up from a file named ~env.scm~ in the root of the
@@ -320,13 +373,16 @@ in ~.gitignore~). Create it:
 
 Every key above is read by ~(lucidplan config)~ at start-up: a value defined in
 the env module wins, and anything you leave out falls back to the default that
-ships with LucidPlan. See [[*Instance configuration keys][Instance configuration keys]] for the full list.
+ships with LucidPlan. See [[#instance-configuration-keys][Instance configuration keys]] for the full list.
 
 If you run LucidPlan locally, it is recommended to use ~localhost~ rather than
 ~127.0.0.1~, as this works better with the authentication, authorization and
 other cookies.
 
 ** Instance configuration keys
+:PROPERTIES:
+:CUSTOM_ID: instance-configuration-keys
+:END:
 
 All of these may be set in ~env.scm~ as ~define-public~ values of the same name.
 
@@ -384,6 +440,9 @@ landing-workflow-intro
 #+end_src
 
 ** Renaming or changing the ticket statuses
+:PROPERTIES:
+:CUSTOM_ID: renaming-or-changing-the-ticket-statuses
+:END:
 
 Which statuses a ticket moves through is configuration, not code: an instance
 that does not use every status drops the ones it does not need, gives the ones
@@ -421,17 +480,21 @@ Two things follow from the list being the instance's:
   ticket carrying a value the list does not name is treated as open, so it stays
   on the board and can be dragged back onto a status that exists.
 
-A status whose label is one of the shipped ones ([[*Instance configuration keys][the list above]] keeps
+A status whose label is one of the shipped ones ([[#instance-configuration-keys][the list above]] keeps
 ~"To-do"~, ~"Work in Progress"~ and so on) is a translation key and is shown in
 the reader's own language; a label of your own is shown exactly as written.
 
 ** A project with its own statuses
+:PROPERTIES:
+:CUSTOM_ID: a-project-with-its-own-statuses
+:END:
 
 A single instance can host very different projects, and one team's board is not
 always another's. So the instance's ~ticket-statuses~ is a *default*: any project
 may override the whole list for itself, from its own edit page, in the same
 one-status-to-a-line format:
 
+#+name: status-labels
 #+begin_example
 todo | Backlog | anchor | ⚓ | open
 work-in-progress | Doing | gear-fine | ⚙️ | open
@@ -448,12 +511,15 @@ Nothing else has to change: the project's backlog, its board, its ticket pages
 and its status menus are all built from whichever list the project ends up with.
 
 ** The database
+:PROPERTIES:
+:CUSTOM_ID: the-database
+:END:
 
 LucidPlan needs a database in the root folder of the project (alongside ~app~,
-~lib~, etc.). It uses SQLite by default, and is also compatible with PostgreSQL
-and MySQL.
+~lib~, etc.). It uses SQLite by default, and is also compatible with [[https://www.postgresql.org/][PostgreSQL]]
+and [[https://www.mysql.com/][MySQL]].
 
-If you use SQLite you should enable WAL mode for concurrent writes. The ~maak~
+If you use SQLite you should enable [[https://sqlite.org/wal.html][WAL mode]] for concurrent writes. The ~maak~
 task does that for you (and creates the file):
 
 #+begin_src sh
@@ -472,11 +538,11 @@ instance never has to think about this. On a database that already exists,
 running it twice in a row is a no-op, and running it on a current database prints
 ~NOTHING TO DO!~.
 
-A migration is a plain SQL file under ~resources/migrations/sqlite/~, named
+A migration is a plain [[https://en.wikipedia.org/wiki/SQL][SQL]] file under ~resources/migrations/sqlite/~, named
 ~YYYY-MM-DD_HH:MM:SS_something.sql~: mutastructura applies the files it has not
 seen in filename order, each in its own transaction, so a migration that fails
 leaves the schema where it was rather than half-moved. What it has seen is kept
-in a ~migrations_history~ table -- the ledger -- with the SHA-256 of each file,
+in a ~migrations_history~ table -- the ledger -- with the [[https://en.wikipedia.org/wiki/SHA-2][SHA-256]] of each file,
 so editing a migration that has already run is reported as a
 ~WARNING: Checksum mismatch~ instead of being applied a second time. The ledger
 is the reason migrations are applied by ~maak migrate~ and not by hand: a
@@ -507,6 +573,9 @@ After that, ~maak migrate~ answers ~NOTHING TO DO!~ and every later migration is
 applied by the one task.
 
 ** Creating the first super-user
+:PROPERTIES:
+:CUSTOM_ID: creating-the-first-super-user
+:END:
 
 A brand-new LucidPlan has no users at all, and the user-management pages need a
 user to reach them -- so the very first account is seeded directly into the
@@ -557,6 +626,9 @@ sqlite3 lucidplan.db "INSERT INTO \"user\" (id, username, email, password, salt,
 #+end_src
 
 ** Running it
+:PROPERTIES:
+:CUSTOM_ID: running-it
+:END:
 
 If you are hacking away at the project, use the development target: it runs the
 server with hot-reloading, using the default ~artanis.conf~ where hostname,
@@ -570,7 +642,7 @@ maak server   # plain server with the default configuration
 By default the server listens on ~localhost:50025~.
 
 For production, use the production configuration (which sets the real host name)
-and, ideally, run LucidPlan as a Shepherd service so it starts on boot and is
+and, ideally, run LucidPlan as a [[https://www.gnu.org/software/shepherd/][Shepherd]] service so it starts on boot and is
 restarted if it falls over.
 
 #+begin_src sh
@@ -617,6 +689,9 @@ Here follows an example Shepherd service for a Guix System:
 #+end_src
 
 ** Creating the other users
+:PROPERTIES:
+:CUSTOM_ID: creating-the-other-users
+:END:
 
 Once you can sign in as the super-user, the rest of the team is created from the
 interface, not from SQL:
@@ -644,27 +719,33 @@ To give a single person the ability to manage users, tick
 but nothing else, tick only ~lucidplan:ticket-create~.
 
 ** Host name, TLS and search engines
+:PROPERTIES:
+:CUSTOM_ID: host-name-tls-and-search-engines
+:END:
 
 For a public instance, point ~host.name~ (in ~conf/production.conf~) at your
-domain and put LucidPlan behind a reverse proxy that terminates TLS, since the
+domain and put LucidPlan behind a reverse proxy that terminates [[https://en.wikipedia.org/wiki/Transport_Layer_Security][TLS]], since the
 session cookie is set ~secure~ and will not be stored over plain HTTP. Set
 ~site-url~ in ~env.scm~ to the public address so the canonical links and preview
 images are absolute.
 
 Search-engine basics are handled for you: every page carries a title, a
 description, a canonical address and Open Graph/Twitter preview tags, plus a
-JSON-LD block describing the application. ~/robots.txt~ is generated and points
+[[https://json-ld.org/][JSON-LD]] block describing the application. ~/robots.txt~ is generated and points
 at a ~/sitemap.xml~ that lists the public pages (the front page, the about page,
 the project list, and each project's backlog and board).
 
 ** The theme, and the files it is made of
+:PROPERTIES:
+:CUSTOM_ID: the-theme-and-the-files-it-is-made-of
+:END:
 
 LucidPlan wears a theme it serves itself. The Lucida faces, the two web font
 families the stylesheet names after them, the Phosphor icon face, the stylesheets
 that describe them, and the image a link preview shows are all files of this
 project, under ~pub/css/~, ~pub/fonts/~ and ~pub/img/~. A page load therefore asks
 this instance for them and no other host: nothing about your visitors is sent to
-a CDN or a font service, and nothing about your instance is told to anybody you
+a [[https://en.wikipedia.org/wiki/Content_delivery_network][CDN]] or a font service, and nothing about your instance is told to anybody you
 did not choose.
 
 The files are committed, so a fresh checkout serves them without any extra step.
@@ -692,6 +773,9 @@ on the page at all -- no request leaves the reader's browser:
 #+end_src
 
 ** Tests
+:PROPERTIES:
+:CUSTOM_ID: tests
+:END:
 
 Tests are run with [[https://codeberg.org/jjba23/veritas][veritas]]:
 
@@ -706,8 +790,11 @@ so it can ~use-modules~ what it tests. Every push to the main branch runs the
 suite on [[https://codeberg.org/jjba23/byggsteg][byggsteg]] before anything is deployed.
 
 ** Translations
+:PROPERTIES:
+:CUSTOM_ID: translations
+:END:
 
-The interface is translated with gettext. The catalogs live under
+The interface is translated with [[https://www.gnu.org/software/gettext/][gettext]]. The catalogs live under
 ~sys/i18n/locale/~. The languages offered today are English (US), Nederlands,
 Español and 日本語. When you add translatable strings (they are written as
 ~(G_ "...")~), refresh and compile the catalogs:
@@ -724,6 +811,9 @@ The languages offered in the interface are configuration: set ~locales~ in
 ------------------
 
 * Authentication, Authorization, User management
+:PROPERTIES:
+:CUSTOM_ID: authentication-authorization-user-management
+:END:
 
 [[https://codeberg.org/jjba23/bewaking][bewaking]] 🔗 is a nice library to help you secure your web applications with
 Guile Scheme.
@@ -752,8 +842,11 @@ use the login page; for scripts and headless usage, use the ~/api/v1/login~
 endpoint and take the ~x-bewaking-lucidplan~ response header.
 
 ** The REST API
+:PROPERTIES:
+:CUSTOM_ID: the-rest-api
+:END:
 
-The versioned API lives under ~/api/v1~ and speaks JSON. All of it is guarded by
+The versioned API lives under ~/api/v1~ and speaks [[https://www.json.org/][JSON]]. All of it is guarded by
 the same ACL as the pages, so a token carries exactly the permissions its owner
 has.
 
@@ -777,6 +870,9 @@ curl -s -H "x-bewaking-lucidplan: $TOKEN" \
 #+end_src
 
 ** Useful query
+:PROPERTIES:
+:CUSTOM_ID: useful-query
+:END:
 
 #+begin_src sql
 -- INSERT INTO "user" (
@@ -805,6 +901,9 @@ curl -s -H "x-bewaking-lucidplan: $TOKEN" \
 ------------------
 
 * On accessibility
+:PROPERTIES:
+:CUSTOM_ID: on-accessibility
+:END:
 
 We believe creating accessible websites for everyone, including people with
 disabilities, is crucial for equality and helps provide a good user experience.
@@ -815,6 +914,9 @@ default, but is very configurable to allow extensibility.
 ------------------
 
 * Contributing
+:PROPERTIES:
+:CUSTOM_ID: contributing
+:END:
 
 Contributing to free software (as in freedom) is a uniquely beautiful act
 because it embodies principles of generosity, collaboration, and empowerment.
@@ -823,6 +925,9 @@ active contribution in all forms: to improve it and/or suggest improvements,
 report issues, brainstorm with me, make it more modular/flexible, etc.
 
 ** Reporting a bug or an idea
+:PROPERTIES:
+:CUSTOM_ID: reporting-a-bug-or-an-idea
+:END:
 
 Open an issue on the [[https://codeberg.org/jjba23/lucidplan][repository's homepage]], also make sure to check the
 project's own [[https://lucidplan.jointhefreeworld.org/tickets/lucidplan][backlog and kanban board]] as they are public.
@@ -834,13 +939,19 @@ versions, and whether you are on a released tag or ~trunk~.
 You can also mail me <jjbigorra@gmail.com> to chat, discuss or send feedback.
 
 ** Sending a PR/patch
+:PROPERTIES:
+:CUSTOM_ID: sending-a-pr-patch
+:END:
 
 The branch is ~trunk~. Small, focused commits are the easiest to review; run
 ~maak fmt~ to format Scheme according to the Guix style guide, and ~maak test~
 before you send anything. A patch that touches a page usually wants its strings
-wrapped in ~(G_ "...")~ so they can be translated (see [[*Translations][Translations]]).
+wrapped in ~(G_ "...")~ so they can be translated (see [[#translations][Translations]]).
 
 ** Trying it before you trust it
+:PROPERTIES:
+:CUSTOM_ID: trying-it-before-you-trust-it
+:END:
 
 Everything here is meant to be read and run: clone it, run ~maak dev~, change a
 string in a view, and watch the page change under you. If something in this
@@ -850,6 +961,9 @@ tell us.
 ------------------
 
 * Licensing
+:PROPERTIES:
+:CUSTOM_ID: licensing
+:END:
 
 lucidplan and all of its source code are free software, licensed under the GNU
 Affero General Public License v3 (or newer at your convenience).
@@ -865,6 +979,9 @@ https://www.gnu.org/licenses/fdl-1.3.html
 ------------------
 
 * AI Policy
+:PROPERTIES:
+:CUSTOM_ID: ai-policy
+:END:
 
 This project adheres to the [[https://jointhefreeworld.org/blog/articles/personal/jointhefreeworld-ai-policy/index.html][jointhefreeworld AI (Artificial Intelligence) policy]].
 
@@ -881,6 +998,9 @@ strictly prohibited.
 ------------------
 
 * Code of conduct
+:PROPERTIES:
+:CUSTOM_ID: code-of-conduct
+:END:
 
 This project adheres to the jointhefreeworld code of conduct. Find it here:
 
@@ -895,12 +1015,19 @@ respect is essential to creating excellent free software.
 ------------------
 
 * About this project
+:PROPERTIES:
+:CUSTOM_ID: about-this-project
+:END:
 
 See the [[https://lucidplan.jointhefreeworld.org/tickets/lucidplan][Backlog and Kanban]] for this project.
 
+#+name: lucidplan-logo
 [[https://jointhefreeworld.org/static-assets/lucidplan/img/logo-small.jpg]]
 
 ** On Lucida fonts
+:PROPERTIES:
+:CUSTOM_ID: on-lucida-fonts
+:END:
 
 Lucida fonts are proprietary typefaces originally developed by Bigelow & Holmes.
 They remain a long-time favorite for many people and are very legible in many
@@ -914,7 +1041,7 @@ contributors are solely responsible for ensuring their usage complies with
 applicable software licensing terms and intellectual property rights.
 
 The faces the interface is set in live in ~pub/fonts/~ as files of this project,
-and are served by the instance itself (see [[*The theme, and the files it is made of][The theme, and the files it is made of]]).
+and are served by the instance itself (see [[#the-theme-and-the-files-it-is-made-of][The theme, and the files it is made of]]).
 An operator who is not licensed to distribute them may drop them from ~pub/fonts/~
 and either set ~asset-url~ to a host that serves them, or remove the @font-face
 rules that name them from ~pub/css/fonts.css~: the stylesheet's families then
@@ -922,6 +1049,9 @@ fall through to whatever the reader's own system offers, and nothing else
 changes.
 
 ** On Reproducibility: Why GNU Guix?
+:PROPERTIES:
+:CUSTOM_ID: on-reproducibility-why-gnu-guix
+:END:
 
 A build should never fail because "it worked on my machine." Reliable software
 development requires explicit, bit-for-bit reproducibility and a functional
@@ -935,11 +1065,14 @@ approach to package management and system deployment.
 
 - *Declarative Build Graphs:* Packages are pure functions of their inputs with no implicit system state.
 - *Programmable with Guile:* Full system and package configurations written in [[https://www.gnu.org/software/guile/][Guile Scheme]] rather than rigid DSLs or static files.
-- *Time Travel:* Rebuild the exact system state from any point in git history using ~guix time-machine~.
+- *Time Travel:* Rebuild the exact system state from any point in [[https://git-scm.com/][git]] history using ~guix time-machine~.
 - *Atomic Operations:* Instantly upgrade or roll back environments without leaving orphaned dependencies or broken states.
 - *Unified Tooling:* One tool manages development shells, isolated containers, package builds, and full system configurations.
 
 ** On GNU Artanis
+:PROPERTIES:
+:CUSTOM_ID: on-gnu-artanis
+:END:
 
 Find the documentation for Artanis here: https://www.gnu.org/software/artanis/manual/
 
@@ -951,7 +1084,7 @@ Here lies not just a framework, but a canvas where your ideas take flight with r
 
 It's about harnessing the power of a robust and mature language to build something truly your own, something beautiful, nimble, flexible, powerful, efficient, understandable and maintainable. GNU Artanis was Certificated as Awesome Project at 2013 Lisp in summer projects.
 
-One day, the folks at GNU were discussing what language they would write the GNU website in - and many chose Python. But I found that strange, because the official extension language of GNU is GNU Guile. And I wondered aloud - why not start a brand new project to provide a web framework written with GNU Guile? To which RMS said, "It's cool, I like this idea."
+One day, the folks at GNU were discussing what language they would write the GNU website in - and many chose [[https://www.python.org/][Python]]. But I found that strange, because the official extension language of GNU is GNU Guile. And I wondered aloud - why not start a brand new project to provide a web framework written with GNU Guile? To which [[https://stallman.org/][RMS]] said, "It's cool, I like this idea."
 
 But at that time, it was just an idea without a plan.
 
@@ -962,10 +1095,13 @@ History:
     February 2013 - Artanis born at the GNU Guile hack-potluck.
     2013 - Artanis submitted to "Lisp In Summer Projects" contest. Received "Certificated awesome project" award in 2014.
     1st January, 2015 - the first stable version Artanis-0.0.1 was released.
-    19th January, 2015 - offers Artanis to FSF/GNU, and RMS inducts it as an official GNU project. Artanis becomes GNU Artanis.
+    19th January, 2015 - offers Artanis to [[https://www.fsf.org/][FSF]]/GNU, and RMS inducts it as an official GNU project. Artanis becomes GNU Artanis.
     29 December 2021 - GNU Artanis donates to HardenedLinux community to connect with product environment more tightly.
 
 ** Thanks
+:PROPERTIES:
+:CUSTOM_ID: thanks
+:END:
 
 LucidPlan stands on a lot of other free software -- [[https://codeberg.org/jjba23/hygguile][hygguile]],
 [[https://codeberg.org/jjba23/kracht][kracht]], [[https://codeberg.org/jjba23/scriba][scriba]], [[https://codeberg.org/jjba23/bewaking][bewaking]], [[https://codeberg.org/jjba23/orgwebalchemy][orgwebalchemy]],
