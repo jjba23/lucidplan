@@ -30,7 +30,7 @@ GNU Affero General Public License v3 or newer.
 
 If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
 
-#+TOC: headlines 2
+#+TOC: headlines 1
 
 Try the public instance at [[https://lucidplan.jointhefreeworld.org/][lucidplan.jointhefreeworld.org]].
 
