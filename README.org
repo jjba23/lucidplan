@@ -19,7 +19,17 @@ It's a flexible system made to simplify everyone's life, accessible to all kinds
 of users -- and free software (free as in freedom), licensed under the
 GNU Affero General Public License v3 or newer.
 
+#+caption: The front page, the projects dashboard, a card dragged across a board, the backlog with a ticket opened, and the same board in the dark theme.
+[[https://codeberg.org/jjba23/lucidplan/raw/branch/trunk/docs/lucidplan-showcase.gif]]
+
+- 🌍 *Read the biggest instance:* [[https://lucidplan.jointhefreeworld.org][lucidplan.jointhefreeworld.org]]
+- 📖 *Read this document rendered as HTML:* [[https://jointhefreeworld.org/manuals/lucidplan/][the LucidPlan manual]]
+- 💾 *Read the source (and send PRs/patches):* [[https://codeberg.org/jjba23/lucidplan][codeberg.org/jjba23/lucidplan]]
+- 🗺️ *Follow what is next:* [[https://lucidplan.jointhefreeworld.org/tickets/lucidplan][the LucidPlan board]]
+
 If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
+
+#+TOC: headlines 2
 
 Try the public instance at [[https://lucidplan.jointhefreeworld.org/][lucidplan.jointhefreeworld.org]].
 
@@ -28,16 +38,10 @@ into one, so there is a single place to read and a single place to keep in step.
 The published HTML manual at [[https://jointhefreeworld.org/manuals/lucidplan/index.html]]
 is this file exported.
 
-* See it in action
-
-#+caption: The front page, the projects dashboard, a card dragged across a board, the backlog with a ticket opened, and the same board in the dark theme.
-[[https://codeberg.org/jjba23/lucidplan/raw/branch/trunk/docs/lucidplan-showcase.gif]]
-
-[[https://codeberg.org/jjba23/lucidplan][Codeberg]] | [[https://codeberg.org/jjba23/lucidplan/issues][Issues]] | [[https://lucidplan.jointhefreeworld.org/tickets/lucidplan][The project's own backlog]] | [[https://jointhefreeworld.org/manuals/lucidplan/index.html][Manual]]
 
 ------------------
 
-* Overview
+* What LucidPlan is
 
 LucidPlan enhances the use of Agile work methodologies in teams thanks to its
 fast-paced, no-nonsense workflows and deep customizability, also thanks to being
@@ -829,7 +833,7 @@ versions, and whether you are on a released tag or ~trunk~.
 
 You can also mail me <jjbigorra@gmail.com> to chat, discuss or send feedback.
 
-** Sending a patch
+** Sending a PR/patch
 
 The branch is ~trunk~. Small, focused commits are the easiest to review; run
 ~maak fmt~ to format Scheme according to the Guix style guide, and ~maak test~
