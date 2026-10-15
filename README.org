@@ -25,7 +25,7 @@ GNU Affero General Public License v3 or newer.
 
 - 🌍 *Read the biggest instance:* [[https://lucidplan.jointhefreeworld.org][lucidplan.jointhefreeworld.org]]
 - 📖 *Read this document rendered as HTML:* [[https://jointhefreeworld.org/manuals/lucidplan/][the LucidPlan manual]]
-- 💾 *Read the source (and send PRs/patches):* [[https://codeberg.org/jjba23/lucidplan][codeberg.org/jjba23/lucidplan]]
+- 💾 *Read the source (and send PR/issues/patches):* [[https://codeberg.org/jjba23/lucidplan][codeberg.org/jjba23/lucidplan]]
 - 🗺️ *Follow what is next:* [[https://lucidplan.jointhefreeworld.org/tickets/lucidplan][the LucidPlan board]]
 
 If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
