@@ -3,7 +3,7 @@
 #+author: Josep Bigorra
 #+email: jjbigorra@gmail.com
 #+language: en
-#+options: toc:nil
+#+options: toc:nil num:nil
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://jointhefreeworld.org/static/css/jointhefreeworld.css" />
 
 [[https://jointhefreeworld.org/ggg/dist/scheme-guile.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-guix.svg]] [[https://jointhefreeworld.org/ggg/dist/maak.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-artanis.svg]]
