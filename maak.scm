@@ -347,9 +347,9 @@ path, so a test names the module it tests the way the application does."
   ;; loader's own defaults agree with both of them; they are said anyway, so a
   ;; run from here is the run that was asked for.
   (time-machine-manifest-shell (list "env" "VERITAS_TEST_TYPE=unit"
-                                     "VERITAS_RUN_BENCHMARKS=true"
-                                     "guile -L . -L lib -L test"
-                                     "-c '((@ (veritas runner) run-tests))'")))
+                                "VERITAS_RUN_BENCHMARKS=true"
+                                "guile --fresh-auto-compile -L . -L lib -L test"
+                                "-c '(begin (setlocale LC_ALL \"C.UTF-8\") (use-modules (veritas runner)) (run-tests))'")))
 
 (define (hot-reload)
   "Hot-reloading developer's setup."
