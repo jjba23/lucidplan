@@ -83,6 +83,12 @@
                    (sql-delete 'ticket_assignee
                                #:where (list (cons 'ticket-id ticket-id)))))
 
+  (define (move-ticket-assignee ticket-id project-id)
+    (execute-write "move-ticket-assignee"
+                   (sql-update 'ticket_assignee
+                               `((project-id unquote project-id))
+                               #:where (list (cons 'ticket-id ticket-id)))))
+
   (mk-ticket-assignee-repository
                                  #:get-ticket-assignee-by-project-human-id-proc
                                  get-ticket-assignee-by-project-human-id
@@ -91,4 +97,6 @@
                                  #:upsert-ticket-assignee-proc
                                  upsert-ticket-assignee
                                  #:unassign-ticket-assignee-proc
-                                 unassign-ticket-assignee))
+                                 unassign-ticket-assignee
+                                 #:move-ticket-assignee-proc
+                                 move-ticket-assignee))

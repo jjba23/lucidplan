@@ -36,7 +36,9 @@
          created-at
          updated-at
          deleted-at
-         priority))
+         priority
+         estimate-points
+         estimate-size))
 
   (define conn
     (DB-open rc))
@@ -126,6 +128,25 @@
                                      #:where (list (cons 'project-id pid)
                                                    (cons 'human-id human-id)))))))
 
+  ;; The two estimates are written by a statement of their own because an
+  ;; unestimated ticket is stored as NULL, and the builders bind #f as 0 --
+  ;; an estimate nobody made would then read as an estimate of zero.  The
+  ;; numbers and the size are the values the domain accepted, never free
+  ;; text: the size is a member of the shipped ladder and the points are an
+  ;; integer, so the one interpolated fragment cannot carry anything else.
+  (define (update-ticket-estimates-by-id id points size)
+    (let ((size-set? (and (string? size)
+                          (not (string-null? size)))))
+      (execute-write "update-ticket-estimates-by-id"
+                     (sql-parameterize (format #f
+                                        "UPDATE ticket SET estimate_points = ~a, estimate_size = ~a WHERE id = ?"
+                                        (if (number? points)
+                                            (number->string points) "NULL")
+                                        (if size-set? "?" "NULL"))
+                                       (if size-set?
+                                           (list size id)
+                                           (list id))))))
+
   (define (insert-ticket attrs)
     (execute-write "insert-ticket"
                    (sql-insert 'ticket attrs)))
@@ -138,4 +159,6 @@
                         get-ticket-of-latest-human-id
                         #:update-ticket-by-project-human-id-and-human-id-proc
                         update-ticket-by-project-human-id-and-human-id
+                        #:update-ticket-estimates-by-id-proc
+                        update-ticket-estimates-by-id
                         #:insert-ticket-proc insert-ticket))

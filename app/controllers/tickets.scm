@@ -21,23 +21,35 @@
         (web uri)
         (ice-9 string-fun)
         (ice-9 iconv)
+        (ice-9 binary-ports)
         (srfi srfi-1)
         (lucidplan auth)
         (kracht prelude)
         (uuid generate)
         (lucidplan html)
+        (lucidplan attachments)
+        (lucidplan config)
         (lucidplan domain)
         (lucidplan notifications)
         (json)
         (artanis security nss)
+        (artanis upload)
         (lucidplan domain project)
         (lucidplan domain ticket)
         (lucidplan domain ticket-assignee)
+        (lucidplan domain ticket-attachment)
+        (lucidplan domain ticket-comment)
+        (lucidplan domain ticket-event)
+        (lucidplan domain ticket-revision)
         (lucidplan domain user)
         (lucidplan sqlite util)
         (lucidplan sqlite project)
         (lucidplan sqlite ticket)
         (lucidplan sqlite ticket-assignee)
+        (lucidplan sqlite ticket-attachment)
+        (lucidplan sqlite ticket-comment)
+        (lucidplan sqlite ticket-event)
+        (lucidplan sqlite ticket-revision)
         (lucidplan sqlite user)
         (hygguile hygguile))
 
@@ -63,6 +75,212 @@
         (if (pair? open)
             (car open)
             (car (ticket-status-values statuses))))))
+
+;; ===== What every write to a ticket leaves behind =====
+;;
+;; A change used to be just the UPDATE: the row said what the ticket is now,
+;; and nothing said how it got there.  The helpers below are the other half.
+;; Each write appends to the ticket's audit trail -- who, when, which field,
+;; what it was, what it became -- and, when the ticket's own content changed,
+;; writes the resulting content down as the next numbered version.  They are
+;; called from the endpoints that write, after the write, with the ticket as
+;; it was read back, so the history describes what the database actually
+;; holds rather than what the request meant to say.
+
+(define (new-id)
+  (string-replace-substring (generate-string-uuid) "\n" ""))
+
+;; Add COLUMN to ATTRS unless VALUE is nothing a row should carry.  The
+;; builders bind #f as 0, so an absent optional value is left out of the
+;; statement entirely and the column keeps its NULL instead.  An attribute is
+;; a dotted pair, the shape the `(column unquote value)' templates in the
+;; repositories expand to; a three-element list is not one, and the builder
+;; would bind the whole `(unquote value)' as the value.
+(define (value-attr attrs column value)
+  (if (or (not value)
+          (and (string? value)
+               (string-null? value))) attrs
+      (append attrs
+              (list (cons column value)))))
+
+(define* (record-event! event-repo
+                        #:key ticket-id
+                        project-id
+                        actor-id
+                        action
+                        (field #f)
+                        (old-value #f)
+                        (new-value #f))
+  (insert-ticket-event event-repo
+                       (value-attr (value-attr (value-attr (append `((id
+                                                                      unquote
+                                                                      (new-id))
+                                                                     (ticket-id
+                                                                      unquote
+                                                                      ticket-id)
+                                                                     (project-id
+                                                                      unquote
+                                                                      project-id)
+                                                                     (action
+                                                                      unquote
+                                                                      action)
+                                                                     (created-at
+                                                                      unquote
+                                                                      (current-time)))
+                                                                   (if
+                                                                    actor-id
+                                                                    `((actor-id
+                                                                       unquote
+                                                                       actor-id))
+                                                                    '()))
+                                                           'field field)
+                                               'old-value old-value)
+                                   'new-value new-value)))
+
+(define* (record-revision! revision-repo ticket
+                           #:key (actor-id #f))
+  (let* ((ticket-id (assq-ref ticket
+                              'id))
+         (attrs (append `((id unquote
+                              (new-id))
+                          (ticket-id unquote ticket-id)
+                          (project-id unquote
+                                      (assq-ref ticket
+                                                'project-id))
+                          (version unquote
+                                   (next-ticket-version revision-repo
+                                                        ticket-id))
+                          (title unquote
+                                 (assq-ref ticket
+                                           'title))
+                          (created-at unquote
+                                      (current-time)))
+                        (if actor-id
+                            `((author-id unquote actor-id))
+                            '()))))
+    (insert-ticket-revision revision-repo
+                            (value-attr (value-attr (value-attr (value-attr (value-attr
+                                                                             (value-attr
+                                                                              attrs
+                                                                              'description
+                                                                              
+                                                                              (assq-ref
+                                                                               ticket
+                                                                               'description))
+                                                                             'ticket-status
+                                                                             (assq-ref
+                                                                              ticket
+                                                                              'ticket-status))
+                                                                            'ticket-type
+                                                                            (assq-ref
+                                                                             ticket
+                                                                             'ticket-type))
+                                                                'priority
+                                                                (assq-ref
+                                                                 ticket
+                                                                 'priority))
+                                                    'estimate-points
+                                                    (assq-ref ticket
+                                                              'estimate-points))
+                                        'estimate-size
+                                        (assq-ref ticket
+                                                  'estimate-size)))))
+
+(define* (record-tracked-changes! event-repo
+                                  changes
+                                  #:key ticket-id
+                                  project-id
+                                  actor-id)
+  (for-each (lambda (change)
+              (record-event! event-repo
+                             #:ticket-id ticket-id
+                             #:project-id project-id
+                             #:actor-id actor-id
+                             #:action "changed"
+                             #:field (cadr change)
+                             #:old-value (caddr change)
+                             #:new-value (cadddr change))) changes))
+
+(define (current-version revision-repo ticket-id)
+  (let ((revisions (get-ticket-revisions revision-repo ticket-id)))
+    (if (null? revisions) 0
+        (or (assq-ref (car revisions)
+                      'version) 0))))
+
+;; The map from a tracked column to the name its change is recorded under.
+(define (tracked-field-label column)
+  (let ((field (find (lambda (f)
+                       (eq? (car f) column)) ticket-tracked-fields)))
+    (if field
+        (cadr field)
+        (format #f "~a" column))))
+
+(define (username-of user-names user-id)
+  "Answer the username USER-ID names in USER-NAMES, or the empty string.
+
+An account may have been removed since the row naming it was written, and a
+history entry that says somebody is better than one that fails to render."
+  (let ((row (and user-id
+                  (find (lambda (u)
+                          (equal? (assq-ref u
+                                            'id) user-id)) user-names))))
+    (if row
+        (or (assq-ref row
+                      'username) "") "")))
+
+;; A ticket's estimates are written by their own statement (see the ticket
+;; repository), so every writer needs the other estimate the ticket holds:
+;; changing one estimate must not clear the other.
+(define (update-estimates! ticket-repo ticket points size)
+  (update-ticket-estimates-by-id ticket-repo
+                                 (assq-ref ticket
+                                           'id)
+                                 (if (eq? points
+                                          'keep)
+                                     (assq-ref ticket
+                                               'estimate-points) points)
+                                 (if (eq? size
+                                          'keep)
+                                     (assq-ref ticket
+                                               'estimate-size) size)))
+
+;; The values a ticket is being given, as the tracker compares them.  A
+;; column whose value is not being changed carries what the ticket holds, so
+;; a form that leaves a field alone is not recorded as a change to it.
+(define* (submitted-values old
+                           #:key (title 'keep)
+                           (description 'keep)
+                           (ticket-status 'keep)
+                           (ticket-type 'keep)
+                           (priority 'keep)
+                           (points 'keep)
+                           (size 'keep))
+  (let ((kept (lambda (sent column)
+                (if (eq? sent
+                         'keep)
+                    (and old
+                         (assq-ref old column)) sent))))
+    `((title unquote
+             (kept title
+                   'title))
+      (description unquote
+                   (kept description
+                         'description))
+      (ticket-status unquote
+                     (kept ticket-status
+                           'ticket-status))
+      (ticket-type unquote
+                   (kept ticket-type
+                         'ticket-type))
+      (priority unquote
+                (kept priority
+                      'priority))
+      (estimate-points unquote
+                       (kept points
+                             'estimate-points))
+      (estimate-size unquote
+                     (kept size
+                           'estimate-size)))))
 
 (get "/tickets/:project"
      #:mime 'xml
@@ -235,12 +453,23 @@
         (define (do-delete)
           (let* ((body (alist-from-url-encoded-body (rc-body rc)))
                  (id (assoc-ref body "id"))
+                 (project-repo (make-sqlite-project-repository rc))
                  (execute-write (db-write (DB-open rc))))
             (execute-write "soft-delete-ticket"
                            (sql-update 'ticket
                                        `((deleted-at unquote
                                                      (current-time)))
                                        #:where (list (cons 'id id))))
+            ;; The ticket is gone from the pages, but the trail of what
+            ;; happened to it is not: deleting is one of the things that can
+            ;; happen to a ticket, and it is recorded like the rest.
+            (record-event! (make-sqlite-ticket-event-repository rc)
+                           #:ticket-id id
+                           #:project-id (project-id-from-human-id project-repo
+                                         (params rc "project"))
+                           #:actor-id (session-owner-id #:rc rc
+                                                        #:token-name 'x-bewaking-lucidplan)
+                           #:action "deleted")
 
             (redirect-to rc
                          (string->uri (format #f "~a/tickets/~a"
@@ -279,6 +508,12 @@
                  (ticket-type (assoc-ref body "ticket-type"))
                  (description (html-escape (assoc-ref body "description")))
                  (priority (string->number (assoc-ref body "priority")))
+                 (estimate-points (parse-estimate-points (assoc-ref body
+                                                          "estimate-points")))
+                 (estimate-size (parse-estimate-size (assoc-ref body
+                                                      "estimate-size")))
+                 (actor-id (session-owner-id #:rc rc
+                                             #:token-name 'x-bewaking-lucidplan))
                  (project-id (project-id-from-human-id project-repo
                                                        (params rc "project")))
                  (new-uuid (string-replace-substring (generate-string-uuid)
@@ -292,26 +527,55 @@
                  (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
                                         rc)))
             (insert-ticket ticket-repo
-                           `((id unquote new-uuid)
-                             (human-id unquote new-human-id)
-                             (project-id unquote project-id)
-                             (title unquote title)
-                             (ticket-status unquote ticket-status)
-                             (ticket-type unquote ticket-type)
-                             (priority unquote priority)
-                             (description unquote description)
-                             (created-at unquote
-                                         (current-time))))
+                           (append `((id unquote new-uuid)
+                                     (human-id unquote new-human-id)
+                                     (project-id unquote project-id)
+                                     (title unquote title)
+                                     (ticket-status unquote ticket-status)
+                                     (ticket-type unquote ticket-type)
+                                     (priority unquote priority)
+                                     (description unquote description)
+                                     (created-at unquote
+                                                 (current-time)))
+                                   ;; An unestimated ticket keeps the NULL the
+                                   ;; schema gave the column, so the columns
+                                   ;; are only named when there is something
+                                   ;; to put in them.
+                                   (if estimate-points
+                                       `((estimate-points unquote
+                                                          estimate-points))
+                                       '())
+                                   (if estimate-size
+                                       `((estimate-size unquote estimate-size))
+                                       '())))
 
             ;; A new ticket may be assigned to one of the accounts that
             ;; exist, or to nobody -- which is simply the absence of an
             ;; assignment row, so there is nothing to write.
-            (let ((assignee-id (known-user-id user-ids submitted-assignee)))
+            (let* ((assignee-id (known-user-id user-ids submitted-assignee))
+                   (created (get-ticket-by-project-human-id-and-human-id
+                             ticket-repo
+                             (params rc "project") new-human-id))
+                   (event-repo (make-sqlite-ticket-event-repository rc))
+                   (revision-repo (make-sqlite-ticket-revision-repository rc)))
               (when assignee-id
                 (upsert-ticket-assignee ticket-assignee-repo
                                         `((project-id unquote project-id)
                                           (ticket-id unquote new-uuid)
                                           (user-id unquote assignee-id))))
+
+              ;; The ticket begins its own history: the first thing the
+              ;; trail says is that it exists, and the first version is the
+              ;; content it was created with.  Both are written from the row
+              ;; read back, so they describe the ticket the database holds --
+              ;; including the status the project's ladder settled on.
+              (record-event! event-repo
+                             #:ticket-id new-uuid
+                             #:project-id project-id
+                             #:actor-id actor-id
+                             #:action "created")
+              (record-revision! revision-repo created
+                                #:actor-id actor-id)
 
               ;; Everyone who takes part in the project hears that the board
               ;; moved.  The ticket is read back rather than described from
@@ -325,11 +589,8 @@
                                   #:assignee-repo ticket-assignee-repo
                                   #:project project
                                   #:statuses statuses
-                                  #:ticket (get-ticket-by-project-human-id-and-human-id
-                                            ticket-repo
-                                            (params rc "project") new-human-id)
-                                  #:author-id (session-owner-id #:rc rc
-                                                                #:token-name 'x-bewaking-lucidplan)
+                                  #:ticket created
+                                  #:author-id actor-id
                                   #:assignee-id assignee-id))
 
             (redirect-to rc
@@ -396,17 +657,51 @@
       (lambda (rc)
         (define (do-reorder)
           (let* ((proj (params rc "project"))
+                 (project-repo (make-sqlite-project-repository rc))
                  (ticket-repo (make-sqlite-ticket-repository rc))
+                 (event-repo (make-sqlite-ticket-event-repository rc))
+                 (project-id (project-id-from-human-id project-repo proj))
+                 (actor-id (session-owner-id #:rc rc
+                                             #:token-name 'x-bewaking-lucidplan))
                  (raw-b (bytevector->string (rc-body rc) "utf-8"))
                  (b (json-string->scm raw-b))
                  (upd-r (begin
                           (for-each (lambda (item)
-                                      (let ((human-id (assoc-ref item "id"))
-                                            (priority (assoc-ref item
-                                                                 "priority")))
-                                        (update-ticket-by-project-human-id-and-human-id
-                                         ticket-repo proj human-id
-                                         `((priority unquote priority)))))
+                                      (let* ((human-id (assoc-ref item "id"))
+                                             (priority (assoc-ref item
+                                                                  "priority"))
+                                             (old (get-ticket-by-project-human-id-and-human-id
+                                                   ticket-repo proj human-id)))
+                                        (when old
+                                          (update-ticket-by-project-human-id-and-human-id
+                                           ticket-repo proj human-id
+                                           `((priority unquote priority)))
+                                          ;; A drag writes the whole list's
+                                          ;; priorities; only the rows whose
+                                          ;; number actually moved are
+                                          ;; recorded, so one drop is a
+                                          ;; handful of entries rather than
+                                          ;; a page of them.
+                                          (unless (equal? (tracked-value (assq-ref
+                                                                          old
+                                                                          'priority))
+                                                          (tracked-value
+                                                           priority))
+                                            (record-event! event-repo
+                                                           #:ticket-id (assq-ref
+                                                                        old
+                                                                        'id)
+                                                           #:project-id
+                                                           project-id
+                                                           #:actor-id actor-id
+                                                           #:action "changed"
+                                                           #:field "priority"
+                                                           #:old-value (tracked-value
+                                                                        (assq-ref
+                                                                         old
+                                                                         'priority))
+                                                           #:new-value (tracked-value
+                                                                        priority))))))
                                     (vector->list (assoc-ref b "tickets"))) #t)))
             
             (if upd-r
@@ -439,20 +734,46 @@
                                                        project-repo proj)))
                  (raw-b (bytevector->string (rc-body rc) "utf-8"))
                  (b (json-string->scm raw-b))
-                 (new-status (assoc-ref b "status")))
+                 (new-status (assoc-ref b "status"))
+                 (old-ticket (get-ticket-by-project-human-id-and-human-id
+                              ticket-repo proj human-id)))
             
             (cond
               ((not (and (string? new-status)
                          (member new-status
                                  (ticket-status-values statuses))))
                (refuse-json 400 "Unknown status"))
+              ((not old-ticket)
+               (refuse-json 404 "No such ticket"))
               ((update-ticket-by-project-human-id-and-human-id ticket-repo
                                                                proj human-id
                                                                `((ticket-status
                                                                   unquote
-                                                                  new-status)))
-               (:mime rc
-                      '(("result" . "success"))))
+                                                                  new-status)
+                                                                 (updated_at
+                                                                  unquote
+                                                                  (current-time))))
+               (let* ((project-id (project-id-from-human-id project-repo proj))
+                      (actor-id (session-owner-id #:rc rc
+                                                  #:token-name 'x-bewaking-lucidplan))
+                      (updated (get-ticket-by-project-human-id-and-human-id
+                                ticket-repo proj human-id))
+                      (values (submitted-values old-ticket
+                                                #:ticket-status new-status))
+                      (changes (ticket-changes old-ticket values)))
+                 (record-tracked-changes! (make-sqlite-ticket-event-repository
+                                           rc)
+                                          changes
+                                          #:ticket-id (assq-ref old-ticket
+                                                                'id)
+                                          #:project-id project-id
+                                          #:actor-id actor-id)
+                 (when (pair? changes)
+                   (record-revision! (make-sqlite-ticket-revision-repository
+                                      rc) updated
+                                     #:actor-id actor-id))
+                 (:mime rc
+                        '(("result" . "success")))))
               (else (refuse-json 500 "Failed to update status")))))
         (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
                            #:needed-permissions '(lucidplan:ticket-create)
@@ -481,6 +802,13 @@
                  (b (json-string->scm raw-b))
                  (change (ticket-field-change (assoc-ref b "field")
                                               (assoc-ref b "value") statuses))
+                 ;; A change is a one-entry association list -- the column and
+                 ;; its new value -- not the pair alone, because that is the
+                 ;; shape the repository update takes.
+                 (column (and change
+                              (caar change)))
+                 (submitted (and change
+                                 (cdar change)))
                  ;; Ask for the ticket before writing it: an unknown project or
                  ;; human id then answers a plain "no such ticket" rather than
                  ;; resting on what the driver reports for a write that
@@ -492,17 +820,72 @@
                (refuse-json 400 "Unknown field or value"))
               ((not t)
                (refuse-json 404 "No such ticket"))
-              (else
-               ;; A change is an edit, so the ticket's own "last edited" stamp
-               ;; moves with it and the backlog can order by it.
-               (update-ticket-by-project-human-id-and-human-id ticket-repo
-                                                               proj human-id
-                                                               (append change
-                                                                       `((updated_at
-                                                                          unquote
-                                                                          (current-time)))))
-               (:mime rc
-                      '(("result" . "success")))))))
+              (else (let* ((project-id (project-id-from-human-id project-repo
+                                                                 proj))
+                           (actor-id (session-owner-id #:rc rc
+                                                       #:token-name 'x-bewaking-lucidplan))
+                           (event-repo (make-sqlite-ticket-event-repository rc))
+                           (revision-repo (make-sqlite-ticket-revision-repository
+                                           rc))
+                           (points (if (eq? column
+                                            'estimate-points)
+                                       (parse-estimate-points submitted)
+                                       'keep))
+                           (size (if (eq? column
+                                          'estimate-size)
+                                     (parse-estimate-size submitted)
+                                     'keep)))
+                      ;; A change is an edit, so the ticket's own "last edited"
+                      ;; stamp moves with it and the backlog can order by it.
+                      (if (or (eq? column
+                                   'estimate-points)
+                              (eq? column
+                                   'estimate-size))
+                          (update-ticket-estimates-by-id ticket-repo
+                                                         (assq-ref t
+                                                                   'id)
+                                                         (if (eq? points
+                                                                  'keep)
+                                                             (assq-ref t
+                                                                       'estimate-points)
+                                                             points)
+                                                         (if (eq? size
+                                                                  'keep)
+                                                             (assq-ref t
+                                                                       'estimate-size)
+                                                             size))
+                          (update-ticket-by-project-human-id-and-human-id
+                           ticket-repo proj human-id
+                           (append change
+                                   `((updated_at unquote
+                                                 (current-time))))))
+                      (let* ((updated (get-ticket-by-project-human-id-and-human-id
+                                       ticket-repo proj human-id))
+                             (values (submitted-values t
+                                                       #:ticket-status (if (eq?
+                                                                            column
+                                                                            'ticket-status)
+                                                                        submitted
+                                                                        'keep)
+                                                       #:ticket-type (if (eq?
+                                                                          column
+                                                                          'ticket-type)
+                                                                      submitted
+                                                                      'keep)
+                                                       #:points points
+                                                       #:size size))
+                             (changes (ticket-changes t values)))
+                        (record-tracked-changes! event-repo
+                                                 changes
+                                                 #:ticket-id (assq-ref t
+                                                                       'id)
+                                                 #:project-id project-id
+                                                 #:actor-id actor-id)
+                        (when (pair? changes)
+                          (record-revision! revision-repo updated
+                                            #:actor-id actor-id)))
+                      (:mime rc
+                             '(("result" . "success"))))))))
         (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
                            #:needed-permissions '(lucidplan:ticket-create)
                            #:rc rc
@@ -516,9 +899,10 @@
         (define (do-edit)
           (let* ((ticket-repo (make-sqlite-ticket-repository rc))
                  (project-repo (make-sqlite-project-repository rc))
+                 (proj-human (params rc "project"))
+                 (human-id (params rc "human-id"))
                  (statuses (effective-ticket-statuses (get-project-by-human-id
-                                                       project-repo
-                                                       (params rc "project"))))
+                                                       project-repo proj-human)))
                  (body (alist-from-url-encoded-body (rc-body rc)))
                  (title (html-escape (assoc-ref body "title")))
                  (description (html-escape (assoc-ref body "description")))
@@ -527,68 +911,642 @@
                                                              "ticket-status")))
                  (priority (string->number (assoc-ref body "priority")))
                  (ticket-type (assoc-ref body "ticket-type"))
-                 (project-id (project-id-from-human-id project-repo
-                                                       (params rc "project")))
-                 (ticket-id (ticket-id-from-human-id ticket-repo
-                                                     (params rc "project")
-                                                     (params rc "human-id")))
+                 (estimate-points (parse-estimate-points (assoc-ref body
+                                                          "estimate-points")))
+                 (estimate-size (parse-estimate-size (assoc-ref body
+                                                      "estimate-size")))
+                 (project-id (project-id-from-human-id project-repo proj-human))
+                 (old-ticket (get-ticket-by-project-human-id-and-human-id
+                              ticket-repo proj-human human-id))
+                 (ticket-id (assq-ref old-ticket
+                                      'id))
                  (ticket-assignee-repo (make-sqlite-ticket-assignee-repository
                                         rc))
+                 (old-assignee (and old-ticket
+                                    (get-ticket-assignee-by-ticket-id
+                                     ticket-assignee-repo ticket-id)))
                  (user-repo (make-sqlite-user-repository rc))
+                 (user-names (get-id-to-username user-repo))
                  (user-ids (map (lambda (u)
                                   (assq-ref u
-                                            'id))
-                                (get-id-to-username user-repo)))
-                 (submitted-assignee (assoc-ref body "assignee")))
-            
-            (update-ticket-by-project-human-id-and-human-id ticket-repo
-                                                            (params rc
-                                                                    "project")
-                                                            (params rc
-                                                             "human-id")
-                                                            `((ticket-status
-                                                               unquote
-                                                               ticket-status)
-                                                              (ticket-type
-                                                               unquote
-                                                               ticket-type)
-                                                              (description
-                                                               unquote
-                                                               description)
-                                                              (title unquote
-                                                                     title)
-                                                              (priority
-                                                               unquote
-                                                               priority)
-                                                              (updated_at
-                                                               unquote
-                                                               (current-time))))
-            ;; Who a ticket is assigned to is one of the accounts that exist,
-            ;; or nobody.  Nobody is the row that the form offers to put the
-            ;; ticket back to, so an empty value clears the assignment rather
-            ;; than recording a user called ""; anything else that is not one
-            ;; of the offered accounts leaves the ticket as it was.
-            (cond
-              ((and (string? submitted-assignee)
-                    (string-null? submitted-assignee))
-               (unassign-ticket-assignee ticket-assignee-repo ticket-id))
-              ((known-user-id user-ids submitted-assignee)
-               =>
-               (lambda (assignee-id)
-                 (upsert-ticket-assignee ticket-assignee-repo
-                                         `((project-id unquote project-id)
-                                           (ticket-id unquote ticket-id)
-                                           (user-id unquote assignee-id)))))
-              (else #f))
+                                            'id)) user-names))
+                 (submitted-assignee (assoc-ref body "assignee"))
+                 (actor-id (session-owner-id #:rc rc
+                                             #:token-name 'x-bewaking-lucidplan))
+                 (event-repo (make-sqlite-ticket-event-repository rc))
+                 (revision-repo (make-sqlite-ticket-revision-repository rc))
+                 (values (submitted-values old-ticket
+                                           #:title title
+                                           #:description description
+                                           #:ticket-status ticket-status
+                                           #:ticket-type ticket-type
+                                           #:priority priority
+                                           #:points estimate-points
+                                           #:size estimate-size))
+                 (changes (ticket-changes old-ticket values)))
+            (when old-ticket
+              (update-ticket-by-project-human-id-and-human-id ticket-repo
+                                                              proj-human
+                                                              human-id
+                                                              `((ticket-status
+                                                                 unquote
+                                                                 ticket-status)
+                                                                (ticket-type
+                                                                 unquote
+                                                                 ticket-type)
+                                                                (description
+                                                                 unquote
+                                                                 description)
+                                                                (title unquote
+                                                                 title)
+                                                                (priority
+                                                                 unquote
+                                                                 priority)
+                                                                (updated_at
+                                                                 unquote
+                                                                 (current-time))))
+              (update-ticket-estimates-by-id ticket-repo ticket-id
+                                             estimate-points estimate-size)
+
+              ;; Who a ticket is assigned to is one of the accounts that
+              ;; exist, or nobody.  Nobody is the row that the form offers to
+              ;; put the ticket back to, so an empty value clears the
+              ;; assignment rather than recording a user called ""; anything
+              ;; else that is not one of the offered accounts leaves the
+              ;; ticket as it was.
+              (let* ((old-assignee-id (and old-assignee
+                                           (assq-ref old-assignee
+                                                     'user-id)))
+                     (old-name (username-of user-names old-assignee-id))
+                     (new-assignee-id (known-user-id user-ids
+                                                     submitted-assignee))
+                     (clear? (and (string? submitted-assignee)
+                                  (string-null? submitted-assignee))))
+                (cond
+                  (clear? (unassign-ticket-assignee ticket-assignee-repo
+                                                    ticket-id)
+                          (unless (equal? old-assignee-id #f)
+                            (record-event! event-repo
+                                           #:ticket-id ticket-id
+                                           #:project-id project-id
+                                           #:actor-id actor-id
+                                           #:action "changed"
+                                           #:field "assignee"
+                                           #:old-value old-name
+                                           #:new-value "")))
+                  (new-assignee-id (upsert-ticket-assignee
+                                    ticket-assignee-repo
+                                    `((project-id unquote project-id)
+                                      (ticket-id unquote ticket-id)
+                                      (user-id unquote new-assignee-id)))
+                                   (unless (equal? new-assignee-id
+                                                   old-assignee-id)
+                                     (record-event! event-repo
+                                                    #:ticket-id ticket-id
+                                                    #:project-id project-id
+                                                    #:actor-id actor-id
+                                                    #:action "changed"
+                                                    #:field "assignee"
+                                                    #:old-value old-name
+                                                    #:new-value (username-of
+                                                                 user-names
+                                                                 new-assignee-id))))
+                  (else #f)))
+
+              (record-tracked-changes! event-repo
+                                       changes
+                                       #:ticket-id ticket-id
+                                       #:project-id project-id
+                                       #:actor-id actor-id)
+              ;; A version is written only when the ticket's content
+              ;; actually moved: opening the edit page and submitting it
+              ;; unchanged is not a new version of anything.
+              (when (pair? changes)
+                (record-revision! revision-repo
+                                  (get-ticket-by-project-human-id-and-human-id
+                                   ticket-repo proj-human human-id)
+                                  #:actor-id actor-id)))
             (redirect-to rc
                          (string->uri (format #f "~a/tickets/~a"
-                                              (current-myhost)
-                                              (params rc "project")))
+                                              (current-myhost) proj-human))
                          #:status 302)))
         (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
                            #:needed-permissions '(lucidplan:ticket-create)
                            #:rc rc
                            #:happy-flow do-edit
+                           #:unhappy-flow back-to-login)))
+
+;; ===== The discussion on a ticket =====
+;;
+;; A comment names the comment it answers, and the page draws the replies
+;; under what they answer.  The parent is checked against the comments the
+;; ticket actually has before it is written: a reply to a comment of another
+;; ticket, or to an id that never existed, becomes a comment on the ticket
+;; rather than a node the page can never reach.
+(post "/tickets/:project/id/:human-id/comments"
+      #:mime 'xml
+      #:cookies '(names x-bewaking-lucidplan)
+      (lambda (rc)
+        (define (do-comment)
+          (let* ((proj (params rc "project"))
+                 (human-id (params rc "human-id"))
+                 (ticket-repo (make-sqlite-ticket-repository rc))
+                 (project-repo (make-sqlite-project-repository rc))
+                 (comment-repo (make-sqlite-ticket-comment-repository rc))
+                 (t (get-ticket-by-project-human-id-and-human-id ticket-repo
+                                                                 proj human-id))
+                 (body (alist-from-url-encoded-body (rc-body rc)))
+                 (text (assoc-ref body "body"))
+                 (requested-parent (assoc-ref body "parent-id")))
+            (when (and t
+                       (string? text)
+                       (not (string-null? (string-trim-both text))))
+              (let* ((project-id (project-id-from-human-id project-repo proj))
+                     (ticket-id (assq-ref t
+                                          'id))
+                     (existing (get-ticket-comments comment-repo ticket-id))
+                     (parent (and requested-parent
+                                  (not (string-null? requested-parent))
+                                  (find (lambda (c)
+                                          (equal? (format #f "~a"
+                                                          (assq-ref c
+                                                                    'id))
+                                                  requested-parent)) existing)))
+                     (comment-id (new-id))
+                     (attrs `((id unquote comment-id)
+                              (ticket-id unquote ticket-id)
+                              (project-id unquote project-id)
+                              (author-id unquote
+                                         (or (session-owner-id #:rc rc
+                                                               #:token-name 'x-bewaking-lucidplan)
+                                             ""))
+                              (body unquote
+                                    (html-escape text))
+                              (created-at unquote
+                                          (current-time)))))
+                (insert-ticket-comment comment-repo
+                                       (if parent
+                                           (append attrs
+                                                   `((parent-id unquote
+                                                                (assq-ref
+                                                                 parent
+                                                                 'id)))) attrs))
+                (record-event! (make-sqlite-ticket-event-repository rc)
+                               #:ticket-id ticket-id
+                               #:project-id project-id
+                               #:actor-id (session-owner-id #:rc rc
+                                                            #:token-name 'x-bewaking-lucidplan)
+                               #:action "commented")))
+            (redirect-to rc
+                         (string->uri (format #f "~a/tickets/~a/id/~a"
+                                              (current-myhost) proj human-id))
+                         #:status 302)))
+        (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                           #:needed-permissions '(lucidplan:ticket-create)
+                           #:rc rc
+                           #:happy-flow do-comment
+                           #:unhappy-flow back-to-login)))
+
+;; Removing a comment is a soft delete, so the replies that answer it keep
+;; their place in the thread: the row stays as the node they hang from and
+;; the page draws its body as removed.  The comment is looked for among the
+;; comments of the ticket in the URL, never by its id alone, so a comment of
+;; another ticket cannot be removed by naming it here.
+;;
+;; A comment belongs to whoever wrote it, and that is who may remove it.
+;; Anyone holding `lucidplan:ticket-delete' may remove another person's too:
+;; a thread still has to be moderatable, and the trail records who did it.
+(post "/tickets/:project/id/:human-id/comments/:comment-id/delete"
+      #:mime 'xml
+      #:cookies '(names x-bewaking-lucidplan)
+      (lambda (rc)
+        (define (do-remove-comment)
+          (let* ((proj (params rc "project"))
+                 (human-id (params rc "human-id"))
+                 (comment-id (params rc "comment-id"))
+                 (ticket-repo (make-sqlite-ticket-repository rc))
+                 (project-repo (make-sqlite-project-repository rc))
+                 (comment-repo (make-sqlite-ticket-comment-repository rc))
+                 (t (get-ticket-by-project-human-id-and-human-id ticket-repo
+                                                                 proj human-id))
+                 (actor-id (session-owner-id #:rc rc
+                                             #:token-name 'x-bewaking-lucidplan))
+                 (moderator? (session-has-permission? #:rc rc
+                                                      #:token-name 'x-bewaking-lucidplan
+                                                      #:permission 'lucidplan:ticket-delete))
+                 (comment (and t
+                               (find (lambda (c)
+                                       (equal? (format #f "~a"
+                                                       (assq-ref c
+                                                                 'id))
+                                               comment-id))
+                                     (get-ticket-comments comment-repo
+                                                          (assq-ref t
+                                                                    'id))))))
+            (when (and t
+                       comment
+                       ;; A comment that was removed already is not removed
+                       ;; twice; the trail should say it happened once.
+                       (not (assq-ref comment
+                                      'deleted-at))
+                       (or moderator?
+                           (and actor-id
+                                (equal? (format #f "~a" actor-id)
+                                        (format #f "~a"
+                                                (assq-ref comment
+                                                          'author-id))))))
+              (soft-delete-ticket-comment comment-repo
+                                          (assq-ref comment
+                                                    'id))
+              (record-event! (make-sqlite-ticket-event-repository rc)
+                             #:ticket-id (assq-ref t
+                                                   'id)
+                             #:project-id (project-id-from-human-id
+                                           project-repo proj)
+                             #:actor-id actor-id
+                             #:action "comment-removed"
+                             #:field "comment"
+                             #:old-value (assq-ref comment
+                                                   'body)))
+            (redirect-to rc
+                         (string->uri (format #f "~a/tickets/~a/id/~a"
+                                              (current-myhost) proj human-id))
+                         #:status 302)))
+        (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                           #:needed-permissions '(lucidplan:ticket-create)
+                           #:rc rc
+                           #:happy-flow do-remove-comment
+                           #:unhappy-flow back-to-login)))
+
+;; ===== The files on a ticket =====
+;;
+;; The bytes are stored under a name generated here; what the uploader
+;; called the file is kept in the row and used for the download's name.  The
+;; form is multipart, so it is read by Artanis's upload reader rather than by
+;; the url-encoded body reader the other forms use.
+(post "/tickets/:project/id/:human-id/attachments"
+      #:mime 'xml
+      #:cookies '(names x-bewaking-lucidplan)
+      (lambda (rc)
+        (define (do-upload)
+          (let* ((proj (params rc "project"))
+                 (human-id (params rc "human-id"))
+                 (ticket-repo (make-sqlite-ticket-repository rc))
+                 (project-repo (make-sqlite-project-repository rc))
+                 (attachment-repo (make-sqlite-ticket-attachment-repository rc))
+                 (t (get-ticket-by-project-human-id-and-human-id ticket-repo
+                                                                 proj human-id))
+                 (mo (get-mfds-op-from-post rc
+                                            #:path (attachment-directory)))
+                 (file (find (lambda (m)
+                               (let ((name (mfd-filename m)))
+                                 (and name
+                                      (not (string-null? name)))))
+                             (mfds-operator-mfds mo)))
+                 (size (and file
+                            (mfd-size file)))
+                 (max-bytes (config-ref 'attachment-max-bytes)))
+            (when t
+              (ensure-attachment-directory)
+              (cond
+                ((not file)
+                 (redirect-to rc
+                              (string->uri (format #f
+                                            "~a/tickets/~a/id/~a?attachment-error=no-file"
+                                            (current-myhost) proj human-id))
+                              #:status 302))
+                ((or (not (number? size))
+                     (<= size 0)
+                     (> size max-bytes))
+                 (redirect-to rc
+                              (string->uri (format #f
+                                            "~a/tickets/~a/id/~a?attachment-error=size"
+                                            (current-myhost) proj human-id))
+                              #:status 302))
+                (else (let* ((stored-name (new-id))
+                             (project-id (project-id-from-human-id
+                                          project-repo proj))
+                             (ticket-id (assq-ref t
+                                                  'id))
+                             (filename (safe-attachment-filename (mfd-filename
+                                                                  file))))
+                        (mfds-op-store mo
+                                       #:renamer (lambda (old)
+                                                   stored-name))
+                        (insert-ticket-attachment attachment-repo
+                                                  `((id unquote
+                                                        (new-id))
+                                                    (ticket-id unquote
+                                                               ticket-id)
+                                                    (project-id unquote
+                                                                project-id)
+                                                    (uploader-id unquote
+                                                                 (or (session-owner-id
+                                                                      #:rc rc
+                                                                      #:token-name 'x-bewaking-lucidplan)
+                                                                     ""))
+                                                    (filename unquote filename)
+                                                    (stored-name unquote
+                                                                 stored-name)
+                                                    (content-type unquote
+                                                                  (safe-content-type
+                                                                   (mfd-type
+                                                                    file)))
+                                                    (size unquote size)
+                                                    (created-at unquote
+                                                                (current-time))))
+                        (record-event! (make-sqlite-ticket-event-repository rc)
+                                       #:ticket-id ticket-id
+                                       #:project-id project-id
+                                       #:actor-id (session-owner-id #:rc rc
+                                                                    #:token-name 'x-bewaking-lucidplan)
+                                       #:action "attachment-added"
+                                       #:field "attachment"
+                                       #:new-value filename)
+                        (redirect-to rc
+                                     (string->uri (format #f
+                                                   "~a/tickets/~a/id/~a"
+                                                   (current-myhost) proj
+                                                   human-id))
+                                     #:status 302)))))))
+        (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                           #:needed-permissions '(lucidplan:ticket-create)
+                           #:rc rc
+                           #:happy-flow do-upload
+                           #:unhappy-flow back-to-login)))
+
+(post "/tickets/:project/id/:human-id/attachments/:attachment-id/delete"
+      #:mime 'xml
+      #:cookies '(names x-bewaking-lucidplan)
+      (lambda (rc)
+        (define (do-remove-attachment)
+          (let* ((proj (params rc "project"))
+                 (human-id (params rc "human-id"))
+                 (attachment-id (params rc "attachment-id"))
+                 (ticket-repo (make-sqlite-ticket-repository rc))
+                 (project-repo (make-sqlite-project-repository rc))
+                 (attachment-repo (make-sqlite-ticket-attachment-repository rc))
+                 (t (get-ticket-by-project-human-id-and-human-id ticket-repo
+                                                                 proj human-id))
+                 (attachment (and t
+                                  (get-ticket-attachment-by-id attachment-repo
+                                   attachment-id))))
+            (when (and t attachment
+                       (equal? (format #f "~a"
+                                       (assq-ref attachment
+                                                 'ticket-id))
+                               (format #f "~a"
+                                       (assq-ref t
+                                                 'id))))
+              (soft-delete-ticket-attachment attachment-repo attachment-id)
+              (record-event! (make-sqlite-ticket-event-repository rc)
+                             #:ticket-id (assq-ref t
+                                                   'id)
+                             #:project-id (project-id-from-human-id
+                                           project-repo proj)
+                             #:actor-id (session-owner-id #:rc rc
+                                                          #:token-name 'x-bewaking-lucidplan)
+                             #:action "attachment-removed"
+                             #:field "attachment"
+                             #:old-value (assq-ref attachment
+                                                   'filename)))
+            (redirect-to rc
+                         (string->uri (format #f "~a/tickets/~a/id/~a"
+                                              (current-myhost) proj human-id))
+                         #:status 302)))
+        (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                           #:needed-permissions '(lucidplan:ticket-create)
+                           #:rc rc
+                           #:happy-flow do-remove-attachment
+                           #:unhappy-flow back-to-login)))
+
+;; A download is answered by the application, not by the static file server:
+;; the attachment id has to name a file of the ticket in the URL, so a file
+;; cannot be fetched by guessing a name in the upload directory.
+(get "/tickets/:project/id/:human-id/attachments/:attachment-id"
+     #:mime 'xml
+     (lambda (rc)
+       (let* ((ticket-repo (make-sqlite-ticket-repository rc))
+              (attachment-repo (make-sqlite-ticket-attachment-repository rc))
+              (t (get-ticket-by-project-human-id-and-human-id ticket-repo
+                                                              (params rc
+                                                               "project")
+                                                              (params rc
+                                                               "human-id")))
+              (attachment (and t
+                               (get-ticket-attachment-by-id attachment-repo
+                                                            (params rc
+                                                             "attachment-id"))))
+              (path (and attachment
+                         (attachment-path (assq-ref attachment
+                                                    'stored-name)))))
+         (if (and t attachment path
+                  (file-exists? path)
+                  (equal? (format #f "~a"
+                                  (assq-ref attachment
+                                            'ticket-id))
+                          (format #f "~a"
+                                  (assq-ref t
+                                            'id))))
+             (let* ((bytes (call-with-input-file path
+                             get-bytevector-all))
+                    (type (safe-content-type (assq-ref attachment
+                                                       'content-type))))
+               ;; Artanis hands these headers to Guile's own response writer,
+               ;; which wants a media type in the shape `(text/plain)' -- the
+               ;; type as a symbol, with any parameters beside it -- not the
+               ;; text `"text/plain"'.  A string there is refused with
+               ;; "Bad value for header content-type", so the sanitized type
+               ;; is read back as the symbol it names; `safe-content-type' has
+               ;; already refused anything that is not one.
+               (response-emit bytes
+                              #:headers `((content-type ,(string->symbol type))
+                                          (content-disposition unquote
+                                                               (attachment-disposition
+                                                                (assq-ref
+                                                                 attachment
+                                                                 'filename))))))
+             (response-emit ""
+                            #:status 404)))))
+
+;; ===== A ticket's own versions =====
+;;
+;; Restoring an old version is an ordinary edit whose new content is the old
+;; content: it writes the ticket, records the change in the audit trail and
+;; saves the result as a new version, so the versions in between stay where
+;; they are.
+(post "/tickets/:project/id/:human-id/revisions/:version/restore"
+      #:mime 'xml
+      #:cookies '(names x-bewaking-lucidplan)
+      (lambda (rc)
+        (define (do-restore)
+          (let* ((proj (params rc "project"))
+                 (human-id (params rc "human-id"))
+                 (version (string->number (params rc "version")))
+                 (ticket-repo (make-sqlite-ticket-repository rc))
+                 (project-repo (make-sqlite-project-repository rc))
+                 (revision-repo (make-sqlite-ticket-revision-repository rc))
+                 (t (get-ticket-by-project-human-id-and-human-id ticket-repo
+                                                                 proj human-id))
+                 (revision (and t version
+                                (get-ticket-revision-by-version revision-repo
+                                                                (assq-ref t
+                                                                          'id)
+                                                                version))))
+            (when (and t revision)
+              (let* ((project-id (project-id-from-human-id project-repo proj))
+                     (actor-id (session-owner-id #:rc rc
+                                                 #:token-name 'x-bewaking-lucidplan))
+                     (old-version (current-version revision-repo
+                                                   (assq-ref t
+                                                             'id)))
+                     (title (or (assq-ref revision
+                                          'title)
+                                (assq-ref t
+                                          'title)))
+                     (description (or (assq-ref revision
+                                                'description) "")))
+                (update-ticket-by-project-human-id-and-human-id ticket-repo
+                                                                proj human-id
+                                                                `((title
+                                                                   unquote
+                                                                   title)
+                                                                  (description
+                                                                   unquote
+                                                                   description)
+                                                                  (ticket-status
+                                                                   unquote
+                                                                   (or (assq-ref
+                                                                        revision
+                                                                        'ticket-status)
+                                                                       (assq-ref
+                                                                        t
+                                                                        'ticket-status)))
+                                                                  (ticket-type
+                                                                   unquote
+                                                                   (or (assq-ref
+                                                                        revision
+                                                                        'ticket-type)
+                                                                       (assq-ref
+                                                                        t
+                                                                        'ticket-type)))
+                                                                  (priority
+                                                                   unquote
+                                                                   (or (assq-ref
+                                                                        revision
+                                                                        'priority)
+                                                                       0))
+                                                                  (updated_at
+                                                                   unquote
+                                                                   (current-time))))
+                (update-ticket-estimates-by-id ticket-repo
+                                               (assq-ref t
+                                                         'id)
+                                               (assq-ref revision
+                                                         'estimate-points)
+                                               (assq-ref revision
+                                                         'estimate-size))
+                (let ((restored (get-ticket-by-project-human-id-and-human-id
+                                 ticket-repo proj human-id)))
+                  (record-event! (make-sqlite-ticket-event-repository rc)
+                                 #:ticket-id (assq-ref t
+                                                       'id)
+                                 #:project-id project-id
+                                 #:actor-id actor-id
+                                 #:action "restored"
+                                 #:field "version"
+                                 #:old-value (tracked-value old-version)
+                                 #:new-value (tracked-value version))
+                  (record-revision! revision-repo restored
+                                    #:actor-id actor-id))))
+            (redirect-to rc
+                         (string->uri (format #f "~a/tickets/~a/id/~a"
+                                              (current-myhost) proj human-id))
+                         #:status 302)))
+        (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                           #:needed-permissions '(lucidplan:ticket-create)
+                           #:rc rc
+                           #:happy-flow do-restore
+                           #:unhappy-flow back-to-login)))
+
+;; ===== Moving a ticket to another project =====
+;;
+;; The destination numbers the ticket itself: human ids count within a
+;; project, so a moved ticket takes the next number of its new project.  Its
+;; comments, files and assignment follow it; its history already names the
+;; ticket by its internal id and is read that way.
+(post "/tickets/:project/id/:human-id/move"
+      #:mime 'xml
+      #:cookies '(names x-bewaking-lucidplan)
+      (lambda (rc)
+        (define (do-move)
+          (let* ((source (params rc "project"))
+                 (human-id (params rc "human-id"))
+                 (project-repo (make-sqlite-project-repository rc))
+                 (ticket-repo (make-sqlite-ticket-repository rc))
+                 (t (get-ticket-by-project-human-id-and-human-id ticket-repo
+                                                                 source
+                                                                 human-id))
+                 (body (alist-from-url-encoded-body (rc-body rc)))
+                 (target (assoc-ref body "target-project")))
+            (if (and t
+                     (string? target)
+                     (not (string-null? target))
+                     (not (equal? target source))
+                     (get-project-by-human-id project-repo target))
+                (let* ((source-id (project-id-from-human-id project-repo
+                                                            source))
+                       (target-id (project-id-from-human-id project-repo
+                                                            target))
+                       (latest (get-ticket-of-latest-human-id ticket-repo
+                                                              target))
+                       (new-human-id (+ 1
+                                        (or (assq-ref latest
+                                                      'human-id) 0)))
+                       (ticket-id (assq-ref t
+                                            'id))
+                       (actor-id (session-owner-id #:rc rc
+                                                   #:token-name 'x-bewaking-lucidplan)))
+                  (update-ticket-by-project-human-id-and-human-id ticket-repo
+                                                                  source
+                                                                  human-id
+                                                                  `((project-id
+                                                                     unquote
+                                                                     target-id)
+                                                                    (human-id
+                                                                     unquote
+                                                                     new-human-id)
+                                                                    (updated-at
+                                                                     unquote
+                                                                     (current-time))))
+                  (move-ticket-assignee (make-sqlite-ticket-assignee-repository
+                                         rc) ticket-id target-id)
+                  (move-ticket-comments (make-sqlite-ticket-comment-repository
+                                         rc) ticket-id target-id)
+                  (move-ticket-attachments (make-sqlite-ticket-attachment-repository
+                                            rc) ticket-id target-id)
+                  (record-event! (make-sqlite-ticket-event-repository rc)
+                                 #:ticket-id ticket-id
+                                 #:project-id source-id
+                                 #:actor-id actor-id
+                                 #:action "moved"
+                                 #:field "project"
+                                 #:old-value source
+                                 #:new-value target)
+                  (redirect-to rc
+                               (string->uri (format #f "~a/tickets/~a/id/~a"
+                                                    (current-myhost) target
+                                                    new-human-id))
+                               #:status 302))
+                (redirect-to rc
+                             (string->uri (format #f "~a/tickets/~a/id/~a"
+                                                  (current-myhost) source
+                                                  human-id))
+                             #:status 302))))
+        (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                           #:needed-permissions '(lucidplan:ticket-create)
+                           #:rc rc
+                           #:happy-flow do-move
                            #:unhappy-flow back-to-login)))
 
 (get "/tickets/:project/id/:human-id"
@@ -621,6 +1579,33 @@
                                                       (assq-ref
                                                        ticket-assignee
                                                        'user-id))) user-names))
+                (statuses (effective-ticket-statuses project-details))
+                ;; The record the ticket carries with it: its discussion, its
+                ;; files, what happened to it and the versions of what it
+                ;; said.  They are read by ticket id, so a ticket that was
+                ;; moved between projects takes them along.
+                (comments (get-ticket-comments (make-sqlite-ticket-comment-repository
+                                                rc)
+                                               (assq-ref t
+                                                         'id)))
+                (attachments (get-ticket-attachments (make-sqlite-ticket-attachment-repository
+                                                      rc)
+                                                     (assq-ref t
+                                                               'id)))
+                (events (get-ticket-events (make-sqlite-ticket-event-repository
+                                            rc)
+                                           (assq-ref t
+                                                     'id)))
+                (revisions (get-ticket-revisions (make-sqlite-ticket-revision-repository
+                                                  rc)
+                                                 (assq-ref t
+                                                           'id)))
+                ;; The card offers its inline controls to the same reader the
+                ;; endpoint behind them would accept: holding the permission,
+                ;; not merely being signed in.
+                (editable? (session-has-permission? #:rc rc
+                                                    #:token-name 'x-bewaking-lucidplan
+                                                    #:permission 'lucidplan:ticket-create))
                 ;; The card a change is confirmed with, inert in the page
                 ;; until the script has something to say.
                 (quiet-notice (render-quiet-notice (:i18n rc)))
@@ -630,22 +1615,14 @@
                 (ticket-card (render-ticket (:i18n rc)
                                             #:project (params rc "project")
                                             #:ticket t
-                                            #:statuses (effective-ticket-statuses
-                                                        project-details)
+                                            #:statuses statuses
                                             #:assignee (if (nil?
                                                             ticket-assignee-user)
                                                            #f
                                                            (assq-ref
                                                             ticket-assignee-user
                                                             'username))
-                                            ;; The card offers its inline controls to the
-                                            ;; same reader the endpoint behind them would
-                                            ;; accept: holding the permission, not merely
-                                            ;; being signed in.
-                                            #:editable? (session-has-permission?
-                                                         #:rc rc
-                                                         #:token-name 'x-bewaking-lucidplan
-                                                         #:permission 'lucidplan:ticket-create))))
+                                            #:editable? editable?)))
            (response-emit (:mime rc
                                  (html-template (:i18n rc)
                                                 #:title (assq-ref t
@@ -674,6 +1651,38 @@
                                                          (div (@ (class ,(mk-class '
                                                                           (p-2))))
                                                               ,ticket-card)
+                                                         ,(html-ticket-collaboration
+                                                           (:i18n rc)
+                                                           #:project (params
+                                                                      rc
+                                                                      "project")
+                                                           #:ticket t
+                                                           #:projects proj
+                                                           #:statuses statuses
+                                                           #:users user-names
+                                                           #:comments comments
+                                                           #:attachments
+                                                           attachments
+                                                           #:events events
+                                                           #:revisions
+                                                           revisions
+                                                           #:editable?
+                                                           editable?
+                                                           ;; Who is reading, and whether
+                                                           ;; they may moderate: the
+                                                           ;; discussion offers each
+                                                           ;; comment's remove control by
+                                                           ;; the same rule the endpoint
+                                                           ;; applies it by.
+                                                           #:viewer-id (session-owner-id
+                                                                        #:rc
+                                                                        rc
+                                                                        #:token-name 'x-bewaking-lucidplan)
+                                                           #:moderator? (session-has-permission?
+                                                                         #:rc
+                                                                         rc
+                                                                         #:token-name 'x-bewaking-lucidplan
+                                                                         #:permission 'lucidplan:ticket-delete))
                                                          ,@quiet-notice))))))
        ;; An address naming a ticket that does not exist is a wrong turn, not
        ;; a page: the reader is sent back to the backlog they came from

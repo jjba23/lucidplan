@@ -23,6 +23,7 @@
                         get-ticket-by-project-human-id-and-human-id
                         get-ticket-of-latest-human-id
                         update-ticket-by-project-human-id-and-human-id
+                        update-ticket-estimates-by-id
                         ticket-id-from-human-id
                         insert-ticket))
 
@@ -39,6 +40,8 @@
                         repo-get-ticket-by-project-human-id-and-human-id)
                        (update-ticket-by-project-human-id-and-human-id-proc
                         repo-update-ticket-by-project-human-id-and-human-id)
+                       (update-ticket-estimates-by-id-proc
+                        repo-update-ticket-estimates-by-id)
                        (insert-ticket-proc repo-insert-ticket))
 
 ;; --- eDSL: Embedded Domain Specific Language ---
@@ -59,6 +62,13 @@
 (define-repo-method update-ticket-by-project-human-id-and-human-id
  repo-update-ticket-by-project-human-id-and-human-id
  "Updates a ticket identified by PROJECT-ID and HUMAN-ID with ATTRS in the given REPO.")
+
+(define-repo-method update-ticket-estimates-by-id
+ repo-update-ticket-estimates-by-id
+ "Writes the two estimates of TICKET-ID in REPO, either of which may be @code{#f}
+for an unestimated ticket.  They are written apart from the other columns
+because an estimate that is cleared is a NULL, and the general update builder
+cannot bind one.")
 
 (define-repo-method insert-ticket repo-insert-ticket
                     "Inserts a new ticket using ATTRS into the given REPO.")

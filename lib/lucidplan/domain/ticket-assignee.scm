@@ -21,7 +21,7 @@
   #:use-module (lucidplan domain repo)
   #:export (get-ticket-assignee-by-project-human-id
             get-ticket-assignee-by-ticket-id upsert-ticket-assignee
-            unassign-ticket-assignee))
+            unassign-ticket-assignee move-ticket-assignee))
 
 ;; -- Record definition ---
 
@@ -36,7 +36,8 @@
                        (upsert-ticket-assignee-proc
                         repo-upsert-ticket-assignee)
                        (unassign-ticket-assignee-proc
-                        repo-unassign-ticket-assignee))
+                        repo-unassign-ticket-assignee)
+                       (move-ticket-assignee-proc repo-move-ticket-assignee))
 
 ;; --- eDSL: Embedded Domain Specific Language ---
 
@@ -56,4 +57,10 @@
 unassigned.  Sending a ticket back to nobody is the row's absence rather than
 a row naming an empty user, so the clearing of an assignment is stated rather
 than left to whichever value a form submits.")
+
+(define-repo-method move-ticket-assignee repo-move-ticket-assignee
+ "Rewrites the PROJECT-ID of the assignment of TICKET-ID in REPO.
+
+An assignment names the project it was made in as well as the ticket, so a
+ticket moved to another project takes its assignee row with it.")
 

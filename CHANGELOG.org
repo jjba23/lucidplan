@@ -26,6 +26,67 @@ maak migrate
 
 ----------------------------------
 
+* v1.9.0
+
+A ticket is now a place where the work on it happens, not just a card that
+describes it.
+
+Tickets are estimated twice over: in *story points*, the numbers a team burns
+down, and in *t-shirt sizes*, which is what a first pass through a backlog is
+usually written in.  Both are optional -- an unestimate is stored as NULL rather
+than ~0~, so an unestimated ticket reads as one nobody has looked at yet rather
+than one worth nothing -- and both are changed in place from the ticket's own
+page, next to the status and the type.  The two ladders are ~ticket-points~ and
+~ticket-sizes~ in ~lib/lucidplan/domain.scm~, and the menus and the endpoints
+are both built from them.
+
+Each ticket carries a *discussion* shaped like a thread: a reply is drawn under
+what it answers, indented by its depth.  A removed comment is removed softly, so
+the replies that answer it keep their place instead of disappearing with it; its
+author may take it back, and a holder of ~lucidplan:ticket-delete~ may moderate
+somebody else's.  Bodies are Org mode, as titles and descriptions already were.
+
+*Attachments* are carried per ticket: uploaded from its page, listed with their
+name and size, downloadable, removable.  The bytes are stored under a name the
+application generates -- a submitted filename is data, never a path -- and
+downloads are served by the application, which checks that the attachment
+belongs to the ticket in the URL.  Where they live and how large one may be are
+~attachment-directory~ (default ~var/attachments~, outside ~pub/~ so it is never
+a static file) and ~attachment-max-bytes~ (default 5 MiB).
+
+Every write to a ticket now leaves a row in its *activity*: who, when, which
+field, the value before and the value after, one row per field that actually
+changed, and no row for a form submitted unchanged.  The trail is append-only.
+Beside it the ticket keeps *versions* of its content, one numbered snapshot per
+change of content, never rewritten: a version can be read back, compared with
+the one before it, and restored -- and restoring writes a new version rather
+than erasing the ones in between.
+
+A ticket can finally be *moved between projects* from its own page.  Its
+discussion, its files and its assignment move with it and its history stays with
+it, because the trail names the ticket rather than the project it was in.  Its
+number does not follow: numbers count within a project, so the destination
+numbers it as its own next one.
+
+Four tables are added -- ~ticket_comment~, ~ticket_attachment~, ~ticket_event~
+and ~ticket_revision~ -- and two columns to ~ticket~.  ~maak migrate~ applies
+all of it:
+
+#+begin_src sh
+maak migrate
+#+end_src
+
+An instance that carries attachments has something new to back up besides
+~lucidplan.db~: the two are written by different writes and are only together a
+complete record.  The README's ~Everything a ticket carries~ section has the
+details, and ~attachment-directory~ and ~attachment-max-bytes~ are in ~Instance
+configuration keys~.
+
+~maak i18n-update-template~ was fixed: it passed an unmatched glob for
+~lib/lucidplan/job/~ to xgettext, which then stopped without writing the
+template at all.  A directory that is not there is now left out of the list
+rather than passed on.
+
 * v1.8.0
 
 New tickets are announced by email. When a ticket is created, [[https://codeberg.org/jjba23/pingwing][pingwing]] is asked for the ~lucidplan-new-ticket~ template and it goes to everyone who takes part in the project -- every user the project has assigned a ticket to, the ticket's assignee and the person who opened it. A message counts as sent only when the service answers that it took it: a service that cannot be reached, or that refuses the task, is retried, logged with what it said, and never fails the write. See ~What the mail service is asked to send~ in the README.

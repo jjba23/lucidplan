@@ -193,6 +193,123 @@ assignee is the absence of a row rather than a row naming no one."
 (define-public ticket-types
   '("task" "bug" "story" "spike" "time-box"))
 
+;;; ===== The two estimates a ticket carries =====
+;;;
+;;; A ticket is estimated in story points -- the numbers a team burns down --
+;;; and in t-shirt sizes, which is what a first pass through a backlog is
+;;; usually written in.  Both are optional: an unestimated ticket is a ticket
+;;; nobody has looked at yet, and is stored as NULL rather than as zero.
+;;;
+;;; The two ladders below are what the menus offer and what a submitted value
+;;; is checked against, exactly as the status and type ladders are.  Changing
+;;; what an instance estimates with therefore means editing these lists, and
+;;; the pages, the forms and the endpoints all follow.
+(define-public ticket-points
+  '(0 1
+    2
+    3
+    5
+    8
+    13
+    21
+    34))
+
+(define-public ticket-sizes
+  '("xs" "s" "m" "l" "xl" "xxl"))
+
+(define-public (ticket-size-label size)
+  "Answer the label a reader is shown for the t-shirt size SIZE."
+  (cond
+    ((equal? size "xs")
+     "XS")
+    ((equal? size "s")
+     "S")
+    ((equal? size "m")
+     "M")
+    ((equal? size "l")
+     "L")
+    ((equal? size "xl")
+     "XL")
+    ((equal? size "xxl")
+     "XXL")
+    (else size)))
+
+(define-public (parse-estimate-points value)
+  "Answer the story-point estimate VALUE names, or @code{#f} for no estimate.
+
+A form is not a promise, so the value that arrives is checked against the
+ladder the menu offered: a number on it is answered as that number, an empty
+value is answered as @code{#f} -- an unestimated ticket -- and anything else
+is @code{#f} too, which is what leaves a ticket's estimate as it was."
+  (let ((number (cond
+                  ((number? value)
+                   value)
+                  ((string? value)
+                   (let ((trimmed (string-trim-both value)))
+                     (and (not (string-null? trimmed))
+                          (string->number trimmed))))
+                  (else #f))))
+    (and number
+         (member number ticket-points) number)))
+
+(define-public (parse-estimate-size value)
+  "Answer the t-shirt size VALUE names, or @code{#f} for no estimate.
+
+The comparison is case-insensitive, so a hand-typed form may send @code{L}
+and mean @code{l}; a value the ladder does not name answers @code{#f}."
+  (and (string? value)
+       (let ((size (string-downcase (string-trim-both value))))
+         (and (member size ticket-sizes) size))))
+
+;;; ===== What a ticket's history is made of =====
+;;;
+;;; A tracked field is a column and the name a reader knows it by.  The audit
+;;; trail records a change as one row per field, and a version is a snapshot
+;;; of these same columns, so both use this one list and neither can quietly
+;;; stop watching a column the other still versions.
+(define-public ticket-tracked-fields
+  '((title "title")
+    (description "description")
+    (ticket-status "status")
+    (ticket-type "type")
+    (priority "priority")
+    (estimate-points "story points")
+    (estimate-size "size")))
+
+(define-public (tracked-value value)
+  "Answer VALUE as the text a change is recorded with.
+
+A missing value, and the empty string a form sends for one, are both the
+empty text: a ticket that never had an estimate and one whose estimate was
+just cleared are the same state, and the trail should say so once rather
+than twice."
+  (cond
+    ((not value)
+     "")
+    ((string? value)
+     value)
+    ((null? value)
+     "")
+    (else (format #f "~a" value))))
+
+(define-public (ticket-changes old new)
+  "Answer the tracked fields that differ between OLD and NEW.
+
+OLD is a ticket (or a version snapshot) as the repository answers it; NEW is
+an association list of the values the ticket is being given, keyed by the
+same column names.  The answer is a list of @code{(column label before
+after)} entries, one per field that actually changed -- a form submitted
+without a change is not an edit, and writes no history."
+  (filter-map (lambda (field)
+                (let* ((column (car field))
+                       (label (cadr field))
+                       (before (tracked-value (assq-ref (or old
+                                                            '()) column)))
+                       (after (tracked-value (assq-ref new column))))
+                  (and (not (equal? before after))
+                       (list column label before after))))
+              ticket-tracked-fields))
+
 (define (ticket-ladder field specs)
   "Answer the column a submitted inline change names and the values it may
 hold, as the pair @code{(column . values)}, or @code{#f} for a field a ticket
@@ -207,6 +324,14 @@ statuses the menu that offered it was built from."
            (ticket-status-values specs)))
     ((equal? field "type")
      (cons 'ticket-type ticket-types))
+    ((equal? field "estimate-points")
+     (cons 'estimate-points
+           (cons ""
+                 (map (lambda (points)
+                        (number->string points)) ticket-points))))
+    ((equal? field "estimate-size")
+     (cons 'estimate-size
+           (cons "" ticket-sizes)))
     (else #f)))
 
 (define-public (ticket-field-change field value . statuses-arg)

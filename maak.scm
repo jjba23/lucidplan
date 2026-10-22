@@ -120,24 +120,34 @@ This ensures the .po file stays up-to-date with the latest changes in the templa
            (~ "~a/~a/LC_MESSAGES/~a.po" i18n-dir lang i18n-textdomain)
            (~ "~a/~a.pot" i18n-dir i18n-textdomain))))
 
+(define (i18n-sources)
+  "Answer the files xgettext reads, as the globs it is handed.
+
+A directory that is not there is left out rather than passed on: xgettext
+takes an unmatched glob literally and then stops without writing the template
+at all, so one absent directory -- `lib/lucidplan/job/', which a checkout may
+or may not keep -- would silently cost the project every string it has.
+`ENTRY' is a file rather than a directory, and is always read."
+  (append (filter-map (lambda (dir)
+                        (and (file-exists? dir)
+                             (format #f "~a/*.scm" dir)))
+                      '("lib/lucidplan/job" "lib/lucidplan" "app/controllers"
+                        "app/views" "app/api"))
+          '("ENTRY")))
+
 (define* (i18n-extract* #:key (update? #t))
   "Extract translatable strings from Scheme source files using xgettext.
 Args: update? represents whether we should update a template or create a new one."
-  ($ (list (~ "xgettext --default-domain=~a" i18n-textdomain)
-           (~ "--output=~a/~a.pot" i18n-dir i18n-textdomain)
-           "--language=Scheme --keyword=G_"
-           "--sort-by-file"
-           (if update? "--join-existing" "")
-           (~ "--copyright-holder=\"~a\""
-              (string-join copyright-holders ","))
-           (~ "--package-name=~a" i18n-textdomain)
-           "lib/lucidplan/job/*.scm"
-           "lib/lucidplan/*.scm"
-           "app/controllers/*.scm"
-           "app/views/*.scm"
-           "app/api/*.scm"
-           "ENTRY"
-           "--from-code UTF-8")
+  ($ (append (list (~ "xgettext --default-domain=~a" i18n-textdomain))
+             (list (~ "--output=~a/~a.pot" i18n-dir i18n-textdomain))
+             (list "--language=Scheme --keyword=G_")
+             (list "--sort-by-file")
+             (list (if update? "--join-existing" ""))
+             (list (~ "--copyright-holder=\"~a\""
+                      (string-join copyright-holders ",")))
+             (list (~ "--package-name=~a" i18n-textdomain))
+             (i18n-sources)
+             (list "--from-code UTF-8"))
      #:verbose? #t))
 
 ;; ====== Maak vendored theme assets ======

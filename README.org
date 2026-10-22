@@ -108,6 +108,28 @@ organized:
 - *Flexible statuses*: the statuses a ticket moves through are configuration,
   not code -- rename them, drop the ones your team does not use, add your own,
   or give a single project its own board.
+- *Estimates*: every ticket can be estimated twice over -- in story points, the
+  numbers a team burns down, and in t-shirt sizes, which is what a first pass
+  through a backlog is usually written in.  Both are optional and both are
+  changed from the ticket itself, so an unestimated ticket reads as one nobody
+  has looked at yet rather than as one worth nothing.
+- *Threaded discussion*: a ticket carries a conversation, not a comment box.
+  A reply is drawn under what it answers, indented by its depth, so a thread
+  reads the way the discussion went; a comment that is removed keeps its place
+  in that thread instead of taking the replies to it down with it.
+- *Attachments*: files are carried by the ticket they belong to, uploaded from
+  its page and downloaded through the application, which checks that the caller
+  named a file of the ticket in the URL.  Nothing a browser sends is ever used
+  as a path on disk.
+- *An audit trail and versions*: every write to a ticket is recorded -- who did
+  it, when, the field, the value before and the value after -- and every change
+  of content is kept as a numbered version that can be read back and restored.
+  A version is never rewritten, so restoring an old one adds a new version
+  whose content happens to be the old content.
+- *Moving a ticket between projects*: a ticket filed in the wrong place is one
+  menu away from the right one.  Its discussion, its files and its assignment
+  move with it, and its history stays with it too, because the trail names the
+  ticket rather than the project it was in.
 - *Email notifications*: a new ticket is announced to everyone taking part in
   the project.
 - *A [[https://en.wikipedia.org/wiki/Representational_state_transfer][REST]] [[https://en.wikipedia.org/wiki/API][API]]*: =/api/v1= hands tickets and projects to your scripts, with the
@@ -165,6 +187,7 @@ as:
 - status;
 - type;
 - priority;
+- story-point and t-shirt-size estimates;
 - assignee;
 - project/ticket identifier;
 - edit and delete actions.
@@ -187,6 +210,141 @@ For example, a ticket can be moved from:
 #+begin_example
 To-do → Work in Progress → In Review → Done
 #+end_example
+
+** Everything a ticket carries
+:PROPERTIES:
+:CUSTOM_ID: everything-a-ticket-carries
+:END:
+
+Opening a ticket shows the ticket itself and, under it, everything the work on
+it has gathered: its estimates, its discussion, its files, what has happened to
+it and the versions of what it said.  All of it is written by the same
+permission the ticket is: ~lucidplan:ticket-create~.
+
+*** Estimates
+:PROPERTIES:
+:CUSTOM_ID: estimates
+:END:
+
+A ticket is estimated twice over, because the two answer different questions:
+
+- *story points* -- the numbers a team burns down, taken from a ladder
+  (~ticket-points~, by default 0, 1, 2, 3, 5, 8, 13, 21 and 34);
+- *t-shirt sizes* -- ~XS~, ~S~, ~M~, ~L~, ~XL~ and ~XXL~, which is what a first
+  pass through a backlog is usually written in.
+
+Both are optional, and an unestimated ticket is a ticket nobody has looked at
+yet rather than a ticket worth zero: an unestimate is stored as nothing at all,
+never as ~0~, and the ticket reads as *unestimated* until somebody says
+otherwise.
+
+Both are changed in place, from the ticket's own page, by the same controls the
+status and the type are changed with -- and both can be cleared again, which is
+the first row of each menu.  They are also part of the ticket's edit form, and
+they are part of what a version snapshots (see [[#activity-and-versions][Activity and versions]]).
+
+The two ladders are ~ticket-points~ and ~ticket-sizes~ in
+~lib/lucidplan/domain.scm~; the menus a page offers and the endpoints behind
+them are both built from those two lists, so a team that estimates in powers of
+two edits one line and the whole instance follows.  Whatever is not on the
+ladder is refused rather than stored.
+
+*** Discussion
+:PROPERTIES:
+:CUSTOM_ID: discussion
+:END:
+
+A ticket carries a conversation, and the conversation is a thread: any comment
+can be answered, and the answer is drawn under what it answers, indented by its
+depth, so a discussion reads in the shape it happened in rather than as one
+long list.
+
+Comment bodies are written in Org mode syntax, exactly as titles and
+descriptions are, and are rendered to HTML when the page is drawn.
+
+Removing a comment is a *soft* removal, and that is deliberate: a reply whose
+parent disappeared would lose its place in the thread, so the removed comment
+stays where it is as an empty node -- shown as ~[removed]~ -- and the replies
+to it keep hanging from it.  A comment may be removed by whoever wrote it, or
+by anyone holding ~lucidplan:ticket-delete~, and the removal is recorded in the
+ticket's history either way.
+
+*** Attachments
+:PROPERTIES:
+:CUSTOM_ID: attachments
+:END:
+
+Files are uploaded from the ticket's own page and listed there with the name
+they were uploaded under and their size.  A file can be downloaded and removed
+again by anyone who may edit the ticket.
+
+What a browser sends as a filename is treated as data and never as a path: the
+bytes are stored under a name the application generates itself, and the
+submitted name is kept in the database and cleaned before it is written into a
+download header.  A file therefore cannot escape the directory it is kept in,
+however it was named.
+
+Downloads are answered by the application rather than by the static file
+server, so the attachment id has to name a file *of the ticket in the URL*: a
+file cannot be fetched by guessing a name in the upload directory.
+
+Where the files live and how large one may be are configuration --
+~attachment-directory~ (by default ~var/attachments~, created on the first
+upload) and ~attachment-max-bytes~ (by default 5 MiB, the same ceiling Artanis
+puts on a request body).  The directory is deliberately outside ~pub/~, so it
+is never handed out as a static file.  *An instance that carries attachments
+has something to back up besides ~lucidplan.db~:* the two are written by
+different writes and are only together a complete record.  An instance that
+does not want files keeps the directory empty, and only that loss.
+
+*** Activity and versions
+:PROPERTIES:
+:CUSTOM_ID: activity-and-versions
+:END:
+
+Every write the application makes to a ticket leaves a row in the ticket's
+*activity*: who did it, when, and -- when it was a change to a field -- the
+field, the value before it and the value after it.  Creating, editing,
+assigning, commenting, attaching, restoring and moving are all in there, one
+row per field that actually changed, so a form submitted without a change
+writes no history at all.  The trail is append-only: nothing in the application
+updates or removes a row, because a history that can be rewritten is not an
+audit trail.
+
+What is watched is one list -- ~ticket-tracked-fields~ in
+~lib/lucidplan/domain.scm~ -- so the trail and the versions cannot quietly
+disagree about what a ticket is made of.  It holds the title, the description,
+the status, the type, the priority and both estimates.  The ticket's "last
+edited" stamp is deliberately not on it: it moves on every write and says
+nothing about what the ticket means.
+
+Alongside the trail the ticket keeps its *versions*: every time its content
+changes, the content it now has is written down as a numbered snapshot, and no
+snapshot is ever rewritten.  Opening a version shows what changed between it
+and the one before it, and restoring an old one is an ordinary edit that
+happens to write the old content -- so the versions in between stay where they
+are, and the history says a restore happened rather than pretending it never
+did.  Comments and attachments are not snapshotted: they are records of their
+own, and the trail already says when they were added.
+
+*** Moving a ticket between projects
+:PROPERTIES:
+:CUSTOM_ID: moving-a-ticket-between-projects
+:END:
+
+A ticket filed in the wrong project is moved from its own page: the ticket
+offers the other projects, and choosing one moves it in a single step.
+
+What follows the ticket is everything that belongs to it rather than to the
+project: its discussion, its files and its assignment.  What stays is its
+history -- the trail and the versions name the ticket, not the project it was
+in, so they are read back unchanged and the ticket arrives with its whole past.
+
+Its number does not follow it.  Ticket numbers count within a project, so the
+destination numbers the moved ticket as its own next one, and the page you land
+on is the ticket's new address.  A status the destination's board does not name
+needs no thought either: such a ticket is treated as open, so it appears on the
+new board and can be dragged onto a status that exists there.
 
 ** Keyboard Accessibility
 :PROPERTIES:
@@ -232,9 +390,15 @@ does:
 - creating or editing a ticket -- ~lucidplan:ticket-create~;
 - managing users -- ~lucidplan:modify-permissions~.
 
-The small inline controls on a ticket (its status and type) are shown to exactly
-the readers the endpoint behind them would accept, so a reader who holds the
-permission sees the control and a reader who does not sees the read-only badge.
+The small inline controls on a ticket (its status, its type and its two
+estimates) are shown to exactly the readers the endpoint behind them would
+accept, so a reader who holds the permission sees the control and a reader who
+does not sees the read-only badge.  The same holds for the rest of a ticket's
+own page: the comment box, the upload form, the remove controls, the restore
+buttons and the menu that moves the ticket to another project are all offered
+by the permission their write needs, ~lucidplan:ticket-create~ -- except for
+removing somebody else's comment, which is offered only to a reader holding
+~lucidplan:ticket-delete~, the permission the endpoint checks as well.
 
 ** What the mail service is asked to send
 :PROPERTIES:
@@ -420,6 +584,10 @@ mail-retry-delay       ; seconds to wait before the first retry (doubles each tr
 ;; Accounts and passwords
 password-reset-validity  ; how long a reset link stays good, in seconds
 password-min-score       ; accepted password strength, 0 (very weak) .. 4 (very strong)
+
+;; Files a ticket carries
+attachment-directory     ; where uploaded files are kept, e.g. "var/attachments"
+attachment-max-bytes     ; the largest one accepted, in bytes (5 MiB by default)
 
 ;; The languages the interface offers, as (catalog-name . name-in-that-language)
 locales

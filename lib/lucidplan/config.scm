@@ -49,7 +49,7 @@
 ;; deliberately the values the pages used to carry inline, so turning them into
 ;; configuration changes nothing until an operator changes one.
 (define default-config
-  `(;; -- What the instance is called -------------------------------------
+  `( ;-- What the instance is called -------------------------------------
      (site-name . "LucidPlan")
     (site-tagline . "free and open project management for everyone")
     (site-description . "LucidPlan is free and open project management for teams of every shape and size: multi-project workspaces, backlog management, kanban boards and fine-grained, Lisp-based permissions.")
@@ -165,6 +165,16 @@
                        "Licensed under the GNU AGPL v3 or newer and hackable end to end in Scheme."))
     (landing-workflow-title . "a workflow that fits how your team works")
     (landing-workflow-intro . "Every ticket is a row on a board: move it along the columns as the work moves, and let the state of the board tell you where the project stands.")
+
+    ;; -- Files a ticket carries -------------------------------------------
+    ;; Where uploaded attachments are kept, relative to the instance's own
+    ;; working directory, and the largest one it accepts in bytes (5 MiB,
+    ;; the same ceiling Artanis puts on a request body).  The directory is
+    ;; created on the first upload; it is deliberately outside `pub/', so a
+    ;; file is handed out by the application -- which knows which ticket it
+    ;; belongs to -- rather than by the static file server.
+    (attachment-directory . "var/attachments")
+    (attachment-max-bytes . 5242880)
 
     ;; -- Mail -------------------------------------------------------------
     ;; The name and address a notification is sent from, and the subject

@@ -37,7 +37,9 @@
   #:use-module (ice-9 i18n)
   #:use-module (lucidplan html)
   #:use-module (kracht prelude)
+  #:use-module (lucidplan attachments)
   #:use-module (lucidplan domain)
+  #:use-module (lucidplan domain ticket-comment)
   #:use-module (hygguile hygguile)
   #:use-module (artanis security nss)
   #:export (render-ticket render-ticket-listitem
@@ -45,6 +47,7 @@
                           html-new-ticket-form
                           html-edit-ticket-form
                           html-ticket-form
+                          html-ticket-collaboration
                           render-quiet-notice))
 
 ;; =============================================================================
@@ -186,6 +189,28 @@
   (ticket-choices G_ ticket-types ticket-type-label glyph-for-ticket-type
                   selected))
 
+;; The two estimation menus.  Their first row is not a value but the absence
+;; of one: an unestimated ticket is a ticket nobody has looked at yet, and
+;; the menus say so in words rather than offering a zero that would read as
+;; an estimate somebody made.
+(define (ticket-point-choices G_ selected)
+  (cons (option #:value ""
+                #:content (G_ "unestimated")
+                #:selected-value selected)
+        (map (lambda (points)
+               (option #:value (number->string points)
+                       #:content (format #f "~a" points)
+                       #:selected-value selected)) ticket-points)))
+
+(define (ticket-size-choices G_ selected)
+  (cons (option #:value ""
+                #:content (G_ "no size")
+                #:selected-value selected)
+        (map (lambda (size)
+               (option #:value size
+                       #:content (ticket-size-label size)
+                       #:selected-value selected)) ticket-sizes)))
+
 ;; =============================================================================
 ;;  Changing a ticket in place
 ;; =============================================================================
@@ -299,6 +324,8 @@ at the first of them."
          (type (t-ref 'ticket-type))
          (desc (t-ref 'description))
          (priority (t-ref 'priority))
+         (points (t-ref 'estimate-points))
+         (size (t-ref 'estimate-size))
 
          (toggle-js (format #f
                      "document.getElementById('details-~a').toggleAttribute('hidden')"
@@ -350,7 +377,40 @@ at the first of them."
                                                    #:value type
                                                    #:id-suffix id-suffix
                                                    #:options (ticket-type-choices
-                                                              G_ type))))
+                                                              G_ type)))
+                       ;; The two estimates are changed the same way the two
+                       ;; ladders above are: a menu that posts what it shows,
+                       ;; from the ticket's own page.
+                       (div (@ (class ,(mk-class '(flex flex-col gap-3))))
+                            (small (@ (class ,%label-face))
+                                   ,(G_ "story points"))
+                            ,(render-inline-choice G_
+                                                   #:project project
+                                                   #:human-id human-id
+                                                   #:field "estimate-points"
+                                                   #:value (if points
+                                                               (format #f "~a"
+                                                                       points)
+                                                               "")
+                                                   #:id-suffix id-suffix
+                                                   #:options (ticket-point-choices
+                                                              G_
+                                                              (if points
+                                                                  (format #f
+                                                                   "~a" points)
+                                                                  ""))))
+                       (div (@ (class ,(mk-class '(flex flex-col gap-3))))
+                            (small (@ (class ,%label-face))
+                                   ,(G_ "size"))
+                            ,(render-inline-choice G_
+                                                   #:project project
+                                                   #:human-id human-id
+                                                   #:field "estimate-size"
+                                                   #:value (or size "")
+                                                   #:id-suffix id-suffix
+                                                   #:options (ticket-size-choices
+                                                              G_
+                                                              (or size "")))))
                      `(,(render-meta-badge (G_ "status")
                                            (status-icon-node statuses status)
                                            (status-label G_ statuses status)) ,
@@ -384,6 +444,19 @@ at the first of them."
 
           ,@(if (not (nil? assignee))
                 (render-field (G_ "assignee") assignee %val-face)
+                '())
+
+          ;; Where the reader cannot change them, the estimates are the two
+          ;; plain lines they read as.  Where they can, they are the menus at
+          ;; the top of the card, and showing them twice would only make the
+          ;; card longer.
+          ,@(if (and (not editable?) points)
+                (render-field (G_ "story points") points %val-face)
+                '())
+          ,@(if (and (not editable?)
+                     (not (nil? size)))
+                (render-field (G_ "size")
+                              (ticket-size-label size) %val-face)
                 '())
 
           ;; Action Buttons
@@ -927,6 +1000,10 @@ at the first of them."
                     #:users users
                     #:priority (assq-ref t
                                          'priority)
+                    #:estimate-points (assq-ref t
+                                                'estimate-points)
+                    #:estimate-size (assq-ref t
+                                              'estimate-size)
                     #:page-title (G_ "edit ticket")
                     #:canonical-path (format #f "/tickets/~a" project)
                     #:action (format #f "/tickets/~a/id/~a/edit" project
@@ -942,6 +1019,8 @@ at the first of them."
                            (statuses (default-ticket-statuses))
                            (ticket-type "")
                            (priority 0)
+                           (estimate-points #f)
+                           (estimate-size #f)
                            (assignee "")
                            (action "")
                            (is-edit #f)
@@ -965,6 +1044,15 @@ at the first of them."
          (status-opts (ticket-status-choices G_ statuses ticket-status))
 
          (type-opts (ticket-type-choices G_ ticket-type))
+
+         ;; The estimates are menus for the same reason the ladders are:
+         ;; a story-point estimate not on the team's scale, or a size nobody
+         ;; uses, is a value nothing else in the app knows how to count.
+         (points-value (if estimate-points
+                           (format #f "~a" estimate-points) ""))
+         (point-opts (ticket-point-choices G_ points-value))
+         (size-opts (ticket-size-choices G_
+                                         (or estimate-size "")))
 
          ;; The assignee is chosen from the accounts that exist rather than
          ;; typed, so a ticket cannot name somebody the instance has never
@@ -1019,6 +1107,22 @@ at the first of them."
                                              #:type 'number
                                              #:value safe-prio))
 
+                                ;; Story points
+                                (div (@ (class ,field-face))
+                                     (label (@ (class ,label-face))
+                                            ,(G_ "story points"))
+                                     (div ,(select #:name 'estimate-points
+                                                   #:on-change ""
+                                                   #:options point-opts)))
+
+                                ;; T-shirt size
+                                (div (@ (class ,field-face))
+                                     (label (@ (class ,label-face))
+                                            ,(G_ "size"))
+                                     (div ,(select #:name 'estimate-size
+                                                   #:on-change ""
+                                                   #:options size-opts)))
+
                                 ;; Assignee
                                 (div (@ (class ,field-face))
                                      (label (@ (class ,label-face))
@@ -1056,3 +1160,809 @@ at the first of them."
                    #:body `((div (@ (class ,(mk-class '(px-4 py-4))))
                                  ,form-sxml))
                    #:proj projects)))
+
+;; =============================================================================
+;;  What a ticket carries with it
+;; =============================================================================
+
+;; The ticket's own page used to end with the card.  This is everything that
+;; grew around it: the discussion, the files, what happened to it, the
+;; versions of what it said, and the way to hand it to another project.  They
+;; are drawn as one list of sections so the controller only has to say which
+;; ticket it is showing; which of them are offered is decided here, from the
+;; same `editable?' answer the endpoints behind the controls are guarded with.
+
+(define (short-value value)
+  "Answer VALUE as one line short enough for a history row."
+  (let ((text (if (string? value) value
+                  (format #f "~a" value))))
+    (if (> (string-length text) 160)
+        (string-append (substring text 0 157) "...") text)))
+
+(define (value-or-dash value)
+  (if (or (not value)
+          (and (string? value)
+               (string-null? value))) "—"
+      (short-value value)))
+
+(define (event-action-label G_ action)
+  (cond
+    ((equal? action "created")
+     (G_ "created"))
+    ((equal? action "changed")
+     (G_ "changed"))
+    ((equal? action "moved")
+     (G_ "moved"))
+    ((equal? action "restored")
+     (G_ "restored"))
+    ((equal? action "commented")
+     (G_ "commented"))
+    ((equal? action "comment-removed")
+     (G_ "removed a comment"))
+    ((equal? action "attachment-added")
+     (G_ "attached"))
+    ((equal? action "attachment-removed")
+     (G_ "removed"))
+    ((equal? action "deleted")
+     (G_ "deleted"))
+    (else action)))
+
+(define (render-event G_ event users)
+  (let* ((actor (assq-ref event
+                          'actor-id))
+         (actor-name (let ((u (and actor
+                                   (find (lambda (row)
+                                           (equal? (assq-ref row
+                                                             'id) actor))
+                                         users))))
+                       (if u
+                           (assq-ref u
+                                     'username) "")))
+         (action (assq-ref event
+                           'action))
+         (field (assq-ref event
+                          'field))
+         (old (assq-ref event
+                        'old-value))
+         (new (assq-ref event
+                        'new-value)))
+    `(div (@ (class ,(mk-class '(flex flex-col
+                                      gap-1
+                                      border-2
+                                      border-stone-300/50
+                                      dark:border-onyx-100/50
+                                      rounded-lg
+                                      px-3
+                                      py-2))))
+          (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
+                                           items-baseline))))
+               (strong ,(if (string-null? actor-name)
+                            (G_ "somebody") actor-name))
+               (span (@ (class ,(mk-class '(text-sm font-medium))))
+                     ,(event-action-label G_ action))
+               ,@(if field
+                     `((span (@ (class ,(mk-class '(text-sm))))
+                             ,(G_ field)))
+                     '()))
+          ,@(if (and field
+                     (or old new))
+                `((div (@ (class ,(mk-class '(text-sm font-mono
+                                                      wrap-break-word))))
+                       (span ,(value-or-dash old)) " → "
+                       (span ,(value-or-dash new))))
+                '())
+          (small (@ (class ,(mk-class '(text-xs text-onyx-500
+                                                dark:text-stone-500))))
+                 ,(or (assq-ref event
+                                'created-at) "")))))
+
+(define (render-comment-node G_
+                             comment
+                             comments
+                             users
+                             editable?
+                             project
+                             human-id
+                             depth
+                             seen
+                             viewer-id
+                             moderator?)
+  (let* ((id (assq-ref comment
+                       'id))
+         (author (assq-ref comment
+                           'author-id))
+         (author-name (let ((u (and author
+                                    (find (lambda (row)
+                                            (equal? (assq-ref row
+                                                              'id) author))
+                                          users))))
+                        (if u
+                            (assq-ref u
+                                      'username) "")))
+         (deleted? (assq-ref comment
+                             'deleted-at))
+         (body (assq-ref comment
+                         'body))
+         (children (comment-children comments id))
+         ;; Removing a comment is offered by the same rule the endpoint
+         ;; applies it by: its author may take it back, and a moderator may
+         ;; take anybody's -- so a reader is never shown a control that
+         ;; could only ever be refused.
+         (removable? (and editable?
+                          (not deleted?)
+                          (or moderator?
+                              (and viewer-id author
+                                   (equal? (format #f "~a" viewer-id)
+                                           (format #f "~a" author)))))))
+    `(div (@ (class ,(mk-class '(flex flex-col gap-1 py-2)))
+             (style ,(format #f "margin-left: ~apx"
+                             (* 18 depth))))
+          (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
+                                           items-baseline))))
+               (strong ,(if (string-null? author-name)
+                            (G_ "somebody") author-name))
+               (small (@ (class ,(mk-class '(text-xs text-onyx-500
+                                                     dark:text-stone-500))))
+                      ,(or (assq-ref comment
+                                     'created-at) "")))
+          ,@(if deleted?
+                `((em (@ (class ,(mk-class '(text-sm text-onyx-500
+                                                     dark:text-stone-500))))
+                      ,(G_ "[removed]")))
+                `((div (@ (class ,(mk-class '(text-md leading-7 max-w-prose
+                                                      wrap-break-word))))
+                       ,(org2html (html-unescape body)))))
+          ,@(if (and editable?
+                     (not deleted?))
+                `((details (summary (@ (class ,(mk-class '(text-sm
+                                                           cursor-pointer
+                                                           font-medium))))
+                                    ,(G_ "reply"))
+                           (form (@ (enctype
+                                     "application/x-www-form-urlencoded")
+                                    (method POST)
+                                    (action ,(format #f
+                                              "/tickets/~a/id/~a/comments"
+                                              project human-id)))
+                                 (input (@ (type hidden)
+                                           (name "parent-id")
+                                           (value ,id)))
+                                 (textarea #:label (G_ "your reply")
+                                           #:name "body"
+                                           #:required #t
+                                           #:rows 3
+                                           #:textarea-css '(leading-7 p-3
+                                                            rounded-xl
+                                                            border-stone-700
+                                                            dark:border-onyx-100
+                                                            dark:text-stone-300
+                                                            dark:bg-onyx-700/75
+                                                            bg-stone-300/75
+                                                            border-2
+                                                            min-h-24
+                                                            w-full
+                                                            max-w-prose
+                                                            shadow-md))
+                                 (div ,(submit-button (G_ "reply"))))))
+                '())
+          ,@(if removable?
+                `((form (@ (enctype "application/x-www-form-urlencoded")
+                           (method POST)
+                           (action ,(format #f
+                                     "/tickets/~a/id/~a/comments/~a/delete"
+                                     project human-id id)))
+                        ,(danger-submit-button (G_ "remove"))))
+                '())
+          ,@(map (lambda (child)
+                   (render-comment-node G_
+                                        child
+                                        comments
+                                        users
+                                        editable?
+                                        project
+                                        human-id
+                                        (+ depth 1)
+                                        (cons (assq-ref child
+                                                        'id) seen)
+                                        viewer-id
+                                        moderator?))
+                 (filter (lambda (child)
+                           (not (member (assq-ref child
+                                                  'id) seen))) children)))))
+
+(define* (html-ticket-collaboration G_
+                                    #:key project
+                                    ticket
+                                    projects
+                                    statuses
+                                    users
+                                    comments
+                                    attachments
+                                    events
+                                    revisions
+                                    (editable? #f)
+                                    (viewer-id #f)
+                                    (moderator? #f))
+  (let* ((human-id (assq-ref ticket
+                             'human-id))
+         (section-title (lambda (icon-name text count)
+                          `(h3 (@ (class ,(mk-class '(flex flex-row
+                                                           flex-wrap
+                                                           gap-2
+                                                           items-center
+                                                           text-lg
+                                                           font-bold
+                                                           my-2))))
+                               ,(icon #:type icon-name
+                                      #:icon-css '(text-md text-onyx-700
+                                                   dark:text-stone-300))
+                               (span ,text)
+                               (span (@ (class ,(mk-class '(text-sm font-light
+                                                            text-onyx-500
+                                                            dark:text-stone-500))))
+                                     ,(format #f " (~a)" count)))))
+         (comment-form (if editable?
+                           `((form (@ (enctype
+                                       "application/x-www-form-urlencoded")
+                                      (method POST)
+                                      (action ,(format #f
+                                                "/tickets/~a/id/~a/comments"
+                                                project human-id)))
+                                   (textarea #:label (G_ "add a comment")
+                                             #:name "body"
+                                             #:required #t
+                                             #:rows 3
+                                             #:textarea-css '(leading-7 p-3
+                                                              rounded-xl
+                                                              border-stone-700
+                                                              dark:border-onyx-100
+                                                              dark:text-stone-300
+                                                              dark:bg-onyx-700/75
+                                                              bg-stone-300/75
+                                                              border-2
+                                                              min-h-24
+                                                              w-full
+                                                              max-w-prose
+                                                              shadow-md))
+                                   (div ,(submit-button (G_ "comment")))))
+                           '()))
+         (attachment-form (if editable?
+                              `((form (@ (enctype "multipart/form-data")
+                                         (method POST)
+                                         (action ,(format #f
+                                                   "/tickets/~a/id/~a/attachments"
+                                                   project human-id)))
+                                      (label (@ (class ,(mk-class '(text-sm
+                                                                    font-medium))))
+                                             ,(G_ "attach a file"))
+                                      (div (@ (class ,(mk-class '(flex
+                                                                  flex-row
+                                                                  flex-wrap
+                                                                  gap-2
+                                                                  items-center
+                                                                  my-2))))
+                                           (input (@ (type file)
+                                                     (name "file")
+                                                     (required "")
+                                                     (class ,(mk-class '(text-sm
+                                                                         font-sans)))))
+                                           ,(submit-button (G_ "attach")))))
+                              '()))
+         (move-section (if (and editable?
+                                (> (length projects) 1))
+                           `((details (summary (@ (class ,(mk-class '(text-sm
+                                                                      font-medium
+                                                                      cursor-pointer))))
+                                               ,(G_
+                                                 "move ticket to another project"))
+                                      (form (@ (enctype
+                                                "application/x-www-form-urlencoded")
+                                               (method POST)
+                                               (action ,(format #f
+                                                         "/tickets/~a/id/~a/move"
+                                                         project human-id)))
+                                            (div (@ (class ,(mk-class '(flex
+                                                                        flex-row
+                                                                        flex-wrap
+                                                                        gap-2
+                                                                        items-end
+                                                                        my-2))))
+                                                 (div ,(select #:name 'target-project
+                                                               #:label (G_
+                                                                        "project")
+                                                               #:on-change ""
+                                                               #:options (map (lambda 
+                                                                                      (p)
+                                                                                
+                                                                                (option
+                                                                                 #:value
+                                                                                 (assq-ref
+                                                                                  p
+                                                                                  'human-id)
+                                                                                 #:content
+                                                                                 (assq-ref
+                                                                                  p
+                                                                                  'title)))
+                                                                              
+                                                                              (filter (lambda 
+                                                                                              (p)
+                                                                                        
+                                                                                        (not
+                                                                                         (equal?
+                                                                                          (assq-ref
+                                                                                           p
+                                                                                           'human-id)
+                                                                                          project)))
+                                                                               projects))))
+                                                 (div ,(submit-button (G_
+                                                                       "move")))))))
+                           '()))
+         (latest-version (if (pair? revisions)
+                             (assq-ref (car revisions)
+                                       'version) 0)))
+    (append
+     ;; -- Discussion -------------------------------------------------------
+     (list (glass-panel `(,(section-title 'chat-circle
+                                          (G_ "discussion")
+                                          (length comments)) ,@comment-form
+                          ,@(if (pair? comments)
+                                (map (lambda (comment)
+                                       (render-comment-node G_
+                                                            comment
+                                                            comments
+                                                            users
+                                                            editable?
+                                                            project
+                                                            human-id
+                                                            0
+                                                            (list (assq-ref
+                                                                   comment
+                                                                   'id))
+                                                            viewer-id
+                                                            moderator?))
+                                     (filter (lambda (comment)
+                                               (not (assq-ref comment
+                                                              'parent-id)))
+                                             comments))
+                                `((p (@ (class ,(mk-class '(text-sm
+                                                            text-onyx-500
+                                                            dark:text-stone-500))))
+                                     ,(G_ "no comments yet")))))
+                        #:frost 3
+                        #:padding '(p-4 sm:p-5)
+                        #:classes '(flex flex-col gap-2 my-3)))
+     ;; -- Files ------------------------------------------------------------
+     (list (glass-panel `(,(section-title 'paperclip
+                                          (G_ "attachments")
+                                          (length attachments)) ,@attachment-form
+                          ,@(if (pair? attachments)
+                                (map (lambda (attachment)
+                                       (let ((url (format #f
+                                                   "/tickets/~a/id/~a/attachments/~a"
+                                                   project human-id
+                                                   (assq-ref attachment
+                                                             'id))))
+                                         `(div (@ (class ,(mk-class '(flex
+                                                                      flex-row
+                                                                      flex-wrap
+                                                                      gap-2
+                                                                      items-center
+                                                                      justify-between
+                                                                      border-2
+                                                                      border-stone-300/50
+                                                                      dark:border-onyx-100/50
+                                                                      rounded-lg
+                                                                      px-3
+                                                                      py-2
+                                                                      my-1))))
+                                               (div (@ (class ,(mk-class '(flex
+                                                                           flex-row
+                                                                           flex-wrap
+                                                                           gap-2
+                                                                           items-center))))
+                                                    (span ,(icon #:type 'file
+                                                                 #:icon-css '(text-md)))
+                                                    (a (@ (href ,url))
+                                                       ,(assq-ref attachment
+                                                                  'filename))
+                                                    (small (@ (class ,(mk-class '
+                                                                       (text-xs
+                                                                        text-onyx-500
+                                                                        dark:text-stone-500))))
+                                                           ,(attachment-size-label
+                                                             (assq-ref
+                                                              attachment
+                                                              'size))))
+                                               ,@(if editable?
+                                                     `((form (@ (method POST)
+                                                                (action ,(format
+                                                                          #f
+                                                                          "~a/delete"
+                                                                          url)))
+                                                             ,(danger-submit-button
+                                                               (G_ "remove"))))
+                                                     '())))) attachments)
+                                `((p (@ (class ,(mk-class '(text-sm
+                                                            text-onyx-500
+                                                            dark:text-stone-500))))
+                                     ,(G_ "no attachments yet")))))
+                        #:frost 3
+                        #:padding '(p-4 sm:p-5)
+                        #:classes '(flex flex-col gap-2 my-3)))
+     ;; -- Audit trail ------------------------------------------------------
+     (list (glass-panel `(,(section-title 'clock-counter-clockwise
+                                          (G_ "activity")
+                                          (length events)) ,@(if (pair? events)
+                                                                 (map (lambda 
+                                                                              (event)
+                                                                        (render-event
+                                                                         G_
+                                                                         event
+                                                                         users))
+                                                                      events)
+                                                                 `((p (@ (class ,
+                                                                          (mk-class '
+                                                                           (text-sm
+                                                                            text-onyx-500
+                                                                            dark:text-stone-500))))
+                                                                      ,(G_
+                                                                        "nothing recorded yet")))))
+                        #:frost 3
+                        #:padding '(p-4 sm:p-5)
+                        #:classes '(flex flex-col gap-1 my-3)))
+     ;; -- Versions ---------------------------------------------------------
+     (list (glass-panel `(,(section-title 'git-branch
+                                          (G_ "versions")
+                                          (length revisions)) ,@(if (pair?
+                                                                     revisions)
+                                                                    (map (lambda 
+                                                                                 (revision)
+                                                                           (let* 
+                                                                                 (
+                                                                                  (version
+                                                                                   (assq-ref
+                                                                                    revision
+                                                                                    'version))
+                                                                                  
+                                                                                  (previous (let loop
+                                                                                              
+                                                                                              (
+                                                                                               (rest
+                                                                                                revisions))
+                                                                                              (cond
+                                                                                                
+                                                                                                (
+                                                                                                 (null?
+                                                                                                  rest)
+                                                                                                 #f)
+                                                                                                
+                                                                                                (
+                                                                                                 (equal?
+                                                                                                  (assq-ref
+                                                                                                   (car
+                                                                                                    rest)
+                                                                                                   'version)
+                                                                                                  version)
+                                                                                                 
+                                                                                                 (and
+                                                                                                  (pair?
+                                                                                                   (cdr
+                                                                                                    rest))
+                                                                                                  
+                                                                                                  (cadr
+                                                                                                   rest)))
+                                                                                                
+                                                                                                (else
+                                                                                                 (loop
+                                                                                                  (cdr
+                                                                                                   rest))))))
+                                                                                  
+                                                                                  (changed
+                                                                                   (if
+                                                                                    previous
+                                                                                    
+                                                                                    (map
+                                                                                     cadr
+                                                                                     
+                                                                                     (ticket-changes
+                                                                                      previous
+                                                                                      revision))
+                                                                                    '()))
+                                                                                  
+                                                                                  (author
+                                                                                   (assq-ref
+                                                                                    revision
+                                                                                    'author-id))
+                                                                                  
+                                                                                  (author-name (let 
+                                                                                                    (
+                                                                                                     (u
+                                                                                                      (and
+                                                                                                       author
+                                                                                                       
+                                                                                                       (find (lambda 
+                                                                                                                     (row)
+                                                                                                               
+                                                                                                               (equal?
+                                                                                                                (assq-ref
+                                                                                                                 row
+                                                                                                                 'id)
+                                                                                                                author))
+                                                                                                        users))))
+                                                                                                 
+                                                                                                 (if
+                                                                                                  u
+                                                                                                  
+                                                                                                  (assq-ref
+                                                                                                   u
+                                                                                                   'username)
+                                                                                                  ""))))
+                                                                             `
+                                                                             (details
+                                                                              (@
+                                                                               (class ,
+                                                                                (mk-class '
+                                                                                 (border-2
+                                                                                  border-stone-300/50
+                                                                                  dark:border-onyx-100/50
+                                                                                  rounded-lg
+                                                                                  px-3
+                                                                                  py-2
+                                                                                  my-1))))
+                                                                              
+                                                                              (summary
+                                                                               (@
+                                                                                (class ,
+                                                                                 (mk-class '
+                                                                                  (text-sm
+                                                                                   font-medium
+                                                                                   cursor-pointer))))
+                                                                               ,
+                                                                               (format
+                                                                                #f
+                                                                                "v~a — ~a — ~a"
+                                                                                version
+                                                                                
+                                                                                (or
+                                                                                 (assq-ref
+                                                                                  revision
+                                                                                  'created-at)
+                                                                                 "")
+                                                                                
+                                                                                (if
+                                                                                 (string-null?
+                                                                                  author-name)
+                                                                                 
+                                                                                 (G_
+                                                                                  "somebody")
+                                                                                 author-name)))
+                                                                              ,@
+                                                                              (if
+                                                                               (pair?
+                                                                                changed)
+                                                                               `
+                                                                               (
+                                                                                (small
+                                                                                 (@
+                                                                                  (class ,
+                                                                                   (mk-class '
+                                                                                    (text-xs
+                                                                                     text-onyx-500
+                                                                                     dark:text-stone-500))))
+                                                                                 ,
+                                                                                 (format
+                                                                                  #f
+                                                                                  "~a: ~a"
+                                                                                  
+                                                                                  (G_
+                                                                                   "changed")
+                                                                                  
+                                                                                  (string-join
+                                                                                   changed
+                                                                                   ", "))))
+                                                                               '())
+                                                                              
+                                                                              (div
+                                                                               (@
+                                                                                (class ,
+                                                                                 (mk-class '
+                                                                                  (text-sm
+                                                                                   leading-7
+                                                                                   max-w-prose
+                                                                                   wrap-break-word))))
+                                                                               
+                                                                               (strong ,
+                                                                                (G_
+                                                                                 "title"))
+                                                                               ": "
+                                                                               ,
+                                                                               (or
+                                                                                (assq-ref
+                                                                                 revision
+                                                                                 'title)
+                                                                                ""))
+                                                                              
+                                                                              (div
+                                                                               (@
+                                                                                (class ,
+                                                                                 (mk-class '
+                                                                                  (text-sm))))
+                                                                               
+                                                                               (strong ,
+                                                                                (G_
+                                                                                 "status"))
+                                                                               ": "
+                                                                               ,
+                                                                               (status-label
+                                                                                G_
+                                                                                statuses
+                                                                                
+                                                                                (or
+                                                                                 (assq-ref
+                                                                                  revision
+                                                                                  'ticket-status)
+                                                                                 "")))
+                                                                              
+                                                                              (div
+                                                                               (@
+                                                                                (class ,
+                                                                                 (mk-class '
+                                                                                  (text-sm))))
+                                                                               
+                                                                               (strong ,
+                                                                                (G_
+                                                                                 "type"))
+                                                                               ": "
+                                                                               ,
+                                                                               (ticket-type-label
+                                                                                G_
+                                                                                
+                                                                                (or
+                                                                                 (assq-ref
+                                                                                  revision
+                                                                                  'ticket-type)
+                                                                                 "")))
+                                                                              ,@
+                                                                              (if
+                                                                               (assq-ref
+                                                                                revision
+                                                                                'priority)
+                                                                               `
+                                                                               (
+                                                                                (div
+                                                                                 (@
+                                                                                  (class ,
+                                                                                   (mk-class '
+                                                                                    (text-sm))))
+                                                                                 
+                                                                                 (strong ,
+                                                                                  (G_
+                                                                                   "priority"))
+                                                                                 ": "
+                                                                                 ,
+                                                                                 (format
+                                                                                  #f
+                                                                                  "~a"
+                                                                                  
+                                                                                  (assq-ref
+                                                                                   revision
+                                                                                   'priority))))
+                                                                               '())
+                                                                              ,@
+                                                                              (if
+                                                                               (assq-ref
+                                                                                revision
+                                                                                'estimate-points)
+                                                                               `
+                                                                               (
+                                                                                (div
+                                                                                 (@
+                                                                                  (class ,
+                                                                                   (mk-class '
+                                                                                    (text-sm))))
+                                                                                 
+                                                                                 (strong ,
+                                                                                  (G_
+                                                                                   "story points"))
+                                                                                 ": "
+                                                                                 ,
+                                                                                 (format
+                                                                                  #f
+                                                                                  "~a"
+                                                                                  
+                                                                                  (assq-ref
+                                                                                   revision
+                                                                                   'estimate-points))))
+                                                                               '())
+                                                                              ,@
+                                                                              (if
+                                                                               (assq-ref
+                                                                                revision
+                                                                                'estimate-size)
+                                                                               `
+                                                                               (
+                                                                                (div
+                                                                                 (@
+                                                                                  (class ,
+                                                                                   (mk-class '
+                                                                                    (text-sm))))
+                                                                                 
+                                                                                 (strong ,
+                                                                                  (G_
+                                                                                   "size"))
+                                                                                 ": "
+                                                                                 ,
+                                                                                 (ticket-size-label
+                                                                                  (assq-ref
+                                                                                   revision
+                                                                                   'estimate-size))))
+                                                                               '())
+                                                                              ,@
+                                                                              (if
+                                                                               (assq-ref
+                                                                                revision
+                                                                                'description)
+                                                                               `
+                                                                               (
+                                                                                (div
+                                                                                 (@
+                                                                                  (class ,
+                                                                                   (mk-class '
+                                                                                    (text-md
+                                                                                     leading-7
+                                                                                     max-w-prose
+                                                                                     wrap-break-word))))
+                                                                                 ,
+                                                                                 (org2html
+                                                                                  (html-unescape
+                                                                                   (assq-ref
+                                                                                    revision
+                                                                                    'description)))))
+                                                                               '())
+                                                                              ,@
+                                                                              (if
+                                                                               (and
+                                                                                editable?
+                                                                                
+                                                                                (not
+                                                                                 (equal?
+                                                                                  version
+                                                                                  latest-version)))
+                                                                               `
+                                                                               (
+                                                                                (form
+                                                                                 (@
+                                                                                  (method
+                                                                                   POST)
+                                                                                  
+                                                                                  (action ,
+                                                                                   (format
+                                                                                    #f
+                                                                                    "/tickets/~a/id/~a/revisions/~a/restore"
+                                                                                    project
+                                                                                    human-id
+                                                                                    version)))
+                                                                                 
+                                                                                 (div ,
+                                                                                  (submit-button
+                                                                                   (G_
+                                                                                    "restore this version")))))
+                                                                               '()))))
+                                                                     revisions)
+                                                                    `((p (@ (class ,
+                                                                             (mk-class '
+                                                                              (text-sm
+                                                                               text-onyx-500
+                                                                               dark:text-stone-500))))
+                                                                         ,(G_
+                                                                           "no versions yet")))))
+                        #:frost 3
+                        #:padding '(p-4 sm:p-5)
+                        #:classes '(flex flex-col gap-1 my-3)))
+     ;; -- Moving -----------------------------------------------------------
+     (if (pair? move-section)
+         (list (glass-panel move-section
+                            #:frost 3
+                            #:padding '(p-4 sm:p-5)
+                            #:classes '(flex flex-col gap-2 my-3)))
+         '()))))

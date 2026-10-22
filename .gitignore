@@ -2,7 +2,10 @@ tmp/cache/route.cache
 lucidplan.db*
 reports/
 tmp/*
+var/
 *.log
+# msgmerge keeps the previous file beside the one it rewrote
+*.po~
 en-GB.html
 env.scm
 .nrepl-port
