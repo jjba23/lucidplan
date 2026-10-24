@@ -322,7 +322,7 @@ Args: update? represents whether we should update a template or create a new one
 
 (define (default)
   "Default task to be run, list available tasks."
-  ($ '("maak --list")))
+  (list-tasks))
 
 (define (build-manual)
   "Render the project's manual."
@@ -340,7 +340,9 @@ Args: update? represents whether we should update a template or create a new one
 
 (define (fmt)
   "Format Scheme source code files according to the Guix style guide."
-  ($ '("find . -maxdepth 8 -name '*.scm'" "-type f -exec guix style -f {} \\;")))
+  (run (list "find" "." "-maxdepth" "8" "-name" "*.scm" "-type" "f"
+             "-exec" "guix" "style" "-f" "{}" ";")
+       #:verbose? #t))
 
 (define (test)
   "Run the test suite with veritas.
@@ -385,7 +387,7 @@ path, so a test names the module it tests the way the application does."
 (define (kill-server)
   "Kill any running HTTP server in the same port."
   ($ (list (~ "fuser -k ~a/tcp || true" http-port)))
-  ($ '("sleep 1")))
+  (run (list "sleep" "1")))
 
 (define (server)
   "Target to start the lucidplan server with the default configuration."
