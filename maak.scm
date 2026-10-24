@@ -16,13 +16,11 @@
 ;; along with lucidplan.  If not, see <https://www.gnu.org/licenses/>.
 
 (define-module (maak)
+  #:declarative? #t
   #:use-module (maak maak)
-  #:use-module (ice-9 popen)
   #:use-module (ice-9 regex)
   #:use-module (ice-9 string-fun)
-  #:use-module (ice-9 textual-ports)
-  #:use-module (srfi srfi-1)
-  #:declarative? #t)
+  #:use-module (srfi srfi-1))
 
 ;; ====== Maak constants ======
 
@@ -90,9 +88,9 @@ Args: lang represents the language code (e.g., en_US, nl_NL, etc.)
 
 Use msgfmt to compile the .po file into a .mo file for the specified language
 The output .mo file will be placed in the LC_MESSAGES directory under the language's folder."
-  ($ (list (~ "msgfmt -v -o ~a/~a/LC_MESSAGES/~a.mo" i18n-dir lang
-              i18n-textdomain)
-           (~ "~a/~a/LC_MESSAGES/~a.po" i18n-dir lang i18n-textdomain))))
+  (run (list "msgfmt" "-v" "-o"
+             (~ "~a/~a/LC_MESSAGES/~a.mo" i18n-dir lang i18n-textdomain)
+             (~ "~a/~a/LC_MESSAGES/~a.po" i18n-dir lang i18n-textdomain))))
 
 (define (i18n-init* lang)
   "Initialize a new translation file from a template (.pot) for a specific language.
@@ -103,10 +101,11 @@ Use msginit to generate a .po file from the .pot template for the specified lang
 The -l option sets the language, and --no-translator means no translator is pre-filled in the .po file
 The generated .po file is placed in the LC_MESSAGES directory for the given language"
   (mkdir-p (~ "~a/~a/LC_MESSAGES" i18n-dir lang))
-  ($ (list (~ "msginit -l ~a.UTF8 -o" lang)
-           (~ "~a/~a/LC_MESSAGES/~a.po" i18n-dir lang i18n-textdomain)
-           (~ "-i ~a/~a.pot --no-translator" i18n-dir i18n-textdomain))
-     #:verbose? #t))
+  (run (list "msginit" "-l" (~ "~a.UTF8" lang)
+             "-o" (~ "~a/~a/LC_MESSAGES/~a.po" i18n-dir lang i18n-textdomain)
+             "-i" (~ "~a/~a.pot" i18n-dir i18n-textdomain)
+             "--no-translator")
+       #:verbose? #t))
 
 (define (i18n-merge* lang)
   "Merge translation updates from the template (.pot) into an existing .po file.
@@ -116,9 +115,9 @@ Args: lang represents the language code (e.g., en_US, nl_NL, etc.)
 Use msgmerge to update the specified language's .po file with new translations from the template (.pot)
 The -U flag updates the .po file in place
 This ensures the .po file stays up-to-date with the latest changes in the template"
-  ($ (list "msgmerge -U"
-           (~ "~a/~a/LC_MESSAGES/~a.po" i18n-dir lang i18n-textdomain)
-           (~ "~a/~a.pot" i18n-dir i18n-textdomain))))
+  (run (list "msgmerge" "-U"
+             (~ "~a/~a/LC_MESSAGES/~a.po" i18n-dir lang i18n-textdomain)
+             (~ "~a/~a.pot" i18n-dir i18n-textdomain))))
 
 (define (i18n-sources)
   "Answer the files xgettext reads, as the globs it is handed.
@@ -130,7 +129,7 @@ or may not keep -- would silently cost the project every string it has.
 `ENTRY' is a file rather than a directory, and is always read."
   (append (filter-map (lambda (dir)
                         (and (file-exists? dir)
-                             (format #f "~a/*.scm" dir)))
+                             (~ "~a/*.scm" dir)))
                       '("lib/lucidplan/job" "lib/lucidplan" "app/controllers"
                         "app/views" "app/api"))
           '("ENTRY")))
@@ -138,17 +137,22 @@ or may not keep -- would silently cost the project every string it has.
 (define* (i18n-extract* #:key (update? #t))
   "Extract translatable strings from Scheme source files using xgettext.
 Args: update? represents whether we should update a template or create a new one."
-  ($ (append (list (~ "xgettext --default-domain=~a" i18n-textdomain))
-             (list (~ "--output=~a/~a.pot" i18n-dir i18n-textdomain))
-             (list "--language=Scheme --keyword=G_")
-             (list "--sort-by-file")
-             (list (if update? "--join-existing" ""))
-             (list (~ "--copyright-holder=\"~a\""
-                      (string-join copyright-holders ",")))
-             (list (~ "--package-name=~a" i18n-textdomain))
-             (i18n-sources)
-             (list "--from-code UTF-8"))
-     #:verbose? #t))
+  ;; The sources are globs, and xgettext expands no glob of its own, so the
+  ;; line is handed to the shell to name the files it reads.
+  (run (append (list "xgettext"
+                     (~ "--default-domain=~a" i18n-textdomain)
+                     (~ "--output=~a/~a.pot" i18n-dir i18n-textdomain)
+                     "--language=Scheme"
+                     "--keyword=G_"
+                     "--sort-by-file")
+               (if update? (list "--join-existing") '())
+               (list (~ "--copyright-holder=\"~a\""
+                        (string-join copyright-holders ","))
+                     (~ "--package-name=~a" i18n-textdomain))
+               (i18n-sources)
+               (list "--from-code" "UTF-8"))
+       #:expand? #t
+       #:verbose? #t))
 
 ;; ====== Maak vendored theme assets ======
 
@@ -317,8 +321,8 @@ Args: update? represents whether we should update a template or create a new one
 
 (define (repl)
   "Development REPL."
-  (time-machine-manifest-shell '("guile -L ./lib -L ."
-                                 "-c '((@ (ares server) run-nrepl-server))'")))
+  (time-machine-manifest-shell (list "guile" "-L" "./lib" "-L" "."
+                                     "-c" "'((@ (ares server) run-nrepl-server))'")))
 
 (define (default)
   "Default task to be run, list available tasks."
@@ -326,8 +330,11 @@ Args: update? represents whether we should update a template or create a new one
 
 (define (build-manual)
   "Render the project's manual."
-  (time-machine-manifest-shell (list (~ "emacs -Q --batch --eval '~s'"
-                                        emacs-lisp-manual-publish-cmd))
+  ;; The exporter's expression is one argument, so it keeps the quoting a shell
+  ;; would need to read it as one word.
+  (time-machine-manifest-shell (list "emacs" "-Q" "--batch"
+                                     "--eval" (~ "'~s'"
+                                                 emacs-lisp-manual-publish-cmd))
                                #:verbose? #t))
 
 (define (deploy)
@@ -352,16 +359,16 @@ change, and `benchmark/' for the ones that measure rather than assert, which
 veritas keeps apart because they answer a different question and take a
 different amount of time.  The application's own directories are on the load
 path, so a test names the module it tests the way the application does."
-  ;; The two settings the run is described by are handed over with `env' rather
-  ;; than written in front of `guile': what follows the `--' of a guix shell is
-  ;; exec'd, not read by a shell, so an assignment written there is taken for
-  ;; the name of a program and the run answers `command not found'.  The
-  ;; loader's own defaults agree with both of them; they are said anyway, so a
-  ;; run from here is the run that was asked for.
-  (time-machine-manifest-shell (list "env" "VERITAS_TEST_TYPE=unit"
-                                "VERITAS_RUN_BENCHMARKS=true"
-                                "guile --fresh-auto-compile -L . -L lib -L test"
-                                "-c '(begin (setlocale LC_ALL \"C.UTF-8\") (use-modules (veritas runner)) (run-tests))'")))
+  ;; The two settings the run is described by are handed to the run with
+  ;; `#:env' rather than written in front of `guile': what follows the `--' of a
+  ;; guix shell is exec'd, not read by a shell, so an assignment written there is
+  ;; taken for the name of a program and the run answers `command not found'.
+  ;; The loader's own defaults agree with both of them; they are said anyway, so
+  ;; a run from here is the run that was asked for.
+  (time-machine-manifest-shell
+   (list "guile" "--fresh-auto-compile" "-L" "." "-L" "lib" "-L" "test"
+         "-c" "'(begin (setlocale LC_ALL \"C.UTF-8\") (use-modules (veritas runner)) (run-tests))'")
+   #:env '("VERITAS_TEST_TYPE=unit" "VERITAS_RUN_BENCHMARKS=true")))
 
 (define (hot-reload)
   "Hot-reloading developer's setup."
@@ -369,12 +376,12 @@ path, so a test names the module it tests the way the application does."
                                      "--clear"
                                      (~ "--exts ~a"
                                         (string-join (map symbol->string
-                                                      hot-reload-file-types)
+                                                          hot-reload-file-types)
                                                      ","))
                                      "--on-busy-update=restart"
-                                     "--shell bash"
-                                     "--watch . --"
-                                     "maak server")))
+                                     "--shell" "bash"
+                                     "--watch" "."
+                                     "--" "maak" "server")))
 
 (define (hr)
   "Alias to hot-reloading."
@@ -386,18 +393,21 @@ path, so a test names the module it tests the way the application does."
 
 (define (kill-server)
   "Kill any running HTTP server in the same port."
-  ($ (list (~ "fuser -k ~a/tcp || true" http-port)))
+  ;; `fuser' exits non-zero when nothing holds the port, which is the answer
+  ;; this task wants rather than a failure.
+  (run (list "fuser" "-k" (~ "~a/tcp" http-port))
+       #:allow-failure? #t)
   (run (list "sleep" "1")))
 
 (define (server)
   "Target to start the lucidplan server with the default configuration."
   (kill-server)
-  (time-machine-manifest-shell '("art work")))
+  (time-machine-manifest-shell (list "art" "work")))
 
 (define (production-server)
   "Target to start the lucidplan server with the production configuration."
   (kill-server)
-  (time-machine-manifest-shell '("art work -c conf/production.conf")))
+  (time-machine-manifest-shell (list "art" "work" "-c" "conf/production.conf")))
 
 (define (migrate)
   "Bring the database up to the schema the migrations describe.
@@ -409,9 +419,10 @@ never half-migrated, because a migration that fails takes its own statements
 back with it.  The ledger is what makes that possible -- it is the record of
 what has run, and mutastructura is the only thing that writes it -- so the
 migrations are applied here and nowhere else, by hand or otherwise."
-  (time-machine-manifest-shell (list (~
-                                      "mutastructura --database ~a --connection ~a --migrations ~a"
-                                      db-engine lucidplan-db db-migrations-dir))))
+  (time-machine-manifest-shell (list "mutastructura"
+                                     "--database" db-engine
+                                     "--connection" lucidplan-db
+                                     "--migrations" db-migrations-dir)))
 
 (define (init-db)
   "Initialize a new database, migrate it, and enable WAL mode for higher
@@ -419,9 +430,9 @@ concurrent writes to SQLite 3."
   (delete-file-recursively lucidplan-db)
   (delete-file-recursively (~ "~a-shm" lucidplan-db))
   (delete-file-recursively (~ "~a-wal" lucidplan-db))
-  (time-machine-manifest-shell (list (~
-                                      "sqlite3 ~a 'PRAGMA journal_mode=WAL;'"
-                                      lucidplan-db)))
+  ;; The pragma is one argument, quoted so the shell keeps the semicolon in it.
+  (time-machine-manifest-shell (list "sqlite3" lucidplan-db
+                                     "'PRAGMA journal_mode=WAL;'"))
   (migrate))
 
 ;; ====== Maak i18n tasks ======
@@ -459,8 +470,9 @@ concurrent writes to SQLite 3."
   (i18n-extract* #:update? #t))
 
 (define (olive-css)
-  ($ '("curl --output \"./pub/css/lucidplan.olive.min.css\""
-       "\"https://codeberg.org/jjba23/olive-css/raw/branch/trunk/resources/css/lucidplan.olive.min.css\"")))
+  (curl-download
+   "https://codeberg.org/jjba23/olive-css/raw/branch/trunk/resources/css/lucidplan.olive.min.css"
+   #:output "./pub/css/lucidplan.olive.min.css"))
 
 (define (fetch-assets)
   "Refresh the theme files this instance serves itself, from where they came from.
@@ -500,31 +512,42 @@ say where they came from when one is read on its own."
 
   (define (fetch-text url)
     "The body the web server at URL answers with."
-    (let* ((port (open-input-pipe (format #f "curl -fsS -A '~a' '~a'"
-                                          asset-user-agent url)))
-           (body (get-string-all port)))
-      (close-pipe port)
-      (when (string-null? body)
-        (error "fetch-assets: nothing came back from" url)) body))
+    (let ((body (curl-text url #:user-agent asset-user-agent)))
+      ;; A dry run asks no server, so an empty body is the run, not a failure.
+      (when (and (string-null? body) (not (dry-run?)))
+        (task-error "fetch-assets: nothing came back from ~a"
+                    #:args (list url)
+                    #:hint "Check the address the asset is taken from, and that the host answers."))
+      body))
 
   (define (fetch-all! pairs)
     "Take every (URL . FILE) in PAIRS, in a single run of the fetcher."
-    (when (null? pairs)
-      (error "fetch-assets: nothing to fetch"))
-    ($ (append (list "curl -fsS --fail-early" "-A"
-                     (~ "'~a'" asset-user-agent))
-               (append-map (lambda (pair)
-                             (list "--output"
-                                   (~ "'~a'"
-                                      (cdr pair))
-                                   (~ "'~a'"
-                                      (car pair)))) pairs))))
+    (cond
+      ;; A dry run has no answer from the network, so there is no pair to hand
+      ;; to the fetcher and nothing for an empty list to mean.
+      ((null? pairs)
+       (unless (dry-run?)
+         (task-error "fetch-assets: nothing to fetch"
+                     #:hint "Check the sources the assets are taken from."))
+       #t)
+      (else
+       ;; One run for the whole list, so `--fail-early' stops the rest at the
+       ;; first source that cannot be taken rather than leaving half a set.
+       (curl (append (list "--silent" "--show-error" "--fail" "--fail-early"
+                           "--user-agent" asset-user-agent)
+                     (append-map (lambda (pair)
+                                   (list "--output" (cdr pair) (car pair)))
+                                 pairs))))))
 
   (define (write-asset path text)
-    (call-with-output-file path
-      (lambda (port)
-        (display text port)))
-    (log-info "wrote ~a" path))
+    "Write TEXT to PATH, or say what a dry run would have written."
+    (if (dry-run?)
+        (log-info "would write ~a" path)
+        (begin
+          (call-with-output-file path
+            (lambda (port)
+              (display text port)))
+          (log-info "wrote ~a" path))))
 
   ;; A family's stylesheet is captured as the font service wrote it -- the
   ;; @font-face blocks and the subset split are its own -- and then rewritten
@@ -589,14 +612,16 @@ say where they came from when one is read on its own."
     ;; send a browser after it and land a 404, so the trimming is checked
     ;; rather than trusted.
     (when (string-contains trimmed "Phosphor.ttf")
-      (error
-       "fetch-assets: could not drop the TrueType source from the icon sheet"))
+      (task-error "fetch-assets: could not drop the TrueType source from the icon sheet"
+                  #:hint "Check the src list the icon stylesheet declares; the form to drop has changed."))
     (when (string-contains trimmed "Phosphor.svg")
-      (error "fetch-assets: could not drop the SVG source from the icon sheet"))
+      (task-error "fetch-assets: could not drop the SVG source from the icon sheet"
+                  #:hint "Check the src list the icon stylesheet declares; the form to drop has changed."))
     ;; A separator left dangling is a broken declaration, so the shape of what
     ;; is left is checked too, not only what went away.
     (when (string-contains trimmed ",;")
-      (error "fetch-assets: the icon sheet's src list is malformed"))
+      (task-error "fetch-assets: the icon sheet's src list is malformed"
+                  #:hint "A dangling separator means the forms to drop no longer match the sheet."))
     (write-asset (~ "~a/phosphor.css" asset-css-dir)
                  (string-append (format #f
                                  "/* The icon face this instance serves itself (Phosphor ~a).
@@ -615,12 +640,14 @@ say where they came from when one is read on its own."
 
 (define (import-production-database)
   "Import production env's database to local workspace via SSH/SCP"
-  ($ '("scp wolk-jjba:/etc/byggsteg/job-clone/lucidplan/trunk/lucidplan.db* .")))
+  ;; The wildcard is the remote side's, which scp expands on the host it reads
+  ;; from, so it is one argument here.
+  (run (list "scp" "wolk-jjba:/etc/byggsteg/job-clone/lucidplan/trunk/lucidplan.db*" ".")))
 
 (define (import-production-env)
   "Import production env's database to local workspace via SSH/SCP"
-  ($ '("scp wolk-jjba:/etc/byggsteg/job-clone/lucidplan/trunk/env.scm .")))
+  (run (list "scp" "wolk-jjba:/etc/byggsteg/job-clone/lucidplan/trunk/env.scm" ".")))
 
 (define (local-login)
-  ($ '("http --form POST" "http://localhost:50025/api/v1/login"
-       "email=jjbigorra@gmail.com" "password=***")))
+  (run (list "http" "--form" "POST" "http://localhost:50025/api/v1/login"
+             "email=jjbigorra@gmail.com" "password=***")))
