@@ -776,6 +776,34 @@ deadline were not there, which is what it is."
                 ,due-on))
         '())))
 
+;;; ===== A day, typed into a form =====
+;;;
+;;; Three forms ask for a calendar day -- the day time was spent, the day a
+;;; ticket or a milestone is due, the two ends of a sprint -- and all of them
+;;; ask for it the same way: the browser's own date control, which draws a
+;;; calendar in the reader's own locale and submits the one form a server
+;;; should have to parse, `2026-10-27'.  A page therefore needs no date-picker
+;;; script and no format of its own.
+;;;
+;;; It is built on hygguile's `input' rather than on a date component of its
+;;; own, because that is what the version this project pins offers; the field
+;;; is an `<input type="date">' either way, and what a page says about it --
+;;; its label, its day -- is the same.
+
+(define-public (date-input label name . value-arg)
+  "Answer a date field named NAME, labelled LABEL, showing VALUE-ARG.
+
+VALUE-ARG is the day the field opens on, in ISO form, and is optional: a
+form that is creating something rather than editing it has no day to show,
+and the field is then empty rather than showing a stand-in.  A value that is
+not text -- which is how an absent day arrives, as @code{#f} -- is emptied
+rather than written into the markup as it is."
+  (let ((value (if (pair? value-arg) (car value-arg) #f)))
+    (input #:type 'date
+           #:label label
+           #:name name
+           #:value (if (string? value) value ""))))
+
 ;; A closed bucket is titled by the status inside it when it holds exactly
 ;; one -- so renaming that status renames the section -- and by the bucket's
 ;; own name when it holds several, since there is then no one name to borrow.

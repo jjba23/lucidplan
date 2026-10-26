@@ -521,13 +521,11 @@ draw -- and a chart of nothing is worse than a sentence saying so."
                                                                              flex-wrap
                                                                              gap-2
                                                                              items-end))))
-                                                      (div ,(date-field #:label (G_
-                                                                                 "starts on")
-                                                                        #:name
+                                                      (div ,(date-input (G_
+                                                                         "starts on")
                                                                         "starts-on"))
-                                                      (div ,(date-field #:label (G_
-                                                                                 "ends on")
-                                                                        #:name
+                                                      (div ,(date-input (G_
+                                                                         "ends on")
                                                                         "ends-on")))
                                                  ,(submit-button (G_
                                                                   "plan a sprint")))))
@@ -559,6 +557,77 @@ draw -- and a chart of nothing is worse than a sentence saying so."
 ;; The statuses a ticket is drawn with are the project's own ladder, so a
 ;; project that renamed or added a status sees its own words here, and a
 ;; ticket is counted as done by the same rule the backlog counts it.
+;; One row of a ticket list on the board, with whatever control comes with it:
+;; a ticket in the sprint can be taken out of it, and one in the backlog can be
+;; put in.  Both lists draw their rows the same way, so a ticket looks the same
+;; whichever side of the page it is on -- and the row is a procedure rather than
+;; two nearly-identical quasiquotes, which is what keeps them from drifting
+;; apart (and what keeps this body shallow enough to read).
+(define %board-row-face
+  (mk-class '(flex flex-row flex-wrap gap-2 items-center justify-between
+                   border-2 border-stone-300/50 dark:border-onyx-100/50
+                   rounded-lg px-3 py-2 my-1)))
+
+(define %board-row-main-face
+  (mk-class '(flex flex-row flex-wrap gap-2 items-center)))
+
+(define* (render-board-row G_
+                           #:key
+                           project
+                           ticket
+                           statuses
+                           (actions '()))
+  (let ((human-id (assq-ref ticket
+                            'human-id)))
+    `(div (@ (class ,%board-row-face))
+          (div (@ (class ,%board-row-main-face))
+               (a (@ (href ,(format #f "/tickets/~a/id/~a" project human-id))
+                     (class ,(mk-class '(text-sm no-underline))))
+                  ,(assq-ref ticket
+                             'title))
+               (span (@ (class ,%muted-face))
+                     ,(status-label G_ statuses
+                                    (or (assq-ref ticket
+                                                  'ticket-status) "")))
+               (span (@ (class ,%muted-face))
+                     ,(format #f "~a: ~a" (G_ "points")
+                              (ticket-points-of ticket))))
+          ,@actions)))
+
+;; Putting a ticket in or taking it out is one form with the direction in it,
+;; because the endpoint behind it is one endpoint.  The ticket is named by its
+;; own id rather than by its number, since a number only means something inside
+;; one project.
+(define* (render-board-ticket-form G_
+                                   #:key
+                                   project
+                                   sprint-id
+                                   ticket
+                                   direction
+                                   label
+                                   danger?)
+  `(form (@ (enctype "application/x-www-form-urlencoded")
+             (method POST)
+             (action ,(format #f "/projects/~a/sprints/~a/tickets" project
+                              sprint-id)))
+         (input (@ (hidden "")
+                   (name "ticket")
+                   (value ,(assq-ref ticket
+                                     'id))))
+         (input (@ (hidden "")
+                   (name "action")
+                   (value ,direction)))
+         ,(if danger?
+              (danger-submit-button (G_ label))
+              (submit-button (G_ label)))))
+
+;; The board of one sprint: what is in it, what is left, and the line it should
+;; be on.  The backlog beside it is what makes the page useful rather than a
+;; report -- a sprint nobody can add work to is a page about the past.
+;;
+;; The statuses a ticket is drawn with are the project's own ladder, so a
+;; project that renamed or added a status sees its own words here, and a ticket
+;; is counted as done by the same rule the backlog counts it.
 (define* (html-sprint-board G_
                             #:key
                             (projects '())
@@ -572,11 +641,75 @@ draw -- and a chart of nothing is worse than a sentence saying so."
                             (today #f)
                             (editable? #f)
                             (is-logged-in #f))
-  (let ((sprint-id (format #f "~a"
-                          (assq-ref sprint
-                                    'id)))
-        (status (or (assq-ref sprint
-                              'sprint-status) "planned")))
+  (let* ((sprint-id (format #f "~a"
+                            (assq-ref sprint
+                                      'id)))
+         (status (or (assq-ref sprint
+                               'sprint-status) "planned"))
+         (goal (let ((text (assq-ref sprint
+                                     'goal)))
+                 (if (string? text) text "")))
+         (ticket-row (lambda (ticket)
+                       (render-board-row G_
+                                         #:project project
+                                         #:ticket ticket
+                                         #:statuses statuses
+                                         #:actions (if editable?
+                                                       (list (render-board-ticket-form
+                                                              G_
+                                                              #:project project
+                                                              #:sprint-id
+                                                              sprint-id
+                                                              #:ticket ticket
+                                                              #:direction
+                                                              "remove"
+                                                              #:label "take out"
+                                                              #:danger? #t))
+                                                       '()))))
+         ;; The three panels, each built on its own and then spliced into the
+         ;; page: a body of nested quasiquotes two hundred lines deep is a body
+         ;; nobody can count the parentheses of, and this one has the panel
+         ;; boundaries to say where each ends.
+         (burndown-panel `(div (@ (class ,%panel-face))
+                               ,(h3 (G_ "burndown"))
+                               ,@(render-burndown-summary G_ summary rows)
+                               ,@(render-burndown G_ rows)))
+         (tickets-panel `(div (@ (class ,%panel-face))
+                              ,(h3 (format #f "~a (~a)"
+                                           (G_ "in this sprint")
+                                           (length tickets)))
+                              ,@(if (pair? tickets)
+                                    (map ticket-row tickets)
+                                    (render-empty G_
+                                                  (G_
+                                                   "nothing in this sprint yet: add a ticket from the backlog below")))))
+         (backlog-panel (if (and editable?
+                                 (pair? backlog))
+                            `(div (@ (class ,%panel-face))
+                                  ,(h3 (format #f "~a (~a)"
+                                               (G_ "backlog")
+                                               (length backlog)))
+                                  ,@(map (lambda (ticket)
+                                           (render-board-row G_
+                                                             #:project project
+                                                             #:ticket ticket
+                                                             #:statuses statuses
+                                                             #:actions (list (render-board-ticket-form
+                                                                              G_
+                                                                              #:project
+                                                                              project
+                                                                              #:sprint-id
+                                                                              sprint-id
+                                                                              #:ticket
+                                                                              ticket
+                                                                              #:direction
+                                                                              "add"
+                                                                              #:label
+                                                                              "add"
+                                                                              #:danger?
+                                                                              #f))))
+                                         backlog)
+                            '()))))
     (html-template G_
                    #:title (assq-ref sprint
                                      'title)
@@ -604,186 +737,16 @@ draw -- and a chart of nothing is worse than a sentence saying so."
                                            ,(sprint-status-label G_ status)))
                                 (p (@ (class ,%muted-face))
                                    ,(sprint-dates-label G_ sprint))
-                                ,@(if (string-null? (let ((goal (assq-ref sprint
-                                                                          'goal)))
-                                                      (if (string? goal) goal
-                                                          "")))
+                                ,@(if (string-null? goal)
                                       '()
-                                      `((p (@ (class ,(mk-class '(text-sm
-                                                                  max-w-prose))))
-                                           ,(assq-ref sprint
-                                                       'goal))))
-                                ;; -- The burndown ---------------------------------
-                                (div (@ (class ,%panel-face))
-                                     ,(h3 (G_ "burndown"))
-                                     ,@(render-burndown-summary G_ summary rows)
-                                     ,@(render-burndown G_ rows))
-                                ;; -- What is in the sprint ------------------------
-                                (div (@ (class ,%panel-face))
-                                     ,(h3 (format #f "~a (~a)"
-                                                  (G_ "in this sprint")
-                                                  (length tickets)))
-                                     ,@(if (pair? tickets)
-                                           (map (lambda (t)
-                                                  (let ((human-id (assq-ref t
-                                                                            'human-id))
-                                                        (points (ticket-points-of
-                                                                 t)))
-                                                    `(div (@ (class ,(mk-class
-                                                                      '(flex
-                                                                        flex-row
-                                                                        flex-wrap
-                                                                        gap-2
-                                                                        items-center
-                                                                        justify-between
-                                                                        border-2
-                                                                        border-stone-300/50
-                                                                        dark:border-onyx-100/50
-                                                                        rounded-lg
-                                                                        px-3
-                                                                        py-2
-                                                                        my-1))))
-                                                          (div (@ (class ,(mk-class
-                                                                           '(flex
-                                                                             flex-row
-                                                                             flex-wrap
-                                                                             gap-2
-                                                                             items-center))))
-                                                               (a (@ (href ,(format
-                                                                             #f
-                                                                             "/tickets/~a/id/~a"
-                                                                             project
-                                                                             human-id))
-                                                                     (class ,(mk-class
-                                                                              '(text-sm
-                                                                                no-underline))))
-                                                                  ,(assq-ref t
-                                                                             'title))
-                                                               (span (@ (class ,%muted-face))
-                                                                     ,(status-label
-                                                                       G_ statuses
-                                                                       (or (assq-ref
-                                                                            t
-                                                                            'ticket-status)
-                                                                           "")))
-                                                               (span (@ (class ,%muted-face))
-                                                                     ,(format #f
-                                                                              "~a: ~a"
-                                                                              (G_
-                                                                               "points")
-                                                                              points)))
-                                                          ,@(if editable?
-                                                                `((form (@ (enctype
-                                                                            "application/x-www-form-urlencoded")
-                                                                           (method
-                                                                            POST)
-                                                                           (action
-                                                                            ,(format
-                                                                              #f
-                                                                              "/projects/~a/sprints/~a/tickets"
-                                                                              project
-                                                                              sprint-id)))
-                                                                      (input (@ (hidden
-                                                                                 "")
-                                                                                (name
-                                                                                 "ticket")
-                                                                                (value
-                                                                                 ,(assq-ref
-                                                                                   t
-                                                                                   'id))))
-                                                                      (input (@ (hidden
-                                                                                 "")
-                                                                                (name
-                                                                                 "action")
-                                                                                (value
-                                                                                 "remove")))
-                                                                      ,(danger-submit-button
-                                                                        (G_
-                                                                         "take out"))))
-                                                                '()))))
-                                                tickets)
-                                           (render-empty G_
-                                                         (G_
-                                                          "nothing in this sprint yet: add a ticket from the backlog below")))
-                                ;; -- What could be added --------------------------
-                                ,@(if (and editable?
-                                           (pair? backlog))
-                                      `((div (@ (class ,%panel-face))
-                                             ,(h3 (format #f "~a (~a)"
-                                                          (G_ "backlog")
-                                                          (length backlog)))
-                                             ,@(map (lambda (t)
-                                                      `(div (@ (class ,(mk-class
-                                                                        '(flex
-                                                                          flex-row
-                                                                          flex-wrap
-                                                                          gap-2
-                                                                          items-center
-                                                                          justify-between
-                                                                          border-2
-                                                                          border-stone-300/50
-                                                                          dark:border-onyx-100/50
-                                                                          rounded-lg
-                                                                          px-3
-                                                                          py-2
-                                                                          my-1))))
-                                                            (div (@ (class ,(mk-class
-                                                                             '(flex
-                                                                               flex-row
-                                                                               flex-wrap
-                                                                               gap-2
-                                                                               items-center))))
-                                                                 (a (@ (href
-                                                                        ,(format
-                                                                          #f
-                                                                          "/tickets/~a/id/~a"
-                                                                          project
-                                                                          (assq-ref
-                                                                           t
-                                                                           'human-id)))
-                                                                       (class
-                                                                        ,(mk-class
-                                                                          '(text-sm
-                                                                            no-underline))))
-                                                                    ,(assq-ref t
-                                                                               'title))
-                                                                 (span (@ (class ,%muted-face))
-                                                                       ,(format
-                                                                         #f
-                                                                         "~a: ~a"
-                                                                         (G_
-                                                                          "points")
-                                                                         (ticket-points-of
-                                                                          t))))
-                                                            (form (@ (enctype
-                                                                      "application/x-www-form-urlencoded")
-                                                                     (method
-                                                                      POST)
-                                                                     (action
-                                                                      ,(format
-                                                                        #f
-                                                                        "/projects/~a/sprints/~a/tickets"
-                                                                        project
-                                                                        sprint-id)))
-                                                                  (input (@ (hidden
-                                                                             "")
-                                                                            (name
-                                                                             "ticket")
-                                                                            (value
-                                                                             ,(assq-ref
-                                                                               t
-                                                                               'id))))
-                                                                  (input (@ (hidden
-                                                                             "")
-                                                                            (name
-                                                                             "action")
-                                                                            (value
-                                                                             "add")))
-                                                                  ,(submit-button
-                                                                    (G_
-                                                                     "add"))))))
-                                                  backlog))
-                                      '()))))))
+                                      (list `(p (@ (class ,(mk-class '(text-sm
+                                                                       max-w-prose))))
+                                                ,goal)))
+                                ,burndown-panel
+                                ,tickets-panel
+                                ,@(if (pair? backlog-panel)
+                                      (list backlog-panel)
+                                      '())))))
 
 ;; A milestone is a promise made outside the team, so the page is a list of
 ;; promises and how much of each is kept: the tickets that count toward it,
@@ -903,9 +866,7 @@ draw -- and a chart of nothing is worse than a sentence saying so."
                                                                              w-full
                                                                              max-w-prose
                                                                              shadow-md))
-                                                 (div ,(date-field #:label (G_
-                                                                            "due on")
-                                                                   #:name
+                                                 (div ,(date-input (G_ "due on")
                                                                    "due-on"))
                                                  ,(submit-button (G_
                                                                   "add a milestone")))))

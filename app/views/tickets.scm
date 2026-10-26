@@ -1580,10 +1580,10 @@ at the first of them."
                                                 #:placeholder "1h 30m"
                                                 #:help-text (G_
                                                              "1.5h, 90m, 1h30m or 1:30 all mean the same")))
-                                   (div ,(date-field #:label (G_ "which day")
-                                                     #:name "spent-on"
-                                                     #:value (or today
-                                                                 (today-iso)))))
+                                   (div ,(date-input (G_ "which day")
+                                                     "spent-on"
+                                                     (or today
+                                                         (today-iso)))))
                               (textarea #:label (G_ "what was done")
                                         #:name "comment"
                                         #:rows 2
@@ -1670,9 +1670,9 @@ at the first of them."
                                                                flex-wrap
                                                                gap-2
                                                                items-end))))
-                                   (div ,(date-field #:label (G_ "due on")
-                                                     #:name "due-on"
-                                                     #:value due-on))
+                                   (div ,(date-input (G_ "due on")
+                                                     "due-on"
+                                                     due-on))
                                    (div ,(select #:name 'sprint-id
                                                  #:label (G_ "sprint")
                                                  #:on-change ""
