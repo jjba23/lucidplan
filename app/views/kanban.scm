@@ -302,6 +302,27 @@
                                                                         "backlog")
                                                              #:icon-css
                                                              btn-icon-face))
+                                            ;; The plan beside the board: the
+                                            ;; sprints the work is committed
+                                            ;; to and the milestones it counts
+                                            ;; toward, which are the two pages
+                                            ;; a board is read against.
+                                            (a (@ (href ,(format #f
+                                                          "/projects/~a/sprints"
+                                                          project)))
+                                               ,(icon-button #:icon 'calendar-check
+                                                             #:content (G_
+                                                                        "sprints")
+                                                             #:icon-css
+                                                             btn-icon-face))
+                                            (a (@ (href ,(format #f
+                                                          "/projects/~a/milestones"
+                                                          project)))
+                                               ,(icon-button #:icon 'target
+                                                             #:content (G_
+                                                                        "milestones")
+                                                             #:icon-css
+                                                             btn-icon-face))
                                             (a (@ (href ,(format #f
                                                           "/tickets/~a/new"
                                                           project)))

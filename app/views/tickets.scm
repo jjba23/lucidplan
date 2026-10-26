@@ -135,6 +135,22 @@
                 ,value))))
 
 ;; =============================================================================
+;;  The time a ticket has cost
+;; =============================================================================
+
+;; One line of the time a ticket has cost: how long, and how that reads in
+;; hours.  The two are said together because a team reports in hours and logs
+;; in hours and minutes, and neither form is the one the other is written in.
+(define (render-logged-time G_ minutes)
+  `(span (@ (class ,(mk-class '(text-sm text-onyx-700 dark:text-stone-300))))
+         (strong ,(format-duration minutes))
+         " "
+         (small (@ (class ,(mk-class '(text-xs text-onyx-500
+                                               dark:text-stone-500))))
+                ,(format #f "(~a h)" (format-hours minutes)))))
+
+
+;; =============================================================================
 ;;  The two ladders a ticket is triaged with
 ;; =============================================================================
 
@@ -314,6 +330,8 @@ at the first of them."
                         (assignee #f)
                         (editable? #f)
                         (statuses (default-ticket-statuses))
+                        (logged-minutes 0)
+                        (today (today-iso))
                         (id-suffix ""))
   (let* ((t-ref (lambda (k)
                   (assq-ref ticket k)))
@@ -326,6 +344,7 @@ at the first of them."
          (priority (t-ref 'priority))
          (points (t-ref 'estimate-points))
          (size (t-ref 'estimate-size))
+         (due-on (t-ref 'due-on))
 
          (toggle-js (format #f
                      "document.getElementById('details-~a').toggleAttribute('hidden')"
@@ -417,6 +436,21 @@ at the first of them."
                        (render-meta-badge (G_ "type")
                                           (emoji-for-ticket-type type)
                                           (ticket-type-label G_ type)))))
+
+          ;; Where the ticket stands in the team's plan: the deadline read as a
+          ;; state rather than as a date, and the hours it has cost so far.
+          ;; Each is drawn only when there is something to draw, so a ticket
+          ;; with no deadline and no time logged has no empty row.
+          ,@(let ((badge (render-due-badge G_ due-on today)))
+              (if (or (pair? badge)
+                      (> logged-minutes 0))
+                  `((div (@ (class ,(mk-class '(flex flex-row flex-wrap
+                                                        gap-2 items-center))))
+                         ,@badge
+                         ,@(if (> logged-minutes 0)
+                               `(,(render-logged-time G_ logged-minutes))
+                               '())))
+                  '()))
 
           ;; Description
           ,(render-if-nestring (lambda (d)
@@ -868,6 +902,35 @@ at the first of them."
                                                                       (text-md
                                                                        text-onyx-700
                                                                        dark:text-stone-300))))
+                                                ;; The plan the backlog feeds:
+                                                ;; the sprints the work is
+                                                ;; committed to, and the
+                                                ;; milestones it counts
+                                                ;; toward.  Both are pages of
+                                                ;; the project, so they sit
+                                                ;; beside its other two.
+                                                (div (a (@ (href ,(format #f
+                                                                   "/projects/~a/sprints"
+                                                                   proj-human-id)))
+                                                        ,(icon-button #:icon 'calendar-check
+                                                                      #:content
+                                                                      (G_
+                                                                       "sprints")
+                                                                      #:icon-css '
+                                                                      (text-md
+                                                                       text-onyx-700
+                                                                       dark:text-stone-300))))
+                                                (div (a (@ (href ,(format #f
+                                                                   "/projects/~a/milestones"
+                                                                   proj-human-id)))
+                                                        ,(icon-button #:icon 'target
+                                                                      #:content
+                                                                      (G_
+                                                                       "milestones")
+                                                                      #:icon-css '
+                                                                      (text-md
+                                                                       text-onyx-700
+                                                                       dark:text-stone-300))))
                                                 (a (@ (href ,(format #f
                                                               "/tickets/~a/new"
                                                               proj-human-id)))
@@ -1203,11 +1266,29 @@ at the first of them."
      (G_ "attached"))
     ((equal? action "attachment-removed")
      (G_ "removed"))
+    ((equal? action "time-logged")
+     (G_ "logged time"))
+    ((equal? action "time-removed")
+     (G_ "removed time"))
+    ((equal? action "sprint-added")
+     (G_ "took into a sprint"))
+    ((equal? action "sprint-removed")
+     (G_ "took out of a sprint"))
     ((equal? action "deleted")
      (G_ "deleted"))
     (else action)))
 
-(define (render-event G_ event users)
+;; A change of a sprint or a milestone is recorded with the id of the thing
+;; that moved, because that is what the burndown replays and an id survives a
+;; rename.  A reader, on the other hand, knows a sprint by its name, so the
+;; page is handed the plan it already has -- an alist of id to title -- and
+;; says the name where it can.
+(define (plan-name plan id)
+  (let ((row (and plan id
+                  (assoc (format #f "~a" id) plan))))
+    (if row (cdr row) id)))
+
+(define* (render-event G_ event users #:key (plan '()))
   (let* ((actor (assq-ref event
                           'actor-id))
          (actor-name (let ((u (and actor
@@ -1222,10 +1303,15 @@ at the first of them."
                            'action))
          (field (assq-ref event
                           'field))
-         (old (assq-ref event
-                        'old-value))
-         (new (assq-ref event
-                        'new-value)))
+         (named? (and field
+                      (member (string-downcase (format #f "~a" field))
+                              '("sprint" "milestone"))))
+         (old (let ((v (assq-ref event
+                                 'old-value)))
+                (if (and v named?) (plan-name plan v) v)))
+         (new (let ((v (assq-ref event
+                                 'new-value)))
+                (if (and v named?) (plan-name plan v) v))))
     `(div (@ (class ,(mk-class '(flex flex-col
                                       gap-1
                                       border-2
@@ -1370,6 +1456,286 @@ at the first of them."
                            (not (member (assq-ref child
                                                   'id) seen))) children)))))
 
+(define (section-title G_ icon-name text count)
+  "Answer the heading a panel of the ticket's record is opened with."
+  `(h3 (@ (class ,(mk-class '(flex flex-row
+                                   flex-wrap
+                                   gap-2
+                                   items-center
+                                   text-lg
+                                   font-bold
+                                   my-2))))
+       ,(icon #:type icon-name
+              #:icon-css '(text-md text-onyx-700
+                           dark:text-stone-300))
+       (span ,text)
+       (span (@ (class ,(mk-class '(text-sm font-light
+                                            text-onyx-500
+                                            dark:text-stone-500))))
+             ,(format #f " (~a)" count))))
+
+;; =============================================================================
+;;  The hours a ticket has cost
+;; =============================================================================
+
+;; One entry reads as one line -- how long, which day, and who -- with what was
+;; done under it.  The comment is drawn as the text it is rather than through
+;; the org renderer the ticket bodies go through: a note about the hour just
+;; spent is a sentence, not a document, and rendering it as org would turn a
+;; stray asterisk or dash in it into a list nobody wrote.
+;;
+;; Taking an entry back is offered by the same rule the endpoint applies it by
+;; -- its author, or a moderator -- so a reader is never shown a control that
+;; could only ever be refused.
+(define* (render-time-entry G_
+                            #:key
+                            project
+                            human-id
+                            entry
+                            users
+                            (editable? #f)
+                            (viewer-id #f)
+                            (moderator? #f))
+  (let* ((entry-id (assq-ref entry
+                             'id))
+         (author (assq-ref entry
+                           'author-id))
+         (author-name (let ((u (and author
+                                    (find (lambda (row)
+                                            (equal? (assq-ref row
+                                                              'id) author))
+                                          users))))
+                        (if u
+                            (assq-ref u
+                                      'username) "")))
+         (minutes (assq-ref entry
+                            'duration-minutes))
+         (spent-on (assq-ref entry
+                             'spent-on))
+         (comment (assq-ref entry
+                            'comment))
+         (removable? (and editable?
+                          (or moderator?
+                              (and viewer-id author
+                                   (equal? (format #f "~a" viewer-id)
+                                           (format #f "~a" author)))))))
+    `(div (@ (class ,(mk-class '(flex flex-col gap-1 border-2
+                                        border-stone-300/50
+                                        dark:border-onyx-100/50
+                                        rounded-lg px-3 py-2 my-1))))
+          (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
+                                            items-baseline justify-between))))
+               (span (@ (class ,(mk-class '(text-sm font-bold))))
+                     ,(format-duration minutes))
+               (small (@ (class ,(mk-class '(text-xs text-onyx-500
+                                                     dark:text-stone-500))))
+                      ,(format #f "~a h · ~a"
+                               (format-hours minutes)
+                               (or spent-on ""))))
+          (small (@ (class ,(mk-class '(text-xs text-onyx-500
+                                               dark:text-stone-500))))
+                 ,(if (string-null? author-name)
+                      (G_ "somebody") author-name))
+          ,@(if (and (string? comment)
+                     (not (string-null? comment)))
+                `((div (@ (class ,(mk-class '(text-sm leading-6
+                                                      max-w-prose
+                                                      whitespace-pre-wrap))))
+                       ,comment))
+                '())
+          ,@(if removable?
+                `((form (@ (enctype "application/x-www-form-urlencoded")
+                           (method POST)
+                           (action ,(format #f
+                                     "/tickets/~a/id/~a/time/~a/delete"
+                                     project human-id entry-id)))
+                        ,(danger-submit-button (G_ "remove"))))
+                '()))))
+
+(define* (render-time-panel G_
+                            #:key
+                            project
+                            human-id
+                            entries
+                            total-minutes
+                            users
+                            (editable? #f)
+                            (viewer-id #f)
+                            (moderator? #f)
+                            (today #f))
+  (let* ((time-form (if editable?
+                        `((form (@ (enctype
+                                    "application/x-www-form-urlencoded")
+                                   (method POST)
+                                   (action ,(format #f
+                                             "/tickets/~a/id/~a/time" project
+                                             human-id)))
+                              (div (@ (class ,(mk-class '(flex flex-row
+                                                               flex-wrap
+                                                               gap-2
+                                                               items-end))))
+                                   (div ,(input #:label (G_ "how long")
+                                                #:name "duration"
+                                                #:required #t
+                                                #:placeholder "1h 30m"
+                                                #:help-text (G_
+                                                             "1.5h, 90m, 1h30m or 1:30 all mean the same")))
+                                   (div ,(date-field #:label (G_ "which day")
+                                                     #:name "spent-on"
+                                                     #:value (or today
+                                                                 (today-iso)))))
+                              (textarea #:label (G_ "what was done")
+                                        #:name "comment"
+                                        #:rows 2
+                                        #:help-text (G_
+                                                     "the note that says what the hours bought")
+                                        #:textarea-css '(leading-7 p-3
+                                                         rounded-xl
+                                                         border-stone-700
+                                                         dark:border-onyx-100
+                                                         dark:text-stone-300
+                                                         dark:bg-onyx-700/75
+                                                         bg-stone-300/75
+                                                         border-2
+                                                         min-h-24
+                                                         w-full
+                                                         max-w-prose
+                                                         shadow-md))
+                              (div ,(submit-button (G_ "log time")))))
+                        '())))
+    `(,@(if (pair? time-form)
+            (append time-form '()) '())
+      ,@(if (pair? entries)
+            (map (lambda (entry)
+                   (render-time-entry G_
+                                      #:project project
+                                      #:human-id human-id
+                                      #:entry entry
+                                      #:users users
+                                      #:editable? editable?
+                                      #:viewer-id viewer-id
+                                      #:moderator? moderator?))
+                 entries)
+            `((p (@ (class ,(mk-class '(text-sm text-onyx-500
+                                               dark:text-stone-500))))
+                 ,(G_ "no time logged yet")))))))
+
+;; =============================================================================
+;;  Where the ticket sits in the plan
+;; =============================================================================
+
+;; The deadline, the sprint and the milestone are one form because they are one
+;; question: when is this due, and where does it count.  All three may be
+;; cleared, so the form always posts all three and what it says is written as
+;; it stands -- there is no "leave this one alone" row, because the page is
+;; showing the whole answer and the reader is answering all of it.
+(define* (render-planning-panel G_
+                                #:key
+                                project
+                                human-id
+                                ticket
+                                sprints
+                                milestones
+                                (editable? #f)
+                                (today #f))
+  (let* ((due-on (assq-ref ticket
+                           'due-on))
+         (sprint-id (let ((value (assq-ref ticket
+                                            'sprint-id)))
+                      (and value
+                           (format #f "~a" value))))
+         (milestone-id (let ((value (assq-ref ticket
+                                               'milestone-id)))
+                         (and value
+                              (format #f "~a" value))))
+         (sprint (and sprint-id
+                      (find (lambda (s)
+                              (equal? (format #f "~a"
+                                              (assq-ref s
+                                                        'id))
+                                      sprint-id)) sprints)))
+         (milestone (and milestone-id
+                          (find (lambda (m)
+                                  (equal? (format #f "~a"
+                                                  (assq-ref m
+                                                            'id))
+                                          milestone-id)) milestones)))
+         (plan-form (if editable?
+                        `((form (@ (enctype "application/x-www-form-urlencoded")
+                                   (method POST)
+                                   (action ,(format #f
+                                             "/tickets/~a/id/~a/planning"
+                                             project human-id)))
+                              (div (@ (class ,(mk-class '(flex flex-row
+                                                               flex-wrap
+                                                               gap-2
+                                                               items-end))))
+                                   (div ,(date-field #:label (G_ "due on")
+                                                     #:name "due-on"
+                                                     #:value due-on))
+                                   (div ,(select #:name 'sprint-id
+                                                 #:label (G_ "sprint")
+                                                 #:on-change ""
+                                                 #:options (cons (option #:value ""
+                                                                         #:content (G_
+                                                                                    "no sprint")
+                                                                         #:selected-value
+                                                                         (or sprint-id
+                                                                             ""))
+                                                                 (map (lambda (s)
+                                                                        (option #:value
+                                                                                (format #f
+                                                                                 "~a"
+                                                                                 (assq-ref s
+                                                                                           'id))
+                                                                                #:content
+                                                                                (assq-ref s
+                                                                                          'title)
+                                                                                #:selected-value
+                                                                                (or sprint-id
+                                                                                    "")))
+                                                                      sprints))))
+                                   (div ,(select #:name 'milestone-id
+                                                 #:label (G_ "milestone")
+                                                 #:on-change ""
+                                                 #:options (cons (option #:value ""
+                                                                         #:content (G_
+                                                                                    "no milestone")
+                                                                         #:selected-value
+                                                                         (or milestone-id
+                                                                             ""))
+                                                                 (map (lambda (m)
+                                                                        (option #:value
+                                                                                (format #f
+                                                                                 "~a"
+                                                                                 (assq-ref m
+                                                                                           'id))
+                                                                                #:content
+                                                                                (assq-ref m
+                                                                                          'title)
+                                                                                #:selected-value
+                                                                                (or milestone-id
+                                                                                    "")))
+                                                                      milestones)))))
+                              (div ,(submit-button (G_ "save the plan")))))
+                        '())))
+    `(,@(if (pair? plan-form)
+            (append plan-form '())
+            `((div (@ (class ,(mk-class '(flex flex-col gap-2))))
+                  (div ,@(render-due-badge G_ due-on today))
+                  (div (@ (class ,(mk-class '(text-sm))))
+                       (strong ,(G_ "sprint")) ": "
+                       ,(if sprint
+                            (assq-ref sprint
+                                      'title)
+                            (G_ "none")))
+                  (div (@ (class ,(mk-class '(text-sm))))
+                       (strong ,(G_ "milestone")) ": "
+                       ,(if milestone
+                            (assq-ref milestone
+                                      'title)
+                            (G_ "none")))))))))
+
 (define* (html-ticket-collaboration G_
                                     #:key project
                                     ticket
@@ -1380,27 +1746,16 @@ at the first of them."
                                     attachments
                                     events
                                     revisions
+                                    (time-entries '())
+                                    (logged-minutes 0)
+                                    (sprints '())
+                                    (milestones '())
+                                    (today #f)
                                     (editable? #f)
                                     (viewer-id #f)
                                     (moderator? #f))
   (let* ((human-id (assq-ref ticket
                              'human-id))
-         (section-title (lambda (icon-name text count)
-                          `(h3 (@ (class ,(mk-class '(flex flex-row
-                                                           flex-wrap
-                                                           gap-2
-                                                           items-center
-                                                           text-lg
-                                                           font-bold
-                                                           my-2))))
-                               ,(icon #:type icon-name
-                                      #:icon-css '(text-md text-onyx-700
-                                                   dark:text-stone-300))
-                               (span ,text)
-                               (span (@ (class ,(mk-class '(text-sm font-light
-                                                            text-onyx-500
-                                                            dark:text-stone-500))))
-                                     ,(format #f " (~a)" count)))))
          (comment-form (if editable?
                            `((form (@ (enctype
                                        "application/x-www-form-urlencoded")
@@ -1499,10 +1854,74 @@ at the first of them."
                            '()))
          (latest-version (if (pair? revisions)
                              (assq-ref (car revisions)
-                                       'version) 0)))
+                                       'version) 0))
+         ;; The names of the things a ticket's history can name by id: the
+         ;; sprint it was taken into and the milestone it was pointed at.  The
+         ;; trail records the id -- that is what the burndown replays -- and
+         ;; this turns it back into the name a reader knows.
+         (plan (append (map (lambda (s)
+                              (cons (format #f "~a"
+                                            (assq-ref s
+                                                      'id))
+                                    (assq-ref s
+                                              'title)))
+                            sprints)
+                       (map (lambda (m)
+                              (cons (format #f "~a"
+                                            (assq-ref m
+                                                      'id))
+                                    (assq-ref m
+                                              'title)))
+                            milestones))))
     (append
+     ;; -- The plan ---------------------------------------------------------
+     (list (glass-panel `(,(section-title G_ 'calendar-check
+                                          (G_ "plan")
+                                          (length (filter (lambda (value)
+                                                            value)
+                                                          (list (assq-ref
+                                                                 ticket
+                                                                 'due-on)
+                                                                (assq-ref
+                                                                 ticket
+                                                                 'sprint-id)
+                                                                (assq-ref
+                                                                 ticket
+                                                                 'milestone-id)))))
+                          ,@(render-planning-panel G_
+                                                   #:project project
+                                                   #:human-id human-id
+                                                   #:ticket ticket
+                                                   #:sprints sprints
+                                                   #:milestones milestones
+                                                   #:today today
+                                                   #:editable? editable?))
+                        #:frost 3
+                        #:padding '(p-4 sm:p-5)
+                        #:classes '(flex flex-col gap-2 my-3)))
+     ;; -- Time -------------------------------------------------------------
+     (list (glass-panel `(,(section-title G_ 'hourglass
+                                          (G_ "time logged")
+                                          (length time-entries))
+                          ,@(if (> logged-minutes 0)
+                                `((div (@ (class ,(mk-class '(my-1))))
+                                       ,(render-logged-time G_ logged-minutes)))
+                                '())
+                          ,@(render-time-panel G_
+                                               #:project project
+                                               #:human-id human-id
+                                               #:entries time-entries
+                                               #:total-minutes logged-minutes
+                                               #:users users
+                                               #:today today
+                                               #:editable? editable?
+                                               #:viewer-id viewer-id
+                                               #:moderator? moderator?))
+                        #:frost 3
+                        #:padding '(p-4 sm:p-5)
+                        #:classes '(flex flex-col gap-2 my-3)))
      ;; -- Discussion -------------------------------------------------------
-     (list (glass-panel `(,(section-title 'chat-circle
+     (list (glass-panel `(,(section-title G_ 'chat-circle
                                           (G_ "discussion")
                                           (length comments)) ,@comment-form
                           ,@(if (pair? comments)
@@ -1532,7 +1951,7 @@ at the first of them."
                         #:padding '(p-4 sm:p-5)
                         #:classes '(flex flex-col gap-2 my-3)))
      ;; -- Files ------------------------------------------------------------
-     (list (glass-panel `(,(section-title 'paperclip
+     (list (glass-panel `(,(section-title G_ 'paperclip
                                           (G_ "attachments")
                                           (length attachments)) ,@attachment-form
                           ,@(if (pair? attachments)
@@ -1590,7 +2009,7 @@ at the first of them."
                         #:padding '(p-4 sm:p-5)
                         #:classes '(flex flex-col gap-2 my-3)))
      ;; -- Audit trail ------------------------------------------------------
-     (list (glass-panel `(,(section-title 'clock-counter-clockwise
+     (list (glass-panel `(,(section-title G_ 'clock-counter-clockwise
                                           (G_ "activity")
                                           (length events)) ,@(if (pair? events)
                                                                  (map (lambda 
@@ -1598,7 +2017,9 @@ at the first of them."
                                                                         (render-event
                                                                          G_
                                                                          event
-                                                                         users))
+                                                                         users
+                                                                         #:plan
+                                                                         plan))
                                                                       events)
                                                                  `((p (@ (class ,
                                                                           (mk-class '
@@ -1611,7 +2032,7 @@ at the first of them."
                         #:padding '(p-4 sm:p-5)
                         #:classes '(flex flex-col gap-1 my-3)))
      ;; -- Versions ---------------------------------------------------------
-     (list (glass-panel `(,(section-title 'git-branch
+     (list (glass-panel `(,(section-title G_ 'git-branch
                                           (G_ "versions")
                                           (length revisions)) ,@(if (pair?
                                                                      revisions)

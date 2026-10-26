@@ -38,7 +38,14 @@
          deleted-at
          priority
          estimate-points
-         estimate-size))
+         estimate-size
+         ;; Where the ticket sits in the team's plan: the day it is due, the
+         ;; sprint it is being worked in, and the milestone it counts toward.
+         ;; All three are optional, and a ticket with none of them is the
+         ;; ordinary ticket rather than one in a special state.
+         due-on
+         sprint-id
+         milestone-id))
 
   (define conn
     (DB-open rc))
@@ -151,6 +158,59 @@
     (execute-write "insert-ticket"
                    (sql-insert 'ticket attrs)))
 
+  ;; ===== The plan a ticket sits in =====
+  ;;
+  ;; A ticket's deadline, its sprint and its milestone are written by a
+  ;; statement of their own for the reason the two estimates are: all three
+  ;; are optional, and the general update builder binds #f as 0, so clearing
+  ;; a deadline with it would store the epoch rather than nothing.  What is
+  ;; not given is written as NULL, which is the same thing the page reads as
+  ;; "this ticket has no deadline".
+  (define (nullable-literal value)
+    "Answer the placeholder VALUE is bound as, or the SQL NULL it means."
+    (if (or (not value)
+            (and (string? value)
+                 (string-null? value))) "NULL" "?"))
+
+  (define (update-ticket-planning-by-id id due-on sprint-id milestone-id)
+    (execute-write "update-ticket-planning-by-id"
+                   (sql-parameterize (format #f
+                                      "UPDATE ticket SET due_on = ~a, sprint_id = ~a, milestone_id = ~a WHERE id = ?"
+                                      (nullable-literal due-on)
+                                      (nullable-literal sprint-id)
+                                      (nullable-literal milestone-id))
+                                    (append (filter (lambda (value)
+                                                      (string=? (nullable-literal
+                                                                 value) "?"))
+                                                    (list due-on sprint-id
+                                                          milestone-id))
+                                            (list id)))))
+
+  ;; A ticket that was in a sprint, or counted toward a milestone, keeps its
+  ;; row when that sprint or milestone is deleted -- it is simply no longer
+  ;; in one.  Clearing the reference in one statement is what makes that
+  ;; true without walking every ticket.
+  (define (unassign-sprint sprint-id)
+    (execute-write "unassign-sprint"
+                   (sql-parameterize "UPDATE ticket SET sprint_id = NULL WHERE sprint_id = ?"
+                                     (list sprint-id))))
+
+  (define (unassign-milestone milestone-id)
+    (execute-write "unassign-milestone"
+                   (sql-parameterize "UPDATE ticket SET milestone_id = NULL WHERE milestone_id = ?"
+                                     (list milestone-id))))
+
+  ;; The tickets of one sprint, for the sprint's own page and for the
+  ;; burndown drawn on it.  The sprint is named by its internal id, which is
+  ;; what a ticket carries, so no project has to be resolved here.
+  (define (get-tickets-by-sprint sprint-id order-by)
+    (execute-read "get-tickets-by-sprint"
+                  (sql-select 'ticket
+                              #:columns columns
+                              #:where (list '(deleted-at is null)
+                                            (cons 'sprint-id sprint-id))
+                              #:order-by order-by)))
+
   (mk-ticket-repository #:get-tickets-proc get-tickets
                         #:search-tickets-proc search-tickets
                         #:get-ticket-by-project-human-id-and-human-id-proc
@@ -161,4 +221,9 @@
                         update-ticket-by-project-human-id-and-human-id
                         #:update-ticket-estimates-by-id-proc
                         update-ticket-estimates-by-id
+                        #:update-ticket-planning-by-id-proc
+                        update-ticket-planning-by-id
+                        #:get-tickets-by-sprint-proc get-tickets-by-sprint
+                        #:unassign-sprint-proc unassign-sprint
+                        #:unassign-milestone-proc unassign-milestone
                         #:insert-ticket-proc insert-ticket))

@@ -24,6 +24,10 @@
                         get-ticket-of-latest-human-id
                         update-ticket-by-project-human-id-and-human-id
                         update-ticket-estimates-by-id
+                        update-ticket-planning-by-id
+                        get-tickets-by-sprint
+                        unassign-sprint
+                        unassign-milestone
                         ticket-id-from-human-id
                         insert-ticket))
 
@@ -42,6 +46,11 @@
                         repo-update-ticket-by-project-human-id-and-human-id)
                        (update-ticket-estimates-by-id-proc
                         repo-update-ticket-estimates-by-id)
+                       (update-ticket-planning-by-id-proc
+                        repo-update-ticket-planning-by-id)
+                       (get-tickets-by-sprint-proc repo-get-tickets-by-sprint)
+                       (unassign-sprint-proc repo-unassign-sprint)
+                       (unassign-milestone-proc repo-unassign-milestone)
                        (insert-ticket-proc repo-insert-ticket))
 
 ;; --- eDSL: Embedded Domain Specific Language ---
@@ -72,6 +81,25 @@ cannot bind one.")
 
 (define-repo-method insert-ticket repo-insert-ticket
                     "Inserts a new ticket using ATTRS into the given REPO.")
+
+(define-repo-method update-ticket-planning-by-id repo-update-ticket-planning-by-id
+ "Writes the deadline, the sprint and the milestone of TICKET-ID in REPO,
+each of which may be @code{#f} for a ticket that has none.
+
+They are written apart from the other columns for the reason the estimates
+are: a reference that is cleared is a NULL, and the general update builder
+cannot bind one.")
+
+(define-repo-method get-tickets-by-sprint repo-get-tickets-by-sprint
+ "Retrieves the active tickets of SPRINT-ID from REPO, ordered by SORT.")
+
+(define-repo-method unassign-sprint repo-unassign-sprint
+ "Takes every ticket of SPRINT-ID out of it in REPO, leaving the tickets
+themselves untouched.")
+
+(define-repo-method unassign-milestone repo-unassign-milestone
+ "Takes every ticket out of MILESTONE-ID in REPO, leaving the tickets
+themselves untouched.")
 
 (define (ticket-id-from-human-id repo project-id human-id)
   "Resolves the internal ticket ID from a given PROJECT-ID and HUMAN-ID in REPO."

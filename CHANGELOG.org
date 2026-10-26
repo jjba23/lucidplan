@@ -31,6 +31,48 @@ maak migrate
 A ticket is now a place where the work on it happens, not just a card that
 describes it.
 
+Time is logged against a ticket, and the log is where the work is written down
+rather than a timesheet kept beside it.  Each entry is a duration, the day it
+was spent and what was done, and the duration is typed the way people say it:
+~1.5h~, ~90m~, ~1h30m~, ~1h 30m~, ~1:30~ and a bare ~90~ are all the same
+ninety minutes.  Nothing, an empty field and zero log no time, and a day's worth
+is the ceiling, so a typo that turns ninety minutes into ninety hours is refused
+rather than stored.  The day defaults to today, the comment is what the entry is
+for, and a ticket's total is shown both as ~2h 45m~ and as the ~2.75~ hours a
+report adds up in.  An entry belongs to whoever logged it and may be removed by
+them -- or by a holder of ~lucidplan:ticket-delete~, since a log that could only
+be corrected by its author would stay wrong once that person left -- and
+removing one is a soft removal, so the trail still says the hours were logged
+and then taken back.
+
+*Sprints* are the stretch of work a team commits to: a name, a goal, a start, an
+end and a state (planned, active or closed), reached from the backlog or the
+board.  A project works in one sprint at a time, and a sprint's own page lists
+what is in it beside the backlog it can be fed from.  Deleting a sprint takes its
+tickets out of it first, so a deleted sprint leaves a backlog rather than tickets
+pointing at something that is no longer there.
+
+Every sprint has a *burndown*, and it is not kept in a table of its own: it is
+replayed from the audit trail the tickets already leave -- a ticket put into a
+sprint is recorded as ~sprint-added~, one taken out as ~sprint-removed~, and every
+status change is recorded with the statuses it moved between -- so the chart
+cannot disagree with the tickets it is about.  It is drawn as SVG in the page,
+day by day up to today, against the straight line the team committed to.
+
+A ticket can be given a *deadline*, and its card shows the deadline as a state
+-- overdue, due today, due soon (within ~deadline-soon-days~, a week) or
+scheduled -- rather than as a date a reader has to compare against a calendar.
+A *milestone* is a result the project promised by a date: several sprints may
+feed one, and its page keeps a running account of how many tickets count toward
+it, how many points they add up to and how many of those are done.
+
+The deadline, the sprint and the milestone are one form on the ticket's own
+page, because they answer one question: when is this due, and where does it
+count.  All three are optional and all three may be cleared.  A calendar date is
+stored as the text ~2026-10-27~ rather than as a number -- it sorts, compares and
+is read back by a date field -- and a date that does not exist, the 31st of
+February say, is refused rather than rolled into the next month.
+
 Tickets are estimated twice over: in *story points*, the numbers a team burns
 down, and in *t-shirt sizes*, which is what a first pass through a backlog is
 usually written in.  Both are optional -- an unestimate is stored as NULL rather
@@ -68,9 +110,9 @@ it, because the trail names the ticket rather than the project it was in.  Its
 number does not follow: numbers count within a project, so the destination
 numbers it as its own next one.
 
-Four tables are added -- ~ticket_comment~, ~ticket_attachment~, ~ticket_event~
-and ~ticket_revision~ -- and two columns to ~ticket~.  ~maak migrate~ applies
-all of it:
+Seven tables are added -- ~ticket_comment~, ~ticket_attachment~,
+~ticket_event~, ~ticket_revision~, ~sprint~, ~milestone~ and ~time_entry~ --
+together with the columns they hang off.  ~maak migrate~ applies all of it:
 
 #+begin_src sh
 maak migrate

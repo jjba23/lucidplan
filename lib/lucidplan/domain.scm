@@ -18,6 +18,8 @@
 (define-module (lucidplan domain)
   #:declarative? #t
   #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-19)
+  #:use-module (ice-9 regex)
   #:use-module (ice-9 string-fun)
   #:use-module (lucidplan config))
 
@@ -382,3 +384,609 @@ unknown (or missing) keyword falls back to the most recently edited first."
     ((equal? "priority-asc" user-sort)
      '((priority asc)))
     (else '((updated-at desc)))))
+
+;;; ===== The days a plan is made of =====
+;;;
+;;; Three things below are dates rather than moments -- the day a sprint
+;;; starts, the day a ticket is due, the day somebody did the work -- and
+;;; they are read and written as the ISO text `2026-10-27', the form the
+;;; schema stores and an `<input type="date">' speaks.  What is here is what
+;;; turns submitted text into that form, and what does arithmetic on it: a
+;;; form is not a promise, so a date that arrives is checked by writing it
+;;; back out and seeing whether it says the same thing, which is what
+;;; refuses the 31st of February rather than quietly rolling it into March.
+;;;
+;;; A timestamp -- when a row was written -- is the other kind of value: it
+;;; is the number of seconds since the epoch, the way every `created_at' in
+;;; this schema holds it.  `seconds->iso-date' is the bridge, because the
+;;; burndown below has to put the moment a ticket was finished onto the day
+;;; it was finished.
+
+(define-public (current-time-seconds)
+  "Answer the moment it is, as the number of seconds since the epoch.
+
+`current-time' is what the rest of the application writes into a row, so
+this is the same value said as one number, which is what arithmetic can be
+done on: everything that reads a timestamp back -- a sprint's history, a
+ticket's status changes -- has to be able to compare and subtract them."
+  (let ((now (current-time)))
+    (if (number? now) now
+        (time-second now))))
+
+(define-public (seconds->iso-date seconds)
+  "Answer the ISO day SECONDS names, or @code{#f} when it names no moment.
+
+The conversion is made in the server's own timezone, so a change recorded
+late in the evening is the day the reader remembers making it, and so it
+agrees with @code{today-iso} on what day it is now."
+  (and (number? seconds)
+       (date->string (time-utc->date (make-time 'time-utc
+                                                0
+                                                (inexact->exact (round
+                                                                 seconds))))
+                     "~Y-~m-~d")))
+
+(define (leap-year? year)
+  "Is YEAR a leap year, by the rule the Gregorian calendar actually uses?"
+  (and (zero? (remainder year 4))
+       (or (not (zero? (remainder year 100)))
+           (zero? (remainder year 400)))))
+
+(define (days-in-month year month)
+  "Answer how many days MONTH of YEAR has."
+  (cond
+    ((= month 2) (if (leap-year? year) 29 28))
+    ((member month '(4 6 9 11)) 30)
+    (else 31)))
+
+(define (iso-date-parts value)
+  "Answer the year, month and day VALUE names as a list, or @code{#f}.
+
+VALUE has to be exactly `YYYY-MM-DD', zero-padded, and has to name a day
+that exists.  The check is made against the length of the month rather than
+by writing the day back out: the calendar library keeps a 31st of February
+as a 31st of February, so a round trip would agree with itself about a day
+that never happened."
+  (and (string? value)
+       (let* ((text (string-trim-both value))
+              (m (string-match "^([0-9]{4})-([0-9]{2})-([0-9]{2})$" text)))
+         (and m
+              (let ((year (string->number (match:substring m 1)))
+                    (month (string->number (match:substring m 2)))
+                    (day (string->number (match:substring m 3))))
+                (and (>= month 1)
+                     (<= month 12)
+                     (>= day 1)
+                     (<= day (days-in-month year month))
+                     (list year month day)))))))
+
+(define-public (parse-iso-date value)
+  "Answer VALUE as the ISO day it names, or @code{#f} for no day.
+
+This is what an endpoint does with a submitted date: a form is not a
+promise, so the value that arrives is whatever was sent, and anything that
+is not a day written as `YYYY-MM-DD' answers @code{#f} -- which is what
+leaves the column it was meant for as it was."
+  (and (iso-date-parts value)
+       (string-trim-both value)))
+
+(define-public (iso-date->day value)
+  "Answer the Julian day number VALUE names, or @code{#f} for no day.
+
+A Julian day is a whole number per calendar day, so two of them subtract
+to the number of days between them with no month lengths or leap years to
+think about.  The arithmetic stays exact -- the answer is a number, and one
+day is one added to it."
+  (let ((parts (iso-date-parts value)))
+    (and parts
+         (date->julian-day (apply make-date
+                                  (append '(0 0 0 0)
+                                          (reverse parts)
+                                          '(0)))))))
+
+(define-public (day->iso-date day)
+  "Answer DAY, a Julian day number, as the ISO day it names."
+  (and (number? day)
+       (date->string (julian-day->date day 0) "~Y-~m-~d")))
+
+(define-public (iso-date-diff from to)
+  "Answer how many days separate FROM and TO, or @code{#f}.
+
+The answer is negative when TO is the earlier of the two, so a caller can
+ask which end of a plan a day falls on with one subtraction."
+  (let ((a (iso-date->day from))
+        (b (iso-date->day to)))
+    (and a b
+         (- b a))))
+
+(define-public (today-iso)
+  "Answer the day it is, as the ISO text a date column holds."
+  (date->string (current-date) "~Y-~m-~d"))
+
+(define-public (iso-date-compare a b)
+  "Answer how the ISO days A and B order, as a number that sorts them.
+
+The text of an ISO day sorts the way the day sorts, so this is a string
+comparison with the numbers spelled out: a negative answer means A is the
+earlier day, zero that they are the same day, and a positive one that A is
+the later.  A value that is not a day is treated as the empty text, which
+sorts before every day -- an absent date is not a day in the future."
+  (let ((left (or (and (string? a)
+                       a) ""))
+        (right (or (and (string? b)
+                        b) "")))
+    (cond
+      ((string<? left right) -1)
+      ((string>? left right) 1)
+      (else 0))))
+
+;;; ===== The time somebody spent on a ticket =====
+;;;
+;;; A time entry is a duration and a comment, and the duration is written
+;;; the way people say it rather than the way a form would prefer: an hour
+;;; and a half is `1.5h', `90m', `1h30m', `1h 30m' or `1:30', and a reader
+;;; who types any of them means the same ninety minutes.  All of them are
+;;; read here, into the one thing the schema can hold exactly: a whole
+;;; number of minutes.
+;;;
+;;; What is *not* a duration is as important as what is.  Nothing, an empty
+;;; form and zero all answer @code{#f}: logging no time is not logging, and
+;;; an entry of zero minutes would sit in the list saying nothing happened
+;;; while counting toward nothing.  A day's worth is the ceiling -- no
+;;; honest entry is longer than the day it happened in -- so a typo that
+;;; turns 90 minutes into 90 hours is refused rather than stored.
+
+(define-public time-entry-max-minutes
+  ;; Twenty-four hours, in minutes.
+  1440)
+
+;; One `<amount><unit>' of a duration, and whatever follows it.  The units
+;; are listed longest first so that `1hour' is read as an hour rather than
+;; as an `h' followed by `our', and a bare number is a number of minutes.
+(define duration-part-rx
+  (make-regexp
+   "^([0-9]+(\\.[0-9]+)?)(hours|hour|hrs|hr|h|minutes|minute|mins|min|m)?(.*)$"))
+
+(define (duration-unit-in-hours? unit)
+  "Is UNIT the name of an hour -- `h', `hr', `hrs', `hour', `hours'?"
+  (and (string? unit)
+       (not (string-null? unit))
+       (char=? (string-ref unit 0)
+               #\h)))
+
+;; A duration written as a clock reading -- `1:30' -- which is read only as
+;; hours and minutes, and only when the minutes are a real minute of the
+;; hour: `1:99' is not one hundred and thirty-nine minutes, it is a typo.
+(define (parse-clock-duration text)
+  (let ((m (string-match "^([0-9]+):([0-9]{2})$" text)))
+    (and m
+         (let ((minutes (string->number (match:substring m 2))))
+           (and (< minutes 60)
+                (+ (* 60 (string->number (match:substring m 1)))
+                   minutes))))))
+
+;; A duration written as a run of amounts and units -- `1h30m', `90m',
+;; `2 hours' with the spaces already taken out -- read one part at a time
+;; until nothing is left.  A character that names no part answers #f rather
+;; than being skipped, so `1h!' is refused rather than read as an hour.
+(define (parse-unit-duration text)
+  (let loop
+    ((rest text)
+     (minutes 0))
+    (cond
+      ((string-null? rest)
+       (round minutes))
+      (else (let ((m (regexp-exec duration-part-rx rest)))
+              (and m
+                   (let ((amount (string->number (match:substring m 1)))
+                         (unit (match:substring m 3)))
+                     (and amount
+                          (loop (match:substring m 4)
+                                (+ minutes
+                                   (* (if (duration-unit-in-hours? unit)
+                                          60
+                                          1) amount)))))))))))
+
+(define-public (parse-duration value)
+  "Answer the number of minutes VALUE names, or @code{#f} for no duration.
+
+VALUE is what somebody typed into the time form, and it is read the ways a
+duration is written:
+
+@example
+1.5h   1h30m   1h 30m   90m   1:30   90
+@end example
+
+A whole number of minutes is the answer, and it has to be more than none
+and no more than a day (@code{time-entry-max-minutes}): zero is not a
+duration anybody logged, and more than a day is a typo rather than a day's
+work.  Anything else -- words, a negative amount, a clock reading whose
+minutes are not minutes -- answers @code{#f}, which is what leaves the
+ticket's time log without an entry."
+  (and (string? value)
+       (let ((text (string-delete char-set:whitespace
+                                  (string-downcase (string-trim-both value)))))
+         (and (not (string-null? text))
+              (let ((minutes (or (parse-clock-duration text)
+                                 (parse-unit-duration text))))
+                (and (number? minutes)
+                     (> minutes 0)
+                     (<= minutes time-entry-max-minutes)
+                     (inexact->exact minutes)))))))
+
+(define-public (format-duration minutes)
+  "Answer MINUTES as the text a reader reads it as: `1h 30m', `45m', `2h'.
+
+An absent or nonsensical number answers the empty text, so a page can put
+the answer where a duration belongs without checking first."
+  (if (or (not (number? minutes))
+          (< minutes 0)) ""
+      (let* ((whole (inexact->exact (round minutes)))
+             (hours (quotient whole 60))
+             (left (remainder whole 60)))
+        (cond
+          ((and (zero? hours)
+                (zero? left)) "0m")
+          ((zero? hours) (format #f "~am" left))
+          ((zero? left) (format #f "~ah" hours))
+          (else (format #f "~ah ~am" hours left))))))
+
+(define-public (format-hours minutes)
+  "Answer MINUTES as the decimal number of hours a report adds up in.
+
+The answer is exact to a hundredth of an hour -- 3.6 seconds, which is as
+fine as a time log is ever written -- and it is said without trailing
+zeros: an hour is `1' and an hour and a half is `1.5', because a report
+that reads `1.0' and `1.5' side by side looks like two different units."
+  (if (or (not (number? minutes))
+          (< minutes 0)) "0"
+      (let* ((hundredths (inexact->exact (round (* 100 (/ minutes 60)))))
+             (whole (quotient hundredths 100))
+             (part (remainder hundredths 100)))
+        (cond
+          ((zero? part) (format #f "~a" whole))
+          ((zero? (remainder part 10)) (format #f "~a.~a" whole
+                                               (quotient part 10)))
+          ((< part 10) (format #f "~a.0~a" whole part))
+          (else (format #f "~a.~a" whole part))))))
+
+(define-public (time-entries-minutes entries)
+  "Answer how many minutes the time ENTRIES add up to.
+
+A row whose duration is missing -- which the schema does not allow but a
+hand-written list might carry -- is counted as nothing rather than breaking
+the sum, because a total is a report and a report should not fail."
+  (let loop
+    ((rest entries)
+     (total 0))
+    (if (null? rest) total
+        (let ((minutes (assq-ref (car rest)
+                                 'duration-minutes)))
+          (loop (cdr rest)
+                (if (number? minutes) (+ total minutes) total))))))
+
+;;; ===== How a deadline stands =====
+;;;
+;;; A due date is read by a person at a glance, so what the page needs is not
+;;; the date but how it stands: past, today, close enough to worry about, or
+;;; comfortably ahead.  The threshold is one number, kept here so the colour
+;;; a deadline is drawn in and the sentence under it cannot disagree about
+;;; what "soon" means.
+
+(define-public deadline-soon-days
+  ;; A week is what a team can still do something about.
+  7)
+
+(define-public (ticket-due-state due-on . today-arg)
+  "Answer how the deadline DUE-ON stands, as a symbol, or @code{#f}.
+
+The answer is `overdue' for a day that has passed, `due-today' for today,
+`due-soon' for one within @code{deadline-soon-days}, and `scheduled' for
+anything further out.  TODAY-ARG is the day to judge by, and defaults to
+the day it is; a ticket with no deadline -- or one whose deadline is not a
+day at all -- answers @code{#f}, which is what leaves the page without a
+badge rather than with a misleading one."
+  (let* ((today (if (pair? today-arg) (car today-arg) (today-iso)))
+         (due (iso-date->day due-on))
+         (now (iso-date->day today)))
+    (and due now
+         (let ((distance (- due now)))
+           (cond
+             ((< distance 0) 'overdue)
+             ((= distance 0) 'due-today)
+             ((<= distance deadline-soon-days) 'due-soon)
+             (else 'scheduled))))))
+
+(define-public (due-state-label state)
+  "Answer the translation key a reader is shown for a deadline STATE."
+  (case state
+    ((overdue) "overdue")
+    ((due-today) "due today")
+    ((due-soon) "due soon")
+    ((scheduled) "scheduled")
+    (else "")))
+
+;;; ===== Sprints =====
+;;;
+;;; A sprint is a stretch of work with a beginning, an end, and a state that
+;;; says whether it is still being planned, under way, or finished.  The
+;;; ladder is deliberately three values long: a fourth state would be a
+;;; workflow a team has to agree on, and the point of a sprint is to be the
+;;; simplest thing that can be committed to and closed.
+
+(define-public sprint-statuses
+  '("planned" "active" "closed"))
+
+(define-public (parse-sprint-status value)
+  "Answer the sprint status VALUE names, or @code{#f} for one it does not.
+
+The comparison is case-insensitive and ignores space around the value, so
+a hand-written form may send @code{Active} and mean @code{active}; a value
+the ladder does not name answers @code{#f}, which is what leaves a sprint
+as it was rather than moving it to a state nothing knows how to draw."
+  (and (string? value)
+       (let ((status (string-downcase (string-trim-both value))))
+         (and (member status sprint-statuses) status))))
+
+(define-public (sprint-running? status)
+  "Is a sprint in STATUS the one a team is working in?"
+  (equal? status "active"))
+
+(define-public (sprint-closed? status)
+  "Is a sprint in STATUS finished?"
+  (equal? status "closed"))
+
+(define-public (sprint-spans-valid? starts-on ends-on)
+  "Do STARTS-ON and ENDS-ON describe a stretch of days a sprint can run over?
+
+Both may be absent -- a sprint is often written down before anybody agrees
+on the dates -- and an absent end is an open-ended sprint, which is
+allowed.  What is refused is an end that is before its beginning, which is
+not a sprint but a typo."
+  (let ((start (iso-date->day starts-on))
+        (end (iso-date->day ends-on)))
+    (or (not start)
+        (not end)
+        (<= start end))))
+
+;;; ===== Burning a sprint down =====
+;;;
+;;; A burndown answers one question, day by day: how much work is left.  It
+;;; is read off what the application already records rather than kept in a
+;;; table of its own -- a snapshot written every night would be a second
+;;; copy of the truth, and the first day it disagreed with the tickets
+;;; nobody would know which to believe.
+;;;
+;;; So the series is replayed from the audit trail.  A ticket counts toward
+;;; a day when it was in the sprint on that day, and counts as burnt when
+;;; its status on that day was one of the project's closed ones.  Both of
+;;; those come from events: putting a ticket in a sprint and taking it out
+;;; are recorded as `sprint-added' and `sprint-removed', and a status change
+;;; is recorded with the statuses it moved between.
+;;;
+;;; Two things are taken as they are now rather than as they were then, and
+;;; they are worth knowing when reading the chart: a ticket's estimate is
+;;; the estimate it carries today, and a ticket nothing recorded an entry
+;;; for is taken to have been in the sprint from the day the sprint began.
+;;; The first is exact whenever an estimate never changed, which is most of
+;;; the time; the second is right whenever a ticket was put in the sprint
+;;; before the team started burning it down.
+
+(define (same-id? a b)
+  "Are A and B the same identifier, written as text?"
+  (and a b
+       (equal? (format #f "~a" a)
+               (format #f "~a" b))))
+
+(define (ticket-points-value ticket)
+  "Answer the story points TICKET is estimated at, counting none as zero.
+
+An unestimated ticket contributes nothing to a burndown -- not because it
+is worth nothing, but because it cannot be added to the same sum as the
+tickets that were estimated.  The chart is drawn over the work somebody has
+sized."
+  (let ((points (assq-ref ticket
+                          'estimate-points)))
+    (if (number? points) points 0)))
+
+(define (event-seconds event)
+  "Answer when EVENT happened, as seconds since the epoch, or @code{#f}."
+  (let ((value (assq-ref event
+                         'created-at)))
+    (cond
+      ((number? value) value)
+      ((string? value) (string->number value))
+      (else #f))))
+
+(define (event-day event)
+  "Answer the ISO day EVENT happened on, or @code{#f}."
+  (seconds->iso-date (event-seconds event)))
+
+;; The days a ticket spent in a sprint, as `(added . removed)', either end of
+;; which may be #f: #f for the addition means the ticket was in the sprint
+;; before the application started recording it, and #f for the removal means
+;; it is in the sprint still.
+(define (sprint-membership sprint-id events)
+  (define (first-day-of action)
+    (let ((days (filter-map (lambda (event)
+                              (and (equal? (assq-ref event
+                                                     'action) action)
+                                   (same-id? (assq-ref event
+                                                       'new-value) sprint-id)
+                                   (event-day event)))
+                            events)))
+      (and (pair? days) (car (sort days
+                                   string<?)))))
+  (cons (first-day-of "sprint-added")
+        (first-day-of "sprint-removed")))
+
+(define (in-sprint-on-day? membership day)
+  "Was the ticket MEMBERSHIP describes in the sprint on DAY?"
+  (let ((added (car membership))
+        (removed (cdr membership)))
+    (and (or (not added)
+             (<= (iso-date-compare added day) 0))
+         (or (not removed)
+             (< (iso-date-compare day removed) 0)))))
+
+;; The status changes a ticket has been through, oldest first, as
+;; `(seconds day new-status old-status)'.
+(define (status-changes events)
+  (sort (filter-map (lambda (event)
+                      (and (equal? (assq-ref event
+                                             'action) "changed")
+                           (equal? (assq-ref event
+                                             'field) "status")
+                           (let ((seconds (event-seconds event))
+                                 (day (event-day event)))
+                             (and seconds day
+                                  (list seconds day
+                                        (assq-ref event
+                                                  'new-value)
+                                        (assq-ref event
+                                                  'old-value))))))
+                    events)
+        (lambda (a b)
+          (< (car a) (car b)))))
+
+;; The status a ticket stood in at the end of DAY: the last change on or
+;; before it.  Before the first change it was in the status that change
+;; moved it away from; a ticket nothing has ever restatused is in the status
+;; it carries now.
+(define (ticket-status-on-day ticket changes day)
+  (let loop
+    ((rest changes)
+     (status (if (pair? changes)
+                 (car (cdddr (car changes)))
+                 (assq-ref ticket
+                           'ticket-status))))
+    (cond
+      ((null? rest) status)
+      ;; A change made on the day being measured counts: the ticket was in
+      ;; the status it moved to by the end of that day.  Only a change made
+      ;; after it is still to come.
+      ((> (iso-date-compare (cadr (car rest)) day) 0) status)
+      (else (loop (cdr rest)
+                  (car (cddr (car rest))))))))
+
+(define (events-of-ticket ticket events)
+  "Answer the events in EVENTS that happened to TICKET."
+  (filter (lambda (event)
+            (same-id? (assq-ref event
+                                'ticket-id)
+                      (assq-ref ticket
+                                'id)))
+          events))
+
+(define (round-to-hundredths value)
+  "Answer VALUE as an exact number, rounded to two decimal places."
+  (/ (round (* (exact->inexact value) 100)) 100))
+
+(define-public (burndown-days starts-on ends-on today)
+  "Answer every ISO day a sprint is measured over, in order.
+
+The days run from STARTS-ON to ENDS-ON, and stop at TODAY: a chart has no
+business drawing the future as though it had happened.  A sprint whose
+dates are missing or whose end is before its beginning is a sprint nothing
+can be measured over, and answers the empty list rather than a broken
+range."
+  (let ((start (iso-date->day starts-on))
+        (end (iso-date->day ends-on))
+        (now (iso-date->day today)))
+    (cond
+      ((or (not start) (not end) (> start end)) '())
+      (else (let ((last (if (and now (< now end)) now end)))
+              (let loop
+                ((day start)
+                 (out '()))
+                (if (> day last) (reverse out)
+                    (loop (+ day 1)
+                          (cons (day->iso-date day) out)))))))))
+
+;; `define-public' expands to a plain `define', whose formals list cannot
+;; take `#:key' -- so a procedure that is called by keyword is exported
+;; explicitly, once, after it has been written.
+(define* (burndown-series #:key
+                          sprint-id
+                          starts-on
+                          ends-on
+                          tickets
+                          (events '())
+                          (statuses (default-ticket-statuses))
+                          (today #f))
+  "Answer the burndown of a sprint, one row per day, in order.
+
+Each row is an association list of the day it describes and the three
+numbers a chart is drawn from:
+
+@example
+((day . \"2026-10-27\") (scope . 13) (completed . 5)
+ (remaining . 8) (ideal . 13))
+@end example
+
+SCOPE is the points of the tickets that were in the sprint that day,
+COMPLETED is how many of them were in a closed status at the end of it,
+and REMAINING is the difference.  IDEAL is the straight line the team
+committed to: the sprint's own points, falling evenly to nothing on the
+last day, drawn from the scope the sprint has now so that the two lines
+start in the same place.
+
+TICKETS are the sprint's tickets as the repository answers them, EVENTS is
+the audit trail of those tickets, and STATUSES is the ladder that says
+which statuses are closed -- the project's own list, since a project that
+renamed its statuses still has to be measured against them."
+  (let* ((days (burndown-days starts-on ends-on (or today (today-iso))))
+         (span (iso-date-diff starts-on ends-on))
+         (committed (apply + 0
+                         (map ticket-points-value tickets))))
+    (map (lambda (day)
+           (let ((scope 0)
+                 (completed 0))
+             (for-each (lambda (ticket)
+                         (let* ((mine (events-of-ticket ticket events))
+                                (points (ticket-points-value ticket)))
+                           (when (in-sprint-on-day? (sprint-membership sprint-id
+                                                                       mine)
+                                                    day)
+                             (set! scope (+ scope points))
+                             (when (ticket-status-in-bucket? statuses
+                                                             (ticket-status-on-day
+                                                              ticket
+                                                              (status-changes
+                                                               mine) day)
+                                                             "done")
+                               (set! completed (+ completed points))))))
+                       tickets)
+             (let* ((index (or (iso-date-diff starts-on day) 0))
+                    (ideal (if (or (not span)
+                                   (zero? span)) 0
+                               (* committed
+                                  (max 0
+                                       (- 1 (/ index span)))))))
+               (list (cons 'day day)
+                     (cons 'scope scope)
+                     (cons 'completed completed)
+                     (cons 'remaining (max 0
+                                           (- scope completed)))
+                     (cons 'ideal (round-to-hundredths ideal))))))
+         days)))
+
+;; See the note above `burndown-series'.
+(export burndown-series)
+
+(define-public (burndown-summary rows)
+  "Answer the three numbers a burndown is read as a whole by.
+
+ROWS is what @code{burndown-series} answered, and the answer is an
+association list of the scope the sprint was given, the points burnt so
+far, and the points still standing: the same three figures as the last day
+of the chart, said once for a reader who does not want to read a chart."
+  (let* ((last (and (pair? rows) (car (reverse rows))))
+         (scope (or (and last (assq-ref last
+                                        'scope)) 0))
+         (completed (or (and last (assq-ref last
+                                            'completed)) 0)))
+    (list (cons 'scope scope)
+          (cons 'completed completed)
+          (cons 'remaining (max 0
+                               (- scope completed))))))

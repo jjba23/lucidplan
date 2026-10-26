@@ -42,6 +42,9 @@
         (lucidplan domain ticket-event)
         (lucidplan domain ticket-revision)
         (lucidplan domain user)
+        (lucidplan domain sprint)
+        (lucidplan domain milestone)
+        (lucidplan domain time-entry)
         (lucidplan sqlite util)
         (lucidplan sqlite project)
         (lucidplan sqlite ticket)
@@ -51,6 +54,9 @@
         (lucidplan sqlite ticket-event)
         (lucidplan sqlite ticket-revision)
         (lucidplan sqlite user)
+        (lucidplan sqlite sprint)
+        (lucidplan sqlite milestone)
+        (lucidplan sqlite time-entry)
         (hygguile hygguile))
 
 ;; A refused change is answered as JSON, with the status that says which kind
@@ -1369,6 +1375,306 @@ history entry that says somebody is better than one that fails to render."
              (response-emit ""
                             #:status 404)))))
 
+;; ===== The hours spent on a ticket =====
+;;
+;; A time entry says three things -- how long, which day, and what was done --
+;; and all three are checked before anything is written.  The duration is read
+;; by `parse-duration', which is where every way a person writes an hour and a
+;; half (`1.5h', `90m', `1h30m', `1h 30m', `1:30') becomes the same ninety
+;; minutes; a form that says nothing a duration can be read from writes
+;; nothing at all rather than an entry of zero.
+;;
+;; The day defaults to today, because "I worked on this for two hours" is said
+;; about today far more often than about any other day, and a form that insists
+;; on a date before it will take an hour is a form people stop using.
+;;
+;; The comment is stored as it was typed and escaped when the page draws it,
+;; which is where markup is escaped everywhere else: what is written down is
+;; what somebody said, and what a reader is shown is that text as text.
+(post "/tickets/:project/id/:human-id/time"
+      #:mime 'xml
+      #:cookies '(names x-bewaking-lucidplan)
+      (lambda (rc)
+        (define (do-log-time)
+          (let* ((proj (params rc "project"))
+                 (human-id (params rc "human-id"))
+                 (ticket-repo (make-sqlite-ticket-repository rc))
+                 (project-repo (make-sqlite-project-repository rc))
+                 (time-repo (make-sqlite-time-entry-repository rc))
+                 (t (get-ticket-by-project-human-id-and-human-id ticket-repo
+                                                                 proj human-id))
+                 (body (alist-from-url-encoded-body (rc-body rc)))
+                 (minutes (parse-duration (assoc-ref body "duration")))
+                 ;; A day that is not a day is not a reason to refuse the
+                 ;; entry: the hours were still spent, so the day falls back
+                 ;; to today and the log stays complete.
+                 (spent-on (or (parse-iso-date (assoc-ref body "spent-on"))
+                               (today-iso)))
+                 (comment (assoc-ref body "comment")))
+            (when (and t minutes)
+              (let* ((project-id (project-id-from-human-id project-repo proj))
+                     (ticket-id (assq-ref t
+                                          'id))
+                     (actor-id (session-owner-id #:rc rc
+                                                 #:token-name 'x-bewaking-lucidplan)))
+                (insert-time-entry time-repo
+                                   (value-attr (append `((id unquote
+                                                             (new-id))
+                                                         (ticket-id unquote
+                                                                    ticket-id)
+                                                         (project-id unquote
+                                                                     project-id)
+                                                         (duration-minutes
+                                                          unquote minutes)
+                                                         (spent-on unquote
+                                                                   spent-on)
+                                                         (created-at unquote
+                                                                     (current-time)))
+                                                       (if actor-id
+                                                           `((author-id
+                                                              unquote
+                                                              actor-id)) '()))
+                                               'comment (and (string? comment)
+                                                             (string-trim-both
+                                                              comment))))
+                (record-event! (make-sqlite-ticket-event-repository rc)
+                               #:ticket-id ticket-id
+                               #:project-id project-id
+                               #:actor-id actor-id
+                               #:action "time-logged"
+                               #:field "time"
+                               #:new-value (format-duration minutes))))
+            (redirect-to rc
+                         (string->uri (format #f "~a/tickets/~a/id/~a"
+                                              (current-myhost) proj human-id))
+                         #:status 302)))
+        (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                           #:needed-permissions '(lucidplan:ticket-create)
+                           #:rc rc
+                           #:happy-flow do-log-time
+                           #:unhappy-flow back-to-login)))
+
+;; Taking an entry back is a soft delete, so the trail still says the hours
+;; were logged and then taken back, and the ticket's total stops counting
+;; them.  The entry is looked for among the entries of the ticket in the URL,
+;; never by its id alone: an entry of another ticket cannot be removed by
+;; naming it here.
+;;
+;; Time belongs to whoever logged it, and that is who may take it back.
+;; Anyone holding `lucidplan:ticket-delete' may remove another person's too --
+;; a log that could only be corrected by its author would be wrong forever
+;; once that person left -- and the trail records who did it.
+(post "/tickets/:project/id/:human-id/time/:entry-id/delete"
+      #:mime 'xml
+      #:cookies '(names x-bewaking-lucidplan)
+      (lambda (rc)
+        (define (do-remove-time)
+          (let* ((proj (params rc "project"))
+                 (human-id (params rc "human-id"))
+                 (entry-id (params rc "entry-id"))
+                 (ticket-repo (make-sqlite-ticket-repository rc))
+                 (project-repo (make-sqlite-project-repository rc))
+                 (time-repo (make-sqlite-time-entry-repository rc))
+                 (t (get-ticket-by-project-human-id-and-human-id ticket-repo
+                                                                 proj human-id))
+                 (actor-id (session-owner-id #:rc rc
+                                             #:token-name 'x-bewaking-lucidplan))
+                 (moderator? (session-has-permission? #:rc rc
+                                                      #:token-name 'x-bewaking-lucidplan
+                                                      #:permission 'lucidplan:ticket-delete))
+                 (entry (and t
+                             (find (lambda (e)
+                                     (equal? (format #f "~a"
+                                                     (assq-ref e
+                                                               'id))
+                                             entry-id))
+                                   (get-time-entries time-repo (assq-ref t
+                                                                         'id))))))
+            (when (and t
+                       entry
+                       (or moderator?
+                           (and actor-id
+                                (equal? (format #f "~a" actor-id)
+                                        (format #f "~a"
+                                                (assq-ref entry
+                                                          'author-id))))))
+              (soft-delete-time-entry time-repo
+                                      (assq-ref entry
+                                                'id))
+              (record-event! (make-sqlite-ticket-event-repository rc)
+                             #:ticket-id (assq-ref t
+                                                   'id)
+                             #:project-id (project-id-from-human-id
+                                           project-repo proj)
+                             #:actor-id actor-id
+                             #:action "time-removed"
+                             #:field "time"
+                             #:old-value (format-duration (assq-ref entry
+                                                                    'duration-minutes))))
+            (redirect-to rc
+                         (string->uri (format #f "~a/tickets/~a/id/~a"
+                                              (current-myhost) proj human-id))
+                         #:status 302)))
+        (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                           #:needed-permissions '(lucidplan:ticket-create)
+                           #:rc rc
+                           #:happy-flow do-remove-time
+                           #:unhappy-flow back-to-login)))
+
+;; ===== Where the ticket sits in the plan =====
+;;
+;; Three references are set from the ticket's own page in one form: the day it
+;; is due, the sprint it is being worked in, and the milestone it counts
+;; toward.  All three are optional and all three may be cleared, so the form
+;; posts all three every time and what it says is written as it stands.
+;;
+;; A sprint or a milestone is accepted only when it names one the project
+;; actually has: a form is not a promise, and a ticket pointing at a sprint
+;; that does not exist would be a ticket no board can show.  The empty row is
+;; how the form says "none", and stores a NULL rather than a reference to
+;; nothing.
+;;
+;; Putting a ticket into a sprint and taking it out are recorded as events of
+;; their own -- `sprint-added' and `sprint-removed' -- rather than as an
+;; ordinary change of a column.  The burndown replays them to know how much
+;; work was still in the sprint on any given day, which a column holding only
+;; what is true now could not answer.
+(post "/tickets/:project/id/:human-id/planning"
+      #:mime 'xml
+      #:cookies '(names x-bewaking-lucidplan)
+      (lambda (rc)
+        (define (do-plan)
+          (let* ((proj (params rc "project"))
+                 (human-id (params rc "human-id"))
+                 (ticket-repo (make-sqlite-ticket-repository rc))
+                 (project-repo (make-sqlite-project-repository rc))
+                 (sprint-repo (make-sqlite-sprint-repository rc))
+                 (milestone-repo (make-sqlite-milestone-repository rc))
+                 (t (get-ticket-by-project-human-id-and-human-id ticket-repo
+                                                                 proj human-id))
+                 (body (alist-from-url-encoded-body (rc-body rc)))
+                 (project-id (project-id-from-human-id project-repo proj))
+                 (sprints (if project-id
+                              (get-sprints sprint-repo project-id) '()))
+                 (milestones (if project-id
+                                 (get-milestones milestone-repo project-id)
+                                 '()))
+                 ;; A date the form left empty is a deadline somebody removed;
+                 ;; a date it filled in with something that is not a day is a
+                 ;; mistake, and leaves the deadline the ticket had.
+                 (submitted-due (assoc-ref body "due-on"))
+                 (submitted-sprint (assoc-ref body "sprint-id"))
+                 (submitted-milestone (assoc-ref body "milestone-id"))
+                 (due-on (cond
+                           ((not (string? submitted-due))
+                            (assq-ref t
+                                      'due-on))
+                           ((string-null? (string-trim-both submitted-due)) #f)
+                           (else (or (parse-iso-date submitted-due)
+                                     (assq-ref t
+                                               'due-on)))))
+                 ;; The row a form offers is the row that is taken; anything
+                 ;; else -- a sprint of another project, an id typed by hand --
+                 ;; is the same as choosing none, because a ticket must not be
+                 ;; left pointing at something no page can show.
+                 (offered-sprint (and (string? submitted-sprint)
+                                      (find (lambda (s)
+                                              (equal? (format #f "~a"
+                                                              (assq-ref s
+                                                                        'id))
+                                                      submitted-sprint))
+                                            sprints)))
+                 (offered-milestone (and (string? submitted-milestone)
+                                         (find (lambda (m)
+                                                 (equal? (format #f "~a"
+                                                                 (assq-ref m
+                                                                           'id))
+                                                         submitted-milestone))
+                                               milestones)))
+                 (wanted-sprint (and offered-sprint
+                                     (format #f "~a"
+                                             (assq-ref offered-sprint
+                                                       'id))))
+                 (wanted-milestone (and offered-milestone
+                                        (format #f "~a"
+                                                (assq-ref offered-milestone
+                                                          'id)))))
+            (when t
+              (let* ((ticket-id (assq-ref t
+                                          'id))
+                     (actor-id (session-owner-id #:rc rc
+                                                 #:token-name 'x-bewaking-lucidplan))
+                     (event-repo (make-sqlite-ticket-event-repository rc))
+                     (old-sprint (assq-ref t
+                                           'sprint-id))
+                     (old-milestone (assq-ref t
+                                              'milestone-id)))
+                (update-ticket-planning-by-id ticket-repo ticket-id due-on
+                                              wanted-sprint wanted-milestone)
+                (update-ticket-by-project-human-id-and-human-id ticket-repo
+                                                                proj human-id
+                                                                `((updated-at
+                                                                   unquote
+                                                                   (current-time))))
+                ;; A deadline is an ordinary field of the ticket, so it is
+                ;; recorded the way every other change of one is.
+                (unless (equal? (tracked-value (assq-ref t
+                                                         'due-on))
+                                (tracked-value due-on))
+                  (record-event! event-repo
+                                 #:ticket-id ticket-id
+                                 #:project-id project-id
+                                 #:actor-id actor-id
+                                 #:action "changed"
+                                 #:field "deadline"
+                                 #:old-value (tracked-value (assq-ref t
+                                                                      'due-on))
+                                 #:new-value (tracked-value due-on)))
+                ;; The two references are recorded as the movement they are,
+                ;; because the burndown reads the movement rather than the
+                ;; column.
+                (unless (equal? (format #f "~a" (or old-sprint ""))
+                                (format #f "~a" (or wanted-sprint "")))
+                  (record-event! event-repo
+                                 #:ticket-id ticket-id
+                                 #:project-id project-id
+                                 #:actor-id actor-id
+                                 #:action (if wanted-sprint
+                                              "sprint-added"
+                                              "sprint-removed")
+                                 #:field "sprint"
+                                 #:old-value (and old-sprint
+                                                 (format #f "~a" old-sprint))
+                                 #:new-value (if wanted-sprint
+                                                 (format #f "~a"
+                                                         wanted-sprint)
+                                                 (and old-sprint
+                                                      (format #f "~a"
+                                                              old-sprint)))))
+                (unless (equal? (format #f "~a" (or old-milestone ""))
+                                (format #f "~a" (or wanted-milestone "")))
+                  (record-event! event-repo
+                                 #:ticket-id ticket-id
+                                 #:project-id project-id
+                                 #:actor-id actor-id
+                                 #:action "changed"
+                                 #:field "milestone"
+                                 #:old-value (and old-milestone
+                                                 (format #f "~a"
+                                                         old-milestone))
+                                 #:new-value (and wanted-milestone
+                                                 (format #f "~a"
+                                                         wanted-milestone))))))
+            (redirect-to rc
+                         (string->uri (format #f "~a/tickets/~a/id/~a"
+                                              (current-myhost) proj human-id))
+                         #:status 302)))
+        (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                           #:needed-permissions '(lucidplan:ticket-create)
+                           #:rc rc
+                           #:happy-flow do-plan
+                           #:unhappy-flow back-to-login)))
+
 ;; ===== A ticket's own versions =====
 ;;
 ;; Restoring an old version is an ordinary edit whose new content is the old
@@ -1525,6 +1831,12 @@ history entry that says somebody is better than one that fails to render."
                                          rc) ticket-id target-id)
                   (move-ticket-attachments (make-sqlite-ticket-attachment-repository
                                             rc) ticket-id target-id)
+                  ;; The hours spent on a ticket are part of its record, so
+                  ;; they move with it: a time log counted in a project whose
+                  ;; board no longer shows the ticket would be a report
+                  ;; nothing can reconcile.
+                  (move-time-entries (make-sqlite-time-entry-repository rc)
+                                     ticket-id target-id)
                   (record-event! (make-sqlite-ticket-event-repository rc)
                                  #:ticket-id ticket-id
                                  #:project-id source-id
@@ -1600,6 +1912,29 @@ history entry that says somebody is better than one that fails to render."
                                                   rc)
                                                  (assq-ref t
                                                            'id)))
+                ;; The hours logged against the ticket, and what they add up
+                ;; to: the entries are read newest day first, and the total is
+                ;; the one number a reader who does not want to read the list
+                ;; is shown.
+                (time-entries (get-time-entries (make-sqlite-time-entry-repository
+                                                 rc)
+                                                (assq-ref t
+                                                          'id)))
+                (logged-minutes (time-entries-minutes time-entries))
+                ;; The plan the ticket can be put in: the project's own
+                ;; sprints and milestones, offered by the same page that
+                ;; writes the choice.  A ticket whose project cannot be
+                ;; resolved has no plan to be put in, which is an empty list
+                ;; rather than an error.
+                (project-id (and project-details
+                                 (assq-ref project-details
+                                           'id)))
+                (sprints (if project-id
+                             (get-sprints (make-sqlite-sprint-repository rc)
+                                          project-id) '()))
+                (milestones (if project-id
+                                (get-milestones (make-sqlite-milestone-repository
+                                                 rc) project-id) '()))
                 ;; The card offers its inline controls to the same reader the
                 ;; endpoint behind them would accept: holding the permission,
                 ;; not merely being signed in.
@@ -1616,6 +1951,8 @@ history entry that says somebody is better than one that fails to render."
                                             #:project (params rc "project")
                                             #:ticket t
                                             #:statuses statuses
+                                            #:today (today-iso)
+                                            #:logged-minutes logged-minutes
                                             #:assignee (if (nil?
                                                             ticket-assignee-user)
                                                            #f
@@ -1666,6 +2003,17 @@ history entry that says somebody is better than one that fails to render."
                                                            #:events events
                                                            #:revisions
                                                            revisions
+                                                           ;; The hours spent on the
+                                                           ;; ticket, and the plan it
+                                                           ;; can be put in.
+                                                           #:time-entries
+                                                           time-entries
+                                                           #:logged-minutes
+                                                           logged-minutes
+                                                           #:sprints sprints
+                                                           #:milestones
+                                                           milestones
+                                                           #:today (today-iso)
                                                            #:editable?
                                                            editable?
                                                            ;; Who is reading, and whether

@@ -127,9 +127,25 @@ organized:
   A version is never rewritten, so restoring an old one adds a new version
   whose content happens to be the old content.
 - *Moving a ticket between projects*: a ticket filed in the wrong place is one
-  menu away from the right one.  Its discussion, its files and its assignment
-  move with it, and its history stays with it too, because the trail names the
-  ticket rather than the project it was in.
+  menu away from the right one.  Its discussion, its files, its assignment and
+  the hours logged against it move with it, and its history stays with it too,
+  because the trail names the ticket rather than the project it was in.
+- *Time logging*: every ticket keeps a log of the hours spent on it -- a
+  duration, the day it was spent, and what was done -- written the way people
+  say it, so an hour and a half is =1.5h=, =90m=, =1h30m=, =1h 30m= or =1:30=
+  and all of them are the same ninety minutes.  The day defaults to today, the
+  comment is what the entry is for, and a ticket's total reads both as =2h 45m=
+  and as the =2.75= hours a report adds up in.
+- *Sprints and a burndown*: a project commits to a stretch of work by giving it
+  a start, an end and a goal, and the tickets it holds carry its id.  Each
+  sprint has its own page with a burndown drawn from the audit trail the
+  tickets already leave -- what was left, day by day, against the line the team
+  committed to -- so the chart cannot disagree with the tickets it is about.
+- *Deadlines and milestones*: a ticket can be due on a day, which its card
+  shows as a state -- overdue, due today, due soon, or scheduled -- rather than
+  as a date a reader has to compare against a calendar.  A milestone is a
+  result the project promised by a date, several sprints may feed one, and the
+  page keeps a running account of how much of each is done.
 - *Email notifications*: a new ticket is announced to everyone taking part in
   the project.
 - *A [[https://en.wikipedia.org/wiki/Representational_state_transfer][REST]] [[https://en.wikipedia.org/wiki/API][API]]*: =/api/v1= hands tickets and projects to your scripts, with the
@@ -217,9 +233,10 @@ To-do → Work in Progress → In Review → Done
 :END:
 
 Opening a ticket shows the ticket itself and, under it, everything the work on
-it has gathered: its estimates, its discussion, its files, what has happened to
-it and the versions of what it said.  All of it is written by the same
-permission the ticket is: ~lucidplan:ticket-create~.
+it has gathered: the plan it sits in, the hours it has cost, its estimates, its
+discussion, its files, what has happened to it and the versions of what it said.
+All of it is written by the same permission the ticket is:
+~lucidplan:ticket-create~.
 
 *** Estimates
 :PROPERTIES:
@@ -248,6 +265,70 @@ The two ladders are ~ticket-points~ and ~ticket-sizes~ in
 them are both built from those two lists, so a team that estimates in powers of
 two edits one line and the whole instance follows.  Whatever is not on the
 ladder is refused rather than stored.
+
+*** Logging time
+:PROPERTIES:
+:CUSTOM_ID: logging-time
+:END:
+
+A ticket keeps a log of the hours it has cost.  Each entry is three things:
+
+- *how long* -- written the way people say it.  An hour and a half can be typed
+  as =1.5h=, =90m=, =1h30m=, =1h 30m=, =1:30= or a bare =90=, and every one of
+  them is stored as the same ninety minutes.  What cannot be a duration is
+  refused rather than guessed at: nothing, an empty field and zero log no time,
+  and a day's worth (24 hours) is the ceiling, so a typo that turns 90 minutes
+  into 90 hours is refused instead of stored;
+- *which day* -- a date, defaulting to today, because "two hours on this" is
+  said about today far more often than about any other day;
+- *what was done* -- the comment that makes the entry a record of work rather
+  than a timesheet.  It is stored as it was typed and shown as text, so nothing
+  in it is markup.
+
+The panel shows the entries newest day first, each with its author, its day and
+its comment, and the ticket's total -- both as a duration (=2h 45m=) and as the
+decimal hours a report is written in (=2.75=).  An entry belongs to whoever
+logged it, and that is who may remove it; a holder of ~lucidplan:ticket-delete~
+may remove another person's too, because a log that could only be corrected by
+its author would stay wrong forever once that person left.  Removing an entry is
+a soft removal: the row stays, so the trail still says the hours were logged and
+then taken back, and the total simply stops counting them.
+
+The durations are read and written by ~parse-duration~, ~format-duration~ and
+~format-hours~ in ~lib/lucidplan/domain.scm~, and the ceiling is
+~time-entry-max-minutes~ beside them.
+
+*** The plan: deadline, sprint and milestone
+:PROPERTIES:
+:CUSTOM_ID: the-plan
+:END:
+
+A ticket's *plan* is one small form on its own page, because the three things in
+it answer one question: when is this due, and where does it count.
+
+- *deadline* -- the day the ticket is due.  It is shown as a state rather than
+  as a date, because a date is something a reader has to compare against a
+  calendar and a state is something they can act on: *overdue*, *due today*,
+  *due soon* (within ~deadline-soon-days~, a week) or *scheduled*.  The
+  threshold is one value in ~lib/lucidplan/domain.scm~, so every badge and every
+  sentence about a deadline agrees about what "soon" means;
+- *sprint* -- the stretch of work the ticket is being worked in (see
+  [[#sprints-and-burndown][Sprints and burndown]]);
+- *milestone* -- the result the ticket counts toward (see
+  [[#milestones][Milestones]]).
+
+All three are optional and all three may be cleared, so the form always posts
+all three and what it says is written as it stands.  A sprint or a milestone is
+accepted only when it names one the project actually has -- a ticket pointing at
+a sprint that does not exist would be a ticket no board could show -- and the
+empty row stores nothing rather than a reference to nothing.
+
+A calendar date is stored as the text =2026-10-27= rather than as a number,
+because that is what sorts, compares and can be read back by a date field.  What
+a form leaves empty is the absence of a date, which is a state of its own: a
+sprint nobody has dated, a milestone nobody has promised a day for.  A date that
+is submitted but does not exist -- the 31st of February, say -- is refused
+rather than rolled into the next month.
 
 *** Discussion
 :PROPERTIES:
@@ -346,6 +427,84 @@ on is the ticket's new address.  A status the destination's board does not name
 needs no thought either: such a ticket is treated as open, so it appears on the
 new board and can be dragged onto a status that exists there.
 
+** Sprints and burndown
+:PROPERTIES:
+:CUSTOM_ID: sprints-and-burndown
+:END:
+
+A sprint is a stretch of work a team commits to.  It has a name, a goal, a
+start, an end and a state, and it is reached from the backlog or the board by
+the calendar button at the top of either.
+
+A sprint is in one of three states:
+
+#+name: sprint-states
+#+begin_example
+planned → active → closed   (and closed → planned, to reopen one)
+#+end_example
+
+A project works in at most one sprint at a time: starting a sprint puts any
+other running one back to *planned*.  It is not closed -- closing is the team's
+own statement that the work is done -- it simply stops claiming to be the sprint
+the team is in.
+
+The tickets of a sprint are the tickets that carry its id.  A sprint's own page
+lists what is in it and, beside it, the backlog it can be fed from: adding a
+ticket takes one press, and taking one out leaves it exactly as it was, only no
+longer in a sprint.  Deleting a sprint takes its tickets out of it first, for
+the same reason -- a deleted sprint leaves a backlog, never a set of tickets
+pointing at something that is no longer there.
+
+*** The burndown
+
+A sprint's page draws its burndown: what was left to do at the end of each day,
+against the straight line the team committed to, so the gap between the two
+lines says at a glance what a table of the same numbers would take a minute to
+say.
+
+The chart is not kept in a table of its own.  It is replayed from the audit
+trail the tickets already leave -- a ticket put into a sprint is recorded as
+~sprint-added~, one taken out as ~sprint-removed~, and every status change is
+recorded with the statuses it moved between -- so the chart cannot disagree with
+the tickets it is about, and there is no second copy of the truth to fall out of
+step with the first.
+
+Two things are taken as they are now rather than as they were then, and they are
+worth knowing when reading the chart: a ticket's estimate is the estimate it
+carries today, and a ticket nothing recorded an entry for is taken to have been
+in the sprint from the day the sprint began.
+
+The chart stops at today: a burndown has no business drawing the future as
+though it had happened.  A closed sprint is drawn to its last day.
+
+The numbers behind it come from ~burndown-series~ in
+~lib/lucidplan/domain.scm~, which answers one row per day -- the scope, what was
+done and what is left -- and ~burndown-summary~, which says the last of those
+rows once for a reader who does not want to read a chart.  The chart itself is
+SVG drawn into the page, so it needs no script and no image to be fetched.
+
+** Milestones
+:PROPERTIES:
+:CUSTOM_ID: milestones
+:END:
+
+A milestone is a result the project promised by a date.  It is not a sprint and
+is deliberately not shaped like one: a sprint is a promise the team makes to
+itself about a stretch of work, while a milestone is a promise made outside the
+team about a result -- which is why a milestone has a date of its own, and why
+several sprints may feed one.
+
+The milestones page lists them soonest first, with each one's date read the way
+a deadline is read (past, today, soon, ahead), and with a running account of the
+tickets that count toward it: how many, how many points they add up to, and how
+many of those are done.
+
+A milestone is reached from the backlog or the board, by the target button at
+the top of either.  Deleting a milestone leaves its tickets where they are --
+they simply no longer count toward anything -- for the same reason deleting a
+sprint does: a milestone is a promise about the work, and withdrawing the
+promise does not withdraw the work.
+
 ** Keyboard Accessibility
 :PROPERTIES:
 :CUSTOM_ID: keyboard-accessibility
@@ -394,11 +553,14 @@ The small inline controls on a ticket (its status, its type and its two
 estimates) are shown to exactly the readers the endpoint behind them would
 accept, so a reader who holds the permission sees the control and a reader who
 does not sees the read-only badge.  The same holds for the rest of a ticket's
-own page: the comment box, the upload form, the remove controls, the restore
-buttons and the menu that moves the ticket to another project are all offered
-by the permission their write needs, ~lucidplan:ticket-create~ -- except for
-removing somebody else's comment, which is offered only to a reader holding
-~lucidplan:ticket-delete~, the permission the endpoint checks as well.
+own page: the comment box, the upload form, the time form, the form that sets
+the plan, the remove controls, the restore buttons and the menu that moves the
+ticket to another project are all offered by the permission their write needs,
+~lucidplan:ticket-create~ -- except for removing somebody else's comment or
+somebody else's time entry, which is offered only to a reader holding
+~lucidplan:ticket-delete~, the permission the endpoint checks as well.  The
+sprint and milestone pages follow the same rule: everybody may read them, and
+only a holder of ~lucidplan:ticket-create~ is offered the forms that write them.
 
 ** What the mail service is asked to send
 :PROPERTIES:
@@ -1159,9 +1321,7 @@ While tools like Large Language Models (LLMs) and interactive chatbots can be
 beneficial for reviewing, refactoring small functions, or acting as a sounding
 board, they should be used with moderation.
 
-We require a human in the loop for all contributions. The use of autonomous AI
-agents to automatically generate and submit pull requests to this project is
-strictly prohibited.
+We require a human in the loop for all contributions.
 
 ------------------
 

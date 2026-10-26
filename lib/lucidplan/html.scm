@@ -726,6 +726,56 @@ translated when it is one of the shipped labels."
   (list (icon #:type (string->symbol (ticket-status-icon specs status))
               #:icon-css '(text-onyx-300 dark:text-stone-300 text-xl))))
 
+;;; ===== How a deadline is read =====
+;;;
+;;; A deadline is useful at a glance or not at all: what a reader has to act
+;;; on is not the day but how the day stands -- past, today, close enough to
+;;; do something about, or comfortably ahead.  The question is put to the
+;;; domain (`ticket-due-state'), so a ticket's badge and a milestone's cannot
+;;; disagree about what "soon" means, and this module only decides how each
+;;; answer is drawn.
+;;;
+;;; The badge is a colour and a border rather than a filled pill, because it
+;;; sits next to the status and the type on a card that is already wearing a
+;;; badge for each: three filled pills in a row read as three equal facts, and
+;;; only one of them is a warning.
+(define-public (due-badge-face state)
+  "The classes a deadline in STATE is drawn with."
+  (mk-class (append '(inline-flex flex-row gap-1 items-center
+                                  text-xs px-2 py-1 rounded-lg border-2
+                                  font-medium)
+                    (case state
+                      ((overdue due-today)
+                       '(text-redwood-700 dark:text-redwood-300
+                         border-redwood-500/75 dark:border-redwood-500/75))
+                      ((due-soon)
+                       '(text-olive-700 dark:text-olive-300
+                         border-olive-500/75 dark:border-olive-500/75))
+                      (else
+                       '(text-onyx-500 dark:text-stone-500
+                         border-stone-300/75 dark:border-onyx-100/75))))))
+
+(define-public (render-due-badge G_ due-on . today-arg)
+  "Answer the badge a deadline DUE-ON is read as, or nothing to draw.
+
+TODAY-ARG is the day to judge by and defaults to the day it is.  A ticket
+with no deadline, or with one that is not a day, answers the empty list
+rather than a badge saying nothing: the page is laid out as though the
+deadline were not there, which is what it is."
+  (let ((state (ticket-due-state due-on
+                                 (if (pair? today-arg)
+                                     (car today-arg)
+                                     (today-iso)))))
+    (if state
+        `((span (@ (class ,(due-badge-face state))
+                    (title ,(format #f "~a" due-on)))
+                ,(icon #:type 'calendar-blank
+                       #:icon-css '(text-xs))
+                ,(G_ (due-state-label state))
+                "· "
+                ,due-on))
+        '())))
+
 ;; A closed bucket is titled by the status inside it when it holds exactly
 ;; one -- so renaming that status renames the section -- and by the bucket's
 ;; own name when it holds several, since there is then no one name to borrow.
