@@ -151,7 +151,9 @@ organized:
   being estimated and chooses how the room estimates -- story points or t-shirt
   sizes -- and everybody else takes a seat by typing a name.  Every card stays
   face down until the table turns them over, and what the room said is counted
-  out beside the seats.
+  out beside the seats; whoever may edit the backlog can then write the card the
+  room agreed on onto the ticket it was estimated for, which is the one part of
+  the section that needs an account.
 - *Email notifications*: a new ticket is announced to everyone taking part in
   the project.
 - *A [[https://en.wikipedia.org/wiki/Representational_state_transfer][REST]] [[https://en.wikipedia.org/wiki/API][API]]*: =/api/v1= hands tickets and projects to your scripts, with the
@@ -398,6 +400,12 @@ writes no history at all.  The trail is append-only: nothing in the application
 updates or removes a row, because a history that can be rewritten is not an
 audit trail.
 
+Every stamp in that record -- the trail's own, the one under a comment, and the
+two a version shows -- is read as the date and the time of day it happened,
+~2026-10-27 18:14~, rather than as the epoch second the schema keeps it in.  A
+stamp is said the same way wherever it is said, so a page of them reads as one
+page (see ~recorded-at~ in ~app/views/tickets.scm~).
+
 What is watched is one list -- ~ticket-tracked-fields~ in
 ~lib/lucidplan/domain.scm~ -- so the trail and the versions cannot quietly
 disagree about what a ticket is made of.  It holds the title, the description,
@@ -538,7 +546,21 @@ and not to the round, because a team that estimates in t-shirt sizes does so all
 afternoon, and a room that changed its ladder halfway through would leave its
 own record of what was agreed unreadable.  The *tables you could sit at* list
 shows the meetings still open with the question each is asking, how many rounds
-it is on and how many people have taken a seat.
+it is on, how many people have taken a seat, and which ticket the meeting is
+about where it was opened for one.
+
+A table is often opened for one thing, and a ticket's own page offers to do
+exactly that: *estimate with a table*, with the ladder to deal -- the one the
+ticket is already estimated on where it is estimated on one, and story points
+otherwise.  A table opened that way is about that ticket and nothing else.  It is
+named after the ticket, its first round asks the ticket, and every round it is
+dealt is estimated for it, so nobody types a ticket number at the end: the push
+is one button naming the ticket, and no round can be written onto a ticket its
+table was not opened to estimate.  The table says which ticket it is about -- in
+its heading, and in the list of tables -- and both are links back to it.  Opening
+one asks for ~lucidplan:ticket-create~, the permission a ticket's estimate is
+changed with, because it is deciding where that estimate will come from; sitting
+at it and playing a card still needs no account at all.
 
 Sitting at a table shows the seats, your hand, and the round: who has played --
 never what they played -- and the question being estimated.  Playing a card is
@@ -573,11 +595,27 @@ on or cards that have been turned over mean the page changes shape, so it is
 re-read rather than patched.  The server is the only thing that decides how a
 revealed round reads, so there is no second renderer to disagree with the first.
 
-What the section deliberately does not do is write the agreed number onto a
-ticket: a table answers with the card the room agreed on, and the number goes
-onto the ticket afterwards, from the ticket's own page -- which is where an
-account is needed and where the number belongs.  The meeting decides, and the
-backlog is written down after it.
+The one thing a table does that needs an account is writing its answer down.
+Nobody at a table needs one to play a card, but the answer is only worth
+something in the backlog, and a backlog is where accounts are.  So once the
+cards are over and the room has agreed on one card, a reader whose account
+holds ~lucidplan:ticket-create~ -- the same permission the ticket's own estimate
+is changed with, and the same check the endpoint behind the panel makes, so the
+control is drawn exactly when pressing it would be honoured -- is offered
+*writing it on a ticket*: which project, and the ticket's number in it, unless
+the table was opened for a ticket, in which case there is nothing to ask and the
+push is one button naming it.  The
+card then goes onto that ticket's estimate, on the ladder the room dealt -- a
+table on the t-shirt deck writes the size and leaves the points alone, because a
+push is not a reason to clear an estimate somebody else made -- and it leaves a
+row in the ticket's own activity naming who wrote it and what the number was
+before, exactly as the ticket's own page does.
+
+A round the room split over has nothing to write, because a tie is not an
+agreement, and neither has a round nobody played; the table is then dealt the
+next thing and the round it settled keeps where its number went, as a link: the
+meeting decides, the backlog is written down after it, and the page says which
+of the two happened.
 
 ** Keyboard Accessibility
 :PROPERTIES:

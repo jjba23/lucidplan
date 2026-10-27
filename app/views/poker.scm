@@ -60,21 +60,11 @@
 (define %muted-face
   (mk-class '(text-sm text-onyx-500 dark:text-stone-500)))
 
-;; The name of a deck, said in the reader's language.
-;;
-;; The two labels are written as calls of the translator with the strings in
-;; front of it rather than looked up from a table, which is what lets the
-;; extractor find them: a label that only ever reaches the page as the
-;; argument of a lookup is invisible to `xgettext', and the deck would then
-;; stay in English inside an otherwise translated page.  This is the same
-;; reason `translate-status-label' in `(lucidplan html)' is written this way.
-(define (deck-label G_ deck)
-  (cond
-    ((equal? deck "points")
-     (G_ "story points"))
-    ((equal? deck "sizes")
-     (G_ "t-shirt sizes"))
-    (else deck)))
+;; A ladder is named by `deck-label', which is drawn from `(lucidplan html)'
+;; rather than written here: a ticket's own page names the same two ladders
+;; when it offers to estimate a ticket with a table (see `render-ticket' in
+;; `(app views tickets)'), and a name only one of the two pages can reach is a
+;; name the other one gets wrong.
 
 ;; A card, as a button that submits the card it shows.  A form full of submit
 ;; buttons rather than a row of radios: the browser sends the name and value of
@@ -108,6 +98,21 @@
               (aria-pressed ,(if chosen? "true" "false"))
               (class ,(card-face chosen?)))
            ,(cdr card)))
+
+;; Where a ticket is, from a reference to it: the project it is in and the
+;; number in it, which is what the ticket's own addresses are made of.
+(define (ticket-url ticket)
+  (format #f "/tickets/~a/id/~a"
+          (assq-ref ticket 'project)
+          (assq-ref ticket 'number)))
+
+;; What a reference to a ticket is drawn as -- the project and the number --
+;; so that a room, a round and a list of tables all name a ticket the same way
+;; a reader's address bar does.
+(define (ticket-ref-text ticket)
+  (format #f "~a #~a"
+          (assq-ref ticket 'project)
+          (assq-ref ticket 'number)))
 
 (define (poker-tables-url)
   "/poker")
@@ -151,7 +156,17 @@
                (small (@ (class ,%muted-face))
                       ,(format #f "~a ~a" (G_ "round") (or round 0)))
                (small (@ (class ,%muted-face))
-                      ,(format #f "~a: ~a" (G_ "at the table") seats))))))
+                      ,(format #f "~a: ~a" (G_ "at the table") seats))
+               ;; A table opened for a ticket says which one, and the link is
+               ;; the way back to it: the list is where somebody looks for the
+               ;; meeting their team is in, and two tickets a backlog calls
+               ;; the same thing are told apart by this.
+               ,@(let ((ticket (poker-room-ticket room)))
+                   (if ticket
+                       (list `(a (@ (href ,(ticket-url ticket))
+                                    (class ,(mk-class '(text-sm no-underline))))
+                                 ,(ticket-ref-text ticket)))
+                       '()))))))
 
 (define* (html-poker-tables G_
                             #:key
@@ -364,6 +379,28 @@
                           ,(format #f "~a ~,1f" (G_ "average") average)))
                 '()))))
 
+;; Where a round's number went, as a link to the ticket that now carries it.
+;; Only a round that was written down answers with anything, so a table that
+;; never pushed its answer says nothing rather than saying "not recorded": the
+;; line is about a thing that happened, and there is nothing to report about a
+;; thing that did not.  The ticket is named the way its own addresses name it
+;; -- the project and the number in it -- because that is what the link is
+;; made of and what a reader can look up.
+(define (recorded-lines G_ row)
+  (let ((project (assq-ref row
+                           'ticket-project))
+        (number (assq-ref row
+                          'ticket-number)))
+    (if (not project)
+        '()
+        (let ((ticket (list (cons 'project project)
+                            (cons 'number number))))
+          (list `(p (@ (class ,(mk-class '(text-sm))))
+                    ,(format #f "~a " (G_ "written onto"))
+                    (a (@ (href ,(ticket-url ticket))
+                          (class ,(mk-class '(text-sm font-medium no-underline))))
+                       ,(ticket-ref-text ticket))))))))
+
 ;; The cards the table has already settled, newest first.  An item the room
 ;; dealt but never turned over is shown as unsettled rather than with the cards
 ;; it was holding: a page about a meeting has no business publishing a round
@@ -397,7 +434,12 @@
                                                 (else (string-join (assq-ref
                                                                     row
                                                                     'agreed)
-                                                                   ", "))))))
+                                                                   ", "))))
+                                      ;; A settled round that was written onto
+                                      ;; a ticket says where the number went,
+                                      ;; in the same panel: what a room said
+                                      ;; and where it was taken are one story.
+                                      ,@(recorded-lines G_ row)))
                               rows))))))
 
 (define* (html-poker-room G_
@@ -409,12 +451,21 @@
                           (votes '())
                           (settled '())
                           (seat #f)
+                          (can-record? #f)
+                          (ticket-exists? #f)
+                          (notices '())
                           (is-logged-in #f))
   (let* ((room-id (format #f "~a"
                           (assq-ref room
                                     'id)))
          (deck (assq-ref room
                          'deck))
+         ;; The ticket this table was opened for, where it was opened for one.
+         ;; Every round dealt here is estimated for it, so the push below asks
+         ;; for no number, and the header names the ticket the meeting is
+         ;; about.  A table opened from the list of tables has none, and is
+         ;; asked for one at the end like it always was.
+         (room-ticket (poker-room-ticket room))
          (round (or (and item (assq-ref item
                                         'round)) 0))
          (shown? (and item
@@ -430,6 +481,17 @@
                                         votes))))
                  (and found (cdr found))))
          (played-count (length votes))
+         ;; The one card a room agreed on, which is the only thing a table has
+         ;; to write down: a round it split over is a round to talk about.
+         (agreed (and item
+                      shown?
+                      (poker-agreed-card deck
+                                         (map cdr votes))))
+         ;; Rounds that have been written onto a ticket say where they went,
+         ;; and are not offered again: the number is the ticket's now.
+         (recorded (and item
+                        (assq-ref item
+                                  'ticket-project)))
          (seat-of (lambda (one)
                     (assoc (format #f "~a"
                                    (assq-ref one
@@ -519,6 +581,91 @@
                            (list (render-result-panel G_ deck
                                                       (map cdr votes)))
                            '()))
+         ;; Writing the answer down is the one thing here that needs an
+         ;; account, so the panel is drawn only for a reader whose session
+         ;; holds the permission the endpoint behind it asks for -- a control
+         ;; shown to somebody who would then be refused is a control that lies
+         ;; -- and only once the room has agreed on one card to write.
+         (record-panel (if (and can-record? agreed)
+                           `(div (@ (class ,%panel-face))
+                                 (h3 ,(G_ "writing it on a ticket"))
+                                 (p (@ (class ,%muted-face))
+                                    ,(format #f "~a ~a. ~a"
+                                             (G_ "the room agreed on")
+                                             (poker-card-label deck agreed)
+                                             (G_
+                                              "a table decides, and the backlog is written down after it, so this is where the number goes onto the ticket it was estimated for.")))
+                                 ;; Where the number goes is read off the table
+                                 ;; rather than typed into it wherever the table
+                                 ;; can answer: these are three different things
+                                 ;; said, not one form with a field sometimes
+                                 ;; filled in for the reader.
+                                 ,@(cond
+                                     ;; The round was written down already: it
+                                     ;; says where its number went and is not
+                                     ;; offered again, since the number is the
+                                     ;; ticket's now.
+                                     (recorded (recorded-lines G_ item))
+                                     ;; A table opened for a ticket needs no
+                                     ;; number typed at it: which ticket the
+                                     ;; estimate belongs to was settled when the
+                                     ;; table was opened, so the whole of the
+                                     ;; push is one button naming it.
+                                     (room-ticket
+                                      (if ticket-exists?
+                                          (list `(form (@ (enctype
+                                                           "application/x-www-form-urlencoded")
+                                                          (method "POST")
+                                                          (action ,(format #f
+                                                                           "~a/record"
+                                                                           (poker-room-url
+                                                                            room-id))))
+                                                       (div (@ (class ,(mk-class '(my-1))))
+                                                            ,(submit-button
+                                                              (format #f
+                                                                      "~a ~a"
+                                                                      (G_ "write it on")
+                                                                      (ticket-ref-text
+                                                                       room-ticket))))))
+                                          ;; The ticket the table was opened for
+                                          ;; is gone, so a button here would be
+                                          ;; refused: saying so is better than
+                                          ;; drawing a control that lies.
+                                          (list `(p (@ (class ,%muted-face))
+                                                    ,(G_ "the ticket this table was opened for is gone, so there is nothing to write onto")))))
+                                     ;; A table opened for nothing is asked where
+                                     ;; its answer goes, as it always was.
+                                     (else (list `(form (@ (enctype
+                                                        "application/x-www-form-urlencoded")
+                                                       (method "POST")
+                                                       (action ,(format #f "~a/record"
+                                                                        (poker-room-url
+                                                                         room-id))))
+                                                    ,(select #:label
+                                                             (G_
+                                                              "which project")
+                                                             #:name "project"
+                                                             #:options
+                                                             (map (lambda (one)
+                                                                    (option #:value
+                                                                            (assq-ref
+                                                                             one
+                                                                             'human-id)
+                                                                            #:content
+                                                                            (assq-ref
+                                                                             one
+                                                                             'title)))
+                                                                  projects))
+                                                    ,(input #:label
+                                                            (G_
+                                                             "the ticket's number in that project")
+                                                            #:name "number"
+                                                            #:required #t)
+                                                    (div (@ (class ,(mk-class '(my-1))))
+                                                         ,(submit-button
+                                                           (G_
+                                                            "write it on the ticket"))))))))
+                           '()))
          (close-panel (if (and seat open?)
                           `(div (@ (class ,%panel-face))
                                 (h3 ,(G_ "closing the table"))
@@ -555,6 +702,21 @@
                   (a (@ (href ,(poker-tables-url))
                         (class ,(mk-class '(text-md px-2 no-underline))))
                      ,(G_ "← all tables"))
+                  ;; A push onto a ticket that did not go through says so here,
+                  ;; above the table, in a live region: the reader is at a
+                  ;; meeting rather than in a backlog page, and a press that
+                  ;; silently did nothing would be read as one that worked.
+                  ,@(map (lambda (notice)
+                           `(div (@ (class ,(mk-class '(my-1 px-4 py-2
+                                                               max-w-prose
+                                                               rounded-xl
+                                                               border-2
+                                                               border-jeans-blue-500/50
+                                                               text-onyx-700
+                                                               dark:text-stone-300)))
+                                        (role "status"))
+                                 ,notice))
+                         notices)
                   (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
                                                     items-baseline))))
                        (h2 (@ (class ,(mk-class '(text-lg font-bold))))
@@ -567,6 +729,23 @@
                                                           border-stone-300/75
                                                           dark:border-onyx-100/75))))
                              ,(deck-label G_ deck))
+                       ;; A table that was opened for a ticket says which one, as
+                       ;; a link: what a reader does after a meeting is go and
+                       ;; look at the thing the meeting was about.
+                       ,@(if room-ticket
+                             (list `(a (@ (href ,(ticket-url room-ticket))
+                                          (class ,(mk-class '(text-xs px-2 py-1
+                                                                     rounded-lg
+                                                                     border-2
+                                                                     no-underline
+                                                                     text-onyx-500
+                                                                     dark:text-stone-500
+                                                                     border-stone-300/75
+                                                                     dark:border-onyx-100/75))))
+                                       ,(format #f "~a ~a"
+                                                (G_ "estimating")
+                                                (ticket-ref-text room-ticket))))
+                             '())
                        ,@(if open?
                              '()
                              (list `(span (@ (class ,(mk-class '(text-xs px-2
@@ -600,6 +779,7 @@
                   ,card-panel
                   ,turn-panel
                   ,@result-panel
+                  ,record-panel
                   ,next-panel
                   ,@(render-settled-panel G_ settled)
                   ,close-panel

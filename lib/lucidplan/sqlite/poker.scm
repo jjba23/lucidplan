@@ -47,7 +47,11 @@
 
 (define (make-sqlite-poker-room-repository rc)
   (define columns
-    '(id title deck created-at updated-at))
+    ;; The last two name the ticket the table was opened for, where it was
+    ;; opened from a ticket's own page.  They are read everywhere the room is
+    ;; -- a table is named by what it is about -- and written once, when the
+    ;; room is made.
+    '(id title deck ticket-project ticket-number created-at updated-at))
 
   (define conn
     (DB-open rc))
@@ -95,7 +99,8 @@
 
 (define (make-sqlite-poker-item-repository rc)
   (define columns
-    '(id room-id round title revealed-at created-at))
+    '(id room-id round title revealed-at created-at ticket-project
+         ticket-number))
 
   (define conn
     (DB-open rc))
@@ -143,11 +148,23 @@
                    (sql-parameterize "UPDATE poker_item SET revealed_at = NULL WHERE id = ?"
                                      (list id))))
 
+  ;; The ticket a round was written onto, both halves of it: the project and
+  ;; the number, because that pair is what a link to a ticket is made of and
+  ;; neither half means anything alone.
+  (define (record-item-ticket-by-id id project number)
+    (execute-write "record-poker-item-ticket-by-id"
+                   (sql-update 'poker_item
+                               `((ticket-project unquote project)
+                                 (ticket-number unquote number))
+                               #:where (list (cons 'id id)))))
+
   (mk-poker-item-repository #:get-items-by-room-proc get-items-by-room
                             #:get-current-item-proc get-current-item
                             #:insert-item-proc insert-item
                             #:reveal-item-by-id-proc reveal-item-by-id
-                            #:hide-item-by-id-proc hide-item-by-id))
+                            #:hide-item-by-id-proc hide-item-by-id
+                            #:record-item-ticket-by-id-proc
+                            record-item-ticket-by-id))
 
 ;; ===== the seats =====
 

@@ -1013,6 +1013,24 @@ of the chart, said once for a reader who does not want to read a chart."
 ;;; one place a number is wanted -- the mean of a round of story points -- is
 ;;; the one place that asks the ladder for one.
 
+(define-public (poker-room-ticket room)
+  "Answer the ticket a table was opened for, or @code{#f} when it was opened for none.
+
+A table opened from a ticket's own page is about that ticket, and every round
+it deals is estimated for it; a table opened from the list of tables is about
+nothing in particular, and each round's answer is pushed wherever the room
+says when the round is over.  The ticket is named the way the ticket's own
+addresses name it -- the project it is in and the number in it -- and it takes
+both columns to name one: a room carrying a project and no number is a room
+about no ticket, and a half-reference is not a reference."
+  (let ((project (assq-ref room
+                           'ticket-project))
+        (number (assq-ref room
+                          'ticket-number)))
+    (and project number
+         (list (cons 'project project)
+               (cons 'number number)))))
+
 (define-public poker-decks
   '("points" "sizes"))
 
@@ -1135,6 +1153,35 @@ A round nobody played answers nothing at all."
         '()
         (map car (filter (lambda (row)
                            (= (cdr row) top)) counts)))))
+
+(define-public (poker-agreed-card deck values)
+  "Answer the card a room agreed on, or @code{#f} when it agreed on nothing.
+
+An agreement is one card and only one.  A round the room split evenly between
+two cards is a round to talk about rather than a number to write down, and a
+round nobody played agreed on nothing at all.  This is deliberately the
+narrower question than @code{poker-most-chosen} asks -- that one answers what
+a facilitator has to see, this one answers what may be written onto a ticket:
+the table may estimate a thing twice over and settle it once."
+  (let ((most (poker-most-chosen deck values)))
+    (and (= (length most) 1)
+         (car most))))
+
+(define-public (poker-estimate-field deck)
+  "Answer the ticket column DECK is estimated in, or @code{#f} for no column.
+
+A table's deck and a ticket's estimate are the same two ladders seen from two
+ends: the room picks the ladder it deals, and this says which column of a
+ticket that ladder is written into.  Answering a column name is what lets the
+push onto a ticket go through the very check the ticket's own page goes
+through, so a card a table agreed on cannot become an estimate no ticket could
+have been given."
+  (cond
+    ((equal? deck "points")
+     "estimate-points")
+    ((equal? deck "sizes")
+     "estimate-size")
+    (else #f)))
 
 (define-public (poker-average deck values)
   "Answer the mean of VALUES on DECK, or @code{#f} when there is no mean.

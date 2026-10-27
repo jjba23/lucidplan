@@ -70,15 +70,22 @@
                            shadow-md
                            border-2) frosted-tint-classes)))
 
+;; What a field of a card is called: quiet and set apart from what it holds,
+;; so a reader scanning the card reads the values and finds the names when
+;; they look for them.  A card of controls reads as a form either way; the
+;; small, spaced capitals are what keep the names from competing with the
+;; answers under them.
 (define %label-face
-  (mk-class '(font-sans text-onyx-700 dark:text-stone-300 text-md font-light)))
+  (mk-class '(font-sans text-xs font-medium uppercase tracking-wide
+                        text-onyx-500 dark:text-stone-500)))
 
-(define %val-face
-  (mk-class '(font-sans text-onyx-700 dark:text-stone-300 text-md ml-4)))
-
+;; What a ticket's own reference is written in: the project and the number,
+;; told apart from the title and from every other line by its face rather than
+;; by an indent, so a column of tickets lines up.  It is a fact about the
+;; ticket, not a heading, so it is quieter than the title it sits under.
 (define %mono-face
-  (mk-class '(font-sans text-onyx-700 dark:text-stone-300 text-sm ml-4
-                        font-mono)))
+  (mk-class '(font-mono text-xs sm:text-sm
+                        text-onyx-500 dark:text-stone-500)))
 
 (define %list-wrapper-face
   (mk-class '(flex flex-col gap-2)))
@@ -123,16 +130,6 @@
 ;; =============================================================================
 ;;  UI Helper Components
 ;; =============================================================================
-
-(define (render-meta-badge label icon value)
-  `(div (@ (class ,(mk-class '(flex flex-col gap-3))))
-        (small (@ (class ,%label-face))
-               ,label)
-        (div (@ (class ,(mk-class '(ml-4 flex gap-2 items-center))))
-             (span (@ (class ,(mk-class '(text-2xl))))
-                   ,icon)
-             (p (@ (class ,%label-face))
-                ,value))))
 
 ;; =============================================================================
 ;;  The time a ticket has cost
@@ -307,11 +304,32 @@ at the first of them."
                   #:select-flex-css '(flex flex-row items-center gap-1 my-0
                                            w-fit))))
 
-(define (render-field label value val-class)
-  `((small (@ (class ,%label-face))
-           ,label)
-    (small (@ (class ,val-class))
-           ,(format #f "~a" value))))
+;; One fact about a ticket, as the chip a reader scans rather than the pair of
+;; lines a form would give it: what the fact is called and what it holds stand
+;; on one line, so a card can carry six of them without becoming six
+;; paragraphs.  The value is normally text -- a priority, a name, a size -- and
+;; a fact that is a mark instead (a status is a glyph *and* a word) passes the
+;; nodes it is drawn from, so both kinds sit in the same chip.
+(define (render-fact-chip label value)
+  `(span (@ (class ,(mk-class (append '(inline-flex flex-row gap-2
+                                                 items-center
+                                                 px-2 py-1 rounded-lg
+                                                 border-2
+                                                 border-stone-300/75
+                                                 dark:border-onyx-100/75)
+                                        frosted-tint-classes))))
+         (small (@ (class ,(mk-class '(uppercase tracking-wide text-xs
+                                                 text-onyx-500
+                                                 dark:text-stone-500))))
+                ,label)
+         (span (@ (class ,(mk-class '(flex flex-row gap-1 items-center
+                                              text-sm font-medium
+                                              text-onyx-700
+                                              dark:text-stone-300))))
+               ,@(cond
+                   ((string? value) (list value))
+                   ((list? value) value)
+                   (else (list (format #f "~a" value)))))))
 
 (define (render-toggle-button label js-action)
   `(button (@ (class ,(mk-class '(text-sm font-semibold
@@ -329,6 +347,12 @@ at the first of them."
                         ticket
                         (assignee #f)
                         (editable? #f)
+                        ;; Whether this card is the ticket's own page, where the
+                        ;; team can be asked to estimate it at a table.  A row
+                        ;; in a backlog is a row and not a page, so the control
+                        ;; is offered by the one card that has room to say what
+                        ;; opening a table means.
+                        (planning-table? #f)
                         (statuses (default-ticket-statuses))
                         (logged-minutes 0)
                         (today (today-iso))
@@ -346,6 +370,15 @@ at the first of them."
          (size (t-ref 'estimate-size))
          (due-on (t-ref 'due-on))
 
+         ;; The ladder a table opened from here would deal: the one this ticket
+         ;; is already estimated on, where it is estimated on one and not the
+         ;; other, and story points otherwise -- which is the answer a reader
+         ;; opening the table would have given anyway.
+         (opened-deck (if (and (string? size)
+                               (not (string-null? size))
+                               (not points))
+                          "sizes" "points"))
+
          (toggle-js (format #f
                      "document.getElementById('details-~a').toggleAttribute('hidden')"
                      id))
@@ -354,15 +387,37 @@ at the first of them."
     
     `(div (@ (class ,%card-face))
 
-          ;; Header
-          (div (@ (class ,(mk-class '(flex flex-row justify-between))))
-               ,(h4 (org2html (html-unescape title)))
-               (div (@ (class ,(mk-class '(flex justify-end))))
-                    (span (@ (class ,(mk-class '(cursor-pointer)))
-                             (onclick ,toggle-js))
-                          ,(icon #:type 'x
-                                 #:icon-css '(text-onyx-700
-                                              dark:text-stone-300 text-xl)))))
+          ;; Header: what the ticket is called, which ticket it is, and -- on
+          ;; the card that is a row's unfolded body -- the control that folds
+          ;; it back up.  A page's own card has nothing to fold, so the control
+          ;; is drawn only where there is something for it to close: a button
+          ;; that does nothing is worse than no button.
+          (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
+                                            items-start
+                                            justify-between))))
+               (div (@ (class ,(mk-class '(flex flex-col gap-1 min-w-0 grow))))
+                    (h4 (@ (class ,(mk-class '(text-xl sm:text-2xl
+                                                       font-bold
+                                                       leading-8
+                                                       wrap-break-word))))
+                        ,(org2html (html-unescape title)))
+                    (small (@ (class ,%mono-face))
+                           ,(format #f "~a-~s" project human-id)))
+               ,@(if (string-null? id-suffix)
+                     '()
+                     (list `(button (@ (type "button")
+                                       (onclick ,toggle-js)
+                                       (class ,(mk-class '(cursor-pointer
+                                                                  bg-transparent
+                                                                  border-0
+                                                                  p-1)))
+                                    (span (@ (class ,(mk-class '(sr-only))))
+                                          ,(G_ "close"))
+                                    (span (@ (aria-hidden "true"))
+                                          ,(icon #:type 'x
+                                                 #:icon-css '(text-onyx-700
+                                                              dark:text-stone-300
+                                                              text-xl))))))))
 
           ;; Meta Info (Status & Type).  Where the reader can change them each
           ;; of the two is the control that posts its own change; where they
@@ -371,10 +426,10 @@ at the first of them."
           ;; say is the label a reader knows the value by, never the value
           ;; itself: `work-in-progress' and `time-box' are how the schema
           ;; spells a state, not how a reader names it.
-          (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-6
-                                           justify-start))))
+          (div (@ (class ,(mk-class '(grid grid-cols-2 sm:grid-cols-4
+                                           gap-x-6 gap-y-4 items-start))))
                ,@(if editable?
-                     `((div (@ (class ,(mk-class '(flex flex-col gap-3))))
+                     `((div (@ (class ,(mk-class '(flex flex-col gap-2))))
                             (small (@ (class ,%label-face))
                                    ,(G_ "status"))
                             ,(render-inline-choice G_
@@ -386,7 +441,7 @@ at the first of them."
                                                    #:options (ticket-status-choices
                                                               G_ statuses
                                                               status)))
-                       (div (@ (class ,(mk-class '(flex flex-col gap-3))))
+                       (div (@ (class ,(mk-class '(flex flex-col gap-2))))
                             (small (@ (class ,%label-face))
                                    ,(G_ "type"))
                             ,(render-inline-choice G_
@@ -400,7 +455,7 @@ at the first of them."
                        ;; The two estimates are changed the same way the two
                        ;; ladders above are: a menu that posts what it shows,
                        ;; from the ticket's own page.
-                       (div (@ (class ,(mk-class '(flex flex-col gap-3))))
+                       (div (@ (class ,(mk-class '(flex flex-col gap-2))))
                             (small (@ (class ,%label-face))
                                    ,(G_ "story points"))
                             ,(render-inline-choice G_
@@ -418,7 +473,7 @@ at the first of them."
                                                                   (format #f
                                                                    "~a" points)
                                                                   ""))))
-                       (div (@ (class ,(mk-class '(flex flex-col gap-3))))
+                       (div (@ (class ,(mk-class '(flex flex-col gap-2))))
                             (small (@ (class ,%label-face))
                                    ,(G_ "size"))
                             ,(render-inline-choice G_
@@ -430,92 +485,160 @@ at the first of them."
                                                    #:options (ticket-size-choices
                                                               G_
                                                               (or size "")))))
-                     `(,(render-meta-badge (G_ "status")
-                                           (status-icon-node statuses status)
-                                           (status-label G_ statuses status)) ,
-                       (render-meta-badge (G_ "type")
-                                          (emoji-for-ticket-type type)
-                                          (ticket-type-label G_ type)))))
+                     ;; A reader who cannot change them reads the same two
+                     ;; facts as chips, drawn the way this card's other facts
+                     ;; are drawn, rather than as a second kind of badge that
+                     ;; only ever appears on the card nobody can edit.
+                     (list (render-fact-chip
+                            (G_ "status")
+                            (append (status-icon-node statuses status)
+                                    (list (status-label G_ statuses status))))
+                           (render-fact-chip
+                            (G_ "type")
+                            (append (emoji-for-ticket-type type)
+                                    (list (ticket-type-label G_ type)))))))
 
-          ;; Where the ticket stands in the team's plan: the deadline read as a
-          ;; state rather than as a date, and the hours it has cost so far.
-          ;; Each is drawn only when there is something to draw, so a ticket
-          ;; with no deadline and no time logged has no empty row.
-          ,@(let ((badge (render-due-badge G_ due-on today)))
-              (if (or (pair? badge)
-                      (> logged-minutes 0))
+          ;; What else is known about the ticket, as one row of chips: where it
+          ;; stands in the team's plan -- the deadline read as a state rather
+          ;; than as a date -- and, as each of them has something to say, what
+          ;; it has cost in hours, who is on it, and how important it is.  A
+          ;; fact with nothing to say is left out rather than drawn empty, so
+          ;; a ticket with nothing to add has no empty row.
+          ,@(let ((facts (append (render-due-badge G_ due-on today)
+                                 (if (> logged-minutes 0)
+                                     (list (render-fact-chip
+                                            (G_ "time logged")
+                                            (render-logged-time G_
+                                                                logged-minutes)))
+                                     '())
+                                 (if (and (not (nil? priority))
+                                          (> priority 0))
+                                     (list (render-fact-chip (G_ "priority")
+                                                             priority))
+                                     '())
+                                 (if (not (nil? assignee))
+                                     (list (render-fact-chip (G_ "assignee")
+                                                             assignee))
+                                     '())
+                                 (if (and (not editable?) points)
+                                     (list (render-fact-chip
+                                            (G_ "story points") points))
+                                     '())
+                                 (if (and (not editable?)
+                                          (not (nil? size)))
+                                     (list (render-fact-chip
+                                            (G_ "size")
+                                            (ticket-size-label size)))
+                                     '()))))
+              (if (pair? facts)
                   `((div (@ (class ,(mk-class '(flex flex-row flex-wrap
                                                         gap-2 items-center))))
-                         ,@badge
-                         ,@(if (> logged-minutes 0)
-                               `(,(render-logged-time G_ logged-minutes))
-                               '())))
+                         ,@facts))
                   '()))
 
-          ;; Description
+          ;; Description, set as prose rather than as another value typed into
+          ;; the card: a rule down its side and a readable measure, so a long
+          ;; one reads like the note it is.
           ,(render-if-nestring (lambda (d)
-                                 `((small (@ (class ,%label-face))
-                                          ,(G_ "description"))
-                                   (span (@ (class ,(mk-class '(text-md py-3
-                                                                text-onyx-700
-                                                                dark:text-stone-300
-                                                                font-medium
-                                                                font-sans
-                                                                max-w-prose
-                                                                whitespace-pre-wrap
-                                                                leading-7
-                                                                ml-4))))
-                                         ,(org2html (html-unescape d))))) desc)
+                                 `((div (@ (class ,(mk-class '(flex flex-col
+                                                                    gap-1
+                                                                    my-1))))
+                                        (small (@ (class ,%label-face))
+                                               ,(G_ "description"))
+                                        (div (@ (class ,(mk-class '(border-l-2
+                                                                    border-stone-300/75
+                                                                    dark:border-onyx-100/75
+                                                                    pl-3 sm:pl-4
+                                                                    text-md
+                                                                    leading-7
+                                                                    max-w-prose
+                                                                    whitespace-pre-wrap
+                                                                    text-onyx-700
+                                                                    dark:text-stone-300))))
+                                             ,(org2html (html-unescape d)))))) desc)
 
-          ;; Ticket Details
-          (small (@ (class ,%mono-face))
-                 ,(format #f "~a-~s" project human-id))
+          ;; What a reader can do with the ticket: ask the team for an
+          ;; estimate, change it, delete it.  The rule above the section is
+          ;; what sets the doing apart from everything the card says about the
+          ;; ticket, and the table is opened from here rather than from the
+          ;; table's own page because this is the page that knows how the
+          ;; ticket is estimated.
+          ;;
+          ;; The three sit on one line that wraps -- the meeting first, where
+          ;; a reader reads, and the two edits at the end, where a hand goes
+          ;; looking for them -- rather than in a column of their own, which
+          ;; would leave the card's last third empty on a wide page and push
+          ;; the meeting below the fold on a narrow one.
+          (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-x-4 gap-y-3
+                                             items-end justify-between
+                                             mt-2 pt-4
+                                             border-t-2
+                                             border-stone-300/50
+                                             dark:border-onyx-100/50))))
+               ;; Estimating a ticket is the one thing a reader does with one
+               ;; that a page of its own cannot do: it is a meeting.  The table
+               ;; is opened *for this ticket*, so every round played at it is
+               ;; estimated for this ticket and no number is typed into the
+               ;; push at the end.
+               ,@(if planning-table?
+                     (list `(div (@ (class ,(mk-class '(flex flex-col
+                                                                gap-1))))
+                                 (small (@ (class ,%label-face))
+                                        ,(G_ "estimate with a table"))
+                                 (form (@ (enctype
+                                           application/x-www-form-urlencoded)
+                                          (method POST)
+                                          (action ,(format #f
+                                                           "/tickets/~a/id/~a/planning-table"
+                                                           project human-id)))
+                                       (div (@ (class ,(mk-class '(flex flex-row
+                                                                         flex-wrap
+                                                                         gap-2
+                                                                         items-center))))
+                                            ,(select #:label
+                                                     (G_ "how the table estimates")
+                                                     #:label-css '(sr-only)
+                                                     #:name "deck"
+                                                     #:select-flex-css
+                                                     '(my-0 flex flex-col gap-1
+                                                             w-full sm:w-fit)
+                                                     #:options
+                                                     (map (lambda (deck)
+                                                            (option #:value deck
+                                                                    #:content
+                                                                    (deck-label
+                                                                     G_ deck)
+                                                                    #:selected-value
+                                                                    opened-deck))
+                                                          poker-decks))
+                                            ,(submit-button
+                                              (G_ "open the table"))))))
+                     '())
 
-          ,@(if (and (not (nil? priority))
-                     (> priority 0))
-                (render-field (G_ "priority") priority %val-face)
-                '())
-
-          ,@(if (not (nil? assignee))
-                (render-field (G_ "assignee") assignee %val-face)
-                '())
-
-          ;; Where the reader cannot change them, the estimates are the two
-          ;; plain lines they read as.  Where they can, they are the menus at
-          ;; the top of the card, and showing them twice would only make the
-          ;; card longer.
-          ,@(if (and (not editable?) points)
-                (render-field (G_ "story points") points %val-face)
-                '())
-          ,@(if (and (not editable?)
-                     (not (nil? size)))
-                (render-field (G_ "size")
-                              (ticket-size-label size) %val-face)
-                '())
-
-          ;; Action Buttons
-          (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-4 py-3))))
-               (a (@ (href ,edit-url))
-                  ,(icon-button #:icon 'pencil
-                                #:content (G_ "edit ticket")
-                                #:icon-css '(text-md text-onyx-700
-                                                     dark:text-stone-300)))
-
-               (form (@ (enctype application/x-www-form-urlencoded)
-                        (method POST)
-                        (action ,delete-url))
-                     (input (@ (hidden "")
-                               (name "id")
-                               (value ,id)))
-                     ,(danger-submit-button `(span (@ (class ,(mk-class '(items-center
-                                                                          flex
-                                                                          flex-row
-                                                                          gap-1))))
-                                                   ,(icon #:type 'trash
-                                                          #:icon-css '(text-stone-300
-                                                                       dark:text-stone-300
-                                                                       text-lg))
-                                                   ,(G_ "delete"))))))))
+               ;; The buttons: changing the ticket, and taking it away.
+               (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
+                                                 items-center shrink-0))))
+                    (a (@ (href ,edit-url))
+                       ,(icon-button #:icon 'pencil
+                                     #:content (G_ "edit ticket")
+                                     #:icon-css '(text-md text-onyx-700
+                                                          dark:text-stone-300)))
+                    (form (@ (enctype application/x-www-form-urlencoded)
+                             (method POST)
+                             (action ,delete-url))
+                          (input (@ (hidden "")
+                                    (name "id")
+                                    (value ,id)))
+                          ,(danger-submit-button
+                            `(span (@ (class ,(mk-class '(items-center
+                                                           flex
+                                                           flex-row
+                                                           gap-1))))
+                                   ,(icon #:type 'trash
+                                          #:icon-css '(text-stone-300
+                                                       dark:text-stone-300
+                                                       text-lg))
+                                   ,(G_ "delete")))))))))
 
 ;; A row reads as one line -- the grip, the type's glyph, the title and the
 ;; link -- and unfolds into the ticket itself, which is where it is triaged:
@@ -1235,6 +1358,23 @@ at the first of them."
 ;; ticket it is showing; which of them are offered is decided here, from the
 ;; same `editable?' answer the endpoints behind the controls are guarded with.
 
+;; A stamp in a ticket's own record is the second it happened, which is what
+;; the schema keeps and what the trail is replayed from -- and which no reader
+;; can read.  It is said here as the date and the time of day, in the order
+;; every other date of the application is written in -- the deadline a ticket
+;; carries, the day an hour was spent, the days a burndown plots -- so a page
+;; of stamps reads as one page rather than as one for each writer.  A row that
+;; somehow carries no stamp says nothing rather than a stray number.
+(define (recorded-at value)
+  (let ((seconds (cond
+                   ((number? value) value)
+                   ((and (string? value)
+                         (string->number value)) (string->number value))
+                   (else #f))))
+    (if seconds
+        (strftime "%Y-%m-%d %H:%M" (localtime seconds))
+        (if value (format #f "~a" value) ""))))
+
 (define (short-value value)
   "Answer VALUE as one line short enough for a history row."
   (let ((text (if (string? value) value
@@ -1339,8 +1479,8 @@ at the first of them."
                 '())
           (small (@ (class ,(mk-class '(text-xs text-onyx-500
                                                 dark:text-stone-500))))
-                 ,(or (assq-ref event
-                                'created-at) "")))))
+                 ,(recorded-at (assq-ref event
+                                         'created-at))))))
 
 (define (render-comment-node G_
                              comment
@@ -1380,7 +1520,19 @@ at the first of them."
                               (and viewer-id author
                                    (equal? (format #f "~a" viewer-id)
                                            (format #f "~a" author)))))))
-    `(div (@ (class ,(mk-class '(flex flex-col gap-1 py-2)))
+    `(div (@ (class ,(mk-class '(flex flex-col gap-2
+                                        border-2
+                                        border-stone-300/50
+                                        dark:border-onyx-100/50
+                                        rounded-lg
+                                        px-3
+                                        py-2
+                                        my-1)))
+             ;; A reply is one step in from the comment it answers, and how
+             ;; deep the thread runs is how many steps it has taken.  The
+             ;; indent is what says which comment is being answered, so it is
+             ;; drawn rather than described; a comment of the page is at the
+             ;; left edge of the panel, under the form that writes one.
              (style ,(format #f "margin-left: ~apx"
                              (* 18 depth))))
           (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
@@ -1389,8 +1541,8 @@ at the first of them."
                             (G_ "somebody") author-name))
                (small (@ (class ,(mk-class '(text-xs text-onyx-500
                                                      dark:text-stone-500))))
-                      ,(or (assq-ref comment
-                                     'created-at) "")))
+                      ,(recorded-at (assq-ref comment
+                                              'created-at))))
           ,@(if deleted?
                 `((em (@ (class ,(mk-class '(text-sm text-onyx-500
                                                      dark:text-stone-500))))
@@ -1413,7 +1565,7 @@ at the first of them."
                                  (input (@ (type hidden)
                                            (name "parent-id")
                                            (value ,id)))
-                                 (textarea #:label (G_ "your reply")
+                                 ,(textarea #:label (G_ "your reply")
                                            #:name "body"
                                            #:required #t
                                            #:rows 3
@@ -1457,14 +1609,25 @@ at the first of them."
                                                   'id) seen))) children)))))
 
 (define (section-title G_ icon-name text count)
-  "Answer the heading a panel of the ticket's record is opened with."
+  "Answer the heading a panel of the ticket's record is opened with.
+
+The heading is what sets one panel's business apart from the next one's: it
+names the panel, says how many rows the panel holds, and is ruled off from
+them -- the rule is the panel's edge as well as the heading's underline, so
+a panel of many rows reads as one section of the ticket rather than as a
+run of cards."
   `(h3 (@ (class ,(mk-class '(flex flex-row
                                    flex-wrap
                                    gap-2
                                    items-center
+                                   w-full
                                    text-lg
                                    font-bold
-                                   my-2))))
+                                   pb-2
+                                   mb-1
+                                   border-b-2
+                                   border-stone-300/50
+                                   dark:border-onyx-100/50))))
        ,(icon #:type icon-name
               #:icon-css '(text-md text-onyx-700
                            dark:text-stone-300))
@@ -1584,7 +1747,7 @@ at the first of them."
                                                      "spent-on"
                                                      (or today
                                                          (today-iso)))))
-                              (textarea #:label (G_ "what was done")
+                              ,(textarea #:label (G_ "what was done")
                                         #:name "comment"
                                         #:rows 2
                                         #:help-text (G_
@@ -1763,7 +1926,7 @@ at the first of them."
                                       (action ,(format #f
                                                 "/tickets/~a/id/~a/comments"
                                                 project human-id)))
-                                   (textarea #:label (G_ "add a comment")
+                                   ,(textarea #:label (G_ "add a comment")
                                              #:name "body"
                                              #:required #t
                                              #:rows 3
@@ -1897,8 +2060,8 @@ at the first of them."
                                                    #:today today
                                                    #:editable? editable?))
                         #:frost 3
-                        #:padding '(p-4 sm:p-5)
-                        #:classes '(flex flex-col gap-2 my-3)))
+                        #:padding '(p-4 sm:p-6)
+                        #:classes '(flex flex-col gap-3)))
      ;; -- Time -------------------------------------------------------------
      (list (glass-panel `(,(section-title G_ 'hourglass
                                           (G_ "time logged")
@@ -1918,8 +2081,8 @@ at the first of them."
                                                #:viewer-id viewer-id
                                                #:moderator? moderator?))
                         #:frost 3
-                        #:padding '(p-4 sm:p-5)
-                        #:classes '(flex flex-col gap-2 my-3)))
+                        #:padding '(p-4 sm:p-6)
+                        #:classes '(flex flex-col gap-3)))
      ;; -- Discussion -------------------------------------------------------
      (list (glass-panel `(,(section-title G_ 'chat-circle
                                           (G_ "discussion")
@@ -1948,8 +2111,8 @@ at the first of them."
                                                             dark:text-stone-500))))
                                      ,(G_ "no comments yet")))))
                         #:frost 3
-                        #:padding '(p-4 sm:p-5)
-                        #:classes '(flex flex-col gap-2 my-3)))
+                        #:padding '(p-4 sm:p-6)
+                        #:classes '(flex flex-col gap-3)))
      ;; -- Files ------------------------------------------------------------
      (list (glass-panel `(,(section-title G_ 'paperclip
                                           (G_ "attachments")
@@ -2006,8 +2169,8 @@ at the first of them."
                                                             dark:text-stone-500))))
                                      ,(G_ "no attachments yet")))))
                         #:frost 3
-                        #:padding '(p-4 sm:p-5)
-                        #:classes '(flex flex-col gap-2 my-3)))
+                        #:padding '(p-4 sm:p-6)
+                        #:classes '(flex flex-col gap-3)))
      ;; -- Audit trail ------------------------------------------------------
      (list (glass-panel `(,(section-title G_ 'clock-counter-clockwise
                                           (G_ "activity")
@@ -2029,8 +2192,8 @@ at the first of them."
                                                                       ,(G_
                                                                         "nothing recorded yet")))))
                         #:frost 3
-                        #:padding '(p-4 sm:p-5)
-                        #:classes '(flex flex-col gap-1 my-3)))
+                        #:padding '(p-4 sm:p-6)
+                        #:classes '(flex flex-col gap-3)))
      ;; -- Versions ---------------------------------------------------------
      (list (glass-panel `(,(section-title G_ 'git-branch
                                           (G_ "versions")
@@ -2144,11 +2307,10 @@ at the first of them."
                                                                                 "v~a — ~a — ~a"
                                                                                 version
                                                                                 
-                                                                                (or
+                                                                                (recorded-at
                                                                                  (assq-ref
                                                                                   revision
-                                                                                  'created-at)
-                                                                                 "")
+                                                                                  'created-at))
                                                                                 
                                                                                 (if
                                                                                  (string-null?
@@ -2378,12 +2540,12 @@ at the first of them."
                                                                          ,(G_
                                                                            "no versions yet")))))
                         #:frost 3
-                        #:padding '(p-4 sm:p-5)
-                        #:classes '(flex flex-col gap-1 my-3)))
+                        #:padding '(p-4 sm:p-6)
+                        #:classes '(flex flex-col gap-3)))
      ;; -- Moving -----------------------------------------------------------
      (if (pair? move-section)
          (list (glass-panel move-section
                             #:frost 3
-                            #:padding '(p-4 sm:p-5)
-                            #:classes '(flex flex-col gap-2 my-3)))
+                            #:padding '(p-4 sm:p-6)
+                            #:classes '(flex flex-col gap-3)))
          '()))))

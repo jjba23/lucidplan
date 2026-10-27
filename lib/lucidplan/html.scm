@@ -748,6 +748,20 @@ run against a default address somebody else runs."
      (G_ "Rejected"))
     (else label)))
 
+;; The ladder a planning table deals, said in the reader's language.  It is
+;; written here beside the status labels because both are the same problem: a
+;; page that names a ladder and a page that names a state are both naming
+;; something the reader was never shown in English, and neither label may be
+;; built somewhere only one of those pages can reach.
+(define-public (deck-label G_ deck)
+  "The words a reader is shown for the ladder DECK deals."
+  (cond
+    ((equal? deck "sizes")
+     (G_ "t-shirt sizes"))
+    ((equal? deck "points")
+     (G_ "story points"))
+    (else deck)))
+
 (define-public (status-label G_ specs status)
   "The label a reader is shown for STATUS, resolved through SPECS and
 translated when it is one of the shipped labels."

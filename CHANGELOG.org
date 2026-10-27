@@ -148,11 +148,52 @@ itself current: a small state endpoint answers whether each seat has played and
 never which card -- there is no field in it for one, so a browser cannot be told
 early however it asks -- and the page patches the seat marks in place, re-reading
 itself only when the round has moved on or the cards have been turned over.
-Nothing in the section needs a permission, and nothing in it writes to a ticket:
-the agreed card is put on the ticket afterwards, from the ticket's own page.
+Playing a card needs no permission at all, which is the point of the section.
 
-Four tables come with it -- ~poker_room~, ~poker_item~, ~poker_participant~ and
-~poker_vote~ -- and ~maak migrate~ applies them the same way.
+The one part of it that does is *writing the answer down*: once the room has
+agreed on a single card, a reader whose account holds ~lucidplan:ticket-create~
+-- the permission a ticket's own estimate is changed with, and the one the
+endpoint behind the panel asks for, so the control is offered exactly when
+pressing it would be honoured -- can put that card onto a ticket's estimate, on
+the ladder the room dealt.  The write goes through the same column, the same
+ladder and the same kind of activity row the ticket's own page writes: the other
+estimate is left alone, the change is recorded against the ticket with the
+account that made it, and the round remembers where its number went, as a link
+beside the question it settled.  A split round has nothing to write -- a tie is
+not an agreement -- and neither has a round nobody played.
+
+A table can also be opened *for* a ticket, from that ticket's own page, and is
+then about it for as long as it stands: it is named after the ticket, its first
+round asks the ticket, every round it deals is estimated for it, and the push at
+the end is one button naming the ticket rather than a number typed into it.  A
+table opened for nothing -- from the list of tables -- is asked where its answer
+goes, as it always was.  Which ticket a table is for is the room's own two
+columns, and where a round's number went is still the round's own: the two are
+not the same fact, and a table whose ticket has since been deleted says so
+instead of offering a button that would be refused.  Opening a table for a ticket
+asks ~lucidplan:ticket-create~, the permission the estimate it will hold is
+changed with; playing a card at it still does not.
+
+Four tables come with all of this -- ~poker_room~, ~poker_item~,
+~poker_participant~ and ~poker_vote~ -- together with the two columns a settled
+round keeps to say which ticket took its number, the two a table keeps to say
+which ticket it was opened for, and ~maak migrate~ applies all of it the same
+way.
+
+A ticket's own page was laid out again, since it is where the work on a ticket
+is read as much as written.  The card and the panels under it -- the plan, the
+hours the ticket has cost, the discussion, the files, the activity and the
+versions -- stand in one column of a readable width rather than stretched across
+the screen; the labels above the controls are quiet enough to read past; and
+what a reader does with a ticket -- asking the team for an estimate, changing
+it, deleting it -- is one line at the foot of the card instead of a column of
+its own.  A comment is drawn as the card its replies hang under rather than as a
+paragraph with a number over it, and a panel's heading is ruled off from the
+rows it opens, which is what makes a panel of many rows read as one section of a
+ticket rather than as a run of cards.  Every stamp the ticket's own record keeps
+-- in the activity trail, under a comment and on a version alike -- is shown as
+the date and the time of day it happened, ~2026-10-27 18:14~, instead of as the
+epoch second the schema stores.
 
 ~maak i18n-update-template~ was fixed: it passed an unmatched glob for
 ~lib/lucidplan/job/~ to xgettext, which then stopped without writing the

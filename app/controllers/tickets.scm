@@ -1959,7 +1959,15 @@ history entry that says somebody is better than one that fails to render."
                                                            (assq-ref
                                                             ticket-assignee-user
                                                             'username))
-                                            #:editable? editable?)))
+                                            #:editable? editable?
+                                            ;; The ticket's own page is the
+                                            ;; one card that offers to
+                                            ;; estimate it at a table, and it
+                                            ;; offers that to the reader the
+                                            ;; estimate menus above are drawn
+                                            ;; for -- the endpoint behind it
+                                            ;; asks the same permission.
+                                            #:planning-table? editable?)))
            (response-emit (:mime rc
                                  (html-template (:i18n rc)
                                                 #:title (assq-ref t
@@ -1973,21 +1981,35 @@ history entry that says somebody is better than one that fails to render."
                                                 #:is-logged-in (:cookies-value
                                                                 rc
                                                                 "x-bewaking-lucidplan")
-                                                #:body `(,(a (format #f
+                                                ;; One column, centred and of a
+                                                ;; readable width: the card and
+                                                ;; the panels under it are the
+                                                ;; page, and a page stretched
+                                                ;; across a wide screen leaves
+                                                ;; a reader hunting for the
+                                                ;; ends of its own lines.
+                                                #:body `((div (@ (class ,(mk-class '(w-full
+                                                                                     max-w-256
+                                                                                     mx-auto
+                                                                                     flex
+                                                                                     flex-col
+                                                                                     gap-4
+                                                                                     px-3
+                                                                                     md:px-6
+                                                                                     py-6))))
+                                                              ,(a (format #f
                                                               "← back to backlog: ~a"
                                                               (params rc
                                                                "project"))
-                                                             #:size '(text-md
-                                                                      px-2)
+                                                             #:size '(text-sm
+                                                                      w-fit)
                                                              #:href (format #f
                                                                             "/tickets/~a"
 
                                                                             (params
                                                                              rc
                                                                              "project")))
-                                                         (div (@ (class ,(mk-class '
-                                                                          (p-2))))
-                                                              ,ticket-card)
+                                                              ,ticket-card
                                                          ,(html-ticket-collaboration
                                                            (:i18n rc)
                                                            #:project (params
@@ -2031,7 +2053,7 @@ history entry that says somebody is better than one that fails to render."
                                                                          rc
                                                                          #:token-name 'x-bewaking-lucidplan
                                                                          #:permission 'lucidplan:ticket-delete))
-                                                         ,@quiet-notice))))))
+                                                              ,@quiet-notice)))))))
        ;; An address naming a ticket that does not exist is a wrong turn, not
        ;; a page: the reader is sent back to the backlog they came from
        ;; rather than shown a ticket with nothing in it.

@@ -16,8 +16,8 @@
 ;; along with lucidplan.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; The rules a planning table is made of: the two decks it can deal, the
-;;; cards of each, what a round of cards adds up to, and the seat a browser
-;;; holds without an account.
+;;; cards of each, what a round of cards adds up to, the ticket a table was
+;;; opened for, and the seat a browser holds without an account.
 ;;;
 ;;; The first two things checked here are the two that decide whether the
 ;;; section works at all.  One is that a card is a card of the room's own
@@ -247,6 +247,80 @@
                              #:expect #f
                              #:got (poker-spread "points" '())))))
 
+;;; ====== what a table may write onto a ticket ======
+;;;
+;;; A table answers with a card, and the card it may write down is a narrower
+;;; thing than the card a facilitator has to look at: a round the room split
+;;; over is a round to talk about, so it has no number to take, and the panel
+;;; that offers the push is drawn from this answer rather than from the tally.
+;;;
+;;; The deck decides which column of a ticket the number belongs in, and that
+;;; column is then handed to the very check the ticket's own page uses.  The
+;;; pair is what makes the push safe: a card a table agreed on cannot become an
+;;; estimate no ticket could have been given, because the ladder the room dealt
+;;; and the ladder the column accepts are the same ladder.
+
+(define agreement-suite
+  (suite "what a table may write onto a ticket"
+         (test "a room that agreed on one card has a number to take"
+               (assert-equal #:name "the card everybody played"
+                             #:expect "5"
+                             #:got (poker-agreed-card "points" '("5" "5" "5")))
+               (assert-equal #:name "the card most of it played"
+                             #:expect "5"
+                             #:got (poker-agreed-card "points"
+                                                     '("5" "5" "8")))
+               (assert-equal #:name "a size is a card too"
+                             #:expect "m"
+                             #:got (poker-agreed-card "sizes" '("m" "m" "l"))))
+         (test "a room that split has nothing to write down"
+               ;; The tally names both cards, because a facilitator has to see
+               ;; the split; the push takes neither, because a split is not an
+               ;; agreement.
+               (assert-equal #:name "an even split takes no number"
+                             #:expect #f
+                             #:got (poker-agreed-card "points" '("5" "2")))
+               (assert-equal #:name "and the tally still names both"
+                             #:expect '("2" "5")
+                             #:got (poker-most-chosen "points" '("5" "2"))))
+         (test "a round nobody played has nothing to write down"
+               (assert-equal #:name "no cards, no number"
+                             #:expect #f
+                             #:got (poker-agreed-card "points" '())))
+         (test "the deck a table deals is the column a ticket carries"
+               (assert-equal #:name "points are the ticket's points"
+                             #:expect "estimate-points"
+                             #:got (poker-estimate-field "points"))
+               (assert-equal #:name "sizes are the ticket's size"
+                             #:expect "estimate-size"
+                             #:got (poker-estimate-field "sizes"))
+               (assert-equal #:name "a deck with no column has none"
+                             #:expect #f
+                             #:got (poker-estimate-field "beans")))
+         (test "an agreed card is a change a ticket would accept"
+               ;; The card goes through the same check the ticket's own inline
+               ;; estimate goes through, so the two cannot drift apart.
+               (assert-equal #:name "the agreed points are a submitable change"
+                             #:expect '((estimate-points . "8"))
+                             #:got (ticket-field-change
+                                    (poker-estimate-field "points")
+                                    (poker-agreed-card "points" '("8" "8"))))
+               (assert-equal #:name "and the agreed size is one too"
+                             #:expect '((estimate-size . "xl"))
+                             #:got (ticket-field-change
+                                    (poker-estimate-field "sizes")
+                                    (poker-agreed-card "sizes" '("xl" "xl")))))
+         (test "a card the ladder does not hold is not a change"
+               ;; The ladders are the same list on purpose, but the check is
+               ;; what keeps them so: a value the column does not accept is
+               ;; refused rather than written.
+               (assert-equal #:name "a number the team does not estimate with"
+                             #:expect #f
+                             #:got (ticket-field-change "estimate-points" "4"))
+               (assert-equal #:name "a size nobody sizes at"
+                             #:expect #f
+                             #:got (ticket-field-change "estimate-size" "xxxl")))))
+
 ;;; ====== the name somebody signs in with ======
 
 (define name-suite
@@ -355,6 +429,43 @@
                                #:expect "secret-new"
                                #:got (poker-seat-token grown "room-new"))))))
 
+;;; ====== the ticket a table was opened for ======
+
+(define table-ticket-suite
+  (suite "the ticket a table is about"
+         (test "a table opened for a ticket answers which one"
+               ;; The two columns are the room's own, and what they answer is
+               ;; what the push onto a ticket reads instead of asking the
+               ;; reader again: a table opened from a ticket's page estimates
+               ;; that ticket for every round it deals.
+               (assert-equal #:name "the project and the number in it"
+                             #:expect '((project . "lucidplan")
+                                        (number . 479))
+                             #:got (poker-room-ticket
+                                    '((id . "room-1")
+                                      (title . "Estimate the diagram upload")
+                                      (deck . "points")
+                                      (ticket-project . "lucidplan")
+                                      (ticket-number . 479)))))
+         (test "a table opened for nothing is about no ticket"
+               ;; Every room the section already held, and every room opened
+               ;; from the list of tables, reads its ticket as nothing -- which
+               ;; is what the push reads as "ask the reader where it goes".
+               (assert-equal #:name "a room with no ticket columns at all"
+                             #:expect #f
+                             #:got (poker-room-ticket
+                                    '((id . "room-1")
+                                      (title . "Drafted sizes")
+                                      (deck . "sizes"))))
+               (assert-equal #:name "a project and no number"
+                             #:expect #f
+                             #:got (poker-room-ticket
+                                    '((ticket-project . "lucidplan"))))
+               (assert-equal #:name "a number and no project"
+                             #:expect #f
+                             #:got (poker-room-ticket
+                                    '((ticket-number . 479)))))))
+
 (define (spec)
-  (veritas-run deck-suite card-suite face-down-suite tally-suite name-suite
-               seat-suite))
+  (veritas-run deck-suite card-suite face-down-suite tally-suite
+               agreement-suite name-suite seat-suite table-ticket-suite))

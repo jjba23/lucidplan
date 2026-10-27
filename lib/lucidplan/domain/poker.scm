@@ -40,6 +40,7 @@
   #:export (get-rooms get-room-by-id insert-room soft-delete-room
                          get-items-by-room get-current-item insert-item
                          reveal-item-by-id hide-item-by-id
+                         record-item-ticket-by-id
                          get-participants-by-room
                          get-participant-by-token insert-participant
                          update-participant-by-id get-votes-by-item upsert-vote))
@@ -83,7 +84,9 @@ closing a table ends the meeting, it does not erase what it decided.")
                        (get-current-item-proc repo-get-current-item)
                        (insert-item-proc repo-insert-item)
                        (reveal-item-by-id-proc repo-reveal-item-by-id)
-                       (hide-item-by-id-proc repo-hide-item-by-id))
+                       (hide-item-by-id-proc repo-hide-item-by-id)
+                       (record-item-ticket-by-id-proc
+                        repo-record-item-ticket-by-id))
 
 (define-repo-method get-items-by-room repo-get-items-by-room
  "Retrieves every item ROOM-ID has asked about, in the round order.
@@ -102,6 +105,16 @@ rather than a wrong item.")
 
 (define-repo-method insert-item repo-insert-item
                     "Inserts a new item using ATTRS into the given REPO.")
+
+(define-repo-method record-item-ticket-by-id repo-record-item-ticket-by-id
+ "Remembers that the item ITEM-ID was agreed and written onto a ticket.
+
+PROJECT and NUMBER name the ticket the way its own addresses name it, so the
+table can say where the number went and link there.  Only the round that was
+written onto a ticket answers with one, which is why this is a column set once
+rather than a flag on the ticket: what a room said and what a backlog now
+carries are two facts, and a reader looking at a settled round asks which one
+it became.")
 
 (define-repo-method reveal-item-by-id repo-reveal-item-by-id
  "Turns the cards over on the item ITEM-ID, as of now.
