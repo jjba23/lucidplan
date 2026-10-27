@@ -101,7 +101,7 @@
     ;; -- Who to credit and how to reach them -----------------------------
     (copyright-holder . "Josep Bigorra")
     (contact-email . "jjbigorra@gmail.com")
-    (source-url . "https://codeberg.org/jjba23/lucidplan")
+    (source-url . "https://github.com/jjba23/lucidplan")
     (manual-url . "https://jointhefreeworld.org/manuals/lucidplan/")
     (donate-url . "https://bmc.link/jjbigorra")
     ;; A list of (label . url) pairs shown on the about page.  Empty by
