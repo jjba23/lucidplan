@@ -7,7 +7,7 @@
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://jointhefreeworld.org/static/css/jointhefreeworld.css" />
 
 [[https://jointhefreeworld.org/ggg/dist/lucidplan.svg]] [[https://jointhefreeworld.org/ggg/dist/scheme-guile.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-guix.svg]] [[https://jointhefreeworld.org/ggg/dist/maak.svg]] [[https://jointhefreeworld.org/ggg/dist/hygguile.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-artanis.svg]]
-[[https://jointhefreeworld.org/ggg/dist/license-agpl3+.svg]] [[https://jointhefreeworld.org/ggg/dist/license-fdl13+.svg]] [[https://jointhefreeworld.org/ggg/dist/jointhefreeworld-org.svg]] [[https://img.shields.io/badge/CI-Byggsteg%20%7C%20Woodpecker-2ea44f.svg]]
+[[https://jointhefreeworld.org/ggg/dist/license-agpl3+.svg]] [[https://jointhefreeworld.org/ggg/dist/license-fdl13+.svg]] [[https://jointhefreeworld.org/ggg/dist/jointhefreeworld-org.svg]] [[https://img.shields.io/badge/CI-Byggsteg%20%7C%20GitHub-2ea44f.svg]]
 
 /free and open project management for everyone/
 
@@ -1228,8 +1228,14 @@ maak test
 They live under ~test/veritas/~: ~unit/~ for the tests that run on every change,
 and ~benchmark/~ for those that measure rather than assert. A test is a module
 like any other and is loaded with the application's own directories on the path,
-so it can ~use-modules~ what it tests. Every push to the main branch runs the
-suite on [[https://codeberg.org/jjba23/byggsteg][byggsteg]] before anything is deployed.
+so it can ~use-modules~ what it tests. Every push to the trunk branch runs the
+suite on [[https://codeberg.org/jjba23/byggsteg][byggsteg]] before anything is deployed: =GitHub Actions= is asked for that
+job by [[./.github/workflows/ci.yml][.github/workflows/ci.yml]], which calls
+[[https://github.com/jjba23/byggsteg-github][byggsteg-github]]'s reusable workflow
+rather than carrying the steps in this repository. The job is the same three
+tasks as it has always been -- ~maak-test~, ~pull-and-restart~ and
+~maak-deploy~ -- run by the daemon that file names, and the build goes green or
+red according to what the deployment said it did.
 
 ** Translations
 :PROPERTIES:

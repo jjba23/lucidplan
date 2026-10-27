@@ -200,6 +200,15 @@ epoch second the schema stores.
 template at all.  A directory that is not there is now left out of the list
 rather than passed on.
 
+The pipeline moved to GitHub.  A push to ~trunk~ is built by =GitHub Actions=,
+which calls [[https://github.com/jjba23/byggsteg-github][byggsteg-github]]'s
+reusable workflow and hands Byggsteg the same three tasks and the same daemon as
+before, so what is deployed, and how, is unchanged; only the asking is.
+~.woodpecker/byggsteg.yaml~ is gone, and its replacement,
+~.github/workflows/ci.yml~, is a handful of lines, four of which say what to
+run.  The bridge is untouched -- it was never Woodpecker's to begin with, and
+the image that runs the job is the same one.
+
 * v1.8.0
 
 New tickets are announced by email. When a ticket is created, [[https://codeberg.org/jjba23/pingwing][pingwing]] is asked for the ~lucidplan-new-ticket~ template and it goes to everyone who takes part in the project -- every user the project has assigned a ticket to, the ticket's assignee and the person who opened it. A message counts as sent only when the service answers that it took it: a service that cannot be reached, or that refuses the task, is retried, logged with what it said, and never fails the write. See ~What the mail service is asked to send~ in the README.

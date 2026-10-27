@@ -1,0 +1,59 @@
+# lucidplan - the CI/CD orchestrator written in Guile Scheme
+
+# Copyright © Josep Bigorra <jjbigorra@gmail.com>
+
+# lucidplan is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# lucidplan is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+
+# You should have received a copy of the GNU Affero General Public License
+# along with lucidplan.  If not, see <https://www.gnu.org/licenses/>.
+
+# The pipeline: a push to the trunk branch hands Byggsteg a job and follows it
+# to a green or a red build, which is the whole of it -- nothing here runs a
+# command of its own, because the job is Byggsteg's to run and this is only the
+# asking.
+#
+# The steps are not written out here: they are the reusable workflow of
+# jjba23/byggsteg-github, so the bridge that drives Byggsteg is the same one
+# every project using it calls, and a fix to it is a fix for all of them. Which
+# means the interesting part below is the request: the tasks, the daemon, and
+# which branch a run is about.
+
+name: CI
+
+on:
+  push:
+    branches: [trunk]
+
+# The bridge clones and builds the repository it is told to build; it pushes and
+# publishes nothing, and is handed no token to do either with.
+permissions:
+  contents: read
+
+jobs:
+  byggsteg:
+    name: 🧱 Byggsteg
+    uses: jjba23/byggsteg-github/.github/workflows/byggsteg.yml@trunk
+    with:
+      # The suite, then the daemon's own checkout brought up to this commit and
+      # restarted, then the deployment. A red build says which of the three
+      # failed.
+      tasks: maak-test pull-and-restart maak-deploy
+      daemon-name: lucidplan-daemon
+      # The project, the branch and the clone address are deliberately not named:
+      # on GitHub they are the repository's name, the branch this run is about,
+      # and the repository over HTTPS, which is what the bridge works out from
+      # the run's context. Set them here to say otherwise.
+      #
+      # A ceiling on the waiting, not a target: the deployment clones, tests and
+      # restarts, and the bridge keeps following the job's log until it says it
+      # has finished.
+      timeout-minutes: 120
+    secrets: inherit
