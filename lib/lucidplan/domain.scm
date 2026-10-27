@@ -990,3 +990,258 @@ of the chart, said once for a reader who does not want to read a chart."
           (cons 'completed completed)
           (cons 'remaining (max 0
                                (- scope completed))))))
+
+;;; ===== Planning poker =====
+;;;
+;;; A table a team sits at to put a number on something.  Nothing in this
+;;; section knows about accounts, requests or rows: it is the arithmetic and
+;;; the reading a planning table is made of, so that the page, the endpoint
+;;; that hands a polling browser its state, and the test that watches all of
+;;; it agree about what a room is saying.
+;;;
+;;; There are two decks, and they are the two ladders a ticket is already
+;;; estimated on -- `ticket-points' and `ticket-sizes' -- rather than a third
+;;; list kept beside them.  A team that estimates in powers of two edits one
+;;; line, and both the ticket's own estimate menu and the cards a table deals
+;;; follow, which is what keeps a number agreed at a table from being a
+;;; number no ticket can be given.
+;;;
+;;; A card is carried as the text the ladder stores -- `"5"', `"m"' -- not as
+;;; a number, because the two decks are different kinds of thing and a value
+;;; that had to be a number would leave every size unreadable to the code
+;;; that wrote it.  Everything below therefore reads and answers text, and the
+;;; one place a number is wanted -- the mean of a round of story points -- is
+;;; the one place that asks the ladder for one.
+
+(define-public poker-decks
+  '("points" "sizes"))
+
+(define-public (poker-deck-label deck)
+  "Answer the words a reader is shown for DECK."
+  (cond
+    ((equal? deck "sizes")
+     "t-shirt sizes")
+    ((equal? deck "points")
+     "story points")
+    (else deck)))
+
+(define-public (parse-poker-deck value)
+  "Answer the deck VALUE names, or @code{#f} when no deck is named.
+
+A form is not a promise, so a deck the table does not deal is refused rather
+than guessed at: a room built on a ladder nothing knows would have no card to
+show and no vote it could check."
+  (and (string? value)
+       (let ((deck (string-downcase (string-trim-both value))))
+         (and (member deck poker-decks) deck))))
+
+(define-public (poker-cards deck)
+  "Answer the cards DECK deals, as @code{(value . label)} pairs.
+
+The order is the ladder's own, which is the order a hand of cards is held in
+and the order a tally is read in -- low to high, so a room looking at its own
+votes reads them as a spread rather than as a list of who happened to pick
+what when."
+  (cond
+    ((equal? deck "sizes")
+     (map (lambda (size)
+            (cons size (ticket-size-label size))) ticket-sizes))
+    ((equal? deck "points")
+     (map (lambda (points)
+            (cons (number->string points)
+                  (number->string points))) ticket-points))
+    (else '())))
+
+(define-public (poker-card-rank deck value)
+  "Answer how far along DECK the card VALUE sits, or @code{#f}.
+
+A rank is what makes the sizes orderable at all: `xs' and `xxl' are words,
+and only the ladder says which of them is the low end of a spread."
+  (let loop
+    ((cards (poker-cards deck))
+     (rank 0))
+    (cond
+      ((null? cards) #f)
+      ((equal? (caar cards) value) rank)
+      (else (loop (cdr cards) (+ rank 1))))))
+
+(define-public (parse-poker-card deck value)
+  "Answer VALUE as the card DECK deals it, or @code{#f} for a card nobody deals.
+
+The answer is the deck's own spelling -- @code{\"5\"} for a number a team
+burns down, @code{\"m\"} for a t-shirt size -- which is what a vote is
+stored as and what the ladder was checked against, so a card that arrives
+from a form and a card read back from the database are the same text."
+  (cond
+    ((equal? deck "sizes") (parse-estimate-size value))
+    ((equal? deck "points") (let ((points (parse-estimate-points value)))
+                              (and points (number->string points))))
+    (else #f)))
+
+(define-public (poker-card-label deck value)
+  "Answer the face a reader is shown for the card VALUE on DECK.
+
+A size is shown in capitals, the way it is shown everywhere else in the
+application; a number is already what it says."
+  (cond
+    ((equal? deck "sizes") (ticket-size-label value))
+    ((number? value) (number->string value))
+    ((string? value) value)
+    (else (format #f "~a" value))))
+
+;; The face-down rule, said once.  A planning table only works if nobody can
+;; read the room before the cards are turned over, so what a browser may know
+;; about a vote is decided here rather than in whichever page happens to draw
+;; it -- a page that carried the faces and drew them face down would be one
+;; browser-tools window away from spoiling the vote, and a polling endpoint
+;; that answered with them would hand the same room to anybody watching the
+;; network.
+(define-public (poker-vote-face deck revealed? value)
+  "Answer the card a vote VALUE is drawn as, or @code{#f} while the cards are
+face down.
+
+VALUE is the card a participant played; the answer is its label once the room
+has been revealed, and nothing at all before then."
+  (and revealed? value (poker-card-label deck value)))
+
+;;; --- what a round of cards adds up to ---
+
+(define-public (poker-counts deck values)
+  "Answer how many times each card of DECK was played in VALUES.
+
+One row per card that was played at least once -- @code{(value . count)} --
+in the deck's own order, so a tally is read in the order the cards are dealt
+rather than in the order they happened to be picked.  A card nobody played is
+not a row: a count of zero says nothing about a room."
+  (filter (lambda (row)
+            (> (cdr row) 0))
+          (map (lambda (card)
+                 (cons (car card)
+                       (length (filter (lambda (value)
+                                         (equal? value (car card)))
+                                       values))))
+               (poker-cards deck))))
+
+(define-public (poker-most-chosen deck values)
+  "Answer the cards VALUES played most often, in the deck's own order.
+
+More than one card answers when the room is split evenly between them, which
+is what a facilitator has to see: a tie is not a consensus, and a page that
+picked one of two equal cards would be inventing an agreement nobody made.
+A round nobody played answers nothing at all."
+  (let* ((counts (poker-counts deck values))
+         (top (apply max 0 (map cdr counts))))
+    (if (= top 0)
+        '()
+        (map car (filter (lambda (row)
+                           (= (cdr row) top)) counts)))))
+
+(define-public (poker-average deck values)
+  "Answer the mean of VALUES on DECK, or @code{#f} when there is no mean.
+
+Only the story points have a mean.  The sizes are words, and their average is
+a number nobody asked for: `L' is not half way between `M' and `XL'.  A round
+with nothing played, and a round whose values are not cards of this deck, have
+no mean either."
+  (let ((numbers (filter number? (map parse-estimate-points values))))
+    (if (or (not (equal? deck "points")) (null? numbers)) #f
+        (exact->inexact (/ (apply + numbers) (length numbers))))))
+
+(define-public (poker-spread deck values)
+  "Answer the two ends of the room's disagreement, or @code{#f} for none.
+
+A spread is the read-out a facilitator acts on: thirteen points against two is
+a conversation, and a room that all played the same card has nothing to
+discuss.  A single card, and a round nobody played, are no spread at all, and
+a value the deck does not deal is left out rather than counted as an end."
+  (let ((ranks (filter-map (lambda (value)
+                             (poker-card-rank deck value))
+                           values)))
+    (if (< (length (delete-duplicates ranks)) 2) #f
+        (let ((cards (poker-cards deck)))
+          (list (cons 'low (car (list-ref cards (apply min ranks))))
+                (cons 'high (car (list-ref cards (apply max ranks)))))))))
+
+;;; --- the name a participant is known by ---
+
+(define-public poker-name-max-length
+  40)
+
+(define-public (parse-participant-name value)
+  "Answer the name a participant signed in with, or @code{#f} when there is none.
+
+A name is the only thing asked of somebody joining a table -- there is no
+account to make, and no password to remember -- so it is read forgivingly:
+space around it is not part of it, and a run of spaces inside it is one space.
+It is refused only when there is nothing left, and capped because a name is
+the label on a card rather than a message."
+  (and (string? value)
+       (let ((name (string-join (string-tokenize value) " ")))
+         (and (not (string-null? name))
+              (<= (string-length name) poker-name-max-length)
+              name))))
+
+;;; --- the seat a browser holds ---
+;;;
+;;; A participant is a name and a secret, never an account.  The secret is
+;;; handed out when somebody takes a seat and travels in one cookie for the
+;;; whole section -- one name, rather than a cookie per room -- whose value is
+;;; a small map of room to secret, so sitting at a second table does not cost
+;;; a reader their seat at the first.  Both halves of an entry are UUIDs,
+;;; neither of which can contain either separator, so the value reads back
+;;; without any escaping of its own.
+
+(define-public poker-token-cookie
+  "x-lucidplan-poker")
+
+(define poker-token-room-separator
+  "~")
+
+(define poker-token-seat-separator
+  "|")
+
+;; A cookie is sent on every request, so the map is capped: a browser that has
+;; sat at a great many tables keeps the ones it was at most recently rather
+;; than growing a header without limit.
+(define-public poker-seats-kept
+  8)
+
+(define-public (poker-seats value)
+  "Answer the seats a poker cookie VALUE holds, most recent first.
+
+Anything that is not a well-formed entry -- a truncated value, a hand-edited
+cookie, somebody else's cookie from another application -- is left out rather
+than answered as a seat, so a malformed header is simply a reader who is not
+seated anywhere."
+  (if (not (string? value))
+      '()
+      (filter-map (lambda (entry)
+                    (let ((parts (string-split entry #\~)))
+                      (and (= (length parts) 2)
+                           (not (string-null? (car parts)))
+                           (not (string-null? (cadr parts)))
+                           (cons (car parts) (cadr parts)))))
+                  (string-split value #\|))))
+
+(define-public (poker-seat-token value room)
+  "Answer the seat VALUE holds at ROOM, or @code{#f} when it holds none."
+  (let ((seat (assoc room (poker-seats value))))
+    (and seat (cdr seat))))
+
+(define-public (poker-seat-remember value room token)
+  "Answer VALUE with the seat ROOM/TOKEN written in front of it.
+
+The newest seat is written first and the map is capped at
+@code{poker-seats-kept}, so the tables a reader was last at are the ones that
+survive."
+  (let* ((others (filter (lambda (seat)
+                           (not (equal? (car seat) room)))
+                         (poker-seats value)))
+         (kept (take others
+                     (min (length others)
+                          (- poker-seats-kept 1)))))
+    (string-join (map (lambda (seat)
+                        (format #f "~a~a~a" (car seat)
+                                poker-token-room-separator (cdr seat)))
+                      (cons (cons room token) kept))
+                 poker-token-seat-separator)))

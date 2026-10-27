@@ -44,9 +44,14 @@
   #:use-module (lucidplan domain)
   #:use-module (artanis route))
 
+;; The scripts an instance ships, read once at start-up and inlined into the
+;; page that needs them.  Two of them are on every page, because what they do
+;; -- dragging a ticket, saying how strong a password is -- can happen on any
+;; of them; `poker.js' is only on the page of somebody sitting at a table, so
+;; it is read into the library here and spliced in by that page alone.
 (define-public asset-library
   (build-asset-library '("pub/js/tickets.js" "pub/js/symbanta.js"
-                         "pub/js/password-strength.js")))
+                         "pub/js/password-strength.js" "pub/js/poker.js")))
 
 ;; The footer says only what a footer is for: what this instance is, under
 ;; which licence, where to read more, and how to get back to the top.  The
@@ -500,6 +505,34 @@ run against a default address somebody else runs."
                                           (href "/projects"))
                                        ,(icon-button #:icon 'align-bottom
                                                      #:content (G_ "projects")
+                                                     #:size '(text-sm
+                                                              md:text-md)
+                                                     #:extra-classes '(py-1
+                                                                       px-2
+                                                                       md:px-3
+                                                                       max-w-prose
+                                                                       cursor-pointer
+                                                                       text-onyx-700
+                                                                       dark:text-stone-300)
+                                                     #:icon-css '(text-md
+                                                                  text-onyx-700
+                                                                  dark:text-stone-300)))
+
+                                    ;; Planning Poker Link.  It sits with
+                                    ;; the other links rather than behind
+                                    ;; the signed-in branch, because a table
+                                    ;; is exactly where the people without
+                                    ;; an account on this instance are.
+                                    (a (@ (class ,(mk-class '(lowercase
+                                                              no-underline
+                                                              font-sans
+                                                              font-medium
+                                                              flex
+                                                              items-center
+                                                              hover:opacity-80)))
+                                          (href "/poker"))
+                                       ,(icon-button #:icon 'cards
+                                                     #:content (G_ "poker")
                                                      #:size '(text-sm
                                                               md:text-md)
                                                      #:extra-classes '(py-1

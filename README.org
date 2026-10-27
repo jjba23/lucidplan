@@ -146,6 +146,12 @@ organized:
   as a date a reader has to compare against a calendar.  A milestone is a
   result the project promised by a date, several sprints may feed one, and the
   page keeps a running account of how much of each is done.
+- *Planning poker*: a table a team sits at to put a number on the next thing,
+  and nobody at it needs an account.  Somebody opens a meeting, names what is
+  being estimated and chooses how the room estimates -- story points or t-shirt
+  sizes -- and everybody else takes a seat by typing a name.  Every card stays
+  face down until the table turns them over, and what the room said is counted
+  out beside the seats.
 - *Email notifications*: a new ticket is announced to everyone taking part in
   the project.
 - *A [[https://en.wikipedia.org/wiki/Representational_state_transfer][REST]] [[https://en.wikipedia.org/wiki/API][API]]*: =/api/v1= hands tickets and projects to your scripts, with the
@@ -504,6 +510,74 @@ the top of either.  Deleting a milestone leaves its tickets where they are --
 they simply no longer count toward anything -- for the same reason deleting a
 sprint does: a milestone is a promise about the work, and withdrawing the
 promise does not withdraw the work.
+
+** Planning poker
+:PROPERTIES:
+:CUSTOM_ID: planning-poker
+:END:
+
+Estimating a backlog is a conversation, and planning poker is how most teams
+have it: everybody puts a card down at the same time, the cards are turned over
+together, and the two people who played a three and a thirteen get to explain
+themselves before anybody averages anything.  The section is at *poker* in the
+header.
+
+Nobody at a table needs an account, and that is the point rather than a
+shortcut.  An estimation meeting is where the people who are not in this
+instance turn up -- a product owner, somebody from another team, a guest for the
+afternoon -- and a tool that asks each of them to register before they may say
+"five" is a tool the meeting works around.  So a seat is a name somebody typed
+and a secret their browser holds in a cookie: type a name, press *sit down*, and
+you are at the table.  Nothing else is asked for, and the page says so.
+
+A *table* is a meeting.  Opening one names it -- "Sprint 12 planning" -- names
+the first thing it is estimating, and picks the deck it estimates with: *story
+points*, the numbers a team burns down, or *t-shirt sizes*, which is what a first
+pass through a backlog is usually written in.  The deck belongs to the meeting
+and not to the round, because a team that estimates in t-shirt sizes does so all
+afternoon, and a room that changed its ladder halfway through would leave its
+own record of what was agreed unreadable.  The *tables you could sit at* list
+shows the meetings still open with the question each is asking, how many rounds
+it is on and how many people have taken a seat.
+
+Sitting at a table shows the seats, your hand, and the round: who has played --
+never what they played -- and the question being estimated.  Playing a card is
+one click, changing your mind is another, and the card you hold is marked as
+yours.  The cards stay face down until somebody presses *turn the cards over*,
+and until then the page says only that a seat has played: a browser that asked
+early is told nothing rather than told a smaller something, and the endpoint
+behind the page has no field for a card in it at all.
+
+Turning the cards over is where the conversation goes to.  Each seat shows the
+card it played, and *what the room said* counts the table out: one bar per card,
+the card the room agrees on -- or the two cards it is split between, because a
+tie is not an agreement -- the range the votes ran from, whether everybody
+played the same card, and the average.  Both decks are configurable: the ladders
+are ~poker-decks~ in ~lib/lucidplan/domain/poker.scm~, and the pages, the labels
+and the tally are all built from them.
+
+Once the cards are over the table can be dealt the *next thing* to estimate, and
+the round it settled is kept under *already estimated* -- the question and the
+card the room agreed on -- so the record of the meeting is on the page rather
+than in somebody's notes.  An item the room dealt but never turned over is shown
+as unsettled rather than with the cards it was holding: a page about a meeting
+has no business publishing a round the table never looked at.  *Closing a table*
+takes it off the list of tables somebody could walk into, and keeps all of this
+readable, so what it estimated and what it decided are not lost with it.
+
+A table is the one page in LucidPlan several people look at at the same time, so
+it keeps itself current.  It asks the room's own state endpoint every few seconds
+and patches the seat marks in place -- a name changing from *waiting* to
+*played*, and the count in the heading above them -- while a round that has moved
+on or cards that have been turned over mean the page changes shape, so it is
+re-read rather than patched.  The server is the only thing that decides how a
+revealed round reads, so there is no second renderer to disagree with the first.
+
+What the section deliberately does not do is write the agreed number onto a
+ticket: a table answers with the card the room agreed on, and the number goes
+onto the ticket afterwards, from the ticket's own page -- which is where an
+account is needed and where the number belongs.  The meeting decides, and the
+backlog is written down after it.
 
 ** Keyboard Accessibility
 :PROPERTIES:

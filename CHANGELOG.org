@@ -124,6 +124,36 @@ complete record.  The README's ~Everything a ticket carries~ section has the
 details, and ~attachment-directory~ and ~attachment-max-bytes~ are in ~Instance
 configuration keys~.
 
+*Planning poker* is a section of its own, at ~/poker~: a table a team sits at to
+put a number on the next thing, and nobody at it needs an account.  That last
+part is the point rather than a shortcut -- an estimation meeting is where the
+people who are not in this instance turn up, and a tool that asks each of them to
+register before they may say "five" is a tool the meeting works around -- so a
+seat is a *name and a secret in a cookie*, not a user, and no row of the section
+points at ~user~.  A table is a meeting: it is named, it names the first thing it
+is estimating, and it picks the deck it estimates with, *story points* or
+*t-shirt sizes*.  Everybody else takes a seat by typing a name, plays a card
+with one click, and may change it with another; the cards stay face down until
+the table turns them over.  Turning them over shows each seat's card and counts
+the room out: one bar per card, the card the room agrees on -- or the two it is
+split between, because a tie is not an agreement -- the range the votes ran from,
+whether everybody played the same card, and the average.  The table is then dealt
+the next thing to estimate, and what it settled is kept on the page beside the
+questions still to come, so an item the room dealt but never turned over is shown
+as unsettled rather than with the cards it was holding.  Closing a table takes it
+off the list of tables somebody could walk into and keeps all of it readable.
+
+A table is also the one page several people look at at the same time, so it keeps
+itself current: a small state endpoint answers whether each seat has played and
+never which card -- there is no field in it for one, so a browser cannot be told
+early however it asks -- and the page patches the seat marks in place, re-reading
+itself only when the round has moved on or the cards have been turned over.
+Nothing in the section needs a permission, and nothing in it writes to a ticket:
+the agreed card is put on the ticket afterwards, from the ticket's own page.
+
+Four tables come with it -- ~poker_room~, ~poker_item~, ~poker_participant~ and
+~poker_vote~ -- and ~maak migrate~ applies them the same way.
+
 ~maak i18n-update-template~ was fixed: it passed an unmatched glob for
 ~lib/lucidplan/job/~ to xgettext, which then stopped without writing the
 template at all.  A directory that is not there is now left out of the list
