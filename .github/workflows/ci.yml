@@ -43,9 +43,8 @@ jobs:
     uses: jjba23/byggsteg-github/.github/workflows/byggsteg.yml@trunk
     with:
       # The suite, then the daemon's own checkout brought up to this commit and
-      # restarted, then the deployment. A red build says which of the three
-      # failed.
-      tasks: maak-test pull-and-restart maak-deploy
+      # restarted, then the deployment.
+      tasks: maak-test maak-migrate maak-deploy pull-and-restart
       daemon-name: lucidplan-daemon
       # The project, the branch and the clone address are deliberately not named:
       # on GitHub they are the repository's name, the branch this run is about,
@@ -55,5 +54,5 @@ jobs:
       # A ceiling on the waiting, not a target: the deployment clones, tests and
       # restarts, and the bridge keeps following the job's log until it says it
       # has finished.
-      timeout-minutes: 120
+      timeout-minutes: 60
     secrets: inherit
