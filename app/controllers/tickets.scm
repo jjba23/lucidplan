@@ -1452,13 +1452,21 @@ history entry that says somebody is better than one that fails to render."
 ;; stamped with the moment it changed, so nothing here is a second way of
 ;; writing a ticket; it is the first way, repeated.
 ;;
-;; What arrives is one field of ids and one value, and the value carries the
-;; kind of change in front of it ("epic:sign-in").  The kind is what is
-;; trusted; a value with no kind, or with one this page does not offer, is
-;; refused rather than guessed at.  A label is the exception only in that it is
-;; free text: it arrives in its own field and is added to whatever the ticket
-;; already carries, because a bulk change that *replaced* every label would be
-;; a way to lose data by pressing a button.
+;; What arrives is one field of ids, one value and one word.  The value carries
+;; the kind of change in front of it ("epic:sign-in"), and the kind is what is
+;; trusted: a value with one this page does not offer, or with a slug that
+;; names no epic of this project, is no change at all rather than a guess.  No
+;; kind at all means the reader left the menu on its first choice -- the one
+;; that changes nothing -- and is changing the labels alone, if anything.
+;;
+;; A label is not a kind of change: it is free text, so it arrives in a field
+;; of its own and is added to whatever the ticket already carries, because a
+;; bulk change that *replaced* every label would be a way to lose data by
+;; pressing a button.  It is added whatever the menu says, which is what makes
+;; it possible to tag a handful of rows without restating their epic or their
+;; status as a side effect, and a ticket that ends up with no change at all is
+;; not written: an untouched form is a reader changing their mind, not an edit,
+;; and the backlog can order by when a ticket last changed.
 (post "/tickets/:project/bulk"
       #:mime 'xml
       #:cookies '(names x-bewaking-lucidplan)
@@ -1498,57 +1506,79 @@ history entry that says somebody is better than one that fails to render."
                           (let ((ticket (get-ticket-by-project-human-id-and-human-id
                                          ticket-repo human-id ticket-human-id)))
                             (when ticket
-                              (cond
-                                ;; An epic, or none: the menu offers both, and
-                                ;; a slug that names no epic of this project is
-                                ;; not one of them.
-                                ((equal? kind "epic")
-                                 (when (or (string-null? value) epic)
-                                   (update-ticket-by-project-human-id-and-human-id
-                                    ticket-repo human-id ticket-human-id
-                                    `((epic-id unquote
-                                               (if epic
-                                                   (assq-ref epic 'id)
-                                                   ""))))))
-                                ((and (equal? kind "status")
-                                      (member value
-                                              (ticket-status-values statuses)))
-                                 (update-ticket-by-project-human-id-and-human-id
-                                  ticket-repo human-id ticket-human-id
-                                  `((ticket-status unquote value))))
-                                ((and (equal? kind "assignee")
-                                      assignee-ok?)
-                                 (let ((assignee-repo
-                                        (make-sqlite-ticket-assignee-repository
-                                         rc))
-                                       (project-id (assq-ref project 'id))
-                                       (ticket-id (assq-ref ticket 'id)))
-                                   (if (string-null? value)
-                                       (unassign-ticket-assignee assignee-repo
-                                                                 ticket-id)
-                                       (upsert-ticket-assignee
-                                        assignee-repo
-                                        `((project-id unquote project-id)
-                                          (ticket-id unquote ticket-id)
-                                          (user-id unquote value))))))
-                                ((and (equal? kind "label")
-                                      (not (string-null? label)))
-                                 ;; A label is added, never replaced: the words
-                                 ;; a ticket already carries are somebody's.
-                                 (update-ticket-by-project-human-id-and-human-id
-                                  ticket-repo human-id ticket-human-id
-                                  `((labels unquote
-                                            (labels-text
-                                             (string-join
-                                              (append (ticket-labels ticket)
-                                                      (parse-labels label))
-                                              ","))))))))
-                              ;; Every change is an edit, and the backlog can
-                              ;; order by when a ticket was last edited.
-                              (update-ticket-by-project-human-id-and-human-id
-                               ticket-repo human-id ticket-human-id
-                               `((updated-at unquote (current-time)))))))
-                        (delete-duplicates ids))
+                              (let* ( ;; The change of kind: at most one, named
+                                     ;; by the menu.  A kind the menu does not
+                                     ;; offer, or a slug that names no epic of
+                                     ;; this project, is no change at all
+                                     ;; rather than a guess.
+                                     (change (cond
+                                               ((equal? kind "epic")
+                                                (if (or (string-null? value)
+                                                        epic)
+                                                    `((epic-id unquote
+                                                               (if epic
+                                                                   (assq-ref
+                                                                    epic 'id)
+                                                                   "")))
+                                                    '()))
+                                               ((and (equal? kind "status")
+                                                     (member value
+                                                             (ticket-status-values
+                                                              statuses)))
+                                                `((ticket-status unquote value)))
+                                               (else '())))
+                                     ;; A label is not a kind of change: it is
+                                     ;; the free text typed beside the menu, so
+                                     ;; it is added to whatever the ticket
+                                     ;; already carries -- never in place of it,
+                                     ;; because the words a ticket carries are
+                                     ;; somebody's -- whatever the menu was left
+                                     ;; at, and only when something was typed.
+                                     (change (if (string-null? label)
+                                                 change
+                                                 (append change
+                                                         `((labels unquote
+                                                                   (labels-text
+                                                                    (string-join
+                                                                     (append
+                                                                      (ticket-labels
+                                                                       ticket)
+                                                                      (parse-labels
+                                                                       label))
+                                                                     ",")))))))
+                                     (assignee-change? (and (equal? kind
+                                                                    "assignee")
+                                                            assignee-ok?)))
+                                (when assignee-change?
+                                  (let ((assignee-repo
+                                         (make-sqlite-ticket-assignee-repository
+                                          rc))
+                                        (project-id (assq-ref project 'id))
+                                        (ticket-id (assq-ref ticket 'id)))
+                                    (if (string-null? value)
+                                        (unassign-ticket-assignee assignee-repo
+                                                                  ticket-id)
+                                        (upsert-ticket-assignee
+                                         assignee-repo
+                                         `((project-id unquote project-id)
+                                           (ticket-id unquote ticket-id)
+                                           (user-id unquote value))))))
+                                ;; A form that asked for nothing writes
+                                ;; nothing: pressing apply with the menu left on
+                                ;; its first choice and the field empty is a
+                                ;; reader changing their mind, not an edit, and
+                                ;; an edit would move the ticket in a backlog
+                                ;; ordered by when it last changed.
+                                (when (pair? change)
+                                  (update-ticket-by-project-human-id-and-human-id
+                                   ticket-repo human-id ticket-human-id change)
+                                  ;; Every change is an edit, and the backlog
+                                  ;; can order by when a ticket was last edited.
+                                  (update-ticket-by-project-human-id-and-human-id
+                                   ticket-repo human-id ticket-human-id
+                                   `((updated-at unquote
+                                                 (current-time)))))))))
+                        (delete-duplicates ids)))
             (redirect-to rc
                          (string->uri (format #f "~a/tickets/~a"
                                               (current-myhost) human-id))

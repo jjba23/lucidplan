@@ -881,6 +881,29 @@ at the first of them."
                           ,(label-chip label)))
                     labels)))))
 
+;; A field a reader types one word into, drawn quiet.
+;;
+;; It is deliberately not hygguile's `input'.  That one is the field of a form
+;; -- a label on a line of its own above a plate four times the height of the
+;; words around it -- which is right when filling the field in is what the page
+;; is for, and wrong here: this field sits in a row of links and menus that say
+;; how to read the list, and a plate among them turns one row of small
+;; decisions into a column of three.  So the field keeps the small frame the
+;; menu beside it wears, says its name in its placeholder and in `aria-label'
+;; for a reader who cannot see the placeholder, and takes no height of its own.
+(define* (quiet-field label #:key name value (required? #f))
+  `(input (@ (type "text")
+             (name ,name)
+             (value ,value)
+             ,@(if required? '((required "required")) '())
+             (placeholder ,label)
+             (aria-label ,label)
+             (class ,(mk-class '(text-sm rounded-lg px-2 py-1 w-40
+                                 bg-transparent border-2
+                                 border-stone-500/25
+                                 dark:border-onyx-100/25
+                                 text-onyx-700 dark:text-stone-300))))))
+
 ;; The saved filters: narrowings of this backlog that somebody named.
 ;;
 ;; A saved filter is a name and the query string it stands for (see
@@ -891,81 +914,93 @@ at the first of them."
 ;; excursion into a settings page.
 (define* (saved-filter-panel G_ project-human-id filters
                              #:key (current-query "") (can-edit? #f))
+
+  ;; One saved view: its name, which is a link to the narrowing it stands for,
+  ;; and -- for a reader who may triage -- the way to forget it.
+  ;;
+  ;; The two are one `div' because the second is a `form', and a `form' is not
+  ;; phrasing content: a browser that meets one inside a `span' closes the
+  ;; `span' first and reparents whatever came after it, which is how the delete
+  ;; control ended up outside the form it was meant to submit and the form
+  ;; itself ended up empty.
+  ;;
+  ;; The cross is quiet until it is wanted.  A row of saved views should read
+  ;; as the names it is made of, and the same mark after every name is noise
+  ;; rather than an offer.
+  (define (saved-view filter)
+    (let ((name (assq-ref filter
+                          'name))
+          (query (or (assq-ref filter
+                               'query) ""))
+          (id (assq-ref filter
+                        'id)))
+      (append
+       (list `(a (@ (class ,(mk-class '(text-xs no-underline rounded-lg py-1
+                                               px-2 lp-quiet)))
+                     (href ,(format #f
+                                    "/tickets/~a~a"
+                                    project-human-id
+                                    (if (string-null? query) ""
+                                        (format #f "?~a" query)))))
+                  ,name))
+       (if (not can-edit?) '()
+           (list `(form (@ (method "POST")
+                           (action ,(format #f
+                                            "/tickets/~a/filters/delete"
+                                            project-human-id))
+                           (class ,(mk-class '(inline flex items-center))))
+                        (input (@ (type "hidden") (name "id") (value ,id)))
+                        (button (@ (class ,(mk-class '(lp-quiet cursor-pointer
+                                                               text-xs px-1)))
+                                   (type "submit")
+                                   (aria-label ,(format #f
+                                                       "~a ~a"
+                                                       (G_ "remove")
+                                                       name)))
+                                ,(icon #:type 'x
+                                       #:icon-css '(text-xs)))))))))
+
   `(div (@ (class ,(mk-class '(flex flex-col gap-2 py-1))))
         ,@(if (pair? filters)
               (list `(div (@ (class ,(mk-class '(flex flex-row flex-wrap
                                                         items-center gap-1))))
                           ,@(map (lambda (filter)
-                                   (let ((name (assq-ref filter
-                                                         'name))
-                                         (query (or (assq-ref filter
-                                                              'query) "")))
-                                     `(span (@ (class ,(mk-class '(inline-flex
-                                                                   items-center))))
-                                            (a (@ (class ,(mk-class '(text-xs
-                                                                      no-underline
-                                                                      rounded-lg
-                                                                      py-1 px-2
-                                                                      lp-quiet)))
-                                                  (href ,(format #f
-                                                          "/tickets/~a~a"
-                                                          project-human-id
-                                                          (if (string-null?
-                                                               query) "" (format #f
-                                                                          "?~a"
-                                                                          query)))))
-                                               ,name)
-                                            ,@(if can-edit?
-                                                  `((form (@ (method "POST")
-                                                             (action ,(format
-                                                                       #f
-                                                                       "/tickets/~a/filters/delete"
-                                                                       project-human-id))
-                                                             (class "inline")))
-                                                        (input (@ (type "hidden")
-                                                                  (name "id")
-                                                                  (value ,(assq-ref
-                                                                           filter
-                                                                           'id))))
-                                                        (button (@ (class ,(mk-class
-                                                                            '(cursor-pointer
-                                                                              text-xs
-                                                                              px-1
-                                                                              opacity-60
-                                                                              hover:opacity-100)))
-                                                                   (type "submit")
-                                                                   (aria-label ,(format
-                                                                                 #f
-                                                                                 "~a ~a"
-                                                                                 (G_
-                                                                                  "remove")
-                                                                                 name)))
-                                                                ,(icon #:type 'x
-                                                                       #:icon-css '(text-xs))))
-                                                  '()))))
+                                   `(div (@ (class ,(mk-class
+                                                     '(flex flex-row
+                                                            items-center))))
+                                         ,@(saved-view filter)))
                                  filters)))
               '())
+        ;; The field that keeps the narrowing being read, and the word that
+        ;; keeps it.  It is unquoted because `quiet-field' (like every
+        ;; hygguile component) is a procedure rather than a tag: left unquoted
+        ;; its whole call is printed as text, and the page says the words of
+        ;; the call instead of offering a field.
         ,@(if can-edit?
-              `((form (@ (method "POST")
-                         (action ,(format #f "/tickets/~a/filters/new"
-                                          project-human-id))
-                         (class ,(mk-class '(flex flex-row flex-wrap
-                                                     items-center gap-2))))
-                      (input (@ (type "hidden")
-                                (name "query")
-                                (value ,current-query)))
-                      (input #:label (G_ "name this view")
-                              #:name "name"
-                              #:required #t
-                              #:value "")
-                      (button (@ (class ,(mk-class '(js-only text-xs
-                                                              font-semibold
-                                                              underline
-                                                              cursor-pointer
-                                                              text-onyx-700
-                                                              dark:text-stone-300)))
-                               (type "submit"))
-                              ,(G_ "save this view"))))
+              (list `(form (@ (method "POST")
+                              (action ,(format #f
+                                               "/tickets/~a/filters/new"
+                                               project-human-id))
+                              (class ,(mk-class
+                                       '(flex flex-row flex-wrap
+                                              items-center gap-2))))
+                           (input (@ (type "hidden")
+                                     (name "query")
+                                     (value ,current-query)))
+                           ,(quiet-field (G_ "name this view")
+                                         #:name "name"
+                                         #:value ""
+                                         #:required? #t)
+                           (button (@ (class ,(mk-class
+                                               '(js-only text-xs
+                                                         font-semibold
+                                                         underline
+                                                         cursor-pointer
+                                                         lp-quiet px-2 py-1
+                                                         text-onyx-700
+                                                         dark:text-stone-300)))
+                                      (type "submit"))
+                                   ,(G_ "save this view"))))
               '())))
 
 ;; The bulk bar: what a reader can do to the rows they have ticked.
@@ -984,6 +1019,22 @@ at the first of them."
 ;; guess; the first is there so that the list of values can be read in groups
 ;; -- an epic, a status and a person are different kinds of thing and a flat
 ;; list of all three would be three lists in a trench coat.
+;;
+;; The menu opens on a choice that chooses nothing.  Every other value in it
+;; writes something over every ticked row, and two of them -- no epic, nobody
+;; -- write the *absence* of something, which is exactly the kind of change a
+;; reader makes by accident: tick a row, glance at the field beside the menu,
+;; press apply, and the epics they never mentioned are gone.  So the absence is
+;; spelled out as a change like any other, and the first thing the menu offers
+;; is to change nothing.
+;;
+;; The label is the one change that is not in the menu, because it is free
+;; text: a label is a word nobody had to anticipate, so it is typed rather than
+;; chosen, and it is typed in its own field.  That field is not a second kind of
+;; change -- it is the label of a change of kind, so it is added whatever the
+;; menu was left at, and left alone when it is empty; which is what makes
+;; tagging a handful of rows possible without restating their epic or their
+;; status as a side effect.
 (define* (bulk-bar G_ project-human-id #:key statuses epics assignees
                    (can-edit? #f))
   (if (not can-edit?)
@@ -1002,6 +1053,7 @@ at the first of them."
                               (onclick "lucidplanBulkSelectAll(this)")))
                     ,(G_ "select all"))
              (select (@ (name "value")
+                        (aria-label ,(G_ "change"))
                         (class ,(mk-class '(text-sm rounded-lg px-2 py-1
                                                    max-w-full
                                                    bg-transparent border-2
@@ -1009,8 +1061,15 @@ at the first of them."
                                                    dark:border-onyx-100/25
                                                    text-onyx-700
                                                    dark:text-stone-300))))
+                     ;; The choice that chooses nothing, and the one the menu
+                     ;; opens on, so that pressing apply with only a label
+                     ;; typed changes the labels and nothing else.
+                     ,(option #:value "" #:content (G_ "change nothing"))
                      ,(option #:value "epic:"
-                              #:content (G_ "no epic"))
+                              #:content (format #f
+                                                "~a: ~a"
+                                                (G_ "clear")
+                                                (G_ "epic")))
                      ,@(map (lambda (epic)
                               (option #:value (format #f "epic:~a"
                                                        (assq-ref epic
@@ -1029,7 +1088,10 @@ at the first of them."
                                                                        status))))
                             (ticket-status-values statuses))
                      ,(option #:value "assignee:"
-                              #:content (G_ "nobody"))
+                              #:content (format #f
+                                                "~a: ~a"
+                                                (G_ "clear")
+                                                (G_ "assignee")))
                      ,@(map (lambda (entry)
                               (option #:value (format #f "assignee:~a"
                                                        (car entry))
@@ -1037,10 +1099,11 @@ at the first of them."
                                                          (G_ "assignee")
                                                          (cdr entry))))
                             assignees))
-             (input #:label (G_ "label")
-                    #:name "label"
-                    #:required #f
-                    #:value "")
+             ;; As in the saved-view panel, a component is a call and not a
+             ;; tag: the field is unquoted so that it runs, and it is the quiet
+             ;; field so that it stands on the same line as the menu it is
+             ;; applied with rather than opening a column of its own.
+             ,(quiet-field (G_ "add a label") #:name "label" #:value "")
              (button (@ (class ,(mk-class '(cursor-pointer text-sm
                                                            font-semibold
                                                            underline
@@ -1153,10 +1216,12 @@ at the first of them."
                                                         'human-id)
                                               epic-filter))
                                     epics)))
-          ;; The whole backlog as it was read, before either narrowing: the
-          ;; label panel is built from it, so the panel offers every word the
-          ;; project uses and not merely the ones left after a filter.
-          (all-tickets tickets)
+          ;; The backlog exactly as the repository handed it over, before either
+          ;; narrowing.  The label panel is built from this list and not from
+          ;; the narrowed one, because the panel is how a reader leaves the
+          ;; narrowing they are in: a panel that only lists the label already
+          ;; chosen is a panel with nothing left to say.
+          (read-tickets tickets)
           (tickets (if (and (string? label-filter)
                             (not (string-null? label-filter)))
                        (filter (lambda (t)
@@ -1570,7 +1635,7 @@ at the first of them."
                                       ,(epic-filter-row G_ proj-human-id
                                                         epics epic-selected)
                                       ,(label-filter-row G_ proj-human-id
-                                                         all-tickets
+                                                         read-tickets
                                                          label-filter)
                                       ,(expand-and-tips G_)
                                       ,(if (nil? tickets)

@@ -28,7 +28,7 @@ maak migrate
 
 * Unreleased
 
-Four things a board and a backlog were missing, and one that had stopped
+Four things a board and a backlog were missing, and a handful that had stopped
 working.
 
 **Swimlanes.** The board can be read a lane at a time: `?lanes=epic` cuts it
@@ -64,6 +64,30 @@ label would be a way to lose data by pressing a button.
 class rather than by a `hidden` attribute now, so those controls have to ask the
 shared script to do it -- which is what the projects page's controls have always
 done and what the backlog's, left behind by that change, no longer did.
+
+**The bar above a backlog reads as one line.** Two of its fields -- the name a
+saved view is kept under, and the word a label is added by -- were printed as
+their own source text: the page said `input` twice and offered no field at all.
+They are fields now, in the small frame the menu beside them wears, rather than
+the form-sized plate that would have opened a column of three in a row of small
+links. The cross that forgets a saved view had drifted outside the form it
+submits, and now sits inside it, quiet until it is wanted.
+
+**The menu of bulk changes opens on a choice that changes nothing.** Every other
+value in it writes over every ticked row, and two of them write the *absence* of
+something -- no epic, nobody -- which is the change a reader makes by accident
+on the way to somewhere else. So the absence is spelled out as the change it is,
+and the first thing the menu offers is to change nothing. A form that asks for
+nothing then writes nothing at all: an untouched set of controls is a reader
+changing their mind, not an edit, and the backlog can be ordered by when a
+ticket last changed.
+
+**A label can be added without restating a ticket's epic.** The bulk bar called
+its loop with one argument, so no ticked row had ever been written, and the one
+change that is free text -- a label -- had no value in the menu that could name
+it. Now the loop is given the rows it was asked for, and a label is added
+whatever the menu says, because it is typed beside the menu rather than chosen
+from it: tagging a handful of rows no longer means clearing their epics first.
 
 
 eLog for LucidPlan
