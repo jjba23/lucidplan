@@ -26,6 +26,7 @@
   #:use-module (lucidplan html)
   #:use-module (kracht prelude)
   #:use-module (lucidplan attachments)
+  #:use-module (app views epics)
   #:use-module (lucidplan domain)
   #:use-module (lucidplan domain ticket-comment)
   #:use-module (hygguile hygguile)
@@ -177,6 +178,36 @@
     ((equal? type "time-box")
      (G_ "Time Box"))
     (else type)))
+
+;; The rows of the epic menu: the absence of an epic first -- a ticket belongs
+;; to none far more often than it belongs to one -- then each of the project's
+;; epics under the name a reader knows it by.  The value a row submits is the
+;; epic's slug, which is what the route that writes it resolves.
+;; A label, as the word it is.  It is not a link and not a button: what a
+;; reader does with a label is filter by it, and the filter is the panel above
+;; the list (see `epic-filter-row'), which is where the same word appears once
+;; per project rather than once per ticket.
+(define (label-chip label)
+  `(span (@ (class ,(mk-class '(lp-label-chip))))
+         ,label))
+
+(define (epic-choices G_ epics selected)
+  (cons (option #:value ""
+                #:content (G_ "no epic")
+                #:selected-value (if selected
+                                     (assq-ref selected
+                                               'human-id)
+                                     ""))
+        (map (lambda (epic)
+               (option #:value (assq-ref epic
+                                         'human-id)
+                       #:content (assq-ref epic
+                                           'title)
+                       #:selected-value (if selected
+                                            (assq-ref selected
+                                                      'human-id)
+                                            "")))
+             epics)))
 
 (define (ticket-choices G_ values label-for glyph-for selected)
   (map (lambda (value)
@@ -351,6 +382,10 @@ at the first of them."
                         ;; is offered by the one card that has room to say what
                         ;; opening a table means.
                         (planning-table? #f)
+                        ;; The epics of this ticket's project, so the card can
+                        ;; say which body of work it is a piece of and offer
+                        ;; the one menu that changes it.
+                        (epics '())
                         (statuses (default-ticket-statuses))
                         (logged-minutes 0)
                         (today (today-iso))
@@ -367,6 +402,15 @@ at the first of them."
          (points (t-ref 'estimate-points))
          (size (t-ref 'estimate-size))
          (due-on (t-ref 'due-on))
+         (epic-id (or (t-ref 'epic-id) ""))
+         ;; The epic this ticket is a piece of, found among the epics the page
+         ;; was handed -- or nothing, which is the ordinary ticket.
+         (epic (find (lambda (e)
+                       (equal? (format #f "~a"
+                                       (assq-ref e
+                                                 'id))
+                               (format #f "~a" epic-id)))
+                     epics))
 
          ;; The ladder a table opened from here would deal: the one this ticket
          ;; is already estimated on, where it is estimated on one and not the
@@ -478,6 +522,46 @@ at the first of them."
                             (G_ "type")
                             (append (emoji-for-ticket-type type)
                                     (list (ticket-type-label G_ type)))))))
+
+          ;; Which body of work this ticket is a piece of.  It is its own row
+          ;; rather than a fifth cell of the grid above, because it is the one
+          ;; fact about a ticket that is about other tickets: a reader who can
+          ;; change it gets the menu every other fact is changed with, and a
+          ;; reader who cannot sees the epic's own colour and name.
+          ,@(if (pair? epics)
+                `((div (@ (class ,(mk-class '(flex flex-col gap-2))))
+                       (small (@ (class ,%label-face))
+                              ,(G_ "epic"))
+                       ,@(if editable?
+                             (list (render-inline-choice G_
+                                                         #:project project
+                                                         #:human-id human-id
+                                                         #:field "epic"
+                                                         #:value (if epic
+                                                                     (assq-ref
+                                                                      epic
+                                                                      'human-id)
+                                                                     "")
+                                                         #:id-suffix id-suffix
+                                                         #:options (epic-choices
+                                                                    G_ epics
+                                                                    epic)))
+                             (list (if epic
+                                       (epic-chip epic)
+                                       `(span (@ (class ,(mk-class '(text-sm
+                                                                     text-onyx-500
+                                                                     dark:text-stone-500))))
+                                              ,(G_ "no epic")))))))
+                '())
+
+          ;; The words this ticket is tagged with.  A ticket with none is a
+          ;; ticket with no row, which is the ordinary one.
+          ,@(let ((labels (ticket-labels ticket)))
+              (if (pair? labels)
+                  `((div (@ (class ,(mk-class '(flex flex-row flex-wrap
+                                                        items-center gap-1))))
+                         ,@(map label-chip labels)))
+                  '()))
 
           ;; What else is known about the ticket, as one row of chips: where it
           ;; stands in the team's plan -- the deadline read as a state rather
@@ -635,6 +719,9 @@ at the first of them."
                                  ticket-assignee
                                  user-names
                                  (statuses (default-ticket-statuses))
+                                 ;; The epics of the project, so a row can wear
+                                 ;; the one its ticket belongs to.
+                                 (epics '())
                                  (editable? #f)
                                  (reorderable? #f))
   (let* ((t-ref (lambda (k)
@@ -664,6 +751,21 @@ at the first of them."
           ;; so without the script it is a line of text above the ticket it
           ;; belongs to -- which is what it was before it could be clicked.
           (div (@ (class ,%list-header-face))
+               ;; The tick that puts this row in a bulk change.  It is a
+               ;; control inside the row, which the shared script leaves alone:
+               ;; a click on it selects the ticket rather than opening the
+               ;; card, and nothing else in the row behaves differently
+               ;; because it is there.
+               ,@(if editable?
+                     (list `(input (@ (type "checkbox")
+                                      (class "lp-bulk-check h-4 w-4
+                                              cursor-pointer shrink-0")
+                                      (aria-label ,(format #f "~a ~a"
+                                                           (G_ "select")
+                                                           (t-ref 'human-id)))
+                                      (data-ticket-id ,(t-ref 'human-id)))))
+                     '())
+
                ;; The grip is what makes a row draggable, and dragging a row
                ;; reorders the backlog -- a change to the tickets.  It is read
                ;; by the endpoint the row reorders, so it is offered only to a
@@ -677,6 +779,29 @@ at the first of them."
                ,(emoji-for-ticket-type type)
                (h5 (@ (class ,%list-title-face))
                    ,(org2html (html-unescape title)))
+
+               ;; The words it is tagged with, in the row as well as in the
+               ;; card: a row is what a reader scans, and a tag nobody sees
+               ;; until they open the card is a tag nobody filters by.
+               ,@(map label-chip (ticket-labels ticket))
+
+               ;; The body of work this ticket is a piece of, if any: a
+               ;; colour and a name, in the one place a row has room for a
+               ;; fact that is not about the ticket alone.
+               ,@(if (pair? epics)
+                     (let ((mine (find (lambda (e)
+                                         (equal? (format #f "~a"
+                                                         (assq-ref e
+                                                                   'id))
+                                                 (format #f "~a"
+                                                         (or (t-ref
+                                                              'epic-id)
+                                                             ""))))
+                                       epics)))
+                       (if mine
+                           (list (epic-chip mine))
+                           '()))
+                     '())
 
                ;; Direct Link Icon
                (div (a (@ (class ,%list-link-face)
@@ -716,6 +841,249 @@ at the first of them."
                                               (assq-ref assignee-user
                                                         'username))))))))
 
+;; The epic panel: one link per body of work, so that a backlog can be read a
+;; group at a time.  It is a row of links rather than a menu because reading a
+;; backlog by epic is something a reader does over and over, and a menu would
+;; cost two gestures every time.  The link of the epic being read wears
+;; `aria-current', which is both what a screen reader says and what the sheet
+;; draws as chosen.
+;; The label panel: one link per word the project's tickets are tagged with,
+;; so that a backlog can be read by tag.  It is the epic panel's twin on
+;; purpose -- two ways of narrowing a backlog that are used the same way are
+;; drawn the same way, or a reader has to learn the page twice.
+;;
+;; The labels are collected from the tickets the page was handed rather than
+;; queried: a label only exists because a ticket carries it, so the list is
+;; the tickets themselves read one field further.
+(define (label-filter-row G_ project-human-id tickets selected)
+  (let ((labels (sort (delete-duplicates (append-map ticket-labels tickets)
+                                         string=?)
+                      string<?)))
+    (if (null? labels)
+        '()
+        `(div (@ (class ,(mk-class '(flex flex-row flex-wrap items-center
+                                            gap-1 py-1))))
+              (a (@ (class ,(mk-class '(text-xs no-underline rounded-lg
+                                                 py-1 px-2 lp-quiet)))
+                    (href ,(format #f "/tickets/~a" project-human-id)))
+                 ,(G_ "every label"))
+              ,@(map (lambda (label)
+                       `(a (@ (class ,(mk-class '(no-underline flex
+                                                               items-center)))
+                             (href ,(format #f "/tickets/~a?label=~a"
+                                            project-human-id
+                                            (uri-encode label)))
+                             ,@(if (and selected
+                                        (equal? (string-downcase label)
+                                                (string-downcase selected)))
+                                   '((aria-current "page"))
+                                   '()))
+                          ,(label-chip label)))
+                    labels)))))
+
+;; The saved filters: narrowings of this backlog that somebody named.
+;;
+;; A saved filter is a name and the query string it stands for (see
+;; `(lucidplan domain saved-filter)'), so a link to one is a link to the
+;; backlog with that narrowing already applied.  The field beside them saves
+;; the narrowing being read -- the page hands over the query string it was
+;; asked with -- so keeping one costs a name and a click rather than an
+;; excursion into a settings page.
+(define* (saved-filter-panel G_ project-human-id filters
+                             #:key (current-query "") (can-edit? #f))
+  `(div (@ (class ,(mk-class '(flex flex-col gap-2 py-1))))
+        ,@(if (pair? filters)
+              (list `(div (@ (class ,(mk-class '(flex flex-row flex-wrap
+                                                        items-center gap-1))))
+                          ,@(map (lambda (filter)
+                                   (let ((name (assq-ref filter
+                                                         'name))
+                                         (query (or (assq-ref filter
+                                                              'query) "")))
+                                     `(span (@ (class ,(mk-class '(inline-flex
+                                                                   items-center))))
+                                            (a (@ (class ,(mk-class '(text-xs
+                                                                      no-underline
+                                                                      rounded-lg
+                                                                      py-1 px-2
+                                                                      lp-quiet)))
+                                                  (href ,(format #f
+                                                          "/tickets/~a~a"
+                                                          project-human-id
+                                                          (if (string-null?
+                                                               query) "" (format #f
+                                                                          "?~a"
+                                                                          query)))))
+                                               ,name)
+                                            ,@(if can-edit?
+                                                  `((form (@ (method "POST")
+                                                             (action ,(format
+                                                                       #f
+                                                                       "/tickets/~a/filters/delete"
+                                                                       project-human-id))
+                                                             (class "inline")))
+                                                        (input (@ (type "hidden")
+                                                                  (name "id")
+                                                                  (value ,(assq-ref
+                                                                           filter
+                                                                           'id))))
+                                                        (button (@ (class ,(mk-class
+                                                                            '(cursor-pointer
+                                                                              text-xs
+                                                                              px-1
+                                                                              opacity-60
+                                                                              hover:opacity-100)))
+                                                                   (type "submit")
+                                                                   (aria-label ,(format
+                                                                                 #f
+                                                                                 "~a ~a"
+                                                                                 (G_
+                                                                                  "remove")
+                                                                                 name)))
+                                                                ,(icon #:type 'x
+                                                                       #:icon-css '(text-xs))))
+                                                  '()))))
+                                 filters)))
+              '())
+        ,@(if can-edit?
+              `((form (@ (method "POST")
+                         (action ,(format #f "/tickets/~a/filters/new"
+                                          project-human-id))
+                         (class ,(mk-class '(flex flex-row flex-wrap
+                                                     items-center gap-2))))
+                      (input (@ (type "hidden")
+                                (name "query")
+                                (value ,current-query)))
+                      (input #:label (G_ "name this view")
+                              #:name "name"
+                              #:required #t
+                              #:value "")
+                      (button (@ (class ,(mk-class '(js-only text-xs
+                                                              font-semibold
+                                                              underline
+                                                              cursor-pointer
+                                                              text-onyx-700
+                                                              dark:text-stone-300)))
+                               (type "submit"))
+                              ,(G_ "save this view"))))
+              '())))
+
+;; The bulk bar: what a reader can do to the rows they have ticked.
+;;
+;; It is one form for the whole page rather than a form around the list,
+;; because a row already holds forms of its own -- the delete control inside the
+;; card it opens into -- and a form inside a form is not a document any browser
+;; will parse.  The ticked rows are therefore collected when the form is
+;; submitted, by the script this page already ships
+;; (`lucidplanBulkSubmit' in `pub/js/tickets.js').
+;;
+;; What is being set is named twice: once by the menu that says what kind of
+;; change this is, and once by the word in front of the value chosen.  The
+;; second is what the endpoint trusts, because a menu cannot be a promise and
+;; a value that arrived without its kind is a value whose meaning is anybody's
+;; guess; the first is there so that the list of values can be read in groups
+;; -- an epic, a status and a person are different kinds of thing and a flat
+;; list of all three would be three lists in a trench coat.
+(define* (bulk-bar G_ project-human-id #:key statuses epics assignees
+                   (can-edit? #f))
+  (if (not can-edit?)
+      '()
+      `(form (@ (class ,(mk-class '(js-only flex flex-row flex-wrap
+                                              items-center gap-2 py-2)))
+                (method "POST")
+                (action ,(format #f "/tickets/~a/bulk" project-human-id))
+                (onsubmit "return lucidplanBulkSubmit(this)"))
+             (input (@ (type "hidden") (name "ids") (value "")))
+             (label (@ (class ,(mk-class '(flex flex-row items-center gap-2
+                                                    text-xs text-onyx-700
+                                                    dark:text-stone-300))))
+                    (input (@ (type "checkbox")
+                              (class "h-4 w-4 cursor-pointer")
+                              (onclick "lucidplanBulkSelectAll(this)")))
+                    ,(G_ "select all"))
+             (select (@ (name "value")
+                        (class ,(mk-class '(text-sm rounded-lg px-2 py-1
+                                                   max-w-full
+                                                   bg-transparent border-2
+                                                   border-stone-500/25
+                                                   dark:border-onyx-100/25
+                                                   text-onyx-700
+                                                   dark:text-stone-300))))
+                     ,(option #:value "epic:"
+                              #:content (G_ "no epic"))
+                     ,@(map (lambda (epic)
+                              (option #:value (format #f "epic:~a"
+                                                       (assq-ref epic
+                                                                 'human-id))
+                                      #:content (format #f "~a: ~a"
+                                                         (G_ "epic")
+                                                         (assq-ref epic
+                                                                   'title))))
+                            epics)
+                     ,@(map (lambda (status)
+                              (option #:value (format #f "status:~a" status)
+                                      #:content (format #f "~a: ~a"
+                                                         (G_ "status")
+                                                         (status-label G_
+                                                                       statuses
+                                                                       status))))
+                            (ticket-status-values statuses))
+                     ,(option #:value "assignee:"
+                              #:content (G_ "nobody"))
+                     ,@(map (lambda (entry)
+                              (option #:value (format #f "assignee:~a"
+                                                       (car entry))
+                                      #:content (format #f "~a: ~a"
+                                                         (G_ "assignee")
+                                                         (cdr entry))))
+                            assignees))
+             (input #:label (G_ "label")
+                    #:name "label"
+                    #:required #f
+                    #:value "")
+             (button (@ (class ,(mk-class '(cursor-pointer text-sm
+                                                           font-semibold
+                                                           underline
+                                                           text-onyx-700
+                                                           dark:text-stone-300)))
+                        (type "submit"))
+                     ,(G_ "apply")))))
+
+(define (epic-filter-row G_ project-human-id epics selected)
+  (if (null? epics)
+      '()
+      `(div (@ (class ,(mk-class '(flex flex-row flex-wrap items-center
+                                          gap-1 py-1))))
+            (a (@ (class ,(mk-class '(text-xs no-underline rounded-lg
+                                               py-1 px-2 lp-quiet)))
+                  (href ,(format #f "/tickets/~a" project-human-id)))
+               ,(G_ "every epic"))
+            ,@(map (lambda (epic)
+                     (let* ((slug (assq-ref epic
+                                             'human-id))
+                            (current? (and selected
+                                           (equal? slug
+                                                   (assq-ref selected
+                                                             'human-id))))
+                            (attributes (if current?
+                                            '((aria-current "page"))
+                                            '())))
+                       `(a (@ (class ,(mk-class '(no-underline flex
+                                                               items-center)))
+                              (href ,(format #f "/tickets/~a?epic=~a"
+                                             project-human-id slug))
+                              ,@attributes)
+                           ,(epic-chip epic))))
+                  epics))))
+
+;; The two controls that open and close every card at once.
+;;
+;; They carry an attribute each rather than a line of script, because the fold
+;; is not a `hidden' attribute any more: a card is opened by a class the shared
+;; script toggles (see `pub/js/lucidplan-luxe.js'), so the controls have to ask
+;; that script to do it rather than reach into the document themselves.  That is
+;; what these attributes are for, and why the projects page's controls have
+;; always worked while these did not.
 (define (expand-and-tips G_)
   `(div (@ (class ,(mk-class '(flex flex-row
                                     flex-wrap
@@ -728,11 +1096,26 @@ at the first of them."
              "Tip: Use Tab to navigate tickets and Enter/Space to expand or collapse cards."))
 
         (div (@ (class ,(mk-class '(flex flex-row gap-4))))
-             ,(render-toggle-button (G_ "Expand All")
-               "document.querySelectorAll('[id^=\"details-\"]').forEach(el => el.hidden = false)")
-
-             ,(render-toggle-button (G_ "Collapse All")
-               "document.querySelectorAll('[id^=\"details-\"]').forEach(el => el.hidden = true)"))))
+             (button (@ (class ,(mk-class '(js-only text-sm font-semibold
+                                                    underline
+                                                    cursor-pointer
+                                                    text-onyx-700
+                                                    dark:text-stone-300
+                                                    hover:text-onyx-900
+                                                    dark:hover:text-stone-100)))
+                        (type "button")
+                        (data-lp-expand-all ""))
+                     ,(G_ "Expand All"))
+             (button (@ (class ,(mk-class '(js-only text-sm font-semibold
+                                                    underline
+                                                    cursor-pointer
+                                                    text-onyx-700
+                                                    dark:text-stone-300
+                                                    hover:text-onyx-900
+                                                    dark:hover:text-stone-100)))
+                        (type "button")
+                        (data-lp-collapse-all ""))
+                     ,(G_ "Collapse All")))))
 
 (define* (html-from-tickets G_
                             #:key is-logged-in
@@ -747,8 +1130,49 @@ at the first of them."
                             with-done
                             with-rejected
                             (statuses (default-ticket-statuses))
+                            ;; The epics of this project, and the one the reader
+                            ;; has asked to see the backlog of -- the slug from
+                            ;; the query string, or #f for all of them.
+                            (epics '())
+                            (epic-filter #f)
+                            (label-filter #f)
+                            ;; The named narrowings of this backlog, and the
+                            ;; query string this page was asked with -- which
+                            ;; is what the field beside them saves.
+                            (saved-filters '())
+                            (current-query "")
                             search-query)
   (let* ( ;Core Data
+          ;; The epic the reader asked to read the backlog by, if any, and the
+          ;; tickets of it.  The filter is a link, so this page has to do it:
+          ;; it is the same list, narrowed, which is why the counts beside the
+          ;; buckets and the rows themselves can never disagree.
+          (epic-selected (and epic-filter
+                              (find (lambda (e)
+                                      (equal? (assq-ref e
+                                                        'human-id)
+                                              epic-filter))
+                                    epics)))
+          ;; The whole backlog as it was read, before either narrowing: the
+          ;; label panel is built from it, so the panel offers every word the
+          ;; project uses and not merely the ones left after a filter.
+          (all-tickets tickets)
+          (tickets (if (and (string? label-filter)
+                            (not (string-null? label-filter)))
+                       (filter (lambda (t)
+                                 (ticket-has-label? t label-filter))
+                               tickets)
+                       tickets))
+          (tickets (if epic-selected
+                       (filter (lambda (t)
+                                 (equal? (format #f "~a"
+                                                 (or (assq-ref t
+                                                               'epic-id) ""))
+                                         (format #f "~a"
+                                                 (assq-ref epic-selected
+                                                           'id))))
+                               tickets)
+                       tickets))
           (proj-human-id (assq-ref project-details
                                    'human-id))
          (proj-title (assq-ref project-details
@@ -867,6 +1291,7 @@ at the first of them."
                                         #:ticket-assignee ttt-assignee
                                         #:user-names user-names
                                         #:statuses statuses
+                                        #:epics epics
                                         #:editable? triage?
                                         #:reorderable? reorderable?))) tickets))))
 
@@ -898,6 +1323,7 @@ at the first of them."
                                                    ticket-assignee
                                                    #:user-names user-names
                                                    #:statuses statuses
+                                                   #:epics epics
                                                    #:editable? triage?))
                                                 done-tickets)))
                                '()))
@@ -1123,6 +1549,29 @@ at the first of them."
 
                                       ;; Sub-Components & Lists
                                       ,search-param-components
+                                      ,(bulk-bar G_ proj-human-id
+                                                 #:statuses statuses
+                                                 #:epics epics
+                                                 #:assignees (map (lambda (u)
+                                                                   (cons (assq-ref
+                                                                          u
+                                                                          'id)
+                                                                         (assq-ref
+                                                                          u
+                                                                          'username)))
+                                                                 user-names)
+                                                 #:can-edit? can-triage?)
+                                      ,(saved-filter-panel G_ proj-human-id
+                                                           saved-filters
+                                                           #:current-query
+                                                           current-query
+                                                           #:can-edit?
+                                                           can-triage?)
+                                      ,(epic-filter-row G_ proj-human-id
+                                                        epics epic-selected)
+                                      ,(label-filter-row G_ proj-human-id
+                                                         all-tickets
+                                                         label-filter)
                                       ,(expand-and-tips G_)
                                       ,(if (nil? tickets)
                                            fallback-no-ticket-list ticket-list)
@@ -1168,6 +1617,9 @@ at the first of them."
                                       'title)
                     #:description (assq-ref t
                                             'description)
+                    #:labels (labels-text (or (assq-ref t
+                                                       'labels)
+                                             ""))
                     #:ticket-type (assq-ref t
                                             'ticket-type)
                     #:ticket-status (assq-ref t
@@ -1191,6 +1643,9 @@ at the first of them."
                            #:key (project #f)
                            (title "")
                            (description "")
+                           ;; The words the ticket is tagged with, as the
+                           ;; comma-separated line the form edits.
+                           (labels "")
                            (ticket-status "")
                            (statuses (default-ticket-statuses))
                            (ticket-type "")
@@ -1306,6 +1761,22 @@ at the first of them."
                                      (div ,(select #:name 'assignee
                                                    #:on-change ""
                                                    #:options assignee-opts)))
+
+                                ;; Labels: the words this project's own
+                                ;; vocabulary is made of, as one
+                                ;; comma-separated line.  A list that can only
+                                ;; be chosen from is a list somebody else
+                                ;; wrote, and the point of a label is that
+                                ;; nobody had to anticipate it.
+                                ,(input #:label (G_ "labels")
+                                        #:name "labels"
+                                        #:required #f
+                                        #:value (labels-text labels))
+                                (p (@ (class ,(mk-class '(text-sm
+                                                          text-onyx-500
+                                                          dark:text-stone-500))))
+                                   ,(G_
+                                     "Words separated by commas: bug, needs-design, blocked-on-ops."))
 
                                 ;; Description
                                 ,(textarea #:label (G_ "description")

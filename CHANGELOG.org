@@ -28,6 +28,383 @@ maak migrate
 
 * Unreleased
 
+Four things a board and a backlog were missing, and one that had stopped
+working.
+
+**Swimlanes.** The board can be read a lane at a time: `?lanes=epic` cuts it
+into one band per epic, each a board of its own, with the tickets that belong
+to no epic in the last band. Nothing about a lane is a second kind of board --
+it is the same columns, the same drag handlers and the same status ladder, drawn
+from a different list of tickets -- so a lane cannot drift out of step with the
+board it is part of.
+
+**Labels.** A ticket can carry the words a project invents for itself --
+`bug`, `needs-design`, `blocked-on-ops` -- as a comma-separated line, kept as
+written and parsed where it is read. They show on the row and on the card, they
+are edited with the rest of the ticket, and the backlog offers one link per
+label the project uses, drawn the way the epic panel is drawn. Filtering
+compares without case: a reader who types `bug` means the `Bug` somebody else
+tagged.
+
+**Saved filters.** The backlog is narrowable by epic, by label, by a search and
+by an order, and all of that lives in the query string, which is gone the moment
+a reader goes anywhere else. A saved filter is a name for one of those
+narrowings: the query string as text -- so it can never mean something the page
+cannot ask for -- checked against the shape the page's own links have before it
+is kept.
+
+**Bulk changes.** Rows on the backlog can be ticked, and the bar above them
+changes every ticked ticket at once: its epic, its status, its assignee, or a
+label added to it. Each ticket is written through the same repository call the
+single-ticket route uses, so nothing here is a second way of writing a ticket.
+A label is *added* rather than set, because a bulk change that replaced every
+label would be a way to lose data by pressing a button.
+
+**Expand All / Collapse All on a backlog work again.** A card is opened by a
+class rather than by a `hidden` attribute now, so those controls have to ask the
+shared script to do it -- which is what the projects page's controls have always
+done and what the backlog's, left behind by that change, no longer did.
+
+
+eLog for LucidPlan
+#+author: Josep Bigorra
+#+email: jjbigorra@gmail.com
+#+language: en
+#+options: toc:nil
+
+[[https://jointhefreeworld.org/ggg/dist/scheme-guile.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-guix.svg]]  
+[[https://jointhefreeworld.org/ggg/dist/gnu-make.svg]] 
+[[https://jointhefreeworld.org/ggg/dist/license-agpl3+.svg]]    [[https://jointhefreeworld.org/ggg/dist/license-fdl13+.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-artanis.svg]]
+
+
+/free and open project management for everyone/
+
+LucidPlan is a project management for teams of all sizes and jobs.
+
+It's a flexible system made to simplify everyone's life, accessbile to all kinds of users.
+
+If you like my work, please support me by [[https://bmc.link/jjbigorra][buying me a cup of coffee ☕]] so I can continue with a lot of motivation.
+
+---------------------------
+
+Schema migrations are [[https://codeberg.org/jjba23/mutastructura][mutastructura]]'s, and one task applies them:
+#+begin_src sh
+maak migrate
+#+end_src
+
+----------------------------------
+
+
+An epic is the body of work a ticket is a piece of.
+
+A project's plan used to be read at two heights: the project, and the tickets
+in it.  That is one height short -- forty tickets that are all equally
+important is the same as none of them being -- so there is now a middle one.
+An epic has a name, an optional account of itself, and the tickets that point
+at it; it keeps no state of its own, so its progress is the progress of its
+tickets and the two cannot disagree.  It is finished when they are.
+
+A ticket says which epic it is a piece of from the menu every other fact about
+a ticket is changed with, and wears that epic's colour and name wherever it is
+drawn.  The backlog can be read one epic at a time from the panel above it, and
+the project's epics page says how far each has got -- a bar, and the count it
+is drawn from -- and opens to show what is in it.  An epic's colour is derived
+from its name the way a project's letter avatar is derived from the project's:
+nobody chooses it, and two epics are unlikely to share one by accident.
+
+Removing an epic removes the grouping and not the work: the tickets that
+pointed at it read as tickets with no epic, which is where they started.
+
+The Expand All and Collapse All controls on a backlog work again.  A card is
+opened by a class rather than by a `hidden' attribute now, so those controls
+have to ask the shared script to do it -- which is what the projects page's
+controls have always done and what the backlog's, left behind by that change,
+no longer did.
+
+A project in a list is a name and a picture, and a ticket carries its files
+with it.
+
+A project can now be given a picture, uploaded from its edit page with the
+file picker rather than saved along with the form: a file is not something a
+form body can carry, and a picture that lands only when somebody remembers to
+press "save project" is a picture that does not land.  Four types are kept
+(PNG, JPEG, GIF, WebP) and the type a picture is handed back as is read from
+the one it was filed under, never from what the upload claimed, so neither a
+filename nor a claimed type ever becomes a path or a header.
+
+A project that has never been given a picture is not an empty frame waiting for
+one: it is drawn as its own initial, in a colour derived from its name, so the
+same project is the same colour everywhere and two projects are unlikely to be
+the same colour by accident.  The letter is drawn *under* the picture rather
+than instead of it, which is what makes a picture that is slow to arrive show
+the letter while it comes, and a picture that cannot be fetched at all take
+itself away and leave the letter -- instead of the broken-image mark every
+browser draws.  Nothing has to be uploaded for a list of projects to look
+finished.
+
+The picture is served at an address that carries the token of the version being
+shown, so it can be cached for a year and still be replaced: a new picture is a
+new token is a new address, and a reader holding an old page asks for the old
+one and gets what it always meant.
+
+The database is now the whole of what a ticket carries.  A file attached to a
+ticket lives in the attachment's own row instead of in a directory beside the
+instance, so it travels with a copy of the database and a backup cannot take
+the tickets and leave their files behind.  A picture lives in its project's row
+for the same reason.  Both are carried as base64 text rather than as binary:
+every value here is written through the escaped-literal builders, which carry
+text and refuse the NUL a PNG is full of, and base64 is ASCII by construction.
+
+A file uploaded before this change is read from the directory it was written to
+the first time it is downloaded, stored in its row, and never read from a file
+again -- the move migrates itself, one file at a time, instead of depending on
+somebody remembering to run a task first.
+
+* v1.9.0
+
+A ticket is now a place where the work on it happens, not just a card that
+describes it.
+
+Time is logged against a ticket, and the log is where the work is written down
+rather than a timesheet kept beside it.  Each entry is a duration, the day it
+was spent and what was done, and the duration is typed the way people say it:
+~1.5h~, ~90m~, ~1h30m~, ~1h 30m~, ~1:30~ and a bare ~90~ are all the same
+ninety minutes.  Nothing, an empty field and zero log no time, and a day's worth
+is the ceiling, so a typo that turns ninety minutes into ninety hours is refused
+rather than stored.  The day defaults to today, the comment is what the entry is
+for, and a ticket's total is shown both as ~2h 45m~ and as the ~2.75~ hours a
+report adds up in.  An entry belongs to whoever logged it and may be removed by
+them -- or by a holder of ~lucidplan:ticket-delete~, since a log that could only
+be corrected by its author would stay wrong once that person left -- and
+removing one is a soft removal, so the trail still says the hours were logged
+and then taken back.
+
+*Sprints* are the stretch of work a team commits to: a name, a goal, a start, an
+end and a state (planned, active or closed), reached from the backlog or the
+board.  A project works in one sprint at a time, and a sprint's own page lists
+what is in it beside the backlog it can be fed from.  Deleting a sprint takes its
+tickets out of it first, so a deleted sprint leaves a backlog rather than tickets
+pointing at something that is no longer there.
+
+Every sprint has a *burndown*, and it is not kept in a table of its own: it is
+replayed from the audit trail the tickets already leave -- a ticket put into a
+sprint is recorded as ~sprint-added~, one taken out as ~sprint-removed~, and every
+status change is recorded with the statuses it moved between -- so the chart
+cannot disagree with the tickets it is about.  It is drawn as SVG in the page,
+day by day up to today, against the straight line the team committed to.
+
+A ticket can be given a *deadline*, and its card shows the deadline as a state
+-- overdue, due today, due soon (within ~deadline-soon-days~, a week) or
+scheduled -- rather than as a date a reader has to compare against a calendar.
+A *milestone* is a result the project promised by a date: several sprints may
+feed one, and its page keeps a running account of how many tickets count toward
+it, how many points they add up to and how many of those are done.
+
+The deadline, the sprint and the milestone are one form on the ticket's own
+page, because they answer one question: when is this due, and where does it
+count.  All three are optional and all three may be cleared.  A calendar date is
+stored as the text ~2026-10-27~ rather than as a number -- it sorts, compares and
+is read back by a date field -- and a date that does not exist, the 31st of
+February say, is refused rather than rolled into the next month.
+
+Tickets are estimated twice over: in *story points*, the numbers a team burns
+down, and in *t-shirt sizes*, which is what a first pass through a backlog is
+usually written in.  Both are optional -- an unestimate is stored as NULL rather
+than ~0~, so an unestimated ticket reads as one nobody has looked at yet rather
+than one worth nothing -- and both are changed in place from the ticket's own
+page, next to the status and the type.  The two ladders are ~ticket-points~ and
+~ticket-sizes~ in ~lib/lucidplan/domain.scm~, and the menus and the endpoints
+are both built from them.
+
+Each ticket carries a *discussion* shaped like a thread: a reply is drawn under
+what it answers, indented by its depth.  A removed comment is removed softly, so
+the replies that answer it keep their place instead of disappearing with it; its
+author may take it back, and a holder of ~lucidplan:ticket-delete~ may moderate
+somebody else's.  Bodies are Org mode, as titles and descriptions already were.
+
+*Attachments* are carried per ticket: uploaded from its page, listed with their
+name and size, downloadable, removable.  The bytes are stored under a name the
+application generates -- a submitted filename is data, never a path -- and
+downloads are served by the application, which checks that the attachment
+belongs to the ticket in the URL.  Where they live and how large one may be are
+~attachment-directory~ (default ~var/attachments~, outside ~pub/~ so it is never
+a static file) and ~attachment-max-bytes~ (default 5 MiB).
+
+Every write to a ticket now leaves a row in its *activity*: who, when, which
+field, the value before and the value after, one row per field that actually
+changed, and no row for a form submitted unchanged.  The trail is append-only.
+Beside it the ticket keeps *versions* of its content, one numbered snapshot per
+change of content, never rewritten: a version can be read back, compared with
+the one before it, and restored -- and restoring writes a new version rather
+than erasing the ones in between.
+
+A ticket can finally be *moved between projects* from its own page.  Its
+discussion, its files and its assignment move with it and its history stays with
+it, because the trail names the ticket rather than the project it was in.  Its
+number does not follow: numbers count within a project, so the destination
+numbers it as its own next one.
+
+Seven tables are added -- ~ticket_comment~, ~ticket_attachment~,
+~ticket_event~, ~ticket_revision~, ~sprint~, ~milestone~ and ~time_entry~ --
+together with the columns they hang off.  ~maak migrate~ applies all of it:
+
+#+begin_src sh
+maak migrate
+#+end_src
+
+An instance that carries attachments has something new to back up besides
+~lucidplan.db~: the two are written by different writes and are only together a
+complete record.  The README's ~Everything a ticket carries~ section has the
+details, and ~attachment-directory~ and ~attachment-max-bytes~ are in ~Instance
+configuration keys~.
+
+*Planning poker* is a section of its own, at ~/poker~: a table a team sits at to
+put a number on the next thing, and nobody at it needs an account.  That last
+part is the point rather than a shortcut -- an estimation meeting is where the
+people who are not in this instance turn up, and a tool that asks each of them to
+register before they may say "five" is a tool the meeting works around -- so a
+seat is a *name and a secret in a cookie*, not a user, and no row of the section
+points at ~user~.  A table is a meeting: it is named, it names the first thing it
+is estimating, and it picks the deck it estimates with, *story points* or
+*t-shirt sizes*.  Everybody else takes a seat by typing a name, plays a card
+with one click, and may change it with another; the cards stay face down until
+the table turns them over.  Turning them over shows each seat's card and counts
+the room out: one bar per card, the card the room agrees on -- or the two it is
+split between, because a tie is not an agreement -- the range the votes ran from,
+whether everybody played the same card, and the average.  The table is then dealt
+the next thing to estimate, and what it settled is kept on the page beside the
+questions still to come, so an item the room dealt but never turned over is shown
+as unsettled rather than with the cards it was holding.  Closing a table takes it
+off the list of tables somebody could walk into and keeps all of it readable.
+
+A table is also the one page several people look at at the same time, so it keeps
+itself current: a small state endpoint answers whether each seat has played and
+never which card -- there is no field in it for one, so a browser cannot be told
+early however it asks -- and the page patches the seat marks in place, re-reading
+itself only when the round has moved on or the cards have been turned over.
+Playing a card needs no permission at all, which is the point of the section.
+
+The one part of it that does is *writing the answer down*: once the room has
+agreed on a single card, a reader whose account holds ~lucidplan:ticket-create~
+-- the permission a ticket's own estimate is changed with, and the one the
+endpoint behind the panel asks for, so the control is offered exactly when
+pressing it would be honoured -- can put that card onto a ticket's estimate, on
+the ladder the room dealt.  The write goes through the same column, the same
+ladder and the same kind of activity row the ticket's own page writes: the other
+estimate is left alone, the change is recorded against the ticket with the
+account that made it, and the round remembers where its number went, as a link
+beside the question it settled.  A split round has nothing to write -- a tie is
+not an agreement -- and neither has a round nobody played.
+
+A table can also be opened *for* a ticket, from that ticket's own page, and is
+then about it for as long as it stands: it is named after the ticket, its first
+round asks the ticket, every round it deals is estimated for it, and the push at
+the end is one button naming the ticket rather than a number typed into it.  A
+table opened for nothing -- from the list of tables -- is asked where its answer
+goes, as it always was.  Which ticket a table is for is the room's own two
+columns, and where a round's number went is still the round's own: the two are
+not the same fact, and a table whose ticket has since been deleted says so
+instead of offering a button that would be refused.  Opening a table for a ticket
+asks ~lucidplan:ticket-create~, the permission the estimate it will hold is
+changed with; playing a card at it still does not.
+
+Four tables come with all of this -- ~poker_room~, ~poker_item~,
+~poker_participant~ and ~poker_vote~ -- together with the two columns a settled
+round keeps to say which ticket took its number, the two a table keeps to say
+which ticket it was opened for, and ~maak migrate~ applies all of it the same
+way.
+
+A ticket's own page was laid out again, since it is where the work on a ticket
+is read as much as written.  The card and the panels under it -- the plan, the
+hours the ticket has cost, the discussion, the files, the activity and the
+versions -- stand in one column of a readable width rather than stretched across
+the screen; the labels above the controls are quiet enough to read past; and
+what a reader does with a ticket -- asking the team for an estimate, changing
+it, deleting it -- is one line at the foot of the card instead of a column of
+its own.  A comment is drawn as the card its replies hang under rather than as a
+paragraph with a number over it, and a panel's heading is ruled off from the
+rows it opens, which is what makes a panel of many rows read as one section of a
+ticket rather than as a run of cards.  Every stamp the ticket's own record keeps
+-- in the activity trail, under a comment and on a version alike -- is shown as
+the date and the time of day it happened, ~2026-10-27 18:14~, instead of as the
+epoch second the schema stores.
+
+~maak i18n-update-template~ was fixed: it passed an unmatched glob for
+~lib/lucidplan/job/~ to xgettext, which then stopped without writing the
+template at all.  A directory that is not there is now left out of the list
+rather than passed on.
+
+The pipeline moved to GitHub.  A push to ~trunk~ is built by =GitHub Actions=,
+which calls [[https://github.com/jjba23/byggsteg-github][byggsteg-github]]'s
+reusable workflow and hands Byggsteg the same three tasks and the same daemon as
+before, so what is deployed, and how, is unchanged; only the asking is.
+~.woodpecker/byggsteg.yaml~ is gone, and its replacement,
+~.github/workflows/ci.yml~, is a handful of lines, four of which say what to
+run.  The bridge is untouched -- it was never Woodpecker's to begin with, and
+the image that runs the job is the same one.
+
+* v1.8.0
+
+New tickets are announced by email. When a ticket is created, [[https://codeberg.org/jjba23/pingwing][pingwing]] is asked for the ~lucidplan-new-ticket~ template and it goes to everyone who takes part in the project -- every user the project has assigned a ticket to, the ticket's assignee and the person who opened it. A message counts as sent only when the service answers that it took it: a service that cannot be reached, or that refuses the task, is retried, logged with what it said, and never fails the write. See ~What the mail service is asked to send~ in the README.
+
+Migrations are applied by mutastructura through ~maak migrate~ (and by ~maak init-db~ on a fresh database), and are tracked in a ~migrations_history~ ledger. The hand-rolled ~for f in resources/migrations/sqlite/*.sql; do sqlite3 ...~ loop is gone. *A database that was migrated by hand needs its ledger written once*, by recording the migrations already applied, before ~maak migrate~ is used on it; the README's ~The database~ section has the commands.
+
+Tests are run with veritas -- ~maak test~ -- and live under ~test/veritas/~, with ~unit/~ and ~benchmark/~ beneath it.
+
+Added ~ticket_statuses~ column to the ~project~ table:
+
+#+begin_src sh
+sqlite3 database.db 'ALTER TABLE "project" ADD COLUMN "ticket_statuses" varchar(4096)'
+#+end_src
+
+The statuses a ticket moves through are no longer fixed in the code. An instance sets ~ticket-statuses~ in its ~env.scm~ to rename, add, remove and reorder them, and any project may override the whole list for itself from its own edit page. The README has a section on both, ~Renaming or changing the ticket statuses~ and ~A project with its own statuses~.
+
+What the front page says about the software -- the two headings, the lines under them and the feature cards -- moved into configuration too, as ~landing-features-title~, ~landing-features-intro~, ~landing-features~, ~landing-workflow-title~ and ~landing-workflow-intro~.
+
+* v0.7.1
+
+Had to remake the users table, so as to accomodate the bewaking permission system.
+
+* v0.6.4
+
+Removed constraint of uniqueness in ticket titles, this might require some manual touches on the database ~ticket~ table.
+
+
+* v0.6.0
+
+Added ~priority~ column to ~ticket~ table. Added possibilities to sort tickets in the backlog by priority.
+
+Migration will be needed:
+#+begin_src sql
+ALTER TABLE ticket ADD COLUMN priority INTEGER;
+#+end_src
+
+An epic is the body of work a ticket is a piece of.
+
+A project's plan used to be read at two heights: the project, and the tickets
+in it.  That is one height short -- forty tickets that are all equally
+important is the same as none of them being -- so there is now a middle one.
+An epic has a name, an optional account of itself, and the tickets that point
+at it; it keeps no state of its own, so its progress is the progress of its
+tickets and the two cannot disagree.  It is finished when they are.
+
+A ticket says which epic it is a piece of from the menu every other fact about
+a ticket is changed with, and wears that epic's colour and name wherever it is
+drawn.  The backlog can be read one epic at a time from the panel above it, and
+the project's epics page says how far each has got -- a bar, and the count it
+is drawn from -- and opens to show what is in it.  An epic's colour is derived
+from its name the way a project's letter avatar is derived from the project's:
+nobody chooses it, and two epics are unlikely to share one by accident.
+
+Removing an epic removes the grouping and not the work: the tickets that
+pointed at it read as tickets with no epic, which is where they started.
+
+The Expand All and Collapse All controls on a backlog work again.  A card is
+opened by a class rather than by a `hidden' attribute now, so those controls
+have to ask the shared script to do it -- which is what the projects page's
+controls have always done and what the backlog's, left behind by that change,
+no longer did.
+
 A project in a list is a name and a picture, and a ticket carries its files
 with it.
 

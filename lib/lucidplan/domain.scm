@@ -350,6 +350,90 @@ a second time which column moves."
                  (cdr ladder))
          (list (cons (car ladder) value)))))
 
+;;; ===== The words a ticket is tagged with =====
+;;;
+;;; A label is a word a reader hangs on a ticket that no ladder in the schema
+;;; has a place for: `bug', `needs-design', `blocked-on-ops'.  Every team
+;;; invents its own, so nothing here can be a list of allowed values -- what is
+;;; kept is the text that was typed, and what is *meant* is decided by whoever
+;;; reads it back.
+;;;
+;;; The shape is the one a project's status ladder uses for the same reason: a
+;;; comma-separated line, stored as written, parsed where it is read.  Parsing
+;;; is therefore the only place with an opinion, and its opinion is small: a
+;;; label is trimmed of spaces, repeated separators are one separator, an empty
+;;; row is no row, and a label repeated twice is one label.  Case is left
+;;; alone -- `API' and `api' are not the same word to the person who typed them
+;;; -- but a filter matches without it (see `ticket-has-label?').
+
+(define-public (parse-labels text)
+  "Answer the labels TEXT carries, as a list of strings.
+
+TEXT is what a ticket's row holds: a comma-separated line, or nothing.  The
+answer is trimmed, deduplicated and in the order it was written, so a page
+that shows them shows the reader's own order rather than an alphabetical one
+nobody chose."
+  (let ((parts (if (string? text)
+                   (string-split text #\,)
+                   '())))
+    (delete-duplicates (filter (lambda (part)
+                                 (not (string-null? part)))
+                               (map string-trim-both parts))
+                       string=?)))
+
+(define-public (labels-text labels)
+  "Answer LABELS as the line a ticket's row keeps, or the empty string.
+
+It is the way back from `parse-labels', so a page that edits a ticket can hand
+the field back the line it was given without the round trip changing it."
+  (string-join (parse-labels (if (string? labels)
+                                 labels
+                                 (string-join (if (list? labels)
+                                                  labels
+                                                  '())
+                                              ",")))
+               ","))
+
+(define-public (ticket-labels ticket)
+  "Answer the labels of TICKET, parsed."
+  (parse-labels (assq-ref ticket
+                          'labels)))
+
+(define-public (ticket-has-label? ticket label)
+  "Answer whether TICKET carries LABEL, compared without case.
+
+The comparison is the one place case is put aside: a label is written once and
+then filtered by, and a reader who types `bug' into a filter means the
+`Bug' somebody else tagged."
+  (let ((wanted (if (string? label)
+                    (string-downcase label)
+                    "")))
+    (and (not (string-null? wanted))
+         (any (lambda (one)
+                (equal? (string-downcase one) wanted))
+              (ticket-labels ticket)))))
+
+;;; ===== A narrowing of the backlog, kept =====
+
+(define-public (filter-query-ok? query)
+  "Answer QUERY when it is a query string the backlog can be handed back, else
+  @code{#f}.
+
+A saved filter holds whatever was in the query string, and a query string is
+whatever somebody typed into an address.  It is therefore checked against the
+shape the backlog's own links have -- names, `=', `&', and the characters a
+value may carry -- rather than trusted: a filter that could name another host,
+a scheme, or a path is not a filter this application saves."
+  (and (string? query)
+       (<= (string-length query) 1024)
+       (string-every (lambda (c)
+                       (or (char-alphabetic? c)
+                           (char-numeric? c)
+                           (memv c
+                                 (list #\= #\& #\% #\- #\_ #\. #\+ #\:))))
+                     query)
+       query))
+
 (define-public (entity-sort-from-query user-sort)
   "Translate a sort keyword taken from the query string into the ORDER BY spec
 kracht's `sql-select' accepts: a list of (column [direction]) pairs.  An

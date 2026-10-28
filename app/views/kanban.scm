@@ -25,6 +25,7 @@
   #:use-module (ice-9 i18n)
   #:use-module (lucidplan html)
   #:use-module (lucidplan domain)
+  #:use-module (app views epics)
   #:use-module (hygguile hygguile)
   #:use-module (artanis route)
   #:use-module (kracht prelude)
@@ -79,6 +80,44 @@
                                                     hover:text-asparagus-500))))
                           ""))))))))
 
+;; The bands a board is cut into: one for each epic that has tickets on it,
+;; in the order the epics are named, and a last one for the tickets that belong
+;; to none.  An epic with nothing on the board is left out -- a band of nothing
+;; is a band a reader scrolls past -- but the band for no epic is always drawn
+;; when it has anything in it, because that is where a board read by epic
+;; starts showing what still has to be planned.
+(define (lanes-of epics tickets)
+  (let* ((by-epic (map (lambda (epic)
+                         (cons epic
+                               (filter (lambda (ticket)
+                                         (equal? (format #f "~a"
+                                                         (or (assq-ref ticket
+                                                                       'epic-id)
+                                                             ""))
+                                                 (format #f "~a"
+                                                         (assq-ref epic
+                                                                   'id))))
+                                       tickets)))
+                       epics))
+         (with-any (filter (lambda (lane)
+                             (pair? (cdr lane)))
+                           by-epic))
+         (none (filter (lambda (ticket)
+                         (let ((id (format #f "~a"
+                                           (or (assq-ref ticket
+                                                         'epic-id) ""))))
+                           (not (any (lambda (epic)
+                                       (equal? id
+                                               (format #f "~a"
+                                                       (assq-ref epic
+                                                                 'id))))
+                                     epics))))
+                       tickets)))
+    (append with-any
+            (if (pair? none)
+                (list (cons #f none))
+                '()))))
+
 (define* (kanban-from-tickets G_
                               #:key projects
                               project
@@ -87,6 +126,15 @@
                               is-logged-in
                               (can-drag? #f)
                               (statuses (default-ticket-statuses))
+                              ;; The board can be cut into swimlanes: one
+                              ;; band per epic, each a board of its own, with
+                              ;; the tickets that belong to no epic in the
+                              ;; last band.  `lanes?' is whether the reader
+                              ;; asked for that, and it is a link rather than
+                              ;; a stored preference -- a board is read one
+                              ;; way or the other at a time.
+                              (lanes? #f)
+                              (epics '())
                               (current-sort #f))
 
   (let* ( ;Whether a card offers its drag grip is the same question the
@@ -100,7 +148,6 @@
                                                     (assq-ref x
                                                               'ticket-status)))
                                         tickets)))
-
          ;; Which statuses the board is drawn from is the page's ladder: the
          ;; open ones are the columns, in the ladder's order, and the closed
          ;; ones are the sections under the board.  A status an instance adds
@@ -254,6 +301,25 @@
                                                             #:draggable?
                                                             draggable?)) list))))))
 
+         ;; A board, drawn from whichever tickets it is handed.  The plain
+         ;; board is this called with the whole backlog; a swimlane is this
+         ;; called with the tickets of one epic.  Making it a function of the
+         ;; tickets is what keeps the columns, the drag handlers and the
+         ;; status ladder the same in both.
+         (board-of (lambda (lane-tickets)
+                     `(div (@ (class ,board-face))
+                           ,@(map (lambda (status)
+                                    (build-col status
+                                               (status-label G_ statuses status)
+                                               (filter (lambda (x)
+                                                         (string=? status
+                                                                   (assq-ref
+                                                                    x
+                                                                    'ticket-status)))
+                                                       lane-tickets)
+                                               std-col-face))
+                                  open-statuses))))
+
          ;; Build Main HTML
          (kanban-html `((div (@ (class ,(mk-class '(px-2 py-4))))
                              (div (@ (class ,kanban-wrap-face))
@@ -312,6 +378,21 @@
                                                                         "milestones")
                                                              #:icon-css
                                                              btn-icon-face))
+                                            ;; The board cut one way or the
+                                            ;; other: the same page, and the
+                                            ;; link says which way it is not
+                                            ;; being read just now.
+                                            ,(quiet-link #:icon 'stack
+                                                         #:label (if lanes?
+                                                                     (G_ "one board")
+                                                                     (G_ "swimlanes by epic"))
+                                                         #:href (if lanes?
+                                                                    (format #f
+                                                                            "/kanban/~a"
+                                                                            project)
+                                                                    (format #f
+                                                                            "/kanban/~a?lanes=epic"
+                                                                            project)))
                                             (a (@ (href ,(format #f
                                                           "/tickets/~a/new"
                                                           project)))
@@ -321,16 +402,47 @@
                                                              #:icon-css
                                                              btn-icon-face)))))
 
-                             ;; Main Board
-                             (div (@ (class ,board-face))
-                                  ,@(map (lambda (status)
-                                           (build-col status
-                                                      (status-label G_
-                                                                    statuses
-                                                                    status)
-                                                      (tickets-with-status
-                                                       status) std-col-face))
-                                         open-statuses))
+                             ;; Main Board, or one board per epic.
+                             ;;
+                             ;; A swimlane is a way of reading the same board
+                             ;; through one epic at a time: the columns stay
+                             ;; the project's ladder, and what changes is
+                             ;; which tickets each column is drawn from.  The
+                             ;; tickets in no epic come last, because a board
+                             ;; is read for what has been planned before it is
+                             ;; read for what has not.
+                             ,@(if lanes?
+                                   (map (lambda (lane)
+                                          `(div (@ (class ,(mk-class '(flex
+                                                                       flex-col
+                                                                       gap-1
+                                                                       py-2))))
+                                                (div (@ (class ,(mk-class '(flex
+                                                                            flex-row
+                                                                            flex-wrap
+                                                                            items-center
+                                                                            gap-2
+                                                                            px-1))))
+                                                     ,@(if (car lane)
+                                                           (list (epic-chip
+                                                                  (car lane)))
+                                                           (list `(span (@ (class ,
+                                                                           (mk-class
+                                                                            '(text-sm
+                                                                              font-medium
+                                                                              text-onyx-700
+                                                                              dark:text-stone-300))))
+                                                                        ,(G_ "no epic"))))
+                                                     (span (@ (class ,(mk-class '(text-xs
+                                                                                  text-onyx-500
+                                                                                  dark:text-stone-500))))
+                                                           ,(format #f "~a ~a"
+                                                                    (length
+                                                                     (cdr lane))
+                                                                    (G_ "tickets"))))
+                                                ,(board-of (cdr lane))))
+                                        (lanes-of epics tickets))
+                                   (list (board-of tickets)))
 
                              )
                         ;; The closed statuses sit under the board, one

@@ -55,6 +55,11 @@
           ,(quiet-link #:icon 'kanban
                        #:label (G_ "kanban")
                        #:href (format #f "/kanban/~a" human-id))
+          ;; The bodies of work this project is made of: the middle height
+          ;; between the project and its tickets.
+          ,(quiet-link #:icon 'stack
+                       #:label (G_ "epics")
+                       #:href (format #f "/epics/~a" human-id))
           ,(render-if-nestring (lambda (x)
                                  (quiet-link #:icon 'link
                                              #:label (G_ "view live")

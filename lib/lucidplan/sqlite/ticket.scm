@@ -33,7 +33,14 @@
          ;; ordinary ticket rather than one in a special state.
          due-on
          sprint-id
-         milestone-id))
+         milestone-id
+         ;; The body of work this ticket is a piece of, or the empty string
+         ;; for a ticket that belongs to none -- which is the ordinary ticket
+         ;; rather than a special state.  See `(lucidplan domain epic)'.
+         epic-id
+         ;; The words the ticket is tagged with, as the comma-separated line
+         ;; they were typed as.  See `parse-labels'.
+         labels))
 
   (define conn
     (DB-open rc))

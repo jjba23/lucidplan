@@ -11,6 +11,8 @@
         (lucidplan auth)
         (kracht prelude)
         (lucidplan domain)
+        (lucidplan domain epic)
+        (lucidplan sqlite epic)
         (lucidplan sqlite ticket)
         (lucidplan sqlite project)
         (lucidplan domain ticket)
@@ -68,6 +70,21 @@
                                                       #:tickets
                                                       project-tickets
                                                       #:statuses statuses
+                                                      ;; Reading the board a
+                                                      ;; lane at a time is a
+                                                      ;; link, not a stored
+                                                      ;; preference: the same
+                                                      ;; board, cut one way.
+                                                      #:lanes? (equal? "epic"
+                                                                      (get-from-qstr
+                                                                       rc
+                                                                       "lanes"))
+                                                      #:epics (get-epics
+                                                               (make-sqlite-epic-repository
+                                                                rc)
+                                                               (assq-ref
+                                                                project-details
+                                                                'id))
                                                       #:current-sort user-sort
                                                       #:ticket-id-to-human-id
                                                       ticket-id-to-human-id

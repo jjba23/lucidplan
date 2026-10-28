@@ -24,6 +24,10 @@
         (artanis security nss)
         (artanis upload)
         (lucidplan domain project)
+        (lucidplan domain epic)
+        (lucidplan sqlite epic)
+        (lucidplan domain saved-filter)
+        (lucidplan sqlite saved-filter)
         (lucidplan domain ticket)
         (lucidplan domain ticket-assignee)
         (lucidplan domain ticket-attachment)
@@ -295,6 +299,11 @@ history entry that says somebody is better than one that fails to render."
                                         (get-from-qstr rc "search"))
                                 #f)
                                (else (html-escape (get-from-qstr rc "search")))))
+                ;; The two narrowings the panel above the backlog offers, read
+                ;; once here: they are handed to the page and they are what a
+                ;; saved filter is made of.
+                (epic-filter (get-from-qstr rc "epic"))
+                (label-filter (get-from-qstr rc "label"))
                 (user-sort (cond
                              ((not (equal? #f
                                            (get-from-qstr rc "sort")))
@@ -400,6 +409,65 @@ history entry that says somebody is better than one that fails to render."
                                                     #:with-rejected
                                                     with-rejected
                                                     #:statuses statuses
+                                                    ;; The epics of the project
+                                                    ;; -- what a row can say it
+                                                    ;; belongs to, and what the
+                                                    ;; panel above the list
+                                                    ;; narrows the backlog to.
+                                                    #:epics (get-epics
+                                                             (make-sqlite-epic-repository
+                                                              rc)
+                                                             (assq-ref
+                                                              project-details
+                                                              'id))
+                                                    #:epic-filter epic-filter
+                                                    #:label-filter label-filter
+                                                    ;; The named narrowings of
+                                                    ;; this backlog, and the
+                                                    ;; query string this page
+                                                    ;; was asked with -- which
+                                                    ;; is what the field beside
+                                                    ;; them saves.
+                                                    #:saved-filters (get-saved-filters
+                                                                    (make-sqlite-saved-filter-repository
+                                                                     rc)
+                                                                    (assq-ref
+                                                                     project-details
+                                                                     'id))
+                                                    ;; What "this view" is:
+                                                    ;; the query string this
+                                                    ;; page's own links would
+                                                    ;; produce, built from the
+                                                    ;; narrowings it was asked
+                                                    ;; with.  A filter saved
+                                                    ;; from here therefore
+                                                    ;; reopens exactly what the
+                                                    ;; reader was looking at.
+                                                    #:current-query (string-join
+                                                                     (filter
+                                                                      (lambda (part)
+                                                                        (not (string-null?
+                                                                              part)))
+                                                                      (list (if epic-filter
+                                                                                (format #f
+                                                                                        "epic=~a"
+                                                                                        (uri-encode epic-filter))
+                                                                                "")
+                                                                            (if label-filter
+                                                                                (format #f
+                                                                                        "label=~a"
+                                                                                        (uri-encode label-filter))
+                                                                                "")
+                                                                            (if user-search
+                                                                                (format #f
+                                                                                        "search=~a"
+                                                                                        (uri-encode user-search))
+                                                                                "")
+                                                                            (format #f
+                                                                                    "sort=~a"
+                                                                                    (uri-encode
+                                                                                     (or user-sort "")))))
+                                                                     "&")
                                                     #:search-query user-search
                                                     ;; Whether a ticket's row
                                                     ;; offers its inline triage
@@ -497,6 +565,11 @@ history entry that says somebody is better than one that fails to render."
                  (_ (write new-human-id))
                  (body (alist-from-url-encoded-body (rc-body rc)))
                  (title (html-escape (assoc-ref body "title")))
+                 ;; The words the ticket is tagged with, kept as the line they
+                 ;; were typed as (see `parse-labels').
+                 (labels (labels-text (html-escape (or (assoc-ref body
+                                                                   "labels")
+                                                       ""))))
                  (ticket-status (submitted-status statuses
                                                   (assoc-ref body
                                                              "ticket-status")))
@@ -530,6 +603,7 @@ history entry that says somebody is better than one that fails to render."
                                      (ticket-type unquote ticket-type)
                                      (priority unquote priority)
                                      (description unquote description)
+                                     (labels unquote labels)
                                      (created-at unquote
                                                  (current-time)))
                                    ;; An unestimated ticket keeps the NULL the
@@ -795,8 +869,37 @@ history entry that says somebody is better than one that fails to render."
                                                        project-repo proj)))
                  (raw-b (bytevector->string (rc-body rc) "utf-8"))
                  (b (json-string->scm raw-b))
-                 (change (ticket-field-change (assoc-ref b "field")
-                                              (assoc-ref b "value") statuses))
+                 ;; An epic is the one field whose ladder is not a table of
+                 ;; values but a query: what a ticket may be a piece of is the
+                 ;; epics of *its* project, so the value the menu submitted is
+                 ;; resolved against them here rather than in
+                 ;; `ticket-field-change', which knows only the ladders that do
+                 ;; not depend on which project a ticket is in.
+                 (change (if (equal? (assoc-ref b "field") "epic")
+                             (let* ((value (assoc-ref b "value"))
+                                    (epic-repo (make-sqlite-epic-repository rc))
+                                    (project (get-project-by-human-id
+                                              project-repo proj))
+                                    (epic (and project
+                                               (string? value)
+                                               (not (string-null? value))
+                                               (get-epic-by-project-and-human-id
+                                                epic-repo
+                                                (assq-ref project
+                                                          'id)
+                                                value))))
+                               (and project
+                                    (or (and (string? value)
+                                             (string-null? value))
+                                        epic)
+                                    (list (cons 'epic-id
+                                                (if epic
+                                                    (assq-ref epic
+                                                              'id)
+                                                    "")))))
+                             (ticket-field-change (assoc-ref b "field")
+                                                  (assoc-ref b "value")
+                                                  statuses)))
                  ;; A change is a one-entry association list -- the column and
                  ;; its new value -- not the pair alone, because that is the
                  ;; shape the repository update takes.
@@ -901,6 +1004,11 @@ history entry that says somebody is better than one that fails to render."
                  (body (alist-from-url-encoded-body (rc-body rc)))
                  (title (html-escape (assoc-ref body "title")))
                  (description (html-escape (assoc-ref body "description")))
+                 ;; The words it is tagged with, kept as the line they were
+                 ;; typed as (see `parse-labels').
+                 (labels (labels-text (html-escape (or (assoc-ref body
+                                                                   "labels")
+                                                       ""))))
                  (ticket-status (submitted-status statuses
                                                   (assoc-ref body
                                                              "ticket-status")))
@@ -952,6 +1060,13 @@ history entry that says somebody is better than one that fails to render."
                                                                 (description
                                                                  unquote
                                                                  description)
+                                                                ;; The words
+                                                                ;; it is tagged
+                                                                ;; with, as the
+                                                                ;; line they were
+                                                                ;; typed as.
+                                                                (labels unquote
+                                                                        labels)
                                                                 (title unquote
                                                                  title)
                                                                 (priority
@@ -1327,6 +1442,196 @@ history entry that says somebody is better than one that fails to render."
                            #:needed-permissions '(lucidplan:ticket-create)
                            #:rc rc
                            #:happy-flow do-remove-attachment
+                           #:unhappy-flow back-to-login)))
+
+;; ===== Changing several tickets at once =====
+;;
+;; The bar above a backlog offers four changes -- an epic, a status, an
+;; assignee, a label -- to every row a reader ticked.  Each ticket is written
+;; through the same repository call the single-ticket route uses, and each is
+;; stamped with the moment it changed, so nothing here is a second way of
+;; writing a ticket; it is the first way, repeated.
+;;
+;; What arrives is one field of ids and one value, and the value carries the
+;; kind of change in front of it ("epic:sign-in").  The kind is what is
+;; trusted; a value with no kind, or with one this page does not offer, is
+;; refused rather than guessed at.  A label is the exception only in that it is
+;; free text: it arrives in its own field and is added to whatever the ticket
+;; already carries, because a bulk change that *replaced* every label would be
+;; a way to lose data by pressing a button.
+(post "/tickets/:project/bulk"
+      #:mime 'xml
+      #:cookies '(names x-bewaking-lucidplan)
+      (lambda (rc)
+        (define (do-bulk)
+          (let* ((human-id (params rc "project"))
+                 (project-repo (make-sqlite-project-repository rc))
+                 (ticket-repo (make-sqlite-ticket-repository rc))
+                 (epic-repo (make-sqlite-epic-repository rc))
+                 (project (get-project-by-human-id project-repo human-id))
+                 (body (alist-from-url-encoded-body (rc-body rc)))
+                 (ids (and (assoc-ref body "ids")
+                           (string-split (assoc-ref body "ids") #\,)))
+                 (raw (or (assoc-ref body "value") ""))
+                 (label (string-trim-both (or (assoc-ref body "label") "")))
+                 (colon (string-index raw #\:))
+                 (kind (and colon (substring raw 0 colon)))
+                 (value (if colon
+                            (substring raw (+ colon 1) (string-length raw))
+                            raw))
+                 (statuses (and project
+                                (effective-ticket-statuses project)))
+                 (epics (and project
+                             (get-epics epic-repo (assq-ref project 'id))))
+                 (epic (and project
+                            (not (string-null? value))
+                            (find (lambda (e)
+                                    (equal? (assq-ref e 'human-id) value))
+                                  epics)))
+                 (assignee-ok? (or (string-null? value)
+                                   (find (lambda (u)
+                                           (equal? (assq-ref u 'id) value))
+                                         (get-id-to-username
+                                          (make-sqlite-user-repository rc))))))
+            (when (and project (pair? ids))
+              (for-each (lambda (ticket-human-id)
+                          (let ((ticket (get-ticket-by-project-human-id-and-human-id
+                                         ticket-repo human-id ticket-human-id)))
+                            (when ticket
+                              (cond
+                                ;; An epic, or none: the menu offers both, and
+                                ;; a slug that names no epic of this project is
+                                ;; not one of them.
+                                ((equal? kind "epic")
+                                 (when (or (string-null? value) epic)
+                                   (update-ticket-by-project-human-id-and-human-id
+                                    ticket-repo human-id ticket-human-id
+                                    `((epic-id unquote
+                                               (if epic
+                                                   (assq-ref epic 'id)
+                                                   ""))))))
+                                ((and (equal? kind "status")
+                                      (member value
+                                              (ticket-status-values statuses)))
+                                 (update-ticket-by-project-human-id-and-human-id
+                                  ticket-repo human-id ticket-human-id
+                                  `((ticket-status unquote value))))
+                                ((and (equal? kind "assignee")
+                                      assignee-ok?)
+                                 (let ((assignee-repo
+                                        (make-sqlite-ticket-assignee-repository
+                                         rc))
+                                       (project-id (assq-ref project 'id))
+                                       (ticket-id (assq-ref ticket 'id)))
+                                   (if (string-null? value)
+                                       (unassign-ticket-assignee assignee-repo
+                                                                 ticket-id)
+                                       (upsert-ticket-assignee
+                                        assignee-repo
+                                        `((project-id unquote project-id)
+                                          (ticket-id unquote ticket-id)
+                                          (user-id unquote value))))))
+                                ((and (equal? kind "label")
+                                      (not (string-null? label)))
+                                 ;; A label is added, never replaced: the words
+                                 ;; a ticket already carries are somebody's.
+                                 (update-ticket-by-project-human-id-and-human-id
+                                  ticket-repo human-id ticket-human-id
+                                  `((labels unquote
+                                            (labels-text
+                                             (string-join
+                                              (append (ticket-labels ticket)
+                                                      (parse-labels label))
+                                              ","))))))))
+                              ;; Every change is an edit, and the backlog can
+                              ;; order by when a ticket was last edited.
+                              (update-ticket-by-project-human-id-and-human-id
+                               ticket-repo human-id ticket-human-id
+                               `((updated-at unquote (current-time)))))))
+                        (delete-duplicates ids))
+            (redirect-to rc
+                         (string->uri (format #f "~a/tickets/~a"
+                                              (current-myhost) human-id))
+                         #:status 302)))
+        (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                           #:needed-permissions '(lucidplan:ticket-create)
+                           #:rc rc
+                           #:happy-flow do-bulk
+                           #:unhappy-flow back-to-login)))
+
+;; ===== The narrowings of a backlog that somebody named =====
+;;
+;; Two endpoints, and neither of them is a page: a filter is saved from the
+;; backlog it narrows and removed from the panel that lists it, so both answer
+;; a redirect back to where the reader was.  What is kept is the query string
+;; as text (see `(lucidplan domain saved-filter)'), and it is checked before it
+;; is kept -- a query string is somebody's typing, and a filter that could name
+;; another host or another path is not a filter this application saves.
+
+(post "/tickets/:project/filters/new"
+      #:mime 'xml
+      #:cookies '(names x-bewaking-lucidplan)
+      (lambda (rc)
+        (define (do-save)
+          (let* ((human-id (params rc "project"))
+                 (project-repo (make-sqlite-project-repository rc))
+                 (project (get-project-by-human-id project-repo human-id))
+                 (filter-repo (make-sqlite-saved-filter-repository rc))
+                 (body (alist-from-url-encoded-body (rc-body rc)))
+                 (name (html-escape (string-trim-both (or (assoc-ref body
+                                                                     "name")
+                                                           ""))))
+                 (query (or (assoc-ref body "query") "")))
+            (when (and project
+                       (not (string-null? name))
+                       (filter-query-ok? query))
+              (insert-saved-filter filter-repo
+                                   `((id unquote
+                                         (string-replace-substring
+                                          (generate-string-uuid) "\n" ""))
+                                     (project-id unquote
+                                                 (assq-ref project
+                                                           'id))
+                                     (name unquote (if (> (string-length name)
+                                                          120)
+                                                       (substring name 0 120)
+                                                       name))
+                                     (query unquote query)
+                                     (created-at unquote
+                                                 (current-time)))))
+            (redirect-to rc
+                         (string->uri (format #f "~a/tickets/~a~a"
+                                              (current-myhost) human-id
+                                              (if (string-null? query) ""
+                                                  (format #f "?~a" query))))
+                         #:status 302)))
+        (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                           #:needed-permissions '(lucidplan:ticket-create)
+                           #:rc rc
+                           #:happy-flow do-save
+                           #:unhappy-flow back-to-login)))
+
+(post "/tickets/:project/filters/delete"
+      #:mime 'xml
+      #:cookies '(names x-bewaking-lucidplan)
+      (lambda (rc)
+        (define (do-remove)
+          (let* ((human-id (params rc "project"))
+                 (project-repo (make-sqlite-project-repository rc))
+                 (filter-repo (make-sqlite-saved-filter-repository rc))
+                 (body (alist-from-url-encoded-body (rc-body rc)))
+                 (id (assoc-ref body "id")))
+            (when (and id
+                       (get-saved-filter-by-id filter-repo id))
+              (soft-delete-saved-filter filter-repo id))
+            (redirect-to rc
+                         (string->uri (format #f "~a/tickets/~a"
+                                              (current-myhost) human-id))
+                         #:status 302)))
+        (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                           #:needed-permissions '(lucidplan:ticket-create)
+                           #:rc rc
+                           #:happy-flow do-remove
                            #:unhappy-flow back-to-login)))
 
 ;; The bytes of an attachment, as a bytevector, or #f when there are none to
@@ -1928,6 +2233,11 @@ history entry that says somebody is better than one that fails to render."
                                                        ticket-assignee
                                                        'user-id))) user-names))
                 (statuses (effective-ticket-statuses project-details))
+                ;; The epics of the project the ticket is in: the card names the
+                ;; one it belongs to, and offers the menu that changes it.
+                (epics (get-epics (make-sqlite-epic-repository rc)
+                                  (assq-ref project-details
+                                            'id)))
                 ;; The record the ticket carries with it: its discussion, its
                 ;; files, what happened to it and the versions of what it
                 ;; said.  They are read by ticket id, so a ticket that was
@@ -1987,6 +2297,7 @@ history entry that says somebody is better than one that fails to render."
                                             #:project (params rc "project")
                                             #:ticket t
                                             #:statuses statuses
+                                            #:epics epics
                                             #:today (today-iso)
                                             #:logged-minutes logged-minutes
                                             #:assignee (if (nil?

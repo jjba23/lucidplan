@@ -262,3 +262,35 @@ async function updateTicketField(select, project, humanId, field) {
                     template ? template.dataset.failedBody : '');
   }
 }
+
+// ===== Bulk changes =====
+//
+// The backlog's bulk bar is one form for the whole page -- a form around the
+// list would sit around the forms each row already holds, which no browser
+// will parse -- so the ticked rows are collected here, at the moment the form
+// is submitted, and posted as the one field the endpoint reads.
+//
+// Nothing is done when nothing is ticked: a bulk change that quietly changed
+// nothing would look exactly like one that worked.
+function lucidplanBulkSubmit(form) {
+  const ids = Array.prototype.slice
+    .call(document.querySelectorAll('.lp-bulk-check:checked'))
+    .map((box) => box.dataset.ticketId)
+    .filter((id) => id)
+
+  if (!ids.length) {
+    window.alert('Select at least one ticket first.')
+    return false
+  }
+
+  form.querySelector('input[name="ids"]').value = ids.join(',')
+  return true
+}
+
+// The tick in the bar is every tick on the page, and it says which it is: a
+// reader who untick one row is told the whole is no longer ticked.
+function lucidplanBulkSelectAll(box) {
+  document.querySelectorAll('.lp-bulk-check').forEach((one) => {
+    one.checked = box.checked
+  })
+}
