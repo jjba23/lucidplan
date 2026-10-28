@@ -1,19 +1,7 @@
-;;; lucidplan - free and open project management for everyone
-
+;; lucidplan - free and open project management for everyone
+;;
+;; SPDX-LICENSE-IDENTIFIER: MIT
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
-
-;; lucidplan is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU Affero General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; lucidplan is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU Affero General Public License for more details.
-
-;; You should have received a copy of the GNU Affero General Public License
-;; along with lucidplan.  If not, see <https://www.gnu.org/licenses/>.
 
 (define-module (app views me)
   #:use-module (lucidplan html)
@@ -50,7 +38,7 @@
                   token
                   user
                   projects)
-  
+
   (let ((user-details `((div (@ (class ,(mk-class '(py-8 px-4 max-w-prose))))
                              ,(h3 (format #f "~a &lt;~a&gt;"
                                           (assq-ref user
@@ -413,7 +401,7 @@
                                                      dark:text-stone-300))
                                         (input-flex-css '(my-2 flex flex-row
                                                                gap-1)))
-  
+
   `((div (@ (class ,(mk-class input-flex-css)))
          (label (@ (class ,(mk-class label-css))
                    (for ,name))
@@ -475,7 +463,7 @@
                                                                              (member
                                                                               p
 
-                                                                              
+
                                                                               (eval-string
                                                                                (assq-ref
                                                                                 u

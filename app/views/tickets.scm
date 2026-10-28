@@ -1,19 +1,7 @@
-;;; lucidplan - free and open project management for everyone
-
+;; lucidplan - free and open project management for everyone
+;;
+;; SPDX-LICENSE-IDENTIFIER: MIT
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
-
-;; lucidplan is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU Affero General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; lucidplan is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU Affero General Public License for more details.
-
-;; You should have received a copy of the GNU Affero General Public License
-;; along with lucidplan.  If not, see <https://www.gnu.org/licenses/>.
 
 (define-module (app views tickets)
   #:use-module (web server)
@@ -384,7 +372,7 @@ at the first of them."
                      id))
          (edit-url (format #f "/tickets/~a/id/~a/edit" project human-id))
          (delete-url (format #f "/tickets/~a/delete" project)))
-    
+
     `(div (@ (class ,%card-face))
 
           ;; Header: what the ticket is called, which ticket it is, and -- on
@@ -673,7 +661,7 @@ at the first of them."
                                 (equal? (assq-ref u
                                                   'id) ticket-assignee))
                               user-names)))
-    
+
     `(div (@ (class ,%list-wrapper-face)
              (id ,item-id)
              (data-ticket-id ,human-id)
@@ -980,7 +968,7 @@ at the first of them."
                                 #:frost 3
                                 #:padding '(p-5 sm:p-6)
                                 #:classes '(flex flex-col gap-2)))))
-    
+
     ;; Build the final HTML View
     (html-template G_
                    #:title (format #f "backlog of ~a" proj-title)
@@ -1215,7 +1203,7 @@ at the first of them."
                            (page-title "")
                            (canonical-path "/tickets")
                            (is-logged-in #f))
-  
+
   (let* ( ;Consolidate Reusable CSS Classes
           (form-face (mk-class '(flex flex-col gap-6)))
          (field-face (mk-class '(max-w-128)))
@@ -1337,7 +1325,7 @@ at the first of them."
 
                                 ;; Submit Button
                                 (div ,(submit-button (G_ "submit")))))))
-    
+
     ;; Render final template
     (html-template G_
                    #:title (if (string-null? page-title) #f page-title)
@@ -1989,9 +1977,9 @@ run of cards."
                                                                #:label (G_
                                                                         "project")
                                                                #:on-change ""
-                                                               #:options (map (lambda 
+                                                               #:options (map (lambda
                                                                                       (p)
-                                                                                
+
                                                                                 (option
                                                                                  #:value
                                                                                  (assq-ref
@@ -2001,10 +1989,10 @@ run of cards."
                                                                                  (assq-ref
                                                                                   p
                                                                                   'title)))
-                                                                              
-                                                                              (filter (lambda 
+
+                                                                              (filter (lambda
                                                                                               (p)
-                                                                                        
+
                                                                                         (not
                                                                                          (equal?
                                                                                           (assq-ref
@@ -2175,7 +2163,7 @@ run of cards."
      (list (glass-panel `(,(section-title G_ 'clock-counter-clockwise
                                           (G_ "activity")
                                           (length events)) ,@(if (pair? events)
-                                                                 (map (lambda 
+                                                                 (map (lambda
                                                                               (event)
                                                                         (render-event
                                                                          G_
@@ -2199,27 +2187,27 @@ run of cards."
                                           (G_ "versions")
                                           (length revisions)) ,@(if (pair?
                                                                      revisions)
-                                                                    (map (lambda 
+                                                                    (map (lambda
                                                                                  (revision)
-                                                                           (let* 
+                                                                           (let*
                                                                                  (
                                                                                   (version
                                                                                    (assq-ref
                                                                                     revision
                                                                                     'version))
-                                                                                  
+
                                                                                   (previous (let loop
-                                                                                              
+
                                                                                               (
                                                                                                (rest
                                                                                                 revisions))
                                                                                               (cond
-                                                                                                
+
                                                                                                 (
                                                                                                  (null?
                                                                                                   rest)
                                                                                                  #f)
-                                                                                                
+
                                                                                                 (
                                                                                                  (equal?
                                                                                                   (assq-ref
@@ -2227,56 +2215,56 @@ run of cards."
                                                                                                     rest)
                                                                                                    'version)
                                                                                                   version)
-                                                                                                 
+
                                                                                                  (and
                                                                                                   (pair?
                                                                                                    (cdr
                                                                                                     rest))
-                                                                                                  
+
                                                                                                   (cadr
                                                                                                    rest)))
-                                                                                                
+
                                                                                                 (else
                                                                                                  (loop
                                                                                                   (cdr
                                                                                                    rest))))))
-                                                                                  
+
                                                                                   (changed
                                                                                    (if
                                                                                     previous
-                                                                                    
+
                                                                                     (map
                                                                                      cadr
-                                                                                     
+
                                                                                      (ticket-changes
                                                                                       previous
                                                                                       revision))
                                                                                     '()))
-                                                                                  
+
                                                                                   (author
                                                                                    (assq-ref
                                                                                     revision
                                                                                     'author-id))
-                                                                                  
-                                                                                  (author-name (let 
+
+                                                                                  (author-name (let
                                                                                                     (
                                                                                                      (u
                                                                                                       (and
                                                                                                        author
-                                                                                                       
-                                                                                                       (find (lambda 
+
+                                                                                                       (find (lambda
                                                                                                                      (row)
-                                                                                                               
+
                                                                                                                (equal?
                                                                                                                 (assq-ref
                                                                                                                  row
                                                                                                                  'id)
                                                                                                                 author))
                                                                                                         users))))
-                                                                                                 
+
                                                                                                  (if
                                                                                                   u
-                                                                                                  
+
                                                                                                   (assq-ref
                                                                                                    u
                                                                                                    'username)
@@ -2293,7 +2281,7 @@ run of cards."
                                                                                   px-3
                                                                                   py-2
                                                                                   my-1))))
-                                                                              
+
                                                                               (summary
                                                                                (@
                                                                                 (class ,
@@ -2306,16 +2294,16 @@ run of cards."
                                                                                 #f
                                                                                 "v~a — ~a — ~a"
                                                                                 version
-                                                                                
+
                                                                                 (recorded-at
                                                                                  (assq-ref
                                                                                   revision
                                                                                   'created-at))
-                                                                                
+
                                                                                 (if
                                                                                  (string-null?
                                                                                   author-name)
-                                                                                 
+
                                                                                  (G_
                                                                                   "somebody")
                                                                                  author-name)))
@@ -2336,15 +2324,15 @@ run of cards."
                                                                                  (format
                                                                                   #f
                                                                                   "~a: ~a"
-                                                                                  
+
                                                                                   (G_
                                                                                    "changed")
-                                                                                  
+
                                                                                   (string-join
                                                                                    changed
                                                                                    ", "))))
                                                                                '())
-                                                                              
+
                                                                               (div
                                                                                (@
                                                                                 (class ,
@@ -2353,7 +2341,7 @@ run of cards."
                                                                                    leading-7
                                                                                    max-w-prose
                                                                                    wrap-break-word))))
-                                                                               
+
                                                                                (strong ,
                                                                                 (G_
                                                                                  "title"))
@@ -2364,13 +2352,13 @@ run of cards."
                                                                                  revision
                                                                                  'title)
                                                                                 ""))
-                                                                              
+
                                                                               (div
                                                                                (@
                                                                                 (class ,
                                                                                  (mk-class '
                                                                                   (text-sm))))
-                                                                               
+
                                                                                (strong ,
                                                                                 (G_
                                                                                  "status"))
@@ -2379,19 +2367,19 @@ run of cards."
                                                                                (status-label
                                                                                 G_
                                                                                 statuses
-                                                                                
+
                                                                                 (or
                                                                                  (assq-ref
                                                                                   revision
                                                                                   'ticket-status)
                                                                                  "")))
-                                                                              
+
                                                                               (div
                                                                                (@
                                                                                 (class ,
                                                                                  (mk-class '
                                                                                   (text-sm))))
-                                                                               
+
                                                                                (strong ,
                                                                                 (G_
                                                                                  "type"))
@@ -2399,7 +2387,7 @@ run of cards."
                                                                                ,
                                                                                (ticket-type-label
                                                                                 G_
-                                                                                
+
                                                                                 (or
                                                                                  (assq-ref
                                                                                   revision
@@ -2417,7 +2405,7 @@ run of cards."
                                                                                   (class ,
                                                                                    (mk-class '
                                                                                     (text-sm))))
-                                                                                 
+
                                                                                  (strong ,
                                                                                   (G_
                                                                                    "priority"))
@@ -2426,7 +2414,7 @@ run of cards."
                                                                                  (format
                                                                                   #f
                                                                                   "~a"
-                                                                                  
+
                                                                                   (assq-ref
                                                                                    revision
                                                                                    'priority))))
@@ -2443,7 +2431,7 @@ run of cards."
                                                                                   (class ,
                                                                                    (mk-class '
                                                                                     (text-sm))))
-                                                                                 
+
                                                                                  (strong ,
                                                                                   (G_
                                                                                    "story points"))
@@ -2452,7 +2440,7 @@ run of cards."
                                                                                  (format
                                                                                   #f
                                                                                   "~a"
-                                                                                  
+
                                                                                   (assq-ref
                                                                                    revision
                                                                                    'estimate-points))))
@@ -2469,7 +2457,7 @@ run of cards."
                                                                                   (class ,
                                                                                    (mk-class '
                                                                                     (text-sm))))
-                                                                                 
+
                                                                                  (strong ,
                                                                                   (G_
                                                                                    "size"))
@@ -2506,7 +2494,7 @@ run of cards."
                                                                               (if
                                                                                (and
                                                                                 editable?
-                                                                                
+
                                                                                 (not
                                                                                  (equal?
                                                                                   version
@@ -2517,7 +2505,7 @@ run of cards."
                                                                                  (@
                                                                                   (method
                                                                                    POST)
-                                                                                  
+
                                                                                   (action ,
                                                                                    (format
                                                                                     #f
@@ -2525,7 +2513,7 @@ run of cards."
                                                                                     project
                                                                                     human-id
                                                                                     version)))
-                                                                                 
+
                                                                                  (div ,
                                                                                   (submit-button
                                                                                    (G_

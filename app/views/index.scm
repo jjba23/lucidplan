@@ -1,19 +1,7 @@
-;;; lucidplan - free and open project management for everyone
-
+;; lucidplan - free and open project management for everyone
+;;
+;; SPDX-LICENSE-IDENTIFIER: MIT
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
-
-;; lucidplan is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU Affero General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; lucidplan is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU Affero General Public License for more details.
-
-;; You should have received a copy of the GNU Affero General Public License
-;; along with lucidplan.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; The front page is the way in.
 ;;;
@@ -108,7 +96,7 @@
 ;; side of a wide emptiness.
 (define (landing-hero G_ project-count selected-locale)
   (glass-panel `( ;What the reader reads the page in comes first, and it is the one
-                 
+
                  ;; control here that names itself: a reader who cannot read the copy has
                  ;; to be able to find it without reading the copy.
                  (div (@ (class ,(mk-class '(flex flex-row flex-wrap

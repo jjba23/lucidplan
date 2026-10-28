@@ -1,19 +1,7 @@
-;;; lucidplan - free and open project management for everyone
-
+;; lucidplan - free and open project management for everyone
+;;
+;; SPDX-LICENSE-IDENTIFIER: MIT
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
-
-;; lucidplan is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU Affero General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; lucidplan is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU Affero General Public License for more details.
-
-;; You should have received a copy of the GNU Affero General Public License
-;; along with lucidplan.  If not, see <https://www.gnu.org/licenses/>.
 
 (define-module (lucidplan html)
   #:use-module (web server)
@@ -402,12 +390,12 @@ run against a default address somebody else runs."
                                                           ,(assq-ref p
                                                                      'title)))
                                                proj))))
-           
+
            ;; The bar is the framework's frosted glass header: the same pane
            ;; the cards wear, tinted with the brand blue, pinned to the top,
            ;; and left square so the dropdown it holds can escape its edge.
            (nav (glass-panel `(
-                               
+
                                ;; Left Section: Brand/Logo
                                (div (@ (class ,(mk-class '(flex items-center
                                                            justify-center
@@ -624,7 +612,7 @@ run against a default address somebody else runs."
                                                 md:items-center
                                                 md:justify-between
                                                 md:gap-4))))
-      
+
       ;; Output Page
       (render-page `(,doctype-html (html (@ (lang ,(config-ref 'site-language)))
                                          (head (title ,(page-title title))

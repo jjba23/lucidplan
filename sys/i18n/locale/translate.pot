@@ -1,7 +1,8 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR Josep Bigorra
-# This file is distributed under the same license as the translate package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# LucidPlan
+# lucidplan - free and open project management for everyone
+# 
+# SPDX-LICENSE-IDENTIFIER: MIT
+# Copyright © Josep Bigorra <jjbigorra@gmail.com>
 #
 #, fuzzy
 msgid ""

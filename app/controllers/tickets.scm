@@ -1,19 +1,7 @@
-;;; lucidplan - free and open project management for everyone
-
+;; lucidplan - free and open project management for everyone
+;;
+;; SPDX-LICENSE-IDENTIFIER: MIT
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
-
-;; lucidplan is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU Affero General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; lucidplan is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU Affero General Public License for more details.
-
-;; You should have received a copy of the GNU Affero General Public License
-;; along with lucidplan.  If not, see <https://www.gnu.org/licenses/>.
 
 (define-artanis-controller tickets)
 
@@ -169,7 +157,7 @@
                                                                              (value-attr
                                                                               attrs
                                                                               'description
-                                                                              
+
                                                                               (assq-ref
                                                                                ticket
                                                                                'description))
@@ -392,7 +380,7 @@ history entry that says somebody is better than one that fails to render."
                 (ticket-assignee (get-ticket-assignee-by-project-human-id
                                   ticket-assignee-repo
                                   (params rc "project"))))
-           
+
            (response-emit (:mime rc
                                  (html-from-tickets (:i18n rc)
                                                     #:is-logged-in
@@ -709,7 +697,7 @@ history entry that says somebody is better than one that fails to render."
                                                            #:new-value (tracked-value
                                                                         priority))))))
                                     (vector->list (assoc-ref b "tickets"))) #t)))
-            
+
             (if upd-r
                 (:mime rc
                        '(("result" . "success")))
@@ -743,7 +731,7 @@ history entry that says somebody is better than one that fails to render."
                  (new-status (assoc-ref b "status"))
                  (old-ticket (get-ticket-by-project-human-id-and-human-id
                               ticket-repo proj human-id)))
-            
+
             (cond
               ((not (and (string? new-status)
                          (member new-status

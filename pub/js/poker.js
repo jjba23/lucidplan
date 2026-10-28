@@ -1,3 +1,9 @@
+/* lucidplan - free and open project management for everyone
+ *
+ * SPDX-LICENSE-IDENTIFIER: MIT
+ * Copyright © Josep Bigorra <jjbigorra@gmail.com>
+*/
+
 // ==================================
 // A planning table, kept current
 // ==================================

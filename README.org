@@ -15,9 +15,9 @@ LucidPlan is a project management system for teams of all sizes and all kinds
 of work: a multi-project workspace, a priority-ordered backlog, and drag-and-drop
 kanban boards, kept deliberately simple and hackable end to end in Scheme.
 
-It's a flexible system made to simplify everyone's life, accessible to all kinds
-of users -- and free software (free as in freedom), licensed under the
-GNU Affero General Public License v3 or newer.
+#+begin_quote
+It's a flexible system made to simplify everyone's life, and /make project management great again/
+#+end_quote
 
 #+name: lucidplan-showcase
 #+caption: The front page, the projects dashboard, a card dragged across a board, the backlog with a ticket opened, and the same board in the dark theme.
@@ -1413,16 +1413,9 @@ tell us.
 :CUSTOM_ID: licensing
 :END:
 
-lucidplan and all of its source code are free software, licensed under the GNU
-Affero General Public License v3 (or newer at your convenience).
+lucidplan and all of its source code are free and open software, licensed under the [[https://opensource.org/license/mit][MIT License]]
 
-https://www.gnu.org/licenses/agpl-3.0.html
-
-The documentation and examples, including this document, which are provided with
-lucidplan, are all licensed under the GNU Free Documentation License v1.3 (or
-newer at your convenience).
-
-https://www.gnu.org/licenses/fdl-1.3.html
+The documentation and examples, including this document, which are provided with lucidplan, are all licensed under the [[https://creativecommons.org/licenses/by/4.0/][CC BY 4.0 (Creative Commons Attribution)]] license.
 
 ------------------
 

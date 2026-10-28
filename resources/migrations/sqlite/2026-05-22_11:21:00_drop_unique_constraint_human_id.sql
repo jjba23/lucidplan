@@ -1,3 +1,8 @@
+-- lucidplan - free and open project management for everyone
+--
+-- SPDX-LICENSE-IDENTIFIER: MIT
+-- Copyright © Josep Bigorra <jjbigorra@gmail.com>
+
 PRAGMA foreign_keys=off;
 
 ALTER TABLE ticket RENAME TO old_ticket;

@@ -1,3 +1,9 @@
+/* lucidplan - free and open project management for everyone
+ *
+ * SPDX-LICENSE-IDENTIFIER: MIT
+ * Copyright © Josep Bigorra <jjbigorra@gmail.com>
+*/
+
 let draggedTicket = null;
 
 // A ticket is dragged by its grip, never by its whole card or row: a drag
