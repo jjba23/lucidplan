@@ -1,6 +1,6 @@
 ;; lucidplan - free and open project management for everyone
 ;;
-;; SPDX-LICENSE-IDENTIFIER: MIT
+;; SPDX-License-Identifier: MIT
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
 ;;; ===== One place for the things an instance says about itself =====
@@ -155,14 +155,24 @@
     (landing-workflow-intro . "Every ticket is a row on a board: move it along the columns as the work moves, and let the state of the board tell you where the project stands.")
 
     ;; -- Files a ticket carries -------------------------------------------
-    ;; Where uploaded attachments are kept, relative to the instance's own
-    ;; working directory, and the largest one it accepts in bytes (5 MiB,
-    ;; the same ceiling Artanis puts on a request body).  The directory is
-    ;; created on the first upload; it is deliberately outside `pub/', so a
-    ;; file is handed out by the application -- which knows which ticket it
-    ;; belongs to -- rather than by the static file server.
+    ;; The largest file an upload may carry, in bytes (5 MiB, the same ceiling
+    ;; Artanis puts on a request body).  A file now lives in the row that
+    ;; describes it, so it travels with a copy of the database; the directory
+    ;; named below is only what remains of where files used to be written --
+    ;; it is where a file uploaded before that change is found, once, and
+    ;; stored (see the download route).  It can go when no such file is left.
     (attachment-directory . "var/attachments")
     (attachment-max-bytes . 5242880)
+
+    ;; -- The picture a project wears --------------------------------------
+    ;; The largest one this instance accepts, in bytes (2 MiB -- a picture
+    ;; drawn in a list, so a large one is bytes nobody sees).  There is no
+    ;; directory to configure: the picture is kept in the project's own row,
+    ;; so it travels with a copy of the database and cannot be left behind by
+    ;; a backup that forgot a folder.  A project with no picture is drawn as a
+    ;; letter avatar instead; nothing has to be uploaded for a list of
+    ;; projects to look finished.
+    (avatar-max-bytes . 2097152)
 
     ;; -- Mail -------------------------------------------------------------
     ;; The name and address a notification is sent from, and the subject

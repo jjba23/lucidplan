@@ -1,6 +1,6 @@
 /* lucidplan - free and open project management for everyone
  *
- * SPDX-LICENSE-IDENTIFIER: MIT
+ * SPDX-License-Identifier: MIT
  * Copyright © Josep Bigorra <jjbigorra@gmail.com>
  */
 
@@ -74,6 +74,11 @@
   --lp-lift: -0.18rem;
   --lp-shadow-hover: 0 1.45rem 2.6rem -1.1rem rgba(28, 25, 23, 0.34),
     0 0.5rem 1rem -0.6rem rgba(28, 25, 23, 0.2);
+  /* A card an item has been opened into sits a little higher than one at
+     rest, which is what says -- without a single word -- that this is the one
+     being worked on. */
+  --lp-shadow-open: 0 1.1rem 2.2rem -1.15rem rgba(28, 25, 23, 0.3),
+    0 0.35rem 0.8rem -0.55rem rgba(28, 25, 23, 0.16);
 }
 
 [data-theme="dark"] {
@@ -85,6 +90,8 @@
   --lp-grain-opacity: 0.05;
   --lp-shadow-hover: 0 1.45rem 2.6rem -1.1rem rgba(0, 0, 0, 0.7),
     0 0.5rem 1rem -0.6rem rgba(0, 0, 0, 0.45);
+  --lp-shadow-open: 0 1.1rem 2.2rem -1.15rem rgba(0, 0, 0, 0.6),
+    0 0.35rem 0.8rem -0.55rem rgba(0, 0, 0, 0.4);
   color-scheme: dark;
 }
 
@@ -197,47 +204,70 @@
 /* ===== 5. The bar's own controls =====
 
    The bar is a frosted toolbar, so its controls behave like the ones in a
-   toolbar rather than like links in a paragraph: each sits on a pill it only
-   shows when it is pointed at, and the row magnifies around the pointer the
-   way a dock does.  The neighbours of the pointed-at control grow by half as
-   much as it does, which is the detail that makes a dock feel like one
-   surface with a wave running through it instead of a row of independent
-   buttons.
+   toolbar rather than like links in a paragraph: the control under the pointer
+   rises by a pixel and its neighbours by half of one, which is the whole of
+   the dock effect this sheet asks for.
+
+   Restraint is the point of this section, and it is deliberate rather than
+   timid.  A toolbar sits at the top of every page of the application, and a
+   control that leaps and glows is a control a reader learns to flinch at
+   rather than read; the framework already tints its own buttons on hover, so
+   all this sheet adds is the movement, and it adds a millimetre of it.  The
+   curve is the plain ease-out rather than the spring the cards use -- on the
+   one surface a reader meets on every page, nothing should overshoot.
 
    `:has()' is what reaches the neighbour on the left; a browser without it
-   simply magnifies the control under the pointer and leaves the rest alone,
-   which is a lesser effect and not a broken one. */
-
-.lp-navlink {
-  border-radius: 0.85rem;
-  transition: transform var(--lp-base) var(--lp-spring),
-    background-color var(--lp-quick) var(--lp-ease),
-    box-shadow var(--lp-quick) var(--lp-ease);
-}
+   simply lifts the control under the pointer and leaves the rest alone, which
+   is a lesser effect and not a broken one. */
 
 .lp-dock > * {
-  transition: transform var(--lp-base) var(--lp-spring);
+  transition: transform var(--lp-base) var(--lp-ease);
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .lp-navlink:hover {
-    background-color: rgba(255, 255, 255, 0.16);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28),
-      0 0.6rem 1.2rem -0.8rem rgba(0, 0, 0, 0.45);
-  }
-
   .lp-dock > *:hover {
-    transform: translate3d(0, -0.18rem, 0) scale(1.06);
+    transform: translate3d(0, -1px, 0) scale(1.02);
   }
 
   .lp-dock > *:has(+ *:hover),
   .lp-dock > *:hover + * {
-    transform: translate3d(0, -0.08rem, 0) scale(1.02);
+    transform: translate3d(0, -0.5px, 0) scale(1.01);
   }
 }
 
-[data-theme="dark"] .lp-navlink:hover {
-  background-color: rgba(255, 255, 255, 0.08);
+/* ----- The quiet control -----
+
+   A button in this framework is a plate: a fill, a two-pixel frame and a
+   shadow.  That is right for the one thing a page is asking a reader to do,
+   and it is wrong for the fifth: a bar of five plates, or a card whose every
+   link is a plate, reads as a control panel -- everything at the same volume,
+   so nothing stands out, and a reader's eye has nowhere to rest.
+
+   `lp-quiet' takes the plate away and leaves the words.  What stays is what a
+   control needs and what a flow of text does not: the ink, the padding (which
+   is what makes it a target), the focus ring, and a veil of its *own* colour
+   under the pointer -- `currentColor', so the same class works on the bar's
+   pale ink and on a card's dark one.  The frame is made transparent rather
+   than removed, so the control keeps its size and its neighbours do not move
+   when they are pointed at.
+
+   A control that stays quiet until it is wanted is the difference between a
+   row of six buttons and a row of six words. */
+
+.lp-quiet {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.lp-quiet:active {
+  transform: scale(0.985);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .lp-quiet:hover {
+    background: color-mix(in oklch, currentColor 14%, transparent);
+  }
 }
 
 /* ===== 6. A window, not a card =====
@@ -465,7 +495,195 @@
   transform: none;
 }
 
-/* ===== 10. The small inks =====
+/* ===== 10. An item that unfolds =====
+
+   A backlog is a list of things a reader opens one at a time: a project, a
+   ticket.  The list used to draw each one as a small row and then, when the
+   row was clicked, drop a whole separate card into the page underneath it --
+   a second surface, with its own border and its own shadow, arriving all at
+   once, below a row that stayed behind looking like a different thing.  That
+   is the shape that reads as unpolished: not that something appeared, but
+   that two things which are one thing were drawn as two.
+
+   So an item is one card now, and opening it is the card growing.  The row
+   the reader clicks is the first line of the card; what it reveals is the rest
+   of the same card, uncovered rather than inserted:
+
+     .lp-disclosure          the card (frost, hairline, shadow)
+       .lp-disclosure-summary  its first line, the whole of it while closed
+       .lp-disclosure-body     the reveal -- a grid row that grows from 0fr
+         .lp-disclosure-inner    the box that clips it, and the padding
+           ...                   the card the view drew, now the body of this one
+
+   A grid row from `0fr' to `1fr' is what animates the height, because it is
+   the one way to animate to a height nobody measured: the row grows to what
+   the content needs, without a script reading it first, so a body that
+   changes size later -- a ticket's status menu opened inside it -- still
+   fits.  The inner box clips and names `min-height: 0', without which a grid
+   child refuses to shrink below its content and the row never closes.
+
+   Everything inside is progressive.  The card is open by default and the
+   `.lp-js' class, which the page's head sets before anything is painted, is
+   what makes it a fold at all: a reader without the script reads every item
+   open, which is a longer page and a complete one.  The chevron is hidden and
+   the cursor is an arrow until that class arrives, so nothing on the page
+   claims to be a control that is not one.
+
+   What makes it feel like unfolding rather than sliding is the pairing: the
+   height grows at the plain ease-out, while the content fades in a beat later
+   and lifts the last few millimetres into place.  The delay is what sells it
+   -- the box is already opening when the ink arrives in it. */
+
+.lp-disclosure {
+  position: relative;
+  transition: box-shadow var(--lp-base) var(--lp-ease);
+}
+
+.lp-disclosure-open {
+  box-shadow: var(--lp-shadow-open);
+}
+
+.lp-disclosure-summary {
+  position: relative;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.6rem 0.9rem;
+  /* The tint a pointer brings to the row is the card's own shape at the top,
+     so it has to round itself off the pane's radius; while the card is open
+     the row is not the last thing in it, and the tint squares off at its
+     foot, where the hairline takes over. */
+  border-radius: var(--hg-glass-clip, 1.28rem);
+  transition: background-color var(--lp-base) var(--lp-ease),
+    border-start-start-radius var(--lp-quick) var(--lp-ease),
+    border-start-end-radius var(--lp-quick) var(--lp-ease),
+    border-end-start-radius var(--lp-quick) var(--lp-ease),
+    border-end-end-radius var(--lp-quick) var(--lp-ease);
+  outline-offset: -2px;
+}
+
+.lp-js .lp-disclosure-summary {
+  cursor: pointer;
+}
+
+.lp-disclosure-open .lp-disclosure-summary {
+  border-end-start-radius: 0;
+  border-end-end-radius: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .lp-js .lp-disclosure-summary:hover {
+    background-color: rgba(120, 113, 108, 0.09);
+  }
+
+  [data-theme="dark"] .lp-js .lp-disclosure-summary:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+}
+
+/* The line between the row and what it opened.  It is drawn as a hairline that
+   fades in rather than as a border that appears, because a border arriving is
+   the whole page moving down by a pixel at the moment the reader least wants
+   it to. */
+
+.lp-disclosure-summary::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0.9rem;
+  bottom: 0;
+  height: 1px;
+  background: var(--lp-hairline);
+  opacity: 0;
+  transition: opacity var(--lp-base) var(--lp-ease);
+  pointer-events: none;
+}
+
+.lp-disclosure-open .lp-disclosure-summary::after {
+  opacity: 1;
+}
+
+/* The mark that turns over.  It is the only thing on the row that says the row
+   is a control, so it is drawn only where the script that makes it one is
+   running. */
+
+.lp-disclosure-chevron {
+  display: none;
+  flex: none;
+  transition: transform var(--lp-base) var(--lp-spring);
+}
+
+.lp-js .lp-disclosure-chevron {
+  display: inline-block;
+}
+
+.lp-disclosure-open .lp-disclosure-chevron {
+  transform: rotate(180deg);
+}
+
+.lp-disclosure-body {
+  display: grid;
+  /* Open unless something says otherwise; see the head of this section. */
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 380ms var(--lp-ease);
+}
+
+.lp-js .lp-disclosure:not(.lp-disclosure-open) > .lp-disclosure-body {
+  grid-template-rows: 0fr;
+}
+
+.lp-disclosure-inner {
+  min-height: 0;
+  overflow: hidden;
+  visibility: visible;
+  /* The beat of delay is the whole trick: the box is already opening when the
+     ink arrives in it, which reads as unfolding rather than as sliding. */
+  transition: opacity 240ms var(--lp-ease) 70ms,
+    transform 240ms var(--lp-ease) 70ms,
+    visibility 0s linear 0s;
+}
+
+/* A closed card is hidden from the keyboard and from a screen reader as well
+   as from the eye: a body that is merely clipped still holds its links, its
+   menus and its fields in the tab order, and a reader tabbing through the
+   list would be taken through cards they cannot see.  The visibility is held
+   back by the length of the height transition so that the closing card stays
+   on screen for as long as it is being folded, and lifted at once on the way
+   open, where the content has to be there to be revealed. */
+
+.lp-js .lp-disclosure:not(.lp-disclosure-open) > .lp-disclosure-body > .lp-disclosure-inner {
+  opacity: 0;
+  transform: translate3d(0, -0.35rem, 0);
+  visibility: hidden;
+  transition: opacity 240ms var(--lp-ease),
+    transform 240ms var(--lp-ease),
+    visibility 0s linear 380ms;
+}
+
+/* What the row unfolds into is already a card -- it is how these two lists
+   draw the whole ticket or the whole project -- so inside the row's own card
+   it gives that surface up and becomes the body of it.  Only the first level
+   is flattened: the controls the body holds keep whatever shape they were
+   drawn with.
+
+   Its inset is set here, on the card, rather than left to the box around it:
+   a grid item that carries padding cannot shrink below that padding, so the
+   padding would stay on show as a strip under every closed card. */
+
+.lp-disclosure-inner > * {
+  padding: 0 0.9rem 0.9rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.lp-disclosure-inner > *::before {
+  display: none;
+}
+
+/* ===== 11. The small inks =====
 
    The details that are only ever noticed when they are wrong: the colour a
    selection is painted in, the ring a keyboard is shown around the control it
@@ -537,7 +755,7 @@
   }
 }
 
-/* ===== 11. Motion, for the people who want it =====
+/* ===== 12. Motion, for the people who want it =====
 
    Everything this sheet starts, stopped in one place.  Nothing is removed:
    a reveal that is not animated still has to be revealed, so the end state of
@@ -546,11 +764,16 @@
 @media (prefers-reduced-motion: reduce) {
   .lp-lift,
   .lp-spotlight::after,
-  .lp-navlink,
   .lp-dock > *,
   .lp-dot,
   .lp-dot::before,
   .lp-toolbar,
+  .lp-disclosure,
+  .lp-disclosure-summary,
+  .lp-disclosure-summary::after,
+  .lp-disclosure-chevron,
+  .lp-disclosure-body,
+  .lp-disclosure-inner,
   .lp-js .lp-rise {
     transition: none !important;
     animation: none !important;
@@ -570,4 +793,98 @@
   .lp-dot:hover {
     transform: none;
   }
+}
+
+/* ===== 13. The picture of a project =====
+
+   A project in a list is a name and a picture: either one somebody uploaded,
+   or the letter avatar the page generates for a project that has never been
+   given one.  Both are the same disc at the same size, which is what makes a
+   list of projects read as a list of projects rather than as a column of
+   names with some pictures in it.
+
+   The letter is painted from --lp-avatar-hue, the hue the view derived from
+   the project's name (see the lucidplan avatars module), so the same project
+   is the same colour everywhere and no colour is ever chosen by hand.  The
+   two stops are a light and a dark step of that one hue: without a picture,
+   the disc still has to look like something rather than like a placeholder.
+   The ink is white in both themes, because both stops are dark enough for it
+   and a letter that changed colour with the theme would make one project look
+   like two. */
+
+.lp-avatar {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  border-radius: 9999px;
+  overflow: hidden;
+  font-family: "Plus Jakarta Sans", "Lucida Sans", ui-sans-serif, sans-serif;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: #fff;
+  user-select: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28),
+    0 1px 2px rgba(28, 25, 23, 0.12);
+}
+
+/* The picture itself, laid over the letter rather than instead of it: it
+   covers the disc when it loads, and it takes itself away (see the view) when
+   it cannot, which is what leaves the letter showing rather than the
+   broken-image mark every browser draws. */
+
+.lp-avatar-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.lp-avatar-letter {
+  background-image: linear-gradient(145deg,
+      oklch(0.64 0.11 var(--lp-avatar-hue, 250)),
+      oklch(0.46 0.12 var(--lp-avatar-hue, 250)));
+}
+
+[data-theme="dark"] .lp-avatar {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+    0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="dark"] .lp-avatar-letter {
+  background-image: linear-gradient(145deg,
+      oklch(0.58 0.11 var(--lp-avatar-hue, 250)),
+      oklch(0.42 0.12 var(--lp-avatar-hue, 250)));
+}
+
+/* Choosing a file.  The control is the browser's own -- a picker that is not
+   the browser's own is a picker that cannot open a folder -- so what is drawn
+   here is the button inside it, in the manner of every other quiet control in
+   this sheet: no plate until it is pointed at. */
+
+.lp-file {
+  max-width: 100%;
+  font-family: inherit;
+  font-size: 0.8rem;
+  color: inherit;
+}
+
+.lp-file::file-selector-button {
+  margin-inline-end: 0.6rem;
+  padding: 0.35rem 0.75rem;
+  border: 0;
+  border-radius: 9999px;
+  font: inherit;
+  font-weight: 500;
+  color: inherit;
+  cursor: pointer;
+  background: color-mix(in oklch, currentColor 14%, transparent);
+  transition: background 160ms var(--lp-ease);
+}
+
+.lp-file:hover::file-selector-button {
+  background: color-mix(in oklch, currentColor 22%, transparent);
 }

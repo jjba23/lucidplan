@@ -1,6 +1,6 @@
 ;; lucidplan - free and open project management for everyone
 ;;
-;; SPDX-LICENSE-IDENTIFIER: MIT
+;; SPDX-License-Identifier: MIT
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
 ;;; The ladders a ticket is triaged with -- its status and its type -- and the

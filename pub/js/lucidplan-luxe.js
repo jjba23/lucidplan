@@ -1,6 +1,6 @@
 /* lucidplan - free and open project management for everyone
  *
- * SPDX-LICENSE-IDENTIFIER: MIT
+ * SPDX-License-Identifier: MIT
  * Copyright © Josep Bigorra <jjbigorra@gmail.com>
  */
 
@@ -195,6 +195,123 @@
       reduced.addEventListener('change', function () {
         if (reduced.matches) {
           revealAll();
+        }
+      });
+    }
+
+    // ===== Items that unfold =====
+
+    // A backlog is a list of cards a reader opens one at a time.  The markup
+    // carries the whole of each card already -- the row, and beneath it the
+    // body it opens into -- so all that is missing without a script is the
+    // fold itself, and that is what this adds: the rows are decorated into
+    // controls here rather than in the HTML, so a reader whose script never
+    // ran is not handed a button that does nothing, and reads every card open
+    // instead.
+    //
+    // The opening and closing are the stylesheet's: this only says which item
+    // is open, by the one class the reveal is written against.  Nothing is
+    // measured and nothing is set inline, which is what lets a body change
+    // size while it is open -- a ticket's status menu, a form that grew an
+    // error line -- and stay right.
+    const folds = Array.prototype.slice.call(
+      document.querySelectorAll('.lp-disclosure')
+    );
+
+    function setFold(item, open) {
+      item.classList.toggle('lp-disclosure-open', open);
+
+      const row = item.querySelector('.lp-disclosure-summary');
+
+      if (row && row.hasAttribute('aria-expanded')) {
+        row.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+    }
+
+    if (folds.length) {
+      folds.forEach(function (item) {
+        const row = item.querySelector('.lp-disclosure-summary');
+        const body = item.querySelector('.lp-disclosure-body');
+
+        if (!row || !body) {
+          return;
+        }
+
+        row.setAttribute('role', 'button');
+        row.setAttribute('tabindex', '0');
+        row.setAttribute('aria-expanded', 'false');
+
+        if (body.id) {
+          row.setAttribute('aria-controls', body.id);
+        }
+      });
+
+      // The controls a row may hold keep their own job: the link to the
+      // ticket, the grip that drags the row, a menu that posts a change.  Only
+      // a click on the row itself -- its ink, its padding -- opens the card.
+      const OWN_CONTROL = 'a, button, input, select, textarea, label, [draggable="true"]';
+
+      document.addEventListener('click', function (event) {
+        const node = event.target instanceof Element ? event.target : null;
+
+        if (!node) {
+          return;
+        }
+
+        // Two buttons that open and close the whole list at once.
+        if (node.closest('[data-lp-expand-all]')) {
+          folds.forEach(function (item) {
+            setFold(item, true);
+          });
+          return;
+        }
+
+        if (node.closest('[data-lp-collapse-all]')) {
+          folds.forEach(function (item) {
+            setFold(item, false);
+          });
+          return;
+        }
+
+        const row = node.closest('.lp-disclosure-summary');
+
+        if (!row) {
+          return;
+        }
+
+        const own = node.closest(OWN_CONTROL);
+
+        if (own && row.contains(own)) {
+          return;
+        }
+
+        const item = row.closest('.lp-disclosure');
+
+        if (item) {
+          setFold(item, !item.classList.contains('lp-disclosure-open'));
+        }
+      });
+
+      // A row is a control to a keyboard too: it is focusable and it opens on
+      // Enter or Space, the two keys a button answers.  A control inside it
+      // answers its own.
+      document.addEventListener('keydown', function (event) {
+        if (event.key !== 'Enter' && event.key !== ' ' && event.key !== 'Spacebar') {
+          return;
+        }
+
+        const node = event.target instanceof Element ? event.target : null;
+
+        if (!node || !node.classList || !node.classList.contains('lp-disclosure-summary')) {
+          return;
+        }
+
+        event.preventDefault();
+
+        const item = node.closest('.lp-disclosure');
+
+        if (item) {
+          setFold(item, !item.classList.contains('lp-disclosure-open'));
         }
       });
     }

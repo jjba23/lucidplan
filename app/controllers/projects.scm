@@ -19,9 +19,15 @@
 
 (import (app views projects)
         (artanis security nss)
+        (artanis upload)
         (ice-9 string-fun)
+        (ice-9 binary-ports)
+        (rnrs bytevectors)
+        (srfi srfi-1)
         (kracht prelude)
         (lucidplan auth)
+        (lucidplan attachments)
+        (lucidplan avatars)
         (lucidplan sqlite util)
         (lucidplan sqlite project)
         (lucidplan domain project)
@@ -213,3 +219,140 @@
                            #:rc rc
                            #:happy-flow do-edit
                            #:unhappy-flow back-to-login)))
+
+;; ===== The picture a project wears =====
+;;
+;; Three endpoints, and each of them is one of the three things a picture in a
+;; list has to be able to do: be given, be taken away, and be fetched.
+;;
+;; They answer the permission the edit page answers -- `lucidplan:project-
+;; create', which is the permission that writes a project, since there is no
+;; separate one for editing -- except the last of them, which is public: the
+;; list of projects is public (it is on the front page), so the pictures in it
+;; cannot be behind a sign-in.
+;;
+;; The bytes go straight into the project's own row, read out of the request
+;; body rather than out of a file: nothing is written to a directory on the
+;; way, so nothing is left behind by an upload that failed halfway, and a
+;; picture travels with a copy of the database.  What is *not* kept is what the
+;; upload claimed: the type is checked against the four this instance keeps and
+;; the bytes are filed under that one, so neither the upload's filename nor its
+;; claimed type ever becomes a path or a header.
+
+(post "/projects/id/:human-id/avatar"
+      #:mime 'xml
+      #:cookies '(names x-bewaking-lucidplan)
+      (lambda (rc)
+        (define (back)
+          (string->uri (format #f "~a/projects/id/~a/edit"
+                               (current-myhost) (params rc "human-id"))))
+        (define (do-upload)
+          (let* ((human-id (params rc "human-id"))
+                 (project-repo (make-sqlite-project-repository rc))
+                 (p (get-project-by-human-id project-repo human-id))
+                 (mo (and p (get-mfds-op-from-post rc)))
+                 (file (and mo
+                            (find (lambda (m)
+                                    (let ((name (mfd-filename m)))
+                                      (and name
+                                           (not (string-null? name)))))
+                                  (mfds-operator-mfds mo))))
+                 (type (and file (avatar-canonical-type (mfd-type file))))
+                 (bytes (and file type (uploaded-file-bytes rc file)))
+                 (size (and bytes (bytevector-length bytes))))
+            (cond
+              ;; Nothing to put it on: the project is not there, or is gone.
+              ((not p)
+               (redirect-to rc
+                            (string->uri (format #f "~a/projects"
+                                                 (current-myhost)))
+                            #:status 302))
+              ;; What came back is not a picture this instance keeps.  It is
+              ;; refused rather than kept under a type it is not.
+              ((not type)
+               (redirect-to rc (back) #:status 302))
+              ((or (not (number? size))
+                   (<= size 0)
+                   (> size (avatar-max-bytes)))
+               (redirect-to rc (back) #:status 302))
+              (else
+               (update-project-by-human-id project-repo human-id
+                                           `((avatar unquote (avatar-token))
+                                             (avatar-data unquote
+                                                          (bytes->base64 bytes))
+                                             (avatar-content-type unquote type)
+                                             (updated-at unquote
+                                                         (current-time))))
+               (redirect-to rc (back) #:status 302)))))
+        (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                           #:needed-permissions '(lucidplan:project-create)
+                           #:rc rc
+                           #:happy-flow do-upload
+                           #:unhappy-flow back-to-login)))
+
+(post "/projects/id/:human-id/avatar/delete"
+      #:mime 'xml
+      #:cookies '(names x-bewaking-lucidplan)
+      (lambda (rc)
+        (define (do-remove)
+          (let* ((human-id (params rc "human-id"))
+                 (project-repo (make-sqlite-project-repository rc)))
+            (when (get-project-by-human-id project-repo human-id)
+              ;; The row is emptied outright rather than given a value that
+              ;; stands for nothing: a project with no picture is a project
+              ;; whose row says nothing about one, and the letter the pages
+              ;; draw is generated from the name rather than kept here.
+              ((db-write (DB-open rc)) "clear-project-avatar"
+               (sql-parameterize "UPDATE project SET avatar = NULL, avatar_data = NULL, avatar_content_type = NULL, updated_at = ? WHERE human_id = ?"
+                                 (list (current-time) human-id))))
+            (redirect-to rc
+                         (string->uri (format #f "~a/projects/id/~a/edit"
+                                              (current-myhost) human-id))
+                         #:status 302)))
+        (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
+                           #:needed-permissions '(lucidplan:project-create)
+                           #:rc rc
+                           #:happy-flow do-remove
+                           #:unhappy-flow back-to-login)))
+
+;; The picture itself.
+;;
+;; It is served for ever -- `immutable' -- and that is only safe because the
+;; address a page names carries the token of the version it is showing (see
+;; `project-avatar'): a new picture is a new token is a new address, and a
+;; reader holding an old page asks for the old one and gets what it always
+;; meant.  A project with no picture is not an error here -- it is drawn as its
+;; letter avatar and nothing asks for this address at all -- but a request that
+;; lands on one anyway is answered as what it is: a picture that is not there.
+(get "/projects/id/:human-id/avatar"
+     #:mime 'xml
+     (lambda (rc)
+       (let* ((project-repo (make-sqlite-project-repository rc))
+              (picture (get-project-avatar project-repo
+                                           (params rc "human-id")))
+              (data (and picture
+                         (assq-ref picture
+                                   'avatar-data)))
+              (type (and picture
+                         (assq-ref picture
+                                   'avatar-content-type))))
+         (if (and (string? data)
+                  (not (string-null? data))
+                  (string? type))
+             ;; A header's value is a *shape* here, not a line of text: Guile
+             ;; validates each one against the grammar it knows, and
+             ;; `cache-control' is a list of directives -- bare symbols for the
+             ;; ones without a value, pairs for the ones with -- rather than
+             ;; the text `public, max-age=...'.  Written as text it is refused
+             ;; with "Bad value for header", the same lesson the attachment
+             ;; route learned about `content-type'.
+             (response-emit (base64->bytes data)
+                            #:headers `((content-type
+                                         ,(string->symbol type))
+                                        (cache-control
+                                         public
+                                         (max-age . 31536000)
+                                         immutable)))
+             (response-emit ""
+                            #:status 404)))))
+

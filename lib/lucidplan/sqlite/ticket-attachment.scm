@@ -1,6 +1,6 @@
 ;; lucidplan - free and open project management for everyone
 ;;
-;; SPDX-LICENSE-IDENTIFIER: MIT
+;; SPDX-License-Identifier: MIT
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
 (define-module (lucidplan sqlite ticket-attachment)
@@ -14,6 +14,12 @@
 
 ;; --- SQLite implementation ---
 (define (make-sqlite-ticket-attachment-repository rc)
+  ;; What a list of a ticket's files needs.  The bytes are deliberately *not*
+  ;; here: a ticket's page draws the names and the sizes of what it carries,
+  ;; and pulling every file through memory to draw a list of names is how a
+  ;; page becomes slower with every file anybody ever attached.  The bytes are
+  ;; read by `get-ticket-attachment-data', for the one request that is a
+  ;; download.
   (define columns
     '(id ticket-id
          project-id
@@ -52,6 +58,16 @@
       (if (nil? rows) #f
           (car rows))))
 
+  (define (get-ticket-attachment-data id)
+    (let ((rows (execute-read "get-ticket-attachment-data"
+                              (sql-select 'ticket_attachment
+                                          #:columns '(data)
+                                          #:where (list (cons 'id id))
+                                          #:limit 1))))
+      (and (pair? rows)
+           (assq-ref (car rows)
+                     'data))))
+
   (define (insert-ticket-attachment attrs)
     (execute-write "insert-ticket-attachment"
                    (sql-insert 'ticket_attachment attrs)))
@@ -73,6 +89,8 @@
                                    get-ticket-attachments
                                    #:get-ticket-attachment-by-id-proc
                                    get-ticket-attachment-by-id
+                                   #:get-ticket-attachment-data-proc
+                                   get-ticket-attachment-data
                                    #:insert-ticket-attachment-proc
                                    insert-ticket-attachment
                                    #:soft-delete-ticket-attachment-proc

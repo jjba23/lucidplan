@@ -1,6 +1,6 @@
 ;; lucidplan - free and open project management for everyone
 ;;
-;; SPDX-LICENSE-IDENTIFIER: MIT
+;; SPDX-License-Identifier: MIT
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
 ;;; What somebody did and how long it took.

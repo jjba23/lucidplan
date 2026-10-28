@@ -1,6 +1,6 @@
 ;; lucidplan - free and open project management for everyone
 ;;
-;; SPDX-LICENSE-IDENTIFIER: MIT
+;; SPDX-License-Identifier: MIT
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
 (define-module (lucidplan domain project)
@@ -8,6 +8,7 @@
   #:use-module (srfi srfi-9)
   #:use-module (lucidplan domain repo)
   #:export (get-projects search-projects get-project-by-human-id
+                         get-project-avatar
                          update-project-by-human-id insert-project
                          project-id-from-human-id))
 
@@ -20,6 +21,7 @@
                        (search-projects-proc repo-search-projects)
                        (get-project-by-human-id-proc
                         repo-get-project-by-human-id)
+                       (get-project-avatar-proc repo-get-project-avatar)
                        (update-project-by-human-id-proc
                         repo-update-project-by-human-id)
                        (insert-project-proc repo-insert-project))
@@ -34,6 +36,10 @@
 
 (define-repo-method get-project-by-human-id repo-get-project-by-human-id
  "Retrieves a specific active project matching HUMAN-ID from the REPO.")
+
+(define-repo-method get-project-avatar repo-get-project-avatar
+ "Retrieves the picture a specific active project matching HUMAN-ID wears from
+the REPO: the bytes of one version of it and the type they are served as.")
 
 (define-repo-method update-project-by-human-id repo-update-project-by-human-id
  "Updates a project identified by HUMAN-ID with ATTRS in the given REPO.")

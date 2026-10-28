@@ -1,6 +1,6 @@
 ;; lucidplan - free and open project management for everyone
 ;;
-;; SPDX-LICENSE-IDENTIFIER: MIT
+;; SPDX-License-Identifier: MIT
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
 (define-artanis-controller tickets)
@@ -10,6 +10,7 @@
         (ice-9 string-fun)
         (ice-9 iconv)
         (ice-9 binary-ports)
+        (rnrs bytevectors)
         (srfi srfi-1)
         (lucidplan auth)
         (kracht prelude)
@@ -1174,10 +1175,14 @@ history entry that says somebody is better than one that fails to render."
 
 ;; ===== The files on a ticket =====
 ;;
-;; The bytes are stored under a name generated here; what the uploader
-;; called the file is kept in the row and used for the download's name.  The
-;; form is multipart, so it is read by Artanis's upload reader rather than by
-;; the url-encoded body reader the other forms use.
+;; The bytes are kept in the row itself, not in a directory beside the
+;; instance: a ticket's files are part of the ticket, so they travel with a
+;; copy of the database and a backup cannot take the tickets without taking
+;; what they carry.  What the uploader called the file is kept as well, for the
+;; download's name, and the name this instance gives the upload is generated
+;; here, so no submitted text ever reaches a path or a header.  The form is
+;; multipart, so it is read by Artanis's upload reader rather than by the
+;; url-encoded body reader the other forms use.
 (post "/tickets/:project/id/:human-id/attachments"
       #:mime 'xml
       #:cookies '(names x-bewaking-lucidplan)
@@ -1190,18 +1195,21 @@ history entry that says somebody is better than one that fails to render."
                  (attachment-repo (make-sqlite-ticket-attachment-repository rc))
                  (t (get-ticket-by-project-human-id-and-human-id ticket-repo
                                                                  proj human-id))
-                 (mo (get-mfds-op-from-post rc
-                                            #:path (attachment-directory)))
+                 ;; No `#:path': nothing is written to the filesystem on the
+                 ;; way.  The upload is read out of the request body, which is
+                 ;; where the multipart reader has already put it.
+                 (mo (get-mfds-op-from-post rc))
                  (file (find (lambda (m)
                                (let ((name (mfd-filename m)))
                                  (and name
                                       (not (string-null? name)))))
                              (mfds-operator-mfds mo)))
-                 (size (and file
-                            (mfd-size file)))
+                 (bytes (and file
+                             (uploaded-file-bytes rc file)))
+                 (size (and bytes
+                            (bytevector-length bytes)))
                  (max-bytes (config-ref 'attachment-max-bytes)))
             (when t
-              (ensure-attachment-directory)
               (cond
                 ((not file)
                  (redirect-to rc
@@ -1224,9 +1232,6 @@ history entry that says somebody is better than one that fails to render."
                                                   'id))
                              (filename (safe-attachment-filename (mfd-filename
                                                                   file))))
-                        (mfds-op-store mo
-                                       #:renamer (lambda (old)
-                                                   stored-name))
                         (insert-ticket-attachment attachment-repo
                                                   `((id unquote
                                                         (new-id))
@@ -1240,8 +1245,18 @@ history entry that says somebody is better than one that fails to render."
                                                                       #:token-name 'x-bewaking-lucidplan)
                                                                      ""))
                                                     (filename unquote filename)
+                                                    ;; The name this instance
+                                                    ;; gave the upload: what a
+                                                    ;; file written by an older
+                                                    ;; version of this
+                                                    ;; application is found
+                                                    ;; under, and what tells two
+                                                    ;; uploads of one filename
+                                                    ;; apart.
                                                     (stored-name unquote
                                                                  stored-name)
+                                                    (data unquote
+                                                          (bytes->base64 bytes))
                                                     (content-type unquote
                                                                   (safe-content-type
                                                                    (mfd-type
@@ -1314,9 +1329,44 @@ history entry that says somebody is better than one that fails to render."
                            #:happy-flow do-remove-attachment
                            #:unhappy-flow back-to-login)))
 
-;; A download is answered by the application, not by the static file server:
-;; the attachment id has to name a file of the ticket in the URL, so a file
-;; cannot be fetched by guessing a name in the upload directory.
+;; The bytes of an attachment, as a bytevector, or #f when there are none to
+;; be had.
+;;
+;; They are in the row -- except for a file uploaded before this instance kept
+;; them there.  Such a file is still sitting in the directory it was written
+;; to, so the first download of one reads that file, stores it in the row, and
+;; never reads a file again: the move from a directory to a row migrates
+;; itself, one download at a time, rather than depending on somebody
+;; remembering to run a task.  Once an instance's files have all been fetched
+;; once, `attachment-path' and `attachment-directory' are dead code and can
+;; go.
+(define (attachment-bytes rc attachment-repo attachment)
+  (let* ((id (assq-ref attachment
+                       'id))
+         (data (get-ticket-attachment-data attachment-repo id)))
+    (if (and (string? data)
+             (not (string-null? data)))
+        (base64->bytes data)
+        (let* ((stored (assq-ref attachment
+                                 'stored-name))
+               (path (and (string? stored)
+                          (not (string-null? stored))
+                          (attachment-path stored))))
+          (if (and path
+                   (file-exists? path))
+              (let ((bytes (call-with-input-file path
+                             get-bytevector-all)))
+                ((db-write (DB-open rc)) "store-attachment-data"
+                 (sql-parameterize "UPDATE ticket_attachment SET data = ? WHERE id = ?"
+                                   (list (bytes->base64 bytes) id)))
+                bytes)
+              #f)))))
+
+;; A download is answered by the application, not by the static file server,
+;; and the attachment id has to name a file of the ticket in the URL -- so a
+;; file cannot be fetched by guessing anything, and the bytes come out of the
+;; row they belong to rather than out of a directory that answers any name it
+;; is asked for.
 (get "/tickets/:project/id/:human-id/attachments/:attachment-id"
      #:mime 'xml
      (lambda (rc)
@@ -1331,20 +1381,17 @@ history entry that says somebody is better than one that fails to render."
                                (get-ticket-attachment-by-id attachment-repo
                                                             (params rc
                                                              "attachment-id"))))
-              (path (and attachment
-                         (attachment-path (assq-ref attachment
-                                                    'stored-name)))))
-         (if (and t attachment path
-                  (file-exists? path)
-                  (equal? (format #f "~a"
-                                  (assq-ref attachment
-                                            'ticket-id))
-                          (format #f "~a"
-                                  (assq-ref t
-                                            'id))))
-             (let* ((bytes (call-with-input-file path
-                             get-bytevector-all))
-                    (type (safe-content-type (assq-ref attachment
+              (owned? (and t attachment
+                           (equal? (format #f "~a"
+                                           (assq-ref attachment
+                                                     'ticket-id))
+                                   (format #f "~a"
+                                           (assq-ref t
+                                                     'id)))))
+              (bytes (and owned?
+                          (attachment-bytes rc attachment-repo attachment))))
+         (if bytes
+             (let ((type (safe-content-type (assq-ref attachment
                                                        'content-type))))
                ;; Artanis hands these headers to Guile's own response writer,
                ;; which wants a media type in the shape `(text/plain)' -- the
@@ -1354,7 +1401,8 @@ history entry that says somebody is better than one that fails to render."
                ;; is read back as the symbol it names; `safe-content-type' has
                ;; already refused anything that is not one.
                (response-emit bytes
-                              #:headers `((content-type ,(string->symbol type))
+                              #:headers `((content-type
+                                           ,(string->symbol type))
                                           (content-disposition unquote
                                                                (attachment-disposition
                                                                 (assq-ref

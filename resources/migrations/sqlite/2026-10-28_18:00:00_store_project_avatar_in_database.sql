@@ -1,0 +1,31 @@
+-- lucidplan - free and open project management for everyone
+--
+-- SPDX-License-Identifier: MIT
+-- Copyright © Josep Bigorra <jjbigorra@gmail.com>
+
+-- The picture itself, in the database.
+--
+-- It was written to a directory beside the instance at first, which is how
+-- ticket attachments are kept -- but a project's picture is not the same kind
+-- of thing as an attachment.  An attachment belongs to one ticket and is
+-- fetched once, by the reader who wants it; a picture belongs to the project
+-- and is drawn in a list, so it wants to be small, to travel with a copy of
+-- the database, and to survive a backup that forgot a directory.  A project
+-- whose picture is a row in the row it belongs to can never be a project with
+-- a broken picture.
+--
+-- The bytes are stored as base64 text rather than as a BLOB, and that is a
+-- decision about this application's persistence layer rather than about
+-- images: every value here is written through the escaped-literal builders,
+-- which carry text and refuse the NUL a byte string of a PNG is full of.
+-- Base64 is a third larger and needs no exception to a rule that keeps every
+-- other write safe.  What it costs is bytes; what it buys is that a picture
+-- cannot be a way of getting something else into a statement.
+--
+-- The `avatar` column added by the migration before this one stops naming a
+-- file, because there is no file any more: it now carries the token that
+-- identifies the current picture.  The pages put that token in the address
+-- they fetch, which is what lets a picture be cached for a year and still be
+-- replaced -- a new picture is a new token is a new address.
+ALTER TABLE "project" ADD COLUMN "avatar_data" TEXT;
+ALTER TABLE "project" ADD COLUMN "avatar_content_type" varchar(64);

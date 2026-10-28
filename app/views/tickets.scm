@@ -1,6 +1,6 @@
 ;; lucidplan - free and open project management for everyone
 ;;
-;; SPDX-LICENSE-IDENTIFIER: MIT
+;; SPDX-License-Identifier: MIT
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
 (define-module (app views tickets)
@@ -75,28 +75,34 @@
   (mk-class '(font-mono text-xs sm:text-sm
                         text-onyx-500 dark:text-stone-500)))
 
-(define %list-wrapper-face
-  (mk-class '(flex flex-col gap-2)))
-
-(define %list-header-face
-  ;; One line, always: the grip, the type's glyph, the title and the link
-  ;; stand in a row, and the title takes whatever is left.  Nothing else
-  ;; rides here -- the triage pills belong to the card the row unfolds into
-  ;; -- because a wider row would either wrap, and stop reading as a line, or
-  ;; squeeze the title it exists to show down to a few characters.
-  (mk-class (append '(flex flex-row
-                           gap-2
-                           items-center
-                           justify-start
+;; The card a ticket's row is the first line of.  It is one card from top to
+;; bottom: the row a reader clicks, and -- beneath it -- the ticket itself,
+;; uncovered rather than inserted (see `lp-disclosure' in
+;; `pub/css/lucidplan-luxe.css').  The surface lives here, on the card, and not
+;; on the row, so a closed row and an open one are the same object in two
+;; states rather than two different objects.
+(define %list-item-face
+  (mk-class (append '(flex flex-col
+                           rounded-xl
+                           md:rounded-2xl
                            dark:border-onyx-100/75
                            border-stone-300/75
-                           shadow-md
                            border-2
-                           py-2
-                           px-4
-                           cursor-pointer
-                           rounded-xl
-                           lp-lift) frosted-tint-classes)))
+                           shadow-md
+                           lp-disclosure)
+                     frosted-tint-classes)))
+
+;; One line, always: the grip, the type's glyph, the title, the link and the
+;; mark that says the row opens.  Nothing else rides here -- the triage pills
+;; belong to the card the row unfolds into -- because a wider row would either
+;; wrap, and stop reading as a line, or squeeze the title it exists to show
+;; down to a few characters.
+(define %list-header-face
+  (mk-class '(lp-disclosure-summary)))
+
+(define %list-chevron-face
+  (mk-class '(text-onyx-700 dark:text-stone-300 text-lg shrink-0
+              lp-disclosure-chevron)))
 
 (define %list-title-face
   (mk-class '(font-sans text-sm
@@ -246,11 +252,11 @@
                                (id-suffix ""))
   "A field of a ticket as the small control it is on the ticket's own page.
 
-The control is a native menu wearing a frosted pill, so what it shows is the
-value the ticket holds and a change is one gesture rather than a trip
-through the edit form.  It posts as soon as it is changed and is confirmed
-by a card in the tray.  The label is there for assistive technology -- the
-column above the pill already says which field this is.
+The control is a native menu wearing a tint rather than a box, so what it
+shows is the value the ticket holds and a change is one gesture rather than
+a trip through the edit form.  It posts as soon as it is changed and is
+confirmed by a card in the tray.  The label is there for assistive
+technology -- the column above the control already says which field this is.
 
 The menu is named and identified after the field it changes, which is what
 the control needs on a page holding one of them.  A page holding one per
@@ -258,8 +264,8 @@ row -- the backlog, where every row carries its own pair -- passes
 @var{id-suffix} to tell the rows apart: an id names one element, and a page
 of thirty-three controls sharing one name is a page whose labels all point
 at the first of them."
-  `(div (@ (class ,(mk-class (append '(px-2 py-1 w-fit rounded-full)
-                                     frosted-tint-classes)))
+  `(div (@ (class ,(mk-class (append '(px-2 py-1 w-fit rounded-lg)
+                                     chip-tint-classes)))
            ;; What the script needs is here rather than inferred from the
            ;; markup: which field this is, the name it answers to in the
            ;; notice, and the value the ticket held before the menu was
@@ -302,11 +308,8 @@ at the first of them."
 (define (render-fact-chip label value)
   `(span (@ (class ,(mk-class (append '(inline-flex flex-row gap-2
                                                  items-center
-                                                 px-2 py-1 rounded-lg
-                                                 border-2
-                                                 border-stone-300/75
-                                                 dark:border-onyx-100/75)
-                                        frosted-tint-classes))))
+                                                 px-2 py-1 rounded-lg)
+                                        chip-tint-classes))))
          (small (@ (class ,(mk-class '(uppercase tracking-wide text-xs
                                                  text-onyx-500
                                                  dark:text-stone-500))))
@@ -335,6 +338,12 @@ at the first of them."
                         #:key project
                         ticket
                         (assignee #f)
+                        ;; Whether this card says what the ticket is called.
+                        ;; The card that is a row's unfolded body does not: the
+                        ;; row above it is the ticket's name, and repeating it
+                        ;; one line lower would make the card read as a second
+                        ;; thing rather than as the rest of the first.
+                        (headline? #t)
                         (editable? #f)
                         ;; Whether this card is the ticket's own page, where the
                         ;; team can be asked to estimate it at a table.  A row
@@ -368,45 +377,28 @@ at the first of them."
                                (not points))
                           "sizes" "points"))
 
-         (toggle-js (format #f
-                     "document.getElementById('details-~a').toggleAttribute('hidden')"
-                     id))
          (edit-url (format #f "/tickets/~a/id/~a/edit" project human-id))
          (delete-url (format #f "/tickets/~a/delete" project)))
 
     `(div (@ (class ,%card-face))
 
-          ;; Header: what the ticket is called, which ticket it is, and -- on
-          ;; the card that is a row's unfolded body -- the control that folds
-          ;; it back up.  A page's own card has nothing to fold, so the control
-          ;; is drawn only where there is something for it to close: a button
-          ;; that does nothing is worse than no button.
+          ;; Header: what the ticket is called, which ticket it is.  The card
+          ;; that is a row's unfolded body says the reference alone -- the row
+          ;; above it is the ticket's name, and the row is what folds it away
+          ;; again -- so this is drawn only where the card is the whole page.
           (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
                                             items-start
                                             justify-between))))
                (div (@ (class ,(mk-class '(flex flex-col gap-1 min-w-0 grow))))
-                    (h4 (@ (class ,(mk-class '(text-xl sm:text-2xl
-                                                       font-bold
-                                                       leading-8
-                                                       wrap-break-word))))
-                        ,(org2html (html-unescape title)))
+                    ,@(if headline?
+                          `((h4 (@ (class ,(mk-class '(text-xl sm:text-2xl
+                                                             font-bold
+                                                             leading-8
+                                                             wrap-break-word))))
+                                ,(org2html (html-unescape title))))
+                          '())
                     (small (@ (class ,%mono-face))
-                           ,(format #f "~a-~s" project human-id)))
-               ,@(if (string-null? id-suffix)
-                     '()
-                     (list `(button (@ (type "button")
-                                       (onclick ,toggle-js)
-                                       (class ,(mk-class '(cursor-pointer
-                                                                  bg-transparent
-                                                                  border-0
-                                                                  p-1)))
-                                    (span (@ (class ,(mk-class '(sr-only))))
-                                          ,(G_ "close"))
-                                    (span (@ (aria-hidden "true"))
-                                          ,(icon #:type 'x
-                                                 #:icon-css '(text-onyx-700
-                                                              dark:text-stone-300
-                                                              text-xl))))))))
+                           ,(format #f "~a-~s" project human-id))))
 
           ;; Meta Info (Status & Type).  Where the reader can change them each
           ;; of the two is the control that posts its own change; where they
@@ -604,29 +596,30 @@ at the first of them."
                                               (G_ "open the table"))))))
                      '())
 
-               ;; The buttons: changing the ticket, and taking it away.
-               (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-2
-                                                 items-center shrink-0))))
-                    (a (@ (href ,edit-url))
-                       ,(icon-button #:icon 'pencil
-                                     #:content (G_ "edit ticket")
-                                     #:icon-css '(text-md text-onyx-700
-                                                          dark:text-stone-300)))
+               ;; The buttons: changing the ticket, and taking it away.  Both
+               ;; are quiet -- the card is already a surface, and a surface
+               ;; with a red plate on it is a card that is shouting -- but the
+               ;; one that cannot be taken back keeps its red ink, which is
+               ;; what tells it apart without a box.
+               (div (@ (class ,(mk-class '(flex flex-row flex-wrap gap-1
+                                                 items-center shrink-0
+                                                 -ml-2))))
+                    ,(quiet-link #:icon 'pencil
+                                 #:label (G_ "edit")
+                                 #:href edit-url)
                     (form (@ (enctype application/x-www-form-urlencoded)
                              (method POST)
                              (action ,delete-url))
                           (input (@ (hidden "")
                                     (name "id")
                                     (value ,id)))
-                          ,(danger-submit-button
+                          ,(quiet-submit
                             `(span (@ (class ,(mk-class '(items-center
                                                            flex
                                                            flex-row
                                                            gap-1))))
                                    ,(icon #:type 'trash
-                                          #:icon-css '(text-stone-300
-                                                       dark:text-stone-300
-                                                       text-lg))
+                                          #:icon-css '(text-md))
                                    ,(G_ "delete")))))))))
 
 ;; A row reads as one line -- the grip, the type's glyph, the title and the
@@ -653,27 +646,24 @@ at the first of them."
          (priority (or (t-ref 'priority) 0))
 
          (item-id (format #f "listitem-~a" id))
-         (details-id (format #f "details-~a" id))
-         (toggle-js (format #f
-                     "document.getElementById('~a').toggleAttribute('hidden')"
-                     details-id))
+         (details-id (format #f "ticket-body-~a" id))
          (ticket-url (format #f "/tickets/~a/id/~a" project human-id))
          (assignee-user (find (lambda (u)
                                 (equal? (assq-ref u
                                                   'id) ticket-assignee))
                               user-names)))
 
-    `(div (@ (class ,%list-wrapper-face)
+    `(div (@ (class ,%list-item-face)
              (id ,item-id)
              (data-ticket-id ,human-id)
              (data-priority ,(number->string priority)))
 
-          ;; Clickable Header Row
-          (div (@ (onclick ,toggle-js)
-                  (tabindex "0")
-                  (onkeydown
-                   "if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.click(); }")
-                  (class ,%list-header-face))
+          ;; The row: the whole of the card while it is closed, and the whole
+          ;; of what a reader clicks, tabs to and presses Enter on.  The script
+          ;; is what turns it into a control (see `pub/js/lucidplan-luxe.js'),
+          ;; so without the script it is a line of text above the ticket it
+          ;; belongs to -- which is what it was before it could be clicked.
+          (div (@ (class ,%list-header-face))
                ;; The grip is what makes a row draggable, and dragging a row
                ;; reorders the backlog -- a change to the tickets.  It is read
                ;; by the endpoint the row reorders, so it is offered only to a
@@ -695,25 +685,36 @@ at the first of them."
                               #:icon-css '(text-md text-onyx-700
                                            dark:text-stone-300
                                            hover:text-asparagus-500
-                                           dark:hover:text-asparagus-300)))))
+                                           dark:hover:text-asparagus-300))))
 
-          ;; Expandable Details Container
+               ;; The mark that says the row opens, and turns over when it has.
+               ,(icon #:type 'caret-down
+                      #:icon-css '(text-onyx-700 dark:text-stone-300 text-lg
+                                   lp-disclosure-chevron)))
+
+          ;; The rest of the card: the ticket itself, uncovered rather than
+          ;; inserted.
           (div (@ (id ,details-id)
-                  (class ,(mk-class '(ml-1 sm:ml-3)))
-                  (hidden ""))
-               ,(render-ticket G_
-                               #:project project
-                               #:ticket ticket
-                               ;; The card is inside a list, so its two
-                               ;; controls are told apart from the pairs the
-                               ;; other rows carry; the page says which row
-                               ;; by naming it.
-                               #:editable? editable?
-                               #:statuses statuses
-                               #:id-suffix (format #f "-row-~a" human-id)
-                               #:assignee (if (nil? assignee-user) #f
+                  (class ,(mk-class '(lp-disclosure-body))))
+               (div (@ (class ,(mk-class '(lp-disclosure-inner))))
+                    ,(render-ticket G_
+                                    #:project project
+                                    #:ticket ticket
+                                    ;; The card is inside a list, so its two
+                                    ;; controls are told apart from the pairs
+                                    ;; the other rows carry; the page says
+                                    ;; which row by naming it.
+                                    #:editable? editable?
+                                    #:statuses statuses
+                                    ;; The row above already says what the
+                                    ;; ticket is called, and the row is what
+                                    ;; folds this card away again; so the card
+                                    ;; says the ticket's reference only.
+                                    #:headline? #f
+                                    #:id-suffix (format #f "-row-~a" human-id)
+                                    #:assignee (if (nil? assignee-user) #f
                                               (assq-ref assignee-user
-                                                        'username)))))))
+                                                        'username))))))))
 
 (define (expand-and-tips G_)
   `(div (@ (class ,(mk-class '(flex flex-row

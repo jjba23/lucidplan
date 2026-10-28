@@ -1,6 +1,6 @@
 ;; lucidplan - free and open project management for everyone
 ;;
-;; SPDX-LICENSE-IDENTIFIER: MIT
+;; SPDX-License-Identifier: MIT
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
 ;;; The filesystem side of ticket attachments.  What a browser sends as a
@@ -10,17 +10,22 @@
 ;;; header.  A file therefore cannot escape the attachment directory however
 ;;; it was named.
 ;;;
-;;; The directory lives outside `pub/' (see `attachment-directory' in
-;;; `(lucidplan config)'), so a file is served by the application, which can
-;;; check that the caller named a ticket the file belongs to, instead of by
-;;; the static file server, which cannot.
+;;; A file now lives in the row that describes it, in the database, so a ticket
+;;; travels with what it carries.  `attachment-directory' and `attachment-path'
+;;; are what remain of the directory files used to live in: they are how a file
+;;; uploaded before that change is found once, stored, and never read again
+;;; (see the download route).  They can go when no instance has an old file
+;;; left.
 
 (define-module (lucidplan attachments)
   #:use-module (ice-9 format)
   #:use-module (web uri)
+  #:use-module (artanis artanis)
+  #:use-module (artanis upload)
+  #:use-module (rnrs bytevectors)
   #:use-module (lucidplan config)
   #:export (attachment-directory attachment-path
-                                 ensure-attachment-directory
+                                 uploaded-file-bytes
                                  safe-attachment-filename
                                  safe-content-type
                                  attachment-disposition
@@ -35,24 +40,26 @@
   (format #f "~a/~a"
           (attachment-directory) stored-name))
 
-(define (ensure-attachment-directory)
-  "Create the attachment directory, and its parents, if they are not there."
-  (let loop
-    ((path (attachment-directory)))
-    (unless (file-exists? path)
-      (let ((parent (dirname path)))
-        (unless (or (equal? parent path)
-                    (string-null? parent)
-                    (equal? parent "."))
-          (loop parent)))
-      (catch 'system-error
-             (lambda ()
-               (mkdir path))
-             (lambda (key . args)
-               ;; Another request may have created it between the check and the
-               ;; call; that is the outcome this wanted, not an error.
-               (unless (file-exists? path)
-                 (apply throw key args)))))))
+(define (uploaded-file-bytes rc mfd)
+  "Answer the bytes of one uploaded file MFD, as they arrived.
+
+They are read out of the request body rather than out of a file, because the
+application keeps what a ticket carries in the ticket's own row and a project's
+picture in the project's (see the two migrations named `store_..._in_database').
+`begin' and `end' are offsets into that body, and `end' is the index of the
+last byte rather than the one past it -- artanis' own reader takes the same
+view of them (`mfd-size' is `end - begin + 1'), which is why the copy stops at
+`end + 1'."
+  ;; `bytevector-copy!' is R6RS's five-argument form here -- source and its
+  ;; offset first, then the destination and its -- which is worth saying out
+  ;; loud, since the shorter form every other language spells it as puts the
+  ;; arguments the other way round and copies nothing but throws.
+  (let* ((start (mfd-begin mfd))
+         (end (+ (mfd-end mfd) 1))
+         (length (- end start))
+         (bytes (make-bytevector length 0)))
+    (bytevector-copy! (rc-body rc) start bytes 0 length)
+    bytes))
 
 (define (safe-attachment-filename filename)
   "Answer FILENAME as a short name that is safe in a header.

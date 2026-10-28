@@ -1,6 +1,6 @@
 -- lucidplan - free and open project management for everyone
 --
--- SPDX-LICENSE-IDENTIFIER: MIT
+-- SPDX-License-Identifier: MIT
 -- Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
 -- A table is often opened for one thing: somebody looking at a ticket asks the

@@ -1,6 +1,6 @@
 ;; lucidplan - free and open project management for everyone
 ;;
-;; SPDX-LICENSE-IDENTIFIER: MIT
+;; SPDX-License-Identifier: MIT
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
 ;;; The front page is the way in.
@@ -350,9 +350,13 @@
                                             #:background '(bg-asparagus-500/90
                                                            dark:bg-asparagus-700/90)
                                             #:content (G_ "start a project")))
-                           (a (@ (href "/about"))
-                              ,(button (G_ "about")
-                                       #:weight '(font-light))))))
+                           ;; The two ways in are plates; the way *out* of
+                           ;; the page is a word.  Three plates in a row would
+                           ;; be three equal offers, and one of these is the
+                           ;; one the pane is asking for.
+                           ,(quiet-link #:icon 'info
+                                        #:label (G_ "about")
+                                        #:href "/about"))))
                #:frost 3
                #:padding '(p-6 sm:p-10)
                #:classes '(flex flex-col gap-4 w-full

@@ -1,0 +1,24 @@
+-- lucidplan - free and open project management for everyone
+--
+-- SPDX-License-Identifier: MIT
+-- Copyright © Josep Bigorra <jjbigorra@gmail.com>
+
+-- The files a ticket carries, in the database.
+--
+-- They were written to a directory beside the instance and handed back by the
+-- application, which is what `attachment-directory' in the configuration still
+-- names -- but a file kept outside the database is a file a backup can miss, a
+-- copy of the database cannot carry, and an operator has to prune by hand
+-- after a ticket is gone.  A ticket's files now travel with the ticket.
+--
+-- The bytes are stored as base64 text rather than as a BLOB, for the reason
+-- written in the project avatar migration: every value here is written through
+-- the escaped-literal builders, which carry text and refuse the NUL a PDF is
+-- full of.  Base64 is a third larger and needs no exception to a rule that
+-- keeps every other write safe.
+--
+-- `stored_name' stays, and stays NOT NULL: it is the name this instance gave
+-- the upload, it is still what a legacy file is found under (see the download
+-- route, which reads one such file once and stores it), and it is what tells
+-- two uploads of the same filename apart.
+ALTER TABLE "ticket_attachment" ADD COLUMN "data" TEXT;

@@ -1,6 +1,6 @@
 ;; lucidplan - free and open project management for everyone
 ;;
-;; SPDX-LICENSE-IDENTIFIER: MIT
+;; SPDX-License-Identifier: MIT
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
 (define-module (lucidplan html)
@@ -111,6 +111,14 @@
   '(bg-stone-200/45 dark:bg-onyx-800/45
     border-2 border-stone-500/25 dark:border-onyx-100/25))
 
+;; The surface of a chip: a fact, or a field a reader can change where it
+;; stands.  It is a tint and nothing else -- no frame, no frost.  Five framed
+;; chips in a row are five boxes, and a card that holds them stops reading as
+;; a card and starts reading as a form; five tints read as what they are,
+;; which is five values.
+(define-public chip-tint-classes
+  '(bg-stone-200/50 dark:bg-onyx-700/50))
+
 ;;; ===== The window a pane can wear =====
 
 ;;; A pane of frosted glass is the application's surface; a *window* is the
@@ -156,6 +164,86 @@ which is how the front page's language chooser ends up in its title bar."
                      ,@(if (list? trailing)
                            trailing
                            (list trailing)))))))
+
+;;; ===== A link in the bar =====
+
+;;; The bar carries the way through the application, and the whole of it is
+;;; four or five of these.  They wear no box: see `lp-quiet' in
+;;; `pub/css/lucidplan-luxe.css' for why a row of plates is worse than a row
+;;; of words.  What they wear instead is the bar's own pale ink -- the ink the
+;;; brand at the other end already wears -- so the bar reads as one surface
+;;; with marks on it rather than as a shelf of buttons.
+;;;
+;;; This is one procedure rather than five copies of the same twenty lines
+;;; because the five differ only in which word they say: a bar whose controls
+;;; drift apart from one another one keyword at a time is the usual way a
+;;; toolbar starts to look assembled rather than designed.
+
+(define* (bar-link #:key icon label href)
+  "A control of the bar: the mark, the word, and no box around either."
+  `(a (@ (class ,(mk-class '(lowercase font-sans font-medium flex
+                                      items-center no-underline
+                                      hover:opacity-80)))
+         (href ,href))
+      ,(icon-button #:icon icon
+                    #:content label
+                    #:size '(text-sm md:text-md)
+                    #:background '()
+                    #:hover-background '()
+                    #:border-size '()
+                    #:border-color '()
+                    #:shadow '()
+                    #:color '(text-stone-300 dark:text-stone-300)
+                    #:icon-css '(text-md text-stone-300 dark:text-stone-300)
+                    #:extra-classes '(lp-quiet py-1 px-2 md:px-3
+                                               max-w-prose cursor-pointer))))
+
+;;; ===== Controls that stay out of the way =====
+
+;;; A card is a surface already.  Filling it with a second row of plates --
+;;; every link a button, every button a box -- is how a page ends up shouting:
+;;; six things at the same volume, so nothing is the thing to do and the eye
+;;; has nowhere to rest.  These two are the shapes a card's actions take
+;;; instead.  The class that does the work is `lp-quiet' in
+;;; `pub/css/lucidplan-luxe.css' -- the plate comes off, the ink and the
+;;; padding and the focus ring stay, and a veil of the control's own colour
+;;; appears under the pointer -- and these are what a view reaches for rather
+;;; than six copies of the same keyword soup.
+
+(define* (quiet-link #:key icon label href
+                     (ink '(text-onyx-700 dark:text-stone-300)))
+  "An action inside a card: the mark, the word, and no plate around them.
+
+INK is the colour pair the control is drawn in: the card's ordinary ink by
+default, and the red pair for the one action a reader cannot take back."
+  `(a (@ (class ,(mk-class '(no-underline)))
+         (href ,href))
+      ,(icon-button #:icon icon
+                    #:content label
+                    #:size '(text-sm)
+                    #:background '()
+                    #:hover-background '()
+                    #:border-size '()
+                    #:border-color '()
+                    #:shadow '()
+                    #:color ink
+                    #:icon-css (append '(text-md) ink)
+                    #:extra-classes '(lp-quiet py-1 px-2
+                                               max-w-prose cursor-pointer))))
+
+(define* (quiet-submit content
+                       #:key (ink '(text-redwood-700 dark:text-redwood-300)))
+  "A form's submit control, quiet: the word in INK and no plate around it."
+  (button content
+          #:type 'submit
+          #:background '()
+          #:hover-background '()
+          #:border-size '()
+          #:border-color '()
+          #:shadow '()
+          #:size '(text-sm)
+          #:color ink
+          #:extra-classes '(lp-quiet py-1 px-2 max-w-prose cursor-pointer)))
 
 (define-public (aurora-backdrop)
   "A fixed, purely decorative wash of colour behind the page.
@@ -558,166 +646,74 @@ run against a default address somebody else runs."
                                                            md:w-auto
                                                            lp-dock))))
 
-                                    ;; Auth Link
+                                    ;; The way through the application.  Each
+                                    ;; of these is a word with a mark beside
+                                    ;; it and no box around either: five plates
+                                    ;; in a row are five things asking to be
+                                    ;; pressed at once, which is a control
+                                    ;; panel rather than a way through.  See
+                                    ;; `lp-quiet' in
+                                    ;; `pub/css/lucidplan-luxe.css'.
                                     ,(if (not is-logged-in)
-                                         `(a (@ (class ,(mk-class '(lowercase
-                                                                    font-sans
-                                                                    font-medium
-                                                                    flex
-                                                                    items-center
-                                                                    no-underline
-                                                                    lp-navlink
-                                                                    hover:opacity-80)))
-                                                (href "/login"))
-                                             ,(icon-button #:icon 'sign-in
-                                                           #:content (G_
-                                                                      "login")
-                                                           #:size '(text-sm
-                                                                    md:text-md)
-                                                           #:extra-classes '(py-1
-                                                                             px-2
-                                                                             md:px-3
-                                                                             max-w-prose
-                                                                             cursor-pointer
-                                                                             text-onyx-700
-                                                                             dark:text-stone-300)
-                                                           #:icon-css '(text-md
-                                                                        text-onyx-700
-                                                                        dark:text-stone-300)))
-                                         `(a (@ (class ,(mk-class '(lowercase
-                                                                    font-sans
-                                                                    font-medium
-                                                                    flex
-                                                                    items-center
-                                                                    no-underline
-                                                                    lp-navlink
-                                                                    hover:opacity-80)))
-                                                (href "/me"))
-                                             ,(icon-button #:icon 'user-circle
-                                                           #:content (G_ "me")
-                                                           #:size '(text-sm
-                                                                    md:text-md)
-                                                           #:extra-classes '(py-1
-                                                                             px-2
-                                                                             md:px-3
-                                                                             max-w-prose
-                                                                             cursor-pointer
-                                                                             text-onyx-700
-                                                                             dark:text-stone-300)
-                                                           #:icon-css '(text-md
-                                                                        text-onyx-700
-                                                                        dark:text-stone-300))))
+                                         (bar-link #:icon 'sign-in
+                                                   #:label (G_ "login")
+                                                   #:href "/login")
+                                         (bar-link #:icon 'user-circle
+                                                   #:label (G_ "me")
+                                                   #:href "/me"))
 
-                                    ;; Projects Link
-                                    (a (@ (class ,(mk-class '(lowercase
-                                                              no-underline
-                                                              font-sans
-                                                              font-medium
-                                                              flex
-                                                              items-center
-                                                              lp-navlink
-                                                              hover:opacity-80)))
-                                          (href "/projects"))
-                                       ,(icon-button #:icon 'align-bottom
-                                                     #:content (G_ "projects")
-                                                     #:size '(text-sm
-                                                              md:text-md)
-                                                     #:extra-classes '(py-1
-                                                                       px-2
-                                                                       md:px-3
-                                                                       max-w-prose
-                                                                       cursor-pointer
-                                                                       text-onyx-700
-                                                                       dark:text-stone-300)
-                                                     #:icon-css '(text-md
-                                                                  text-onyx-700
-                                                                  dark:text-stone-300)))
+                                    ,(bar-link #:icon 'align-bottom
+                                               #:label (G_ "projects")
+                                               #:href "/projects")
 
-                                    ;; Planning Poker Link.  It sits with
-                                    ;; the other links rather than behind
-                                    ;; the signed-in branch, because a table
-                                    ;; is exactly where the people without
-                                    ;; an account on this instance are.
-                                    (a (@ (class ,(mk-class '(lowercase
-                                                              no-underline
-                                                              font-sans
-                                                              font-medium
-                                                              flex
-                                                              items-center
-                                                              lp-navlink
-                                                              hover:opacity-80)))
-                                          (href "/poker"))
-                                       ,(icon-button #:icon 'cards
-                                                     #:content (G_ "poker")
-                                                     #:size '(text-sm
-                                                              md:text-md)
-                                                     #:extra-classes '(py-1
-                                                                       px-2
-                                                                       md:px-3
-                                                                       max-w-prose
-                                                                       cursor-pointer
-                                                                       text-onyx-700
-                                                                       dark:text-stone-300)
-                                                     #:icon-css '(text-md
-                                                                  text-onyx-700
-                                                                  dark:text-stone-300)))
+                                    ;; Planning Poker sits with the other
+                                    ;; links rather than behind the signed-in
+                                    ;; branch, because a table is exactly
+                                    ;; where the people without an account on
+                                    ;; this instance are.
+                                    ,(bar-link #:icon 'cards
+                                               #:label (G_ "poker")
+                                               #:href "/poker")
 
-                                    ;; About Link
-                                    (a (@ (class ,(mk-class '(lowercase
-                                                              no-underline
-                                                              font-sans
-                                                              font-medium
-                                                              flex
-                                                              items-center
-                                                              lp-navlink
-                                                              hover:opacity-80)))
-                                          (href "/about"))
-                                       ,(icon-button #:icon 'info
-                                                     #:content (G_ "about")
-                                                     #:size '(text-sm
-                                                              md:text-md)
-                                                     #:extra-classes '(py-1
-                                                                       px-2
-                                                                       md:px-3
-                                                                       max-w-prose
-                                                                       cursor-pointer
-                                                                       text-onyx-700
-                                                                       dark:text-stone-300)
-                                                     #:icon-css '(text-md
-                                                                  text-onyx-700
-                                                                  dark:text-stone-300)))
+                                    ,(bar-link #:icon 'info
+                                               #:label (G_ "about")
+                                               #:href "/about")
 
                                     ;; Theme Toggle
                                     ,(ui-mode-button #:icon ""
                                                      #:size '(text-md)
-                                                     #:icon-css '(text-onyx-300
+                                                     #:icon-css '(text-stone-300
                                                                   dark:text-stone-300
                                                                   text-md)
                                                      #:family '(font-sans)
+                                                     #:background '()
+                                                     #:hover-background '()
+                                                     #:border-size '()
+                                                     #:border-color '()
+                                                     #:shadow '()
                                                      #:content `((div ,(icon
                                                                              #:type 'sun
                                                                              #:icon-css '
                                                                              (text-md
                                                                               lg:text-lg
-                                                                              text-onyx-300
+                                                                              text-stone-300
                                                                               dark:text-stone-300))
                                                                       ,(icon
                                                                              #:type 'moon
                                                                              #:icon-css '
                                                                              (text-md
                                                                               lg:text-lg
-                                                                              text-onyx-300
+                                                                              text-stone-300
                                                                               dark:text-stone-300))))
-                                                     #:color '(text-onyx-900
-                                                               dark:text-stone-100)
+                                                     #:color '(text-stone-300
+                                                               dark:text-stone-300)
                                                      #:weight '(font-light)
-                                                     #:extra-classes '(py-1
+                                                     #:extra-classes '(lp-quiet
+                                                                       py-1
                                                                        px-2
                                                                        lg:px-3
                                                                        max-w-prose
-                                                                       cursor-pointer
-                                                                       hover:opacity-80
-                                                                       transition-opacity))
+                                                                       cursor-pointer))
                                     ;; Dropdown Select
                                     ,project-select))
                              #:tag 'header
@@ -843,8 +839,12 @@ run against a default address somebody else runs."
   (export html-template
           frosted-tint-classes
           recessed-tint-classes
+          chip-tint-classes
           window-controls
           window-titlebar
+          bar-link
+          quiet-link
+          quiet-submit
           render-page
           asset-href
           emoji-for-ticket-status

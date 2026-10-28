@@ -26,6 +26,47 @@ maak migrate
 
 ----------------------------------
 
+* Unreleased
+
+A project in a list is a name and a picture, and a ticket carries its files
+with it.
+
+A project can now be given a picture, uploaded from its edit page with the
+file picker rather than saved along with the form: a file is not something a
+form body can carry, and a picture that lands only when somebody remembers to
+press "save project" is a picture that does not land.  Four types are kept
+(PNG, JPEG, GIF, WebP) and the type a picture is handed back as is read from
+the one it was filed under, never from what the upload claimed, so neither a
+filename nor a claimed type ever becomes a path or a header.
+
+A project that has never been given a picture is not an empty frame waiting for
+one: it is drawn as its own initial, in a colour derived from its name, so the
+same project is the same colour everywhere and two projects are unlikely to be
+the same colour by accident.  The letter is drawn *under* the picture rather
+than instead of it, which is what makes a picture that is slow to arrive show
+the letter while it comes, and a picture that cannot be fetched at all take
+itself away and leave the letter -- instead of the broken-image mark every
+browser draws.  Nothing has to be uploaded for a list of projects to look
+finished.
+
+The picture is served at an address that carries the token of the version being
+shown, so it can be cached for a year and still be replaced: a new picture is a
+new token is a new address, and a reader holding an old page asks for the old
+one and gets what it always meant.
+
+The database is now the whole of what a ticket carries.  A file attached to a
+ticket lives in the attachment's own row instead of in a directory beside the
+instance, so it travels with a copy of the database and a backup cannot take
+the tickets and leave their files behind.  A picture lives in its project's row
+for the same reason.  Both are carried as base64 text rather than as binary:
+every value here is written through the escaped-literal builders, which carry
+text and refuse the NUL a PNG is full of, and base64 is ASCII by construction.
+
+A file uploaded before this change is read from the directory it was written to
+the first time it is downloaded, stored in its row, and never read from a file
+again -- the move migrates itself, one file at a time, instead of depending on
+somebody remembering to run a task first.
+
 * v1.9.0
 
 A ticket is now a place where the work on it happens, not just a card that

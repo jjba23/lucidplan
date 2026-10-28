@@ -1,6 +1,6 @@
 ;; lucidplan - free and open project management for everyone
 ;;
-;; SPDX-LICENSE-IDENTIFIER: MIT
+;; SPDX-License-Identifier: MIT
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
 (define-module (lucidplan sqlite project)
@@ -24,6 +24,15 @@
          ;; its edit page was given, or nothing -- in which case the project
          ;; uses the instance's statuses.  See `effective-ticket-statuses'.
          ticket-statuses
+         ;; The token naming one version of the picture this project wears, or
+         ;; nothing -- in which case the pages draw the letter avatar its name
+         ;; generates (see `(lucidplan avatars)').  The token is what a page
+         ;; puts after the picture's address, so that a replaced picture is a
+         ;; new address; the bytes themselves are *not* read here, because a
+         ;; list of projects must not drag every picture in the instance
+         ;; through memory to draw a column of names.  See
+         ;; `get-project-avatar'.
+         avatar
          created-at
          updated-at
          deleted-at))
@@ -66,6 +75,22 @@
       (if (nil? rows) #f
           (car rows))))
 
+  ;; The picture of one project: the bytes and the type they are served as,
+  ;; and nothing else.  It is a query of its own rather than a column of the
+  ;; one above for the reason written there -- a picture is for one row and
+  ;; for one request, not for every list of every project.
+  (define (get-project-avatar human-id)
+    (let ((rows (execute-read "get-project-avatar"
+                              (sql-select 'project
+                                          #:columns '(avatar avatar-content-type
+                                                             avatar-data)
+                                          #:where (list '(deleted-at is null)
+                                                        (cons 'human-id
+                                                              human-id))
+                                          #:limit 1))))
+      (if (nil? rows) #f
+          (car rows))))
+
   (define (update-project-by-human-id human-id attrs)
     (execute-write "update-project-by-human-id"
                    (sql-update 'project attrs
@@ -79,6 +104,8 @@
                          #:search-projects-proc search-projects
                          #:get-project-by-human-id-proc
                          get-project-by-human-id
+                         #:get-project-avatar-proc
+                         get-project-avatar
                          #:update-project-by-human-id-proc
                          update-project-by-human-id
                          #:insert-project-proc insert-project))
