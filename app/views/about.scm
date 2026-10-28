@@ -75,21 +75,33 @@
                    #:is-logged-in is-logged-in
                    #:body `(div (@ (class ,(mk-class '(px-3 md:px-6 py-6
                                                             max-w-256))))
-                                ,(glass-panel `((div (@ (class ,(mk-class '(flex
+                                ;; The page a reader decides whether to trust
+                                ;; this instance is the page most worth
+                                ;; dressing as a window: it is the operator's
+                                ;; own account, and the chrome says where it
+                                ;; ends.
+                                ,(glass-panel `(,(window-titlebar
+                                                  #:title (format #f "~a — ~a"
+                                                                  name
+                                                                  (G_ "about")))
+                                                (div (@ (class ,(mk-class '(flex
                                                                             flex-col
-                                                                            gap-1))))
+                                                                            gap-1
+                                                                            p-6 sm:p-10))))
                                                      ,(h1 (G_ "About"))
                                                      ,(sub-h2 name
                                                               #:weight '(font-light))
                                                      ,(em (config-ref 'site-tagline)
-                                                          #:size '(text-sm)))
-                                                (div (@ (class ,(mk-class '(max-w-prose
-                                                                            my-2))))
-                                                     ,(org2html (config-ref 'about-org)))
-                                                ,links
-                                                ,social-row
-                                                ,contact-row)
+                                                          #:size '(text-sm))
+                                                     (div (@ (class ,(mk-class '(max-w-prose
+                                                                                 my-2))))
+                                                          ,(org2html (config-ref 'about-org)))
+                                                     ,links
+                                                     ,social-row
+                                                     ,contact-row))
                                               #:frost 3
-                                              #:padding '(p-6 sm:p-10)
+                                              #:padding '()
                                               #:classes '(flex flex-col gap-4
-                                                               w-full))))))
+                                                               w-full
+                                                               lp-deep
+                                                               lp-spotlight))))))

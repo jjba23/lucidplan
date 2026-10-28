@@ -95,7 +95,8 @@
                            py-2
                            px-4
                            cursor-pointer
-                           rounded-xl) frosted-tint-classes)))
+                           rounded-xl
+                           lp-lift) frosted-tint-classes)))
 
 (define %list-title-face
   (mk-class '(font-sans text-sm

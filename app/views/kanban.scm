@@ -47,7 +47,8 @@
                                              border-2
                                              shadow-sm
                                              hover:shadow-md
-                                             transition-shadow)
+                                             transition-shadow
+                                             lp-lift)
                                            frosted-tint-classes))))
               (div (@ (class ,(mk-class '(flex flex-row justify-between
                                                items-center gap-2))))

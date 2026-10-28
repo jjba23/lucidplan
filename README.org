@@ -1413,9 +1413,9 @@ tell us.
 :CUSTOM_ID: licensing
 :END:
 
-lucidplan and all of its source code are free and open software, licensed under the [[https://opensource.org/license/mit][MIT License]]
+This project, and Git repository, and all of its source code are free and open software, licensed under the [[https://opensource.org/license/mit][MIT License]]
 
-The documentation and examples, including this document, which are provided with lucidplan, are all licensed under the [[https://creativecommons.org/licenses/by/4.0/][CC BY 4.0 (Creative Commons Attribution)]] license.
+The documentation and examples, including this document, which are provided, are all licensed under the [[https://creativecommons.org/licenses/by/4.0/][CC BY 4.0 (Creative Commons Attribution)]] license.
 
 ------------------
 

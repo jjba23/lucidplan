@@ -1,0 +1,573 @@
+/* lucidplan - free and open project management for everyone
+ *
+ * SPDX-LICENSE-IDENTIFIER: MIT
+ * Copyright © Josep Bigorra <jjbigorra@gmail.com>
+ */
+
+/* ===== What this sheet is =====
+
+   Olive ships utility classes and hygguile ships structure; neither ships a
+   house style.  This sheet is LucidPlan's own: the handful of rules that are
+   about how this application should *feel* rather than about what its markup
+   is made of -- a thicker pane of glass, a spring in the things that move, a
+   light that follows the pointer across a card, and a window chrome that says
+   a piece of software is being used rather than a form being filled in.
+
+   It is a file of this instance, served by this instance, and it is loaded
+   after `lucidplan.olive.min.css', which is the one ordering rule here: an
+   Olive utility has to keep winning over anything this sheet says about the
+   same property, or a page that colours itself with `bg-*' and `text-*' would
+   be coloured by whichever of the two sheets the operator happened to load
+   last.  So every rule below either names a class of its own (`lp-*', which
+   no utility can be), or restates a declaration of a framework component
+   (`hg-frost', the traffic lights) that this sheet is entitled to dress.
+
+   Nothing here is required for the application to work.  A reader with the
+   stylesheet blocked gets a plainer LucidPlan, not a broken one: no rule here
+   carries meaning, changes a box's size, or hides a control.  The motion is
+   all of it optional too -- the block at the foot of the sheet stops every
+   transition and animation this file starts, for anyone who asks their
+   system for less movement. */
+
+/* ===== 1. The tokens =====
+
+   One place for the few values the whole sheet shares, because the point of
+   most of them is that they agree with each other: two shadows that do not
+   share a personality read as two shadows, and two durations that do not
+   share a curve read as two pieces of software.
+
+   The curves are the important ones.  `--lp-spring' overshoots its target by
+   a hair -- that is what makes a lifted card feel like it has weight and
+   then settles rather than sliding to a stop -- and `--lp-ease' is a plain
+   ease-out for the things that must not overshoot, such as a fade or a
+   colour.  A spring on an opacity change looks like a mistake; an ease-out
+   on a lift looks like a machine. */
+
+:root {
+  --lp-spring: cubic-bezier(0.32, 1.28, 0.5, 1);
+  --lp-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --lp-quick: 140ms;
+  --lp-base: 260ms;
+  --lp-slow: 620ms;
+
+  /* The accent is the blue a system uses for the control you are about to
+     press, said in the one colour space the rest of the palette is written
+     in.  It is deliberately the only saturated hue in this sheet: everything
+     else is a hairline, a shadow or a light. */
+  --lp-accent: oklch(0.62 0.17 254);
+  --lp-accent-soft: oklch(0.62 0.17 254 / 0.26);
+
+  /* The two edges of a pane of glass: the bright one along the top, where a
+     light source above the window would catch it, and the faint one all the
+     way round, which is what a real pane's thickness reads as. */
+  --lp-edge: rgba(255, 255, 255, 0.62);
+  --lp-edge-soft: rgba(255, 255, 255, 0.16);
+
+  --lp-hairline: rgba(120, 113, 108, 0.22);
+  --lp-sheen: rgba(255, 255, 255, 0.5);
+  --lp-spot: rgba(255, 255, 255, 0.55);
+  --lp-grain-opacity: 0.028;
+
+  /* A lift is small on purpose.  A card that jumps reads as a toy; a card
+     that rises by two millimetres and casts a longer shadow reads as a sheet
+     of paper being picked up, which is the whole illusion. */
+  --lp-lift: -0.18rem;
+  --lp-shadow-hover: 0 1.45rem 2.6rem -1.1rem rgba(28, 25, 23, 0.34),
+    0 0.5rem 1rem -0.6rem rgba(28, 25, 23, 0.2);
+}
+
+[data-theme="dark"] {
+  --lp-edge: rgba(255, 255, 255, 0.22);
+  --lp-edge-soft: rgba(255, 255, 255, 0.06);
+  --lp-hairline: rgba(214, 211, 209, 0.16);
+  --lp-sheen: rgba(255, 255, 255, 0.14);
+  --lp-spot: rgba(148, 190, 255, 0.22);
+  --lp-grain-opacity: 0.05;
+  --lp-shadow-hover: 0 1.45rem 2.6rem -1.1rem rgba(0, 0, 0, 0.7),
+    0 0.5rem 1rem -0.6rem rgba(0, 0, 0, 0.45);
+  color-scheme: dark;
+}
+
+/* ===== 2. The edges of the glass =====
+
+   Every frosted surface in the application -- the bar, the hero, every card
+   cut from `frosted-tint-classes' -- frosts through `hg-frost::before', the
+   framework's rounded blur layer.  That layer is already the right shape and
+   the right depth in the stacking order, so the two things that turn a tinted
+   blur into a pane of glass are added to it rather than to the pane: a
+   specular hairline along the top edge, and the suggestion of light falling
+   in from above.
+
+   Both are inset shadows, which is what keeps this from needing an element of
+   its own: an inset shadow paints inside the box's own border and follows its
+   radius, so the layer rounds them for free.  Neither changes the pane's
+   layout by a pixel, which matters -- a border added to the surface would
+   have moved every card in the application by a pixel and made the frost
+   layer disagree with the edge it is meant to be inside of.
+
+   `--lp-deep' is the one knob: a pane that holds the whole page's attention
+   asks for a heavier frost and gets a blur it can see rather than infer. */
+
+.hg-frost::before {
+  box-shadow: inset 0 1px 0 0 var(--lp-edge),
+    inset 0 1.5rem 2.5rem -2rem var(--lp-edge-soft);
+}
+
+.lp-deep {
+  --hg-frost-blur: 5.5rem;
+}
+
+/* ===== 3. The light that follows the pointer =====
+
+   A radial highlight that lives under the pane's content and is steered by
+   two custom properties, `--lp-x' and `--lp-y', which `lucidplan-luxe.js'
+   keeps at the pointer's position.  It fades in on hover and out on leave, so
+   a pane that is not being pointed at is exactly the pane it was before.
+
+   The layer is the pane's `::after' -- `::before' is the frost -- and it sits
+   one step back in the stacking order, which is what puts it *above* the
+   pane's own background and *below* its text.  That only works if the pane is
+   a stacking context, so `isolation' states one; a frosted pane already has
+   one, and a pane that is not frosted gets its layer in the right place
+   anyway.
+
+   The default position, before the script has said anything, is the middle of
+   the top edge: that is where a highlight would be if the page had been lit
+   rather than followed, so a page whose script never ran -- or whose reader
+   asked for less motion -- shows a plausible highlight rather than a corner
+   of one. */
+
+.lp-spotlight {
+  position: relative;
+  isolation: isolate;
+}
+
+.lp-spotlight::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--lp-base) var(--lp-ease);
+  background: radial-gradient(22rem circle at var(--lp-x, 50%) var(--lp-y, 0%),
+      var(--lp-spot),
+      transparent 70%);
+}
+
+.lp-spotlight:hover::after,
+.lp-spotlight:focus-within::after {
+  opacity: 1;
+}
+
+/* ===== 4. The lift =====
+
+   What a card does when the pointer is over it: it rises, its shadow lengthens
+   and softens, and -- if the script is running and the card asked for it by
+   carrying `lp-tilt' as well -- it leans very slightly towards the pointer.
+   The lean is two custom properties the script writes, so the card is a plane
+   held at an angle whether the script is there or not: with no script they
+   are both zero and the card simply rises.
+
+   The whole thing is behind `hover: hover' and `pointer: fine', because a
+   touch screen reports neither and a layout that shifts under a thumb is a
+   layout that moves the thing you were aiming at. */
+
+.lp-lift {
+  transition: transform var(--lp-base) var(--lp-spring),
+    box-shadow var(--lp-base) var(--lp-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .lp-lift:hover {
+    transform: perspective(75rem) translate3d(0, var(--lp-lift), 0)
+      rotateX(var(--lp-rx, 0deg)) rotateY(var(--lp-ry, 0deg));
+    box-shadow: var(--lp-shadow-hover);
+  }
+}
+
+/* The press: a control that has just been touched gives back a pixel, which
+   is the smallest possible acknowledgement that the click landed. */
+
+.lp-press:active {
+  transform: translate3d(0, 1px, 0) scale(0.995);
+}
+
+/* ===== 5. The bar's own controls =====
+
+   The bar is a frosted toolbar, so its controls behave like the ones in a
+   toolbar rather than like links in a paragraph: each sits on a pill it only
+   shows when it is pointed at, and the row magnifies around the pointer the
+   way a dock does.  The neighbours of the pointed-at control grow by half as
+   much as it does, which is the detail that makes a dock feel like one
+   surface with a wave running through it instead of a row of independent
+   buttons.
+
+   `:has()' is what reaches the neighbour on the left; a browser without it
+   simply magnifies the control under the pointer and leaves the rest alone,
+   which is a lesser effect and not a broken one. */
+
+.lp-navlink {
+  border-radius: 0.85rem;
+  transition: transform var(--lp-base) var(--lp-spring),
+    background-color var(--lp-quick) var(--lp-ease),
+    box-shadow var(--lp-quick) var(--lp-ease);
+}
+
+.lp-dock > * {
+  transition: transform var(--lp-base) var(--lp-spring);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .lp-navlink:hover {
+    background-color: rgba(255, 255, 255, 0.16);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28),
+      0 0.6rem 1.2rem -0.8rem rgba(0, 0, 0, 0.45);
+  }
+
+  .lp-dock > *:hover {
+    transform: translate3d(0, -0.18rem, 0) scale(1.06);
+  }
+
+  .lp-dock > *:has(+ *:hover),
+  .lp-dock > *:hover + * {
+    transform: translate3d(0, -0.08rem, 0) scale(1.02);
+  }
+}
+
+[data-theme="dark"] .lp-navlink:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ===== 6. A window, not a card =====
+
+   The chrome a desktop application wears: a bar across the top of a pane with
+   three dots at its start, the name of what is open in the middle in a mono
+   face, and whatever the page wants at the end.  It is the one piece of the
+   interface that is pure costume -- nothing here is a control -- so the dots
+   are hidden from assistive technology and the bar carries no landmark of its
+   own.  What it does is place the pane: a reader who has used a computer
+   recognises the shape before reading a word of it, and arrives already
+   knowing the pane is a thing with edges rather than a section of a document.
+
+   The dots take their glyphs from `::before', and the glyphs wait for the
+   group to be hovered, which is what the windows this borrows from do: three
+   plain lights until you go to close one, then three meanings. */
+
+.lp-titlebar {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.85rem;
+  border-bottom: 1px solid var(--lp-hairline);
+  /* The bar is the pane's first row and has a face of its own, so it rounds
+     its own top corners: the pane it sits in does not clip (see
+     `glass-panel', which has to let a dropdown escape), and a bar with a
+     square face inside a rounded pane leaves a bright tag over the tint at
+     the top of every pane that wears one.  The radius is the pane's own --
+     `--hg-glass-clip' is the property the framework's wash layer already
+     names its clip with -- and the default is the rounding a pane wears when
+     a page says nothing. */
+  border-start-start-radius: var(--hg-glass-clip, 1.28rem);
+  border-start-end-radius: var(--hg-glass-clip, 1.28rem);
+  background: linear-gradient(to bottom,
+      rgba(255, 255, 255, 0.34),
+      rgba(255, 255, 255, 0));
+}
+
+[data-theme="dark"] .lp-titlebar {
+  background: linear-gradient(to bottom,
+      rgba(255, 255, 255, 0.07),
+      rgba(255, 255, 255, 0));
+}
+
+.lp-window-title {
+  font-family: "Intel One Mono", ui-monospace, "Lucida Sans Typewriter", monospace;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: rgba(87, 83, 78, 0.8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[data-theme="dark"] .lp-window-title {
+  color: rgba(214, 211, 209, 0.75);
+}
+
+.lp-traffic {
+  display: inline-flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  gap: 0.45rem;
+  flex: none;
+}
+
+.lp-traffic .lp-dot {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.5rem;
+  font-style: normal;
+  line-height: 1;
+  color: rgba(56, 44, 40, 0.62);
+  box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  transition: transform var(--lp-quick) var(--lp-spring),
+    filter var(--lp-quick) var(--lp-ease);
+}
+
+.lp-dot-close {
+  background: radial-gradient(circle at 30% 25%, #ff8a82, #ff5f57 60%);
+}
+
+.lp-dot-min {
+  background: radial-gradient(circle at 30% 25%, #ffd76a, #febc2e 60%);
+}
+
+.lp-dot-zoom {
+  background: radial-gradient(circle at 30% 25%, #63e06f, #28c840 60%);
+}
+
+.lp-dot::before {
+  content: "";
+  opacity: 0;
+  transition: opacity var(--lp-quick) var(--lp-ease);
+}
+
+.lp-dot-close::before {
+  content: "✕";
+}
+
+.lp-dot-min::before {
+  content: "–";
+}
+
+.lp-dot-zoom::before {
+  content: "+";
+}
+
+.lp-traffic:hover .lp-dot::before {
+  opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .lp-dot:hover {
+    transform: scale(1.18);
+  }
+}
+
+.lp-dot:active {
+  filter: brightness(0.9);
+}
+
+/* The strip along the bottom of a window: what is in it, said in the mono face
+   the chrome is set in, quiet enough that it is read on the way past rather
+   than instead of the page.  It rounds its own bottom corners for the same
+   reason the bar rounds its top ones. */
+
+.lp-window-status {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0.9rem;
+  border-top: 1px solid var(--lp-hairline);
+  border-end-start-radius: var(--hg-glass-clip, 1.28rem);
+  border-end-end-radius: var(--hg-glass-clip, 1.28rem);
+  background: linear-gradient(to top,
+      rgba(255, 255, 255, 0.22),
+      rgba(255, 255, 255, 0));
+  font-family: "Intel One Mono", ui-monospace, "Lucida Sans Typewriter", monospace;
+  font-size: 0.7rem;
+  color: rgba(87, 83, 78, 0.78);
+}
+
+[data-theme="dark"] .lp-window-status {
+  background: linear-gradient(to top,
+      rgba(255, 255, 255, 0.06),
+      rgba(255, 255, 255, 0));
+  color: rgba(214, 211, 209, 0.7);
+}
+
+/* ===== 7. A toolbar above the page =====
+
+   The bar is pinned, so once the page has moved under it the bar has to say
+   so: a shadow that was not there when the page was at its top, deepening as
+   soon as anything is behind the glass.  The class is toggled by the script,
+   which is why the resting state is stated first and the scrolled state is
+   only ever an addition -- with no script the bar keeps the shadow the
+   framework gave it. */
+
+.lp-toolbar {
+  transition: box-shadow var(--lp-base) var(--lp-ease);
+}
+
+.lp-toolbar.lp-scrolled {
+  box-shadow: 0 1rem 2rem -1.2rem rgba(28, 25, 23, 0.45),
+    0 0.35rem 0.75rem -0.5rem rgba(28, 25, 23, 0.25);
+}
+
+[data-theme="dark"] .lp-toolbar.lp-scrolled {
+  box-shadow: 0 1rem 2rem -1.2rem rgba(0, 0, 0, 0.75),
+    0 0.35rem 0.75rem -0.5rem rgba(0, 0, 0, 0.55);
+}
+
+/* ===== 8. The paper the page is printed on =====
+
+   A sheet of film grain over the whole backdrop, at two or three percent.  At
+   that strength it is not a texture anyone could point at -- it is what keeps
+   two large flat gradients from banding on a wide screen, and what stops the
+   colour washes behind the glass from reading as a soft focus photograph of
+   nothing.  It is a fixed, decorative layer under the content, so it never
+   takes a pointer event and never scrolls with the page. */
+
+.lp-grain {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='140' height='140' filter='url(%23g)' opacity='0.6'/></svg>");
+  background-repeat: repeat;
+  background-size: 140px 140px;
+  opacity: var(--lp-grain-opacity);
+  mix-blend-mode: soft-light;
+}
+
+/* ===== 9. Things that arrive =====
+
+   The page's own sections fade up as they come into view, which is the
+   difference between a long page that was always there and a long page that
+   is being handed to you a little at a time.  The stagger is `--lp-i', a
+   plain count written on the element by the view that built it, so a grid of
+   six cards can say which number it is without the script having to work it
+   out from the DOM.
+
+   The first rule is guarded by `lp-js', a class the page's head adds before
+   anything is painted: an element that is going to be revealed is only hidden
+   once there is a script that can reveal it.  With scripting off, nothing is
+   hidden at all -- which is the whole reason the guard exists, since a
+   reader whose script did not run would otherwise be shown a blank page that
+   had merely faded in to nothing. */
+
+.lp-js .lp-rise {
+  opacity: 0;
+  transform: translate3d(0, 1rem, 0);
+  transition: opacity var(--lp-slow) var(--lp-ease),
+    transform var(--lp-slow) var(--lp-spring);
+  transition-delay: calc(var(--lp-i, 0) * 80ms);
+}
+
+.lp-js .lp-rise.lp-revealed {
+  opacity: 1;
+  transform: none;
+}
+
+/* ===== 10. The small inks =====
+
+   The details that are only ever noticed when they are wrong: the colour a
+   selection is painted in, the ring a keyboard is shown around the control it
+   has reached, and a scrollbar thin enough to be a hint rather than furniture.
+   All three are the same accent as section 1, so the page has one idea of
+   what "this one, the one you are on" looks like. */
+
+::selection {
+  background: var(--lp-accent-soft);
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--lp-accent);
+  outline-offset: 2px;
+}
+
+/* A scrollbar is drawn by the browser and only hinted at here: the width of a
+   standard scrollbar is not something a stylesheet should move, but its
+   colour is, and a bar that is a shade of the page's own ink rather than a
+   grey rectangle is the difference between a page and an application. */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 113, 108, 0.45) transparent;
+}
+
+[data-theme="dark"] * {
+  scrollbar-color: rgba(214, 211, 209, 0.35) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(120, 113, 108, 0.4);
+  background-clip: content-box;
+  border: 0.22rem solid transparent;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(120, 113, 108, 0.62);
+  background-clip: content-box;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background-color: rgba(214, 211, 209, 0.3);
+  background-clip: content-box;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(214, 211, 209, 0.5);
+}
+
+/* A page that moves under an anchor jump is a page that hides where it went,
+   so the jump is a scroll and only where the reader has not asked it not to
+   be. */
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* ===== 11. Motion, for the people who want it =====
+
+   Everything this sheet starts, stopped in one place.  Nothing is removed:
+   a reveal that is not animated still has to be revealed, so the end state of
+   each effect is stated here rather than left to the transitions above. */
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-lift,
+  .lp-spotlight::after,
+  .lp-navlink,
+  .lp-dock > *,
+  .lp-dot,
+  .lp-dot::before,
+  .lp-toolbar,
+  .lp-js .lp-rise {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .lp-js .lp-rise {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) and (hover: hover) and (pointer: fine) {
+  .lp-lift:hover,
+  .lp-dock > *:hover,
+  .lp-dock > *:has(+ *:hover),
+  .lp-dock > *:hover + *,
+  .lp-dot:hover {
+    transform: none;
+  }
+}

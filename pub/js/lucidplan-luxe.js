@@ -1,0 +1,237 @@
+/* lucidplan - free and open project management for everyone
+ *
+ * SPDX-LICENSE-IDENTIFIER: MIT
+ * Copyright © Josep Bigorra <jjbigorra@gmail.com>
+ */
+
+// The page's polish, in one script: the light that follows the pointer, the
+// lean of a card under it, the reveal of a section as it is scrolled into
+// view, and the deepening of the toolbar once the page has moved under it.
+//
+// None of it is required.  Every one of these effects is stated in
+// `lucidplan-luxe.css' with a resting state that is already the right answer
+// -- a card that is not tilted is a card at zero degrees, a section that is
+// not revealed is a section in plain view once the `lp-js' class says a
+// script is running at all -- so a reader whose script did not load, or who
+// asked their system for less motion, reads the same page with less of it
+// moving.  Nothing here hides or reveals content, and nothing here knows what
+// any of the content says.
+
+(function () {
+  'use strict';
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  // ===== The light that follows the pointer =====
+
+  // One listener on the document rather than one per card: a page can hold
+  // dozens of lit surfaces and a listener apiece would be dozens of closures
+  // doing the same arithmetic.  The pointer's position is kept until the next
+  // frame and then painted once, because a pointer moves several times per
+  // frame and writing two custom properties per move would lay out the card
+  // more often than the screen can show it.
+  const TILT_LIMIT = 3.5;
+
+  let frame = null;
+  let pending = null;
+
+  function paint() {
+    frame = null;
+
+    if (!pending) {
+      return;
+    }
+
+    const lit = pending.lit;
+    const box = lit.getBoundingClientRect();
+
+    if (!box.width || !box.height) {
+      pending = null;
+      return;
+    }
+
+    // Where the pointer is, said as a percentage of the surface, which is
+    // what the radial gradient in the stylesheet reads: a percentage follows
+    // the card when it is resized or scrolled, an offset would not.
+    const x = ((pending.x - box.left) / box.width) * 100;
+    const y = ((pending.y - box.top) / box.height) * 100;
+
+    lit.style.setProperty('--lp-x', x.toFixed(2) + '%');
+    lit.style.setProperty('--lp-y', y.toFixed(2) + '%');
+
+    // The lean is the pointer's distance from the middle of the card, at most
+    // a few degrees: enough for the surface to feel like a plane catching the
+    // light, far too little for any text on it to look crooked.  A card that
+    // is only being lit (`lp-spotlight' alone) is left flat.
+    if (lit.classList.contains('lp-tilt')) {
+      const rx = (0.5 - y / 100) * 2 * TILT_LIMIT;
+      const ry = (x / 100 - 0.5) * 2 * TILT_LIMIT;
+      lit.style.setProperty('--lp-rx', rx.toFixed(2) + 'deg');
+      lit.style.setProperty('--lp-ry', ry.toFixed(2) + 'deg');
+    }
+
+    pending = null;
+  }
+
+  function litSurfaceUnder(node) {
+    return node instanceof Element
+      ? node.closest('.lp-spotlight, .lp-tilt')
+      : null;
+  }
+
+  document.addEventListener(
+    'pointermove',
+    function (event) {
+      if (reduced.matches) {
+        return;
+      }
+
+      // A finger or a pen does not hover, and following one would leave the
+      // last card touched lit and leaning after the finger has gone.
+      if (event.pointerType && event.pointerType !== 'mouse') {
+        return;
+      }
+
+      const lit = litSurfaceUnder(event.target);
+
+      if (!lit) {
+        return;
+      }
+
+      pending = { lit: lit, x: event.clientX, y: event.clientY };
+
+      if (frame === null) {
+        frame = window.requestAnimationFrame(paint);
+      }
+    },
+    { passive: true }
+  );
+
+  // Leaving a card puts it back the way it was.  `relatedTarget' is where the
+  // pointer went; a move from the card onto its own padding still reports the
+  // card itself as the one being left, and that is not a leave.
+  document.addEventListener(
+    'pointerout',
+    function (event) {
+      const tilted =
+        event.target instanceof Element ? event.target.closest('.lp-tilt') : null;
+
+      if (!tilted || tilted.contains(event.relatedTarget)) {
+        return;
+      }
+
+      tilted.style.removeProperty('--lp-rx');
+      tilted.style.removeProperty('--lp-ry');
+    },
+    { passive: true }
+  );
+
+  // ===== Sections that arrive =====
+
+  // A section marked `lp-rise' is hidden by the stylesheet only while the
+  // document carries `lp-js', which the page's head adds before anything is
+  // painted.  The reveal is the script taking that back off, one section at a
+  // time, as each is scrolled near enough to be read.
+  //
+  // This runs once the document has been read rather than when the script is
+  // reached, because the script is written into the page's head: at that
+  // moment there is no section to reveal yet, and a query that ran then would
+  // find nothing and quietly leave the page with nothing to reveal.
+  function ready(run) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run, { once: true });
+    } else {
+      run();
+    }
+  }
+
+  ready(function () {
+    const risers = Array.prototype.slice.call(
+      document.querySelectorAll('.lp-rise')
+    );
+
+    function reveal(riser) {
+      riser.classList.add('lp-revealed');
+    }
+
+    function revealAll() {
+      risers.forEach(reveal);
+    }
+
+    if (risers.length) {
+      if (reduced.matches || !('IntersectionObserver' in window)) {
+        // Nothing is animated, so everything is simply shown: a reader who
+        // asked for less motion should not have to scroll to make a section
+        // appear.
+        revealAll();
+      } else {
+        const watcher = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (!entry.isIntersecting) {
+                return;
+              }
+
+              reveal(entry.target);
+              watcher.unobserve(entry.target);
+            });
+          },
+          // The bottom margin is negative so a section is revealed when it has
+          // genuinely come into view rather than while it is still a sliver at
+          // the foot of the screen.
+          { rootMargin: '0px 0px -8% 0px', threshold: 0.08 }
+        );
+
+        risers.forEach(function (riser) {
+          watcher.observe(riser);
+        });
+      }
+    }
+
+    // The preference can be changed while the page is open, and a reader who
+    // turns motion off then should not be left with sections that never
+    // reveal because they were waited for rather than shown.
+    if (typeof reduced.addEventListener === 'function') {
+      reduced.addEventListener('change', function () {
+        if (reduced.matches) {
+          revealAll();
+        }
+      });
+    }
+
+    // ===== A toolbar that knows the page moved =====
+
+    // A desktop toolbar draws a shadow once there is content under it, and
+    // that shadow is what tells a reader the bar is above the page rather than
+    // part of it.  The bar is `lp-toolbar'; the class toggled here is the one
+    // the stylesheet deepens.
+    const toolbar = document.querySelector('.lp-toolbar');
+
+    if (toolbar) {
+      let ticking = false;
+
+      function settleToolbar() {
+        ticking = false;
+        toolbar.classList.toggle('lp-scrolled', window.scrollY > 8);
+      }
+
+      window.addEventListener(
+        'scroll',
+        function () {
+          if (ticking) {
+            return;
+          }
+
+          ticking = true;
+          window.requestAnimationFrame(settleToolbar);
+        },
+        { passive: true }
+      );
+
+      // A page is rarely opened at its own top -- a reload keeps the scroll
+      // position -- so the bar is told where the page is before the reader
+      // touches it.
+      settleToolbar();
+    }
+  });
+})();

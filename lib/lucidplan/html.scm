@@ -36,10 +36,14 @@
 ;; page that needs them.  Two of them are on every page, because what they do
 ;; -- dragging a ticket, saying how strong a password is -- can happen on any
 ;; of them; `poker.js' is only on the page of somebody sitting at a table, so
-;; it is read into the library here and spliced in by that page alone.
+;; it is read into the library here and spliced in by that page alone.  The
+;; last one is the page's polish (see `pub/js/lucidplan-luxe.js'): it is on
+;; every page too, because every page has a bar, cards and sections that
+;; arrive.
 (define-public asset-library
   (build-asset-library '("pub/js/tickets.js" "pub/js/symbanta.js"
-                         "pub/js/password-strength.js" "pub/js/poker.js")))
+                         "pub/js/password-strength.js" "pub/js/poker.js"
+                         "pub/js/lucidplan-luxe.js")))
 
 ;; The footer says only what a footer is for: what this instance is, under
 ;; which licence, where to read more, and how to get back to the top.  The
@@ -97,13 +101,76 @@
 (define-public frosted-tint-classes
   '(hg-frost bg-stone-100/75 dark:bg-onyx-900/75))
 
+;; A surface set *into* a pane rather than standing on the page in its own
+;; right: the same hairline the panes wear, a tint a shade off the glass, and
+;; no frost of its own.  The frost is left out on purpose -- two blurs stacked
+;; read as fog rather than as depth, and the second one costs a second backdrop
+;; pass for nothing -- so this is what a form inside a window, or a section
+;; inside a card, is made of.
+(define-public recessed-tint-classes
+  '(bg-stone-200/45 dark:bg-onyx-800/45
+    border-2 border-stone-500/25 dark:border-onyx-100/25))
+
+;;; ===== The window a pane can wear =====
+
+;;; A pane of frosted glass is the application's surface; a *window* is the
+;;; thing a piece of software is used through.  The difference is a bar across
+;;; the top with three lights at its start and the name of what is open in it,
+;;; and it is worth borrowing because it places a pane before a reader has read
+;;; a word of it: the shape is recognised as something with edges that was
+;;; opened rather than as a section of a document that happened.
+;;;
+;;; Nothing here is a control.  The lights are decoration, which is why the row
+;;; is hidden from assistive technology and carries no links: a control that
+;;; only looks like a close button is a lie told to a reader who tries it.  What
+;;; they look like is drawn by `lucidplan-luxe.css', which is where the three
+;;; colours and the glyphs revealed on hover live.
+
+(define-public (window-controls)
+  "The three lights a window wears at the start of its title bar."
+  `((span (@ (class ,(mk-class '(lp-traffic)))
+             (aria-hidden "true"))
+          (span (@ (class ,(mk-class '(lp-dot lp-dot-close)))))
+          (span (@ (class ,(mk-class '(lp-dot lp-dot-min)))))
+          (span (@ (class ,(mk-class '(lp-dot lp-dot-zoom))))))))
+
+(define* (window-titlebar #:key title trailing)
+  "The bar across the top of a pane, with its lights, its TITLE and TRAILING.
+
+TITLE is the name of what the pane is, shown in a mono face the way a window
+names its document; an empty or absent one draws no name at all rather than an
+empty slot.  TRAILING is a node, or a list of them, placed at the far end of
+the bar -- the one place in the chrome where a page may put a real control,
+which is how the front page's language chooser ends up in its title bar."
+  `(div (@ (class ,(mk-class '(lp-titlebar))))
+        ,@(window-controls)
+        ,@(if (and (string? title)
+                   (not (string-null? title)))
+              `((span (@ (class ,(mk-class '(lp-window-title min-w-0))))
+                      ,title))
+              '())
+        ,@(if (nil? trailing)
+              '()
+              `((div (@ (class ,(mk-class '(ml-auto flex flex-row flex-wrap
+                                                  items-center gap-2))))
+                     ,@(if (list? trailing)
+                           trailing
+                           (list trailing)))))))
+
 (define-public (aurora-backdrop)
   "A fixed, purely decorative wash of colour behind the page.
 
 Nothing here is content: it is the colour the frosted panes above it frost,
 which is what makes them read as glass rather than as flat cards.  It is fixed
 to the viewport, hidden from assistive technology, and never takes a pointer
-event."
+event.
+
+The discs drift -- `hg-blob' is hygguile's own slow drift, and it stops for
+anyone who asks for less motion -- each at its own pace and out of step with
+the others, because a still wash behind moving glass reads as a printed
+backdrop while a slowly turning one reads as light through a window.  The last
+layer is the grain: two or three percent of noise, which is what keeps two
+large soft gradients from banding on a wide screen."
   `((div (@ (aria-hidden "true")
             (class ,(mk-class '(pointer-events-none fixed inset-0 z-0
                                                     overflow-hidden))))
@@ -114,8 +181,10 @@ event."
                                               rounded-full
                                               blur-3xl
                                               opacity-50
+                                              hg-blob
                                               bg-jeans-blue-500/50
-                                              dark:bg-jeans-blue-700/50)))))
+                                              dark:bg-jeans-blue-700/50)))
+              (style "--hg-blob-duration: 42s; --hg-blob-x: 2rem; --hg-blob-y: 1.5rem")))
          (div (@ (class ,(mk-class '(absolute top-48
                                               right-0
                                               w-128
@@ -123,8 +192,21 @@ event."
                                               rounded-full
                                               blur-3xl
                                               opacity-50
+                                              hg-blob
                                               bg-asparagus-500/50
-                                              dark:bg-asparagus-700/50)))))
+                                              dark:bg-asparagus-700/50)))
+              (style "--hg-blob-duration: 58s; --hg-blob-x: -2.5rem; --hg-blob-y: 2rem; animation-delay: -12s")))
+         (div (@ (class ,(mk-class '(absolute top-1/3
+                                              left-1/2
+                                              w-96
+                                              h-96
+                                              rounded-full
+                                              blur-3xl
+                                              opacity-50
+                                              hg-blob
+                                              bg-redwood-500/50
+                                              dark:bg-redwood-700/50)))
+              (style "--hg-blob-duration: 36s; --hg-blob-x: -1.5rem; --hg-blob-y: -2rem; animation-delay: -24s")))
          (div (@ (class ,(mk-class '(absolute bottom-0
                                               left-64
                                               w-128
@@ -132,8 +214,22 @@ event."
                                               rounded-full
                                               blur-3xl
                                               opacity-50
+                                              hg-blob
                                               bg-olive-500/25
-                                              dark:bg-olive-700/50))))))))
+                                              dark:bg-olive-700/50)))
+              (style "--hg-blob-duration: 50s; --hg-blob-x: 3rem; --hg-blob-y: -1.5rem; animation-delay: -6s")))
+         (div (@ (class ,(mk-class '(absolute bottom-1/4
+                                              right-1/4
+                                              w-96
+                                              h-96
+                                              rounded-full
+                                              blur-3xl
+                                              opacity-50
+                                              hg-blob
+                                              bg-naples-yellow-500/50
+                                              dark:bg-naples-yellow-700/50)))
+              (style "--hg-blob-duration: 64s; --hg-blob-x: -2rem; --hg-blob-y: 2.5rem; animation-delay: -38s")))
+         (div (@ (class ,(mk-class '(lp-grain absolute inset-0))))))))
 
 ;;; ===== The page writer =====
 
@@ -304,6 +400,33 @@ them, all of them files of this instance (see @code{maak fetch-assets})."
   `((link (@ (rel stylesheet)
              (href ,(asset-href "/css/phosphor.css"))))))
 
+;; The house stylesheet: the polish every page of this instance wears -- the
+;; thicker pane of glass, the light that follows the pointer, the window
+;; chrome, the inks a selection and a keyboard focus are painted in.  See
+;; `pub/css/lucidplan-luxe.css' for the whole of it.
+;;
+;; It is linked *after* the framework's own sheets rather than inlined beside
+;; them, and that ordering is the one thing about it that matters: this sheet
+;; restates a handful of declarations the framework set (the edge of a frosted
+;; pane, the shadow of the bar), and a reader's browser settles such a
+;; disagreement by load order.  A file is also the one thing a browser can keep
+;; between two page loads, which an inlined sheet cannot.
+(define (shell-house-style)
+  "The stylesheet this application dresses itself in."
+  `((link (@ (rel stylesheet)
+             (href ,(asset-href "/css/lucidplan-luxe.css"))))))
+
+;; A one-line script, in the head, before anything is painted.  It says the
+;; page has scripting, and the house stylesheet reads that as permission to
+;; hold a section back until it is scrolled into view (see `.lp-js' there).
+;; Without it a reader whose script never ran would be shown sections that had
+;; faded in to nothing; with it, the only page that animates is the page that
+;; can.
+(define (shell-polish-flag)
+  "The early script that marks the document as scripted."
+  `((script (@ (type "text/javascript"))
+            "document.documentElement.classList.add('lp-js');")))
+
 (define (shell-resources)
   "The stylesheets and scripts a page of this shell needs.
 
@@ -432,7 +555,8 @@ run against a default address somebody else runs."
                                                            gap-3
                                                            md:gap-4
                                                            w-full
-                                                           md:w-auto))))
+                                                           md:w-auto
+                                                           lp-dock))))
 
                                     ;; Auth Link
                                     ,(if (not is-logged-in)
@@ -442,6 +566,7 @@ run against a default address somebody else runs."
                                                                     flex
                                                                     items-center
                                                                     no-underline
+                                                                    lp-navlink
                                                                     hover:opacity-80)))
                                                 (href "/login"))
                                              ,(icon-button #:icon 'sign-in
@@ -465,6 +590,7 @@ run against a default address somebody else runs."
                                                                     flex
                                                                     items-center
                                                                     no-underline
+                                                                    lp-navlink
                                                                     hover:opacity-80)))
                                                 (href "/me"))
                                              ,(icon-button #:icon 'user-circle
@@ -489,6 +615,7 @@ run against a default address somebody else runs."
                                                               font-medium
                                                               flex
                                                               items-center
+                                                              lp-navlink
                                                               hover:opacity-80)))
                                           (href "/projects"))
                                        ,(icon-button #:icon 'align-bottom
@@ -517,6 +644,7 @@ run against a default address somebody else runs."
                                                               font-medium
                                                               flex
                                                               items-center
+                                                              lp-navlink
                                                               hover:opacity-80)))
                                           (href "/poker"))
                                        ,(icon-button #:icon 'cards
@@ -541,6 +669,7 @@ run against a default address somebody else runs."
                                                               font-medium
                                                               flex
                                                               items-center
+                                                              lp-navlink
                                                               hover:opacity-80)))
                                           (href "/about"))
                                        ,(icon-button #:icon 'info
@@ -605,13 +734,18 @@ run against a default address somebody else runs."
                              ;; from `md' up, where there is.  Without this the two ends
                              ;; are block-level siblings and the bar is two rows tall on
                              ;; every screen, which wastes the width it is given.
+                             ;; `lp-toolbar' is the hook the house script uses to deepen
+                             ;; the shadow once the page has moved under the bar, and
+                             ;; `lp-dock' the one that makes its controls magnify around
+                             ;; the pointer the way a dock does.
                              #:classes '(w-full flex
                                                 flex-col
                                                 md:flex-row
                                                 md:flex-nowrap
                                                 md:items-center
                                                 md:justify-between
-                                                md:gap-4))))
+                                                md:gap-4
+                                                lp-toolbar))))
 
       ;; Output Page
       (render-page `(,doctype-html (html (@ (lang ,(config-ref 'site-language)))
@@ -625,6 +759,9 @@ run against a default address somebody else runs."
                                                ;; The theme: every stylesheet and script the
                                                ;; shell needs, each one this instance's own.
                                                ,@(shell-resources)
+                                               ;; Whether this page may animate at
+                                               ;; all: said before the body is read.
+                                               ,@(shell-polish-flag)
 
                                                (link (@ (rel "shortcut icon")
                                                         (href ,(asset-href
@@ -640,6 +777,10 @@ run against a default address somebody else runs."
                                                         (href ,(asset-href
                                                                 "/css/lucidplan.olive.min.css")))
                                                      "")
+                                               ;; The house style, after the framework's
+                                               ;; own sheets: it is the last word on the
+                                               ;; handful of declarations it restates.
+                                               ,@(shell-house-style)
 
                                                (script (@ (type
                                                            speculationrules))
@@ -662,7 +803,14 @@ run against a default address somebody else runs."
                                                          "pub/js/tickets.js"))
                                                (script ,(assoc-ref
                                                          asset-library
-                                                         "pub/js/password-strength.js")))
+                                                         "pub/js/password-strength.js"))
+                                               ;; The page's polish: the light that follows
+                                               ;; the pointer, the lean of a card under it,
+                                               ;; the reveal of a section, the shadow the bar
+                                               ;; takes once the page moves under it.
+                                               (script ,(assoc-ref
+                                                         asset-library
+                                                         "pub/js/lucidplan-luxe.js")))
                                          (body (@ (class ,(mk-class '(min-h-screen
                                                                       bg-stone-100
                                                                       dark:bg-onyx-900
@@ -694,6 +842,9 @@ run against a default address somebody else runs."
                                                                        G_))))))))
   (export html-template
           frosted-tint-classes
+          recessed-tint-classes
+          window-controls
+          window-titlebar
           render-page
           asset-href
           emoji-for-ticket-status

@@ -129,7 +129,8 @@
                                                border-2
                                                border-stone-300/75
                                                dark:border-onyx-100/75
-                                               shadow-md) frosted-tint-classes))))
+                                               shadow-md
+                                               lp-lift) frosted-tint-classes))))
            ;; Header
            (div (@ (class ,(mk-class '(flex flex-row justify-between
                                             items-start gap-2))))
@@ -188,7 +189,8 @@
                                                rounded-xl
                                                w-full
                                                focus:outline-none
-                                               focus:ring-2)
+                                               focus:ring-2
+                                               lp-lift)
                                         frosted-tint-classes)))
               (tabindex "0")
               (onclick ,toggle-js)

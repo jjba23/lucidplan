@@ -5,6 +5,7 @@
 
 (define-module (app views login)
   #:use-module (lucidplan html)
+  #:use-module (lucidplan config)
   #:use-module (artanis artanis)
   #:use-module (artanis i18n)
   #:use-module (artanis i18n sxml)
@@ -15,10 +16,26 @@
   #:use-module (ice-9 string-fun)
   #:export (login-page))
 
+;;; The way in, as a window.
+;;;
+;;; Signing in is the one page a reader meets on the way *into* the
+;;; application rather than inside it, so it is drawn as the thing they are
+;;; about to be let into: a pane of frosted glass with the chrome a window
+;;; wears across the top -- the three lights, the instance's own name -- and the
+;;; two doors the page offers inside it.
+;;;
+;;; The two forms used to be panes of their own, frosted like everything else.
+;;; Inside a frosted window that is one frost too many: a blur behind a blur
+;;; reads as fog rather than as depth, and it costs a second backdrop pass for
+;;; nothing.  They are recessed surfaces now -- a tint a shade off the glass,
+;;; with the same hairline the panes wear -- so the hierarchy is legible at a
+;;; glance and there is one frost on the page.
+
 (define* (login-page G_
                      #:key (notices '()))
-  (let* ((login-form `(form (@ (action "/login")
-                               (class ,(mk-class (append '(w-full rounded-xl
+  (let* ((recessed-classes recessed-tint-classes)
+         (login-form `(form (@ (action "/login")
+                               (class ,(mk-class (append '(w-full rounded-2xl
                                                            p-4
                                                            flex
                                                            flex-row
@@ -26,8 +43,8 @@
                                                            items-center
                                                            align-middle
                                                            gap-4
-                                                           shadow-md)
-                                                         frosted-tint-classes)))
+                                                           shadow-sm)
+                                                         recessed-classes)))
                                (method "POST"))
                             ,(input #:label (G_ "email")
                                     #:name "email"
@@ -43,16 +60,15 @@
                                     #:required #t)
                             (div ,(submit-button (G_ "login")))))
          (reset-form `((form (@ (action "/password/reset")
-                                (class ,(mk-class (append '(w-full rounded-xl
+                                (class ,(mk-class (append '(w-full rounded-2xl
                                                             p-4
                                                             flex
                                                             flex-row
                                                             flex-wrap
                                                             items-center
-                                                            items-center
                                                             gap-4
-                                                            shadow-md)
-                                                   frosted-tint-classes)))
+                                                            shadow-sm)
+                                                   recessed-classes)))
                                 (method POST))
                              ,(input #:label (G_ "account to reset (email)")
                                      #:name "email"
@@ -88,17 +104,36 @@
                                                                        dark:text-stone-300)))
                                                    (role "status"))
                                                 ,notice)) notices)
-                                 (div (@ (class ,(mk-class '(w-full flex
-                                                                    flex-row
-                                                                    flex-wrap
-                                                                    gap-10))))
-                                      (div (@ (class ,(mk-class '(flex
-                                                                  flex-col
-                                                                  gap-8))))
-                                           ,(h2 (G_ "login to lucidplan"))
-                                           (div ,login-form))
-                                      (div (@ (class ,(mk-class '(flex
-                                                                  flex-col
-                                                                  gap-8))))
-                                           ,(h2 (G_ "reset password"))
-                                           (div ,reset-form))))))))
+                                 ,(glass-panel
+                                   `(,(window-titlebar
+                                       #:title (format #f "~a — ~a"
+                                                       (config-ref 'site-name)
+                                                       (G_ "login")))
+                                     (div (@ (class ,(mk-class '(flex flex-col
+                                                                      lg:flex-row
+                                                                      gap-10
+                                                                      p-6 sm:p-8))))
+                                          (div (@ (class ,(mk-class '(flex
+                                                                      flex-col
+                                                                      gap-8
+                                                                      grow
+                                                                      min-w-0))))
+                                               ,(h2 (G_ "login to lucidplan"))
+                                               (div ,login-form))
+                                          (div (@ (class ,(mk-class '(flex
+                                                                      flex-col
+                                                                      gap-8
+                                                                      grow
+                                                                      min-w-0))))
+                                               ,(h2 (G_ "reset password"))
+                                               (div ,reset-form))))
+                                   ;; The window's own padding is the bar's
+                                   ;; business and the columns' business, so the
+                                   ;; pane adds none of its own.
+                                   #:padding '()
+                                   ;; The one page a reader has to get through,
+                                   ;; so it frosts deeply and answers the pointer:
+                                   ;; it should feel like a place, not a form.
+                                   #:frost 4
+                                   #:classes '(lp-deep lp-spotlight)
+                                   #:content-classes '(flex flex-col)))))))
