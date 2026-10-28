@@ -860,6 +860,24 @@
       oklch(0.42 0.12 var(--lp-avatar-hue, 250)));
 }
 
+/* A disc that holds a picture is not a disc any more, and the scaffolding
+   under the picture has to come down with it.  A logo drawn on a transparent
+   background would otherwise sit on the hue of its project's name -- a colour
+   nobody picked for it -- and the letter itself would be read through the
+   gaps a logo leaves.  So once the picture has loaded, the class the view's
+   `load' handler adds takes the gradient, the ink and the letter away.
+
+   It is the picture's own arrival that does this, not the fact that the row
+   has a picture, which is why a picture still on its way -- or one that never
+   comes, or one a reader never scrolls to -- leaves the letter standing.  The
+   ring is kept: it is the edge of the disc rather than its fill, and an edge
+   is what tells a white logo from the page behind it. */
+
+.lp-avatar-letter.lp-avatar-has-picture {
+  background-image: none;
+  color: transparent;
+}
+
 /* Choosing a file.  The control is the browser's own -- a picker that is not
    the browser's own is a picker that cannot open a folder -- so what is drawn
    here is the button inside it, in the manner of every other quiet control in

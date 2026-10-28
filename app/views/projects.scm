@@ -173,7 +173,13 @@ it comes, instead of an empty disc.  A picture that cannot be fetched at all
 -- the file went with an old backup, the row was copied without the directory
 -- takes itself away and leaves the letter, instead of leaving the broken-image
 mark every browser draws.  And a project that has never had a picture is not
-a special case at all: it is the same node with nothing laid over it."
+a special case at all: it is the same node with nothing laid over it.
+
+The letter is scaffolding, though, and scaffolding has to come down: a
+picture drawn on a transparent background would otherwise wear the hue of its
+project's name, which is a colour nobody chose for it.  So the picture takes
+the disc away behind itself once it has loaded -- and not a moment before, so
+that the letter is still there to be seen while the picture is on its way."
   (let* ((human-id (proj-ref p
                              'human-id))
         (title (proj-ref p
@@ -199,7 +205,21 @@ a special case at all: it is the same node with nothing laid over it."
                            (alt "")
                            (loading "lazy")
                            (decoding "async")
-                           (onerror "this.remove()"))))
+                           ;; The disc keeps its letter -- and its colour --
+                           ;; until the picture is actually here, and gives
+                           ;; both up the moment it is: see
+                           ;; `lp-avatar-has-picture' in the stylesheet.  This
+                           ;; is a load handler rather than a class drawn by
+                           ;; the view so that a picture which is late, or
+                           ;; which never comes at all, leaves the letter it
+                           ;; found instead of a bare disc.
+                           (onload
+                            "this.parentNode.classList.add('lp-avatar-has-picture')")
+                           ;; The disc is put back before the picture goes,
+                           ;; so a picture that fails after it had already
+                           ;; arrived leaves the letter behind and not a hole.
+                           (onerror
+                            "this.parentNode.classList.remove('lp-avatar-has-picture');this.remove()"))))
                  '()))))
 
 ;;; One project, as the card it unfolds into.
