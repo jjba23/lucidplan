@@ -91,6 +91,10 @@
     (contact-email . "jjbigorra@gmail.com")
     (source-url . "https://github.com/jjba23/lucidplan")
     (manual-url . "https://jointhefreeworld.org/manuals/lucidplan/")
+    ;; The terms this instance is offered under, named in the page footer and
+    ;; declared in the structured data a crawler reads.  The software itself is
+    ;; MIT-licensed; the footer's licence line is a link to this address.
+    (license-url . "https://opensource.org/license/mit")
     (donate-url . "https://bmc.link/jjbigorra")
     ;; A list of (label . url) pairs shown on the about page.  Empty by
     ;; default; an operator advertises their chat or social presence by
@@ -101,7 +105,7 @@
     ;; Org-mode text, rendered to HTML on the about page.  It is a string so
     ;; an operator can replace it wholesale with their own account of the
     ;; instance, its purpose and its rules.
-    (about-org . "#+begin_quote\nLucidPlan is project management for teams of all sizes, done the free-software way.\n#+end_quote\n\nLucidPlan enhances the use of Agile work methodologies in teams thanks to its fast-paced, no-nonsense workflows and deep customizability -- and thanks to being written in Lisp.\n\nIt is the fruit of years of experience using bloated proprietary systems, and of the frustrations they bring.\n\n* What it does\n\n- *Multi-project workspaces*: manage dozens of projects from one dashboard.\n- *Backlog management*: a clean, sortable, drag-and-drop list of every task.\n- *Kanban boards*: track tickets as they move through =To-do=, =Work in Progress=, =In Review= and beyond.\n- *Org-mode everywhere*: write titles and descriptions in Org syntax and see them rendered as rich HTML.\n- *Granular permissions*: an ACL written as plain Lisp lists, so exactly what each user may do is explicit and programmatic.\n- *Free software*: licensed under the GNU AGPL v3 or newer, hackable end to end in Scheme.\n\n* Who runs this instance\n\nThis is a self-hosted deployment. Its operator may have added their own notes, contacts and rules below.\n\n* Contributing\n\nContributions, issues and ideas are welcome at the project's repository.")
+    (about-org . "#+begin_quote\nLucidPlan is project management for teams of all sizes, done the free-software way.\n#+end_quote\n\nLucidPlan enhances the use of Agile work methodologies in teams thanks to its fast-paced, no-nonsense workflows and deep customizability -- and thanks to being written in Lisp.\n\nIt is the fruit of years of experience using bloated proprietary systems, and of the frustrations they bring.\n\n* What it does\n\n- *Multi-project workspaces*: manage dozens of projects from one dashboard.\n- *Backlog management*: a clean, sortable, drag-and-drop list of every task.\n- *Kanban boards*: track tickets as they move through =To-do=, =Work in Progress=, =In Review= and beyond.\n- *Org-mode everywhere*: write titles and descriptions in Org syntax and see them rendered as rich HTML.\n- *Granular permissions*: an ACL written as plain Lisp lists, so exactly what each user may do is explicit and programmatic.\n- *Free software*: licensed under the MIT license, hackable end to end in Scheme.\n\n* Who runs this instance\n\nThis is a self-hosted deployment. Its operator may have added their own notes, contacts and rules below.\n\n* Contributing\n\nContributions, issues and ideas are welcome at the project's repository.")
 
     ;; -- The statuses a ticket moves through -----------------------------
     ;; Each entry is (value label icon glyph bucket):
@@ -150,7 +154,7 @@
                       ("shield-check" "granular permissions"
                        "An access control list written as plain Lisp lists, so exactly what each user may do is explicit.")
                       ("heart" "free software"
-                       "Licensed under the GNU AGPL v3 or newer and hackable end to end in Scheme."))
+                       "Licensed under the MIT license and hackable end to end in Scheme."))
     (landing-workflow-title . "a workflow that fits how your team works")
     (landing-workflow-intro . "Every ticket is a row on a board: move it along the columns as the work moves, and let the state of the board tell you where the project stands.")
 

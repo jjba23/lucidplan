@@ -83,10 +83,18 @@
                            (onclick
                             "window.scrollTo({ top: 0, behavior: 'smooth' })"))
                         ,(G_ "back to top")))
-                ,(em (format #f "© ~a - ~a"
-                             (config-ref 'copyright-holder)
-                             (G_ "GNU AGPL v3 or newer"))
-                     #:size '(text-sm))
+                ;; The licence is named and linked rather than only named:
+                ;; a footer says under what terms the software is offered,
+                ;; and the terms themselves are one click from it.
+                (div (@ (class ,(mk-class '(flex flex-row flex-wrap
+                                                 items-center justify-center
+                                                 gap-x-2))))
+                     ,(em (format #f "© ~a -"
+                                  (config-ref 'copyright-holder))
+                          #:size '(text-sm))
+                     ,(a (G_ "MIT license")
+                         #:href (config-ref 'license-url)
+                         #:size '(text-sm)))
                 ,(mono (format #f "~a"
                                (get-short-commit-sha))
                        #:size '(text-sm)
@@ -410,7 +418,7 @@ fall back to the instance's own when a page has none of its own."
                                    (description unquote desc)
                                    (applicationCategory . "BusinessApplication")
                                    (operatingSystem . "Any")
-                                   (license . "https://www.gnu.org/licenses/agpl-3.0.html")
+                                   (license . "https://opensource.org/license/mit")
                                    (offers (@type . "Offer")
                                            (price . "0")
                                            (priceCurrency . "EUR"))))))

@@ -6,7 +6,7 @@
 
 [[https://jointhefreeworld.org/ggg/dist/scheme-guile.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-guix.svg]]  
 [[https://jointhefreeworld.org/ggg/dist/gnu-make.svg]] 
-[[https://jointhefreeworld.org/ggg/dist/license-agpl3+.svg]]    [[https://jointhefreeworld.org/ggg/dist/license-fdl13+.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-artanis.svg]]
+[[https://jointhefreeworld.org/ggg/dist/license-mit.svg]]    [[https://img.shields.io/badge/docs%20license-CC%20BY%204.0-2ea44f.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-artanis.svg]]
 
 
 /free and open project management for everyone/
@@ -118,6 +118,22 @@ name. Its heading ends with the project's avatar -- the picture if it has one,
 its letter if it has not -- small and quiet, drawn at the end of the words
 rather than in front of them.
 
+The licence is MIT wherever it is said.  The footer named the GNU AGPL, and the
+about page and the landing page repeated it, while `LICENSE' and the header of
+every source file had said MIT for a while -- so the pages and the tree
+disagreed about the terms this software is offered under.  The footer names MIT
+now and links to it (the address is `license-url' in the configuration, so an
+operator can point it at their own copy of the terms), the structured data a
+crawler reads declares it too, the about page carries a licence link beside its
+source and manual ones, and the strings say MIT in every language the instance
+ships.  The source files still carrying the old AGPL header carry the MIT one
+the rest of the tree has.
+
+The badges over these documents say what the documents say.  The software is
+MIT and the documentation is CC BY 4.0, which is what the Licensing section has
+said all along, but the documentation's badge had said GFDL -- a licence
+neither the manual nor anything else is offered under.  It names CC BY 4.0 now.
+
 
 eLog for LucidPlan
 #+author: Josep Bigorra
@@ -127,7 +143,7 @@ eLog for LucidPlan
 
 [[https://jointhefreeworld.org/ggg/dist/scheme-guile.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-guix.svg]]  
 [[https://jointhefreeworld.org/ggg/dist/gnu-make.svg]] 
-[[https://jointhefreeworld.org/ggg/dist/license-agpl3+.svg]]    [[https://jointhefreeworld.org/ggg/dist/license-fdl13+.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-artanis.svg]]
+[[https://jointhefreeworld.org/ggg/dist/license-mit.svg]]    [[https://img.shields.io/badge/docs%20license-CC%20BY%204.0-2ea44f.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-artanis.svg]]
 
 
 /free and open project management for everyone/

@@ -87,6 +87,10 @@ msgstr ""
 msgid "manual"
 msgstr ""
 
+#: app/views/about.scm:61
+msgid "license"
+msgstr "licencia"
+
 #: app/views/about.scm:76
 msgid "write to us at"
 msgstr ""
@@ -704,9 +708,9 @@ msgid "lucidplan - free project management for everyone"
 msgstr "lucidplan - gestión de proyectos libre para todo el mundo"
 
 #: lib/lucidplan/html.scm:48
-msgid "lucidplan is free software, available under the GNU AGPL v3 or newer"
+msgid "lucidplan is free software, available under the MIT license"
 msgstr ""
-"lucidplan es software libre, disponible bajo la GNU AGPL v3 o posterior"
+"lucidplan es software libre, disponible bajo la licencia MIT"
 
 #: lib/lucidplan/html.scm:53 lib/lucidplan/html.scm:59
 msgid "find here the:"
@@ -722,8 +726,8 @@ msgid "back to top"
 msgstr "volver arriba"
 
 #: lib/lucidplan/html.scm:91
-msgid "GNU AGPL v3 or newer"
-msgstr ""
+msgid "MIT license"
+msgstr "Licencia MIT"
 
 #: lib/lucidplan/html.scm:230
 msgid "LucidPlan"

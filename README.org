@@ -7,7 +7,7 @@
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://jointhefreeworld.org/static/css/jointhefreeworld.css" />
 
 [[https://jointhefreeworld.org/ggg/dist/lucidplan.svg]] [[https://jointhefreeworld.org/ggg/dist/scheme-guile.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-guix.svg]] [[https://jointhefreeworld.org/ggg/dist/maak.svg]] [[https://jointhefreeworld.org/ggg/dist/hygguile.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-artanis.svg]]
-[[https://jointhefreeworld.org/ggg/dist/license-agpl3+.svg]] [[https://jointhefreeworld.org/ggg/dist/license-fdl13+.svg]] [[https://jointhefreeworld.org/ggg/dist/jointhefreeworld-org.svg]] [[https://img.shields.io/badge/CI-Byggsteg%20%7C%20GitHub-2ea44f.svg]]
+[[https://jointhefreeworld.org/ggg/dist/license-mit.svg]] [[https://img.shields.io/badge/docs%20license-CC%20BY%204.0-2ea44f.svg]] [[https://jointhefreeworld.org/ggg/dist/jointhefreeworld-org.svg]] [[https://img.shields.io/badge/CI-Byggsteg%20%7C%20GitHub-2ea44f.svg]]
 
 /free and open project management for everyone/
 
@@ -847,6 +847,7 @@ copyright-holder
 contact-email
 source-url             ; link to this instance's source code
 manual-url             ; link to this instance's documentation
+license-url            ; the terms the instance is offered under, linked from the footer
 donate-url
 social-links           ; a list of (label . url) pairs shown on the about page
 
@@ -1418,7 +1419,7 @@ tell us.
 :CUSTOM_ID: licensing
 :END:
 
-This project, and Git repository, and all of its source code are free and open software, licensed under the [[https://opensource.org/license/mit][MIT License]]
+This project, and Git repository, and all of its source code are free and open software, licensed under the [[https://opensource.org/license/mit][MIT License]]. The full text is in the =LICENSE= file, and every source file says the same in its own header, as an =SPDX-License-Identifier: MIT= line. The instance says so too: the page footer names the licence and links to it -- =license-url= in the configuration, so an operator may point it at their own copy of the terms -- and the about page carries the same link beside its source and manual ones.
 
 The documentation and examples, including this document, which are provided, are all licensed under the [[https://creativecommons.org/licenses/by/4.0/][CC BY 4.0 (Creative Commons Attribution)]] license.
 
