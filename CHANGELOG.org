@@ -89,6 +89,35 @@ it. Now the loop is given the rows it was asked for, and a label is added
 whatever the menu says, because it is typed beside the menu rather than chosen
 from it: tagging a handful of rows no longer means clearing their epics first.
 
+**An upload always comes back.** Neither upload -- a ticket's file, a project's
+picture -- could promise that. A request whose body the multipart reader could
+not make sense of (one sent without a length, in chunks, is a body Artanis does
+not read at all) raised where it stood, and a route that answered with nothing
+at all -- the shape the attachment route took when the ticket was not there --
+left the browser waiting for a response that never came. The error page that
+follows a raise is written without a length and without closing the connection,
+so a reader still sending their file waits for an end that never arrives
+either: an upload that looks like it hangs. Both routes now answer with a
+redirect to the page they were submitted from, carrying the reason in the query
+string, and the page says it beside the control that was used -- with nothing
+attached, an empty file, one too large, or one that could not be read. What is
+unexpected is said on the error port rather than swallowed, so a failure is
+still a failure somebody can find.
+
+**An upload's ceiling answers before the framework's does.** `upload.size` in
+`conf/artanis.conf` sat at exactly `attachment-max-bytes`, so the multipart
+framing around a 5 MiB file was enough to make the framework refuse a request
+before reading it, and its refusal is the response above that a browser cannot
+finish receiving. The framework's ceiling is 8 MiB now: the application's own
+limit is the one that answers a file that is too large, with a page that says
+so.
+
+**The backlog's title wears the project's picture.** The backlog is one
+project's, and which project that is used to be readable only by reading the
+name. Its heading ends with the project's avatar -- the picture if it has one,
+its letter if it has not -- small and quiet, drawn at the end of the words
+rather than in front of them.
+
 
 eLog for LucidPlan
 #+author: Josep Bigorra

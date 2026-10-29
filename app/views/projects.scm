@@ -360,7 +360,24 @@ that the letter is still there to be seen while the picture is on its way."
 ;;; The letter beside the upload is the same avatar the list draws, at twice
 ;;; the size: the control shows what the row shows, so a reader choosing a
 ;;; picture knows what they are replacing.
-(define (project-picture-form G_ project)
+;;;
+;;; An upload that did not land comes back here with the reason in the query
+;;; string, which is what `avatar-refusal' turns into the sentence drawn under
+;;; the controls: a picture that was refused is a picture a reader has to be
+;;; told about, since the one on the page is still the old one.
+(define (avatar-refusal G_ reason)
+  (cond
+    ((equal? reason "no-file") (G_ "nothing was uploaded: choose a picture first"))
+    ((equal? reason "type")
+     (G_ "that picture was not kept: only PNG, JPEG, GIF and WebP are"))
+    ((equal? reason "empty")
+     (G_ "that picture was not kept: it is empty"))
+    ((equal? reason "size")
+     (G_
+      "that picture was not kept: it is larger than this instance keeps"))
+    (else (G_ "that picture was not kept"))))
+
+(define* (project-picture-form G_ project #:key (avatar-error #f))
   (let* ((human-id (proj-ref project
                              'human-id))
         (avatar (proj-ref project
@@ -400,6 +417,11 @@ that the letter is still there to be seen while the picture is on its way."
                                                human-id)))
                                   ,(quiet-submit (G_ "remove picture"))))
                           '()))
+               ;; A picture that was refused says so here, under the control
+               ;; it was chosen with: the one on the page is still the old
+               ;; one, so nothing else would tell the reader it did not land.
+               ,(render-refusal-line (and avatar-error
+                                          (avatar-refusal G_ avatar-error)))
                (p (@ (class ,(mk-class '(text-xs
                                         text-onyx-500
                                         dark:text-stone-500))))
@@ -436,13 +458,16 @@ that the letter is still there to be seen while the picture is on its way."
                      #:is-logged-in is-logged-in))
 
 (define* (html-edit-project-form G_
-                                 #:key projects project is-logged-in)
+                                 #:key projects project is-logged-in
+                                 (avatar-error #f))
   (html-project-form G_
                      #:is-logged-in is-logged-in
                      ;; The picture is its own pair of forms and only a
                      ;; project that exists can have one, so the block is
                      ;; handed to the form rather than built inside it.
-                     #:picture (project-picture-form G_ project)
+                     #:picture (project-picture-form G_ project
+                                                     #:avatar-error
+                                                     avatar-error)
                      #:title (proj-ref project
                                        'title)
                      #:human-id (proj-ref project

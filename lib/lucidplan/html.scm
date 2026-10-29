@@ -990,6 +990,31 @@ rather than written into the markup as it is."
            #:name name
            #:value (if (string? value) value ""))))
 
+;;; ===== A line that says a file did not land =====
+;;;
+;;; Two forms send a file -- a ticket's attachment and a project's picture --
+;;; and both are answered with the page they were submitted from, carrying the
+;;; reason in the query string rather than in the body: a redirect is a page a
+;;; browser can finish reading, which is what an upload that ends any other
+;;; way cannot promise.  The reason has to be said somewhere, though, or a
+;;; reader is handed back the page they were on with no word about what
+;;; happened -- the file simply is not in the list, and pressing the button
+;;; again is the only guess available.
+;;;
+;;; What the route names is a word, and this is where a word becomes a
+;;; sentence: the same line, in the same ink, on both pages, drawn beside the
+;;; control that was used.  It is a warning and not an error page, so it is
+;;; quiet -- a borderless line of small type that does not move the page to
+;;; say it.
+(define-public (render-refusal-line message)
+  "Answer the node that says MESSAGE -- why a file was not kept -- or nothing
+to draw when MESSAGE is @code{#f}."
+  (if message
+      `(p (@ (class ,(mk-class '(text-sm font-medium
+                                          text-redwood-700 dark:text-redwood-300))))
+          ,message)
+      '()))
+
 ;; A closed bucket is titled by the status inside it when it holds exactly
 ;; one -- so renaming that status renames the section -- and by the bucket's
 ;; own name when it holds several, since there is then no one name to borrow.

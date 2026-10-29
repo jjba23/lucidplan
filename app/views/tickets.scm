@@ -27,6 +27,7 @@
   #:use-module (kracht prelude)
   #:use-module (lucidplan attachments)
   #:use-module (app views epics)
+  #:use-module (app views projects)
   #:use-module (lucidplan domain)
   #:use-module (lucidplan domain ticket-comment)
   #:use-module (hygguile hygguile)
@@ -1490,9 +1491,32 @@ at the first of them."
                                            (div (@ (class ,header-face))
                                                 ,(icon #:type 'scroll
                                                        #:icon-css icon-face)
-                                                ,(h2 (format #f
-                                                             "backlog of ~a"
-                                                             proj-title)))
+                                                ;; The title carries the
+                                                ;; project's picture, small and
+                                                ;; last of it: the backlog is
+                                                ;; one project's, and which
+                                                ;; project it is reads at a
+                                                ;; glance the way a row of the
+                                                ;; projects page does.  It is
+                                                ;; quiet -- a sixth of the
+                                                ;; heading's height, at the
+                                                ;; end of the line rather than
+                                                ;; in front of the words --
+                                                ;; because the words are what
+                                                ;; the reader came for, and a
+                                                ;; mark as loud as the title
+                                                ;; would be competing with it.
+                                                ;; A project that has never
+                                                ;; been given a picture draws
+                                                ;; its letter there instead.
+                                                ,(h2 `("backlog of "
+                                                       ,proj-title
+                                                       ,(project-avatar
+                                                         project-details
+                                                         #:classes
+                                                         '(w-8 h-8 text-sm
+                                                                ml-2
+                                                                align-middle)))))
 
                                            (div (@ (class ,btn-row-face))
                                                 (div (a (@ (href ,(format #f
@@ -2425,6 +2449,25 @@ run of cards."
                                       'title)
                             (G_ "none")))))))))
 
+;;; ===== A file that did not land =====
+;;;
+;;; The attach control posts its file on its own, so what the ticket page has
+;;; to say about it is what the redirect back here carried: the reason the
+;;; route refused the file, as a word in the query string.  These are the
+;;; words it knows, and the sentences they stand for; anything else -- a query
+;;; string typed by hand, a reason added later to a page that was not -- is
+;;; answered with the sentence that says nothing was attached, which is true
+;;; of every one of them.
+(define (attachment-refusal G_ reason)
+  (cond
+    ((equal? reason "no-file") (G_ "nothing was attached: choose a file first"))
+    ((equal? reason "empty")
+     (G_ "that file was not attached: it is empty"))
+    ((equal? reason "size")
+     (G_
+      "that file was not attached: it is larger than this instance keeps"))
+    (else (G_ "that file was not attached"))))
+
 (define* (html-ticket-collaboration G_
                                     #:key project
                                     ticket
@@ -2442,7 +2485,8 @@ run of cards."
                                     (today #f)
                                     (editable? #f)
                                     (viewer-id #f)
-                                    (moderator? #f))
+                                    (moderator? #f)
+                                    (attachment-error #f))
   (let* ((human-id (assq-ref ticket
                              'human-id))
          (comment-form (if editable?
@@ -2642,7 +2686,14 @@ run of cards."
      ;; -- Files ------------------------------------------------------------
      (list (glass-panel `(,(section-title G_ 'paperclip
                                           (G_ "attachments")
-                                          (length attachments)) ,@attachment-form
+                                          (length attachments))
+                          ;; What the last upload had to say, if anything:
+                          ;; the control below is where it is answered, so
+                          ;; the answer sits above it.
+                          ,(render-refusal-line (and attachment-error
+                                                     (attachment-refusal G_
+                                                                         attachment-error)))
+                          ,@attachment-form
                           ,@(if (pair? attachments)
                                 (map (lambda (attachment)
                                        (let ((url (format #f

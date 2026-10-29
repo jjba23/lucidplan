@@ -377,14 +377,19 @@ Downloads are answered by the application rather than by the static file
 server, so the attachment id has to name a file *of the ticket in the URL*: a
 file cannot be fetched by guessing a name in the upload directory.
 
-Where the files live and how large one may be are configuration --
-~attachment-directory~ (by default ~var/attachments~, created on the first
-upload) and ~attachment-max-bytes~ (by default 5 MiB, the same ceiling Artanis
-puts on a request body).  The directory is deliberately outside ~pub/~, so it
-is never handed out as a static file.  *An instance that carries attachments
-has something to back up besides ~lucidplan.db~:* the two are written by
-different writes and are only together a complete record.  An instance that
-does not want files keeps the directory empty, and only that loss.
+How large a file may be is configuration -- ~attachment-max-bytes~, 5 MiB by
+default -- and a file over that is refused with the ticket's own page, saying
+so beside the control it was chosen with, rather than with a bare error page.
+Nothing is written to a directory on the way: the bytes go into the
+attachment's own row, so a copy of ~lucidplan.db~ is a copy of everything a
+ticket carries.
+
+That ceiling is the application's, and it has to stay below the one Artanis
+puts on a request body (~upload.size~ in ~conf/artanis.conf~, 8 MiB here) --
+the framework refuses a larger body before it reads it, and its refusal is a
+response a browser cannot finish reading.  Raising the application's ceiling
+therefore means raising the framework's with it, or the reader meets a request
+that appears to hang instead of a file that was refused.
 
 *** Activity and versions
 :PROPERTIES:
@@ -859,9 +864,9 @@ mail-retry-delay       ; seconds to wait before the first retry (doubles each tr
 password-reset-validity  ; how long a reset link stays good, in seconds
 password-min-score       ; accepted password strength, 0 (very weak) .. 4 (very strong)
 
-;; Files a ticket carries
-attachment-directory     ; where uploaded files are kept, e.g. "var/attachments"
-attachment-max-bytes     ; the largest one accepted, in bytes (5 MiB by default)
+;; Files a ticket carries, and the picture a project wears
+attachment-max-bytes     ; the largest file accepted, in bytes (5 MiB by default)
+avatar-max-bytes         ; the largest picture accepted, in bytes (2 MiB by default)
 
 ;; The languages the interface offers, as (catalog-name . name-in-that-language)
 locales

@@ -1298,101 +1298,140 @@ history entry that says somebody is better than one that fails to render."
 ;; here, so no submitted text ever reaches a path or a header.  The form is
 ;; multipart, so it is read by Artanis's upload reader rather than by the
 ;; url-encoded body reader the other forms use.
+;;
+;; Every way this can end is a redirect back to the ticket, carrying the reason
+;; in the query string when there is one (the page says it beside the control
+;; that was used).  That is not a flourish.  A request that answers with
+;; nothing -- the shape this route had when the ticket was not there -- is a
+;; browser left waiting for a response that never comes; and a request that
+;; raises is answered with the framework's error page, which is written without
+;; a length and without closing the connection, so a reader who is still
+;; sending a file waits for an end that never arrives either.  Both look like an
+;; upload that hangs.  A redirect is a page whatever happened, and the row in
+;; the database is already written by the time it is sent.
 (post "/tickets/:project/id/:human-id/attachments"
       #:mime 'xml
       #:cookies '(names x-bewaking-lucidplan)
       (lambda (rc)
+        (define (back . error)
+          (string->uri (format #f "~a/tickets/~a/id/~a~a"
+                               (current-myhost)
+                               (params rc "project")
+                               (params rc "human-id")
+                               (if (null? error)
+                                   ""
+                                   (format #f "?attachment-error=~a"
+                                           (car error))))))
         (define (do-upload)
-          (let* ((proj (params rc "project"))
-                 (human-id (params rc "human-id"))
-                 (ticket-repo (make-sqlite-ticket-repository rc))
-                 (project-repo (make-sqlite-project-repository rc))
-                 (attachment-repo (make-sqlite-ticket-attachment-repository rc))
-                 (t (get-ticket-by-project-human-id-and-human-id ticket-repo
-                                                                 proj human-id))
-                 ;; No `#:path': nothing is written to the filesystem on the
-                 ;; way.  The upload is read out of the request body, which is
-                 ;; where the multipart reader has already put it.
-                 (mo (get-mfds-op-from-post rc))
-                 (file (find (lambda (m)
-                               (let ((name (mfd-filename m)))
-                                 (and name
-                                      (not (string-null? name)))))
-                             (mfds-operator-mfds mo)))
-                 (bytes (and file
-                             (uploaded-file-bytes rc file)))
-                 (size (and bytes
-                            (bytevector-length bytes)))
-                 (max-bytes (config-ref 'attachment-max-bytes)))
-            (when t
-              (cond
-                ((not file)
-                 (redirect-to rc
-                              (string->uri (format #f
-                                            "~a/tickets/~a/id/~a?attachment-error=no-file"
-                                            (current-myhost) proj human-id))
-                              #:status 302))
-                ((or (not (number? size))
-                     (<= size 0)
-                     (> size max-bytes))
-                 (redirect-to rc
-                              (string->uri (format #f
-                                            "~a/tickets/~a/id/~a?attachment-error=size"
-                                            (current-myhost) proj human-id))
-                              #:status 302))
-                (else (let* ((stored-name (new-id))
-                             (project-id (project-id-from-human-id
-                                          project-repo proj))
-                             (ticket-id (assq-ref t
-                                                  'id))
-                             (filename (safe-attachment-filename (mfd-filename
-                                                                  file))))
-                        (insert-ticket-attachment attachment-repo
-                                                  `((id unquote
-                                                        (new-id))
-                                                    (ticket-id unquote
-                                                               ticket-id)
-                                                    (project-id unquote
-                                                                project-id)
-                                                    (uploader-id unquote
-                                                                 (or (session-owner-id
-                                                                      #:rc rc
+          ;; Whether the row was written, so a failure in what is written
+          ;; *after* it -- the history of the change -- is not reported as a
+          ;; file that was not attached.
+          (define stored? #f)
+          (catch #t
+            (lambda ()
+              (let* ((proj (params rc "project"))
+                     (human-id (params rc "human-id"))
+                     (ticket-repo (make-sqlite-ticket-repository rc))
+                     (project-repo (make-sqlite-project-repository rc))
+                     (attachment-repo (make-sqlite-ticket-attachment-repository
+                                       rc))
+                     (t (get-ticket-by-project-human-id-and-human-id
+                         ticket-repo proj human-id))
+                     ;; No `#:path': nothing is written to the filesystem on
+                     ;; the way.  The upload is read out of the request body,
+                     ;; which is where the multipart reader has already put
+                     ;; it -- and which answers #f, rather than raising, when
+                     ;; the framework never read one (see `uploaded-file-of').
+                     (file (uploaded-file-of rc))
+                     (bytes (and file
+                                 (uploaded-file-bytes rc file)))
+                     (size (and bytes
+                                (bytevector-length bytes)))
+                     (max-bytes (config-ref 'attachment-max-bytes)))
+                (cond
+                  ;; A ticket that is not there is a wrong turn rather than a
+                  ;; refused file, so the reader is sent to the backlog they
+                  ;; came from -- but they are answered, which is the point.
+                  ((not t)
+                   (redirect-to rc
+                                (string->uri (format #f "~a/tickets/~a"
+                                                     (current-myhost) proj))
+                                #:status 302))
+                  ((not file)
+                   (redirect-to rc (back "no-file") #:status 302))
+                  ((not (number? size))
+                   (redirect-to rc (back "failed") #:status 302))
+                  ((<= size 0)
+                   (redirect-to rc (back "empty") #:status 302))
+                  ((> size max-bytes)
+                   (redirect-to rc (back "size") #:status 302))
+                  (else (let* ((stored-name (new-id))
+                               (project-id (project-id-from-human-id
+                                            project-repo proj))
+                               (ticket-id (assq-ref t
+                                                    'id))
+                               (filename (safe-attachment-filename (mfd-filename
+                                                                    file))))
+                          (insert-ticket-attachment attachment-repo
+                                                    `((id unquote
+                                                          (new-id))
+                                                      (ticket-id unquote
+                                                                 ticket-id)
+                                                      (project-id unquote
+                                                                  project-id)
+                                                      (uploader-id unquote
+                                                                   (or (session-owner-id
+                                                                        #:rc rc
+                                                                        #:token-name 'x-bewaking-lucidplan)
+                                                                       ""))
+                                                      (filename unquote
+                                                                filename)
+                                                      ;; The name this
+                                                      ;; instance gave the
+                                                      ;; upload: what a file
+                                                      ;; written by an older
+                                                      ;; version of this
+                                                      ;; application is found
+                                                      ;; under, and what tells
+                                                      ;; two uploads of one
+                                                      ;; filename apart.
+                                                      (stored-name unquote
+                                                                   stored-name)
+                                                      (data unquote
+                                                            (bytes->base64
+                                                             bytes))
+                                                      (content-type unquote
+                                                                    (safe-content-type
+                                                                     (mfd-type
+                                                                      file)))
+                                                      (size unquote size)
+                                                      (created-at unquote
+                                                                  (current-time))))
+                          (set! stored? #t)
+                          (record-event! (make-sqlite-ticket-event-repository
+                                          rc)
+                                         #:ticket-id ticket-id
+                                         #:project-id project-id
+                                         #:actor-id (session-owner-id #:rc rc
                                                                       #:token-name 'x-bewaking-lucidplan)
-                                                                     ""))
-                                                    (filename unquote filename)
-                                                    ;; The name this instance
-                                                    ;; gave the upload: what a
-                                                    ;; file written by an older
-                                                    ;; version of this
-                                                    ;; application is found
-                                                    ;; under, and what tells two
-                                                    ;; uploads of one filename
-                                                    ;; apart.
-                                                    (stored-name unquote
-                                                                 stored-name)
-                                                    (data unquote
-                                                          (bytes->base64 bytes))
-                                                    (content-type unquote
-                                                                  (safe-content-type
-                                                                   (mfd-type
-                                                                    file)))
-                                                    (size unquote size)
-                                                    (created-at unquote
-                                                                (current-time))))
-                        (record-event! (make-sqlite-ticket-event-repository rc)
-                                       #:ticket-id ticket-id
-                                       #:project-id project-id
-                                       #:actor-id (session-owner-id #:rc rc
-                                                                    #:token-name 'x-bewaking-lucidplan)
-                                       #:action "attachment-added"
-                                       #:field "attachment"
-                                       #:new-value filename)
-                        (redirect-to rc
-                                     (string->uri (format #f
-                                                   "~a/tickets/~a/id/~a"
-                                                   (current-myhost) proj
-                                                   human-id))
-                                     #:status 302)))))))
+                                         #:action "attachment-added"
+                                         #:field "attachment"
+                                         #:new-value filename)
+                          (redirect-to rc (back) #:status 302))))))
+            (lambda (key . args)
+              ;; Something the route did not expect.  It is said on the error
+              ;; port -- an upload that fails silently is an upload nobody can
+              ;; fix -- and answered with the page the reader came from, which
+              ;; is a response they can act on instead of one they wait on.
+              ;; A row that was written is not reported as a file that was
+              ;; not: the difference is the two writes, and only the second
+              ;; can fail on its own.
+              (format (current-error-port)
+                      "attachment upload failed for ticket ~a: ~a ~a~%"
+                      (params rc "human-id") key args)
+              (redirect-to rc (if stored?
+                                  (back) (back "failed"))
+                           #:status 302))))
         (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
                            #:needed-permissions '(lucidplan:ticket-create)
                            #:rc rc
@@ -2429,7 +2468,20 @@ history entry that says somebody is better than one that fails to render."
                                                                          #:rc
                                                                          rc
                                                                          #:token-name 'x-bewaking-lucidplan
-                                                                         #:permission 'lucidplan:ticket-delete))
+                                                                         #:permission 'lucidplan:ticket-delete)
+                                                           ;; Why the last upload
+                                                           ;; did not land, as the
+                                                           ;; route that refused it
+                                                           ;; named it on the way
+                                                           ;; back here: the attach
+                                                           ;; control says it beside
+                                                           ;; itself rather than
+                                                           ;; leaving a reader to
+                                                           ;; wonder whether anything
+                                                           ;; happened at all.
+                                                           #:attachment-error (get-from-qstr
+                                                                              rc
+                                                                              "attachment-error"))
                                                               ,@quiet-notice)))))))
        ;; An address naming a ticket that does not exist is a wrong turn, not
        ;; a page: the reader is sent back to the backlog they came from

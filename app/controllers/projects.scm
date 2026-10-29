@@ -171,7 +171,16 @@
                                                                          "x-bewaking-lucidplan")
                                                          #:projects (get-projects
                                                                      project-repo)
-                                                         #:project p)))))
+                                                         #:project p
+                                                         ;; Why the last
+                                                         ;; upload did not
+                                                         ;; land, as the route
+                                                         ;; that refused it
+                                                         ;; named it on the way
+                                                         ;; back here.
+                                                         #:avatar-error (get-from-qstr
+                                                                        rc
+                                                                        "avatar-error"))))))
        (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
                           #:needed-permissions '(lucidplan:project-create)
                           #:rc rc
@@ -238,57 +247,83 @@
 ;; upload claimed: the type is checked against the four this instance keeps and
 ;; the bytes are filed under that one, so neither the upload's filename nor its
 ;; claimed type ever becomes a path or a header.
-
+;;
+;; Like the ticket's files, every way this can end is a redirect back to the
+;; edit page, with the reason in the query string when there is one.  A route
+;; that raises is answered with the framework's error page, which is written
+;; without a length and without closing the connection, and a browser still
+;; sending the file waits for an end that never comes -- an upload that hangs
+;; having already been stored, or not stored at all.
 (post "/projects/id/:human-id/avatar"
       #:mime 'xml
       #:cookies '(names x-bewaking-lucidplan)
       (lambda (rc)
-        (define (back)
-          (string->uri (format #f "~a/projects/id/~a/edit"
-                               (current-myhost) (params rc "human-id"))))
+        (define (back . error)
+          (string->uri (format #f "~a/projects/id/~a/edit~a"
+                               (current-myhost)
+                               (params rc "human-id")
+                               (if (null? error)
+                                   ""
+                                   (format #f "?avatar-error=~a"
+                                           (car error))))))
         (define (do-upload)
-          (let* ((human-id (params rc "human-id"))
-                 (project-repo (make-sqlite-project-repository rc))
-                 (p (get-project-by-human-id project-repo human-id))
-                 (mo (and p (get-mfds-op-from-post rc)))
-                 (file (and mo
-                            (find (lambda (m)
-                                    (let ((name (mfd-filename m)))
-                                      (and name
-                                           (not (string-null? name)))))
-                                  (mfds-operator-mfds mo))))
-                 (type (and file (avatar-canonical-type (mfd-type file))))
-                 (bytes (and file type (uploaded-file-bytes rc file)))
-                 (size (and bytes (bytevector-length bytes))))
-            (cond
-              ;; Nothing to put it on: the project is not there, or is gone.
-              ((not p)
-               (redirect-to rc
-                            (string->uri (format #f "~a/projects"
-                                                 (current-myhost)))
-                            #:status 302))
-              ;; What came back is not a picture this instance keeps.  It is
-              ;; refused rather than kept under a type it is not.
-              ((not type)
-               (redirect-to rc (back) #:status 302))
-              ((or (not (number? size))
-                   (<= size 0)
-                   (> size (avatar-max-bytes)))
-               (redirect-to rc (back) #:status 302))
-              (else
-               (update-project-by-human-id project-repo human-id
-                                           `((avatar unquote (avatar-token))
-                                             (avatar-data unquote
-                                                          (bytes->base64 bytes))
-                                             (avatar-content-type unquote type)
-                                             (updated-at unquote
-                                                         (current-time))))
-               (redirect-to rc (back) #:status 302)))))
+          (catch #t
+            (lambda ()
+              (let* ((human-id (params rc "human-id"))
+                     (project-repo (make-sqlite-project-repository rc))
+                     (p (get-project-by-human-id project-repo human-id))
+                     ;; #f rather than a throw when the framework did not read
+                     ;; a body at all: see `uploaded-file-of'.
+                     (file (and p (uploaded-file-of rc)))
+                     (type (and file (avatar-canonical-type (mfd-type file))))
+                     (bytes (and file type (uploaded-file-bytes rc file)))
+                     (size (and bytes (bytevector-length bytes))))
+                (cond
+                  ;; Nothing to put it on: the project is not there, or is
+                  ;; gone.  Answered, rather than left without a response.
+                  ((not p)
+                   (redirect-to rc
+                                (string->uri (format #f "~a/projects"
+                                                     (current-myhost)))
+                                #:status 302))
+                  ((not file)
+                   (redirect-to rc (back "no-file") #:status 302))
+                  ;; What came back is not a picture this instance keeps.  It
+                  ;; is refused rather than kept under a type it is not.
+                  ((not type)
+                   (redirect-to rc (back "type") #:status 302))
+                  ((not (number? size))
+                   (redirect-to rc (back "failed") #:status 302))
+                  ((<= size 0)
+                   (redirect-to rc (back "empty") #:status 302))
+                  ((> size (avatar-max-bytes))
+                   (redirect-to rc (back "size") #:status 302))
+                  (else
+                   (update-project-by-human-id project-repo human-id
+                                               `((avatar unquote
+                                                         (avatar-token))
+                                                 (avatar-data unquote
+                                                              (bytes->base64
+                                                               bytes))
+                                                 (avatar-content-type unquote
+                                                                      type)
+                                                 (updated-at unquote
+                                                             (current-time))))
+                   (redirect-to rc (back) #:status 302)))))
+            (lambda (key . args)
+              ;; Said on the error port -- an upload that fails without a word
+              ;; is one nobody can fix -- and answered with the page the
+              ;; reader came from.
+              (format (current-error-port)
+                      "picture upload failed for project ~a: ~a ~a~%"
+                      (params rc "human-id") key args)
+              (redirect-to rc (back "failed") #:status 302))))
         (bewaking-endpoint #:token-name 'x-bewaking-lucidplan
                            #:needed-permissions '(lucidplan:project-create)
                            #:rc rc
                            #:happy-flow do-upload
                            #:unhappy-flow back-to-login)))
+
 
 (post "/projects/id/:human-id/avatar/delete"
       #:mime 'xml

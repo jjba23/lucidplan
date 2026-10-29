@@ -19,12 +19,14 @@
 
 (define-module (lucidplan attachments)
   #:use-module (ice-9 format)
+  #:use-module (srfi srfi-1)
   #:use-module (web uri)
   #:use-module (artanis artanis)
   #:use-module (artanis upload)
   #:use-module (rnrs bytevectors)
   #:use-module (lucidplan config)
   #:export (attachment-directory attachment-path
+                                 uploaded-file-of
                                  uploaded-file-bytes
                                  safe-attachment-filename
                                  safe-content-type
@@ -41,7 +43,8 @@
           (attachment-directory) stored-name))
 
 (define (uploaded-file-bytes rc mfd)
-  "Answer the bytes of one uploaded file MFD, as they arrived.
+  "Answer the bytes of one uploaded file MFD, as they arrived, or #f when the
+request's body is not there to read them out of.
 
 They are read out of the request body rather than out of a file, because the
 application keeps what a ticket carries in the ticket's own row and a project's
@@ -49,17 +52,57 @@ picture in the project's (see the two migrations named `store_..._in_database').
 `begin' and `end' are offsets into that body, and `end' is the index of the
 last byte rather than the one past it -- artanis' own reader takes the same
 view of them (`mfd-size' is `end - begin + 1'), which is why the copy stops at
-`end + 1'."
+`end + 1'.
+
+@code{#f} is an answer rather than an error: the body this reads is the one the
+framework read, and a request it did not read -- one sent with no
+`Content-Length', in chunks, which is a body artanis does not read at all --
+leaves no bytes to answer with.  A file that is not there is a form that is
+answered with \"nothing was attached\", not a request that fails."
   ;; `bytevector-copy!' is R6RS's five-argument form here -- source and its
   ;; offset first, then the destination and its -- which is worth saying out
   ;; loud, since the shorter form every other language spells it as puts the
   ;; arguments the other way round and copies nothing but throws.
-  (let* ((start (mfd-begin mfd))
-         (end (+ (mfd-end mfd) 1))
-         (length (- end start))
-         (bytes (make-bytevector length 0)))
-    (bytevector-copy! (rc-body rc) start bytes 0 length)
-    bytes))
+  (let ((body (rc-body rc))
+        (start (mfd-begin mfd))
+        (end (+ (mfd-end mfd) 1)))
+    (and (bytevector? body)
+         (>= start 0)
+         (>= end start)
+         (<= end (bytevector-length body))
+         (let* ((length (- end start))
+                (bytes (make-bytevector length 0)))
+           (bytevector-copy! body start bytes 0 length)
+           bytes))))
+
+(define (uploaded-file-of rc)
+  "Answer the first file the multipart request RC carries, or #f.
+
+What the browser called the file is not what identifies it: the file is the
+part of the form that has a filename at all, whether the form called it
+`file', `avatar' or anything else, so the reader does not have to know the
+name a template happened to give the control.
+
+Nothing escapes from here.  A request the multipart reader cannot make sense of
+-- a body that is not multipart, a body the framework never read because it
+arrived without a length, a body that is not framed the way the reader expects
+-- answers @code{#f}, which is the same answer as a form submitted with nothing
+chosen.  That is deliberate: an upload that raises is answered with the
+framework's own error page, and that page is written without a length and
+without closing the connection, so the browser that is still sending its file
+waits for an end that never comes.  An upload that answers @code{#f} is a
+redirect the browser follows, which is what a reader can act on."
+  (catch #t
+         (lambda ()
+           (let ((operator (get-mfds-op-from-post rc)))
+             (and operator
+                  (find (lambda (mfd)
+                          (let ((name (mfd-filename mfd)))
+                            (and name
+                                 (not (string-null? name)))))
+                        (mfds-operator-mfds operator)))))
+         (lambda _
+           #f)))
 
 (define (safe-attachment-filename filename)
   "Answer FILENAME as a short name that is safe in a header.
