@@ -453,9 +453,9 @@ fall back to the instance's own when a page has none of its own."
 
 ;;; ===== The theme, served by this instance =====
 
-;;; A page used to be assembled partly from other people's servers: the Lucida
+;;; A page used to be assembled partly from other people's servers: the font
 ;;; stylesheet was written into every head pointing at jointhefreeworld.org,
-;;; the icon stylesheet was pulled from a CDN, and two Google Fonts hosts were
+;;; the icon stylesheet was pulled from a CDN, and a font service host was
 ;;; woken with a preconnect before either was read.  A self-hosted LucidPlan
 ;;; should not depend on hosts its operator does not run, and none of those
 ;;; files is large, so they now live under `pub/' as files of this project
@@ -486,7 +486,7 @@ served the page and this instance therefore answers itself."
 (define (shell-fonts)
   "The stylesheet that declares the faces the interface is set in.
 
-It carries the Lucida faces and the two web families the theme names after
+It carries the monospace face and the two web families the theme names after
 them, all of them files of this instance (see @code{maak fetch-assets})."
   `((link (@ (rel stylesheet)
              (href ,(asset-href "/css/fonts.css"))))))

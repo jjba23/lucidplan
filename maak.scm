@@ -144,12 +144,12 @@ Args: update? represents whether we should update a template or create a new one
 
 ;; ====== Maak vendored theme assets ======
 
-;; LucidPlan wears a theme it serves itself.  The Lucida faces, the two web
-;; families the shell names after them and the Phosphor icon face used to be
-;; fetched from other people's servers while a page was loading -- the faces
-;; from jointhefreeworld.org, the icons from a CDN -- so every visitor of every
-;; self-hosted instance depended on hosts the operator does not run, and the
-;; instance was slower and less honest about where its bytes came from.
+;; LucidPlan wears a theme it serves itself.  The three web families the shell
+;; is set in and the Phosphor icon face used to be fetched from other people's
+;; servers while a page was loading -- the faces from a font service, the icons
+;; from a CDN -- so every visitor of every self-hosted instance depended on
+;; hosts the operator does not run, and the instance was slower and less honest
+;; about where its bytes came from.
 ;;
 ;; They now live under `pub/' as files of this project and are handed out by
 ;; the instance itself (see `asset-url' in the manual for pointing that at
@@ -157,29 +157,29 @@ Args: update? represents whether we should update a template or create a new one
 ;; from, so keeping them current is one command and the provenance of every
 ;; file is written down here rather than remembered.
 
-;; Where the Lucida faces come from.
-(define lucida-font-base
-  "https://jointhefreeworld.org/static-assets/fonts")
-
-;; The faces themselves: Lucida Sans and its typewriter companion, four styles
-;; each, and the Unicode face the base family falls back to.
-(define lucida-fonts
-  '("LSANS.woff" "LSANSI.woff"
-    "LSANSD.woff"
-    "LSANSDI.woff"
-    "LTYPE.woff"
-    "LTYPEO.woff"
-    "LTYPEB.woff"
-    "LTYPEBO.woff"
-    "l_10646.woff"))
-
-;; The web families the shell asks for by name: a sans to fall back to when
-;; Lucida is absent and the monospace face.  Their stylesheets are captured
-;; with them, so the weight axis and the subset split stay the font service's
-;; choice rather than one made here.
+;; The two web families the theme asks for by name: Work Sans for prose and
+;; Source Serif 4 for long-form reading.  Their stylesheets are captured with
+;; them, so the weight axis and the subset split stay the font service's choice
+;; rather than one made here.
 (define web-font-families
-  '("Intel+One+Mono:ital,wght@0,300..700;1,300..700"
-    "Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800"))
+  '("Work+Sans:ital,wght@0,100..900;1,100..900"
+    "Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900"))
+
+;; JuliaMono, the monospace face, is not in the Google Fonts catalogue: it is
+;; taken from its own project, at a release tag rather than a branch, so a
+;; refresh fetches the release this tree was built against.  The two files are
+;; the latin subsets of the regular and the bold weight, which is the pair a
+;; page of code needs.
+(define juliamono-version
+  "v0.63.2")
+
+(define juliamono-font-base
+  (~ "https://raw.githubusercontent.com/cormullion/juliamono/~a/webfonts"
+     juliamono-version))
+
+(define juliamono-fonts
+  '(("JuliaMono-RegularLatin.woff2" . "juliamono-normal-latin.woff2")
+    ("JuliaMono-BoldLatin.woff2" . "juliamono-bold-latin.woff2")))
 
 ;; The icon set the interface draws with.
 (define phosphor-version
@@ -228,80 +228,29 @@ Args: update? represents whether we should update a template or create a new one
 (define asset-font-dir
   "pub/fonts")
 
-;; The Lucida faces, as the stylesheet declares them.  This is the block that
-;; used to sit in the page pointing at another host, with the addresses changed
-;; to the copies beside it: `../fonts/' resolves against the stylesheet's own
-;; address, so the faces follow it wherever the instance hands it out from.
-(define lucida-font-face-css
-  "/* --- Lucida Sans --- */
+;; The monospace family, as the stylesheet declares it.  JuliaMono is not in the
+;; Google Fonts catalogue, so there is no fetched stylesheet of its own to keep
+;; a copy of; this block names the two files `pub/fonts/' holds instead.  It is
+;; written relative to the stylesheet's own address (`../fonts/'), so the faces
+;; follow the sheet wherever the instance hands it out from.  JuliaMono ships
+;; static weights, hence the pair split at 600.
+(define juliamono-font-face-css
+  "/* --- JuliaMono --- */
 
 @font-face {
-  font-family: 'Lucida Sans';
+  font-family: 'JuliaMono';
   font-style: normal;
-  font-weight: 400;
-  src: url('../fonts/LSANS.woff') format('woff');
+  font-weight: 300 500;
+  font-display: swap;
+  src: url('../fonts/juliamono-normal-latin.woff2') format('woff2');
 }
 
 @font-face {
-  font-family: 'Lucida Sans';
-  font-style: italic;
-  font-weight: 400;
-  src: url('../fonts/LSANSI.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Lucida Sans';
+  font-family: 'JuliaMono';
   font-style: normal;
-  font-weight: 600;
-  src: url('../fonts/LSANSD.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Lucida Sans';
-  font-style: italic;
-  font-weight: 600;
-  src: url('../fonts/LSANSDI.woff') format('woff');
-}
-
-
-/* --- Lucida Sans Typewriter --- */
-
-@font-face {
-  font-family: 'Lucida Sans Typewriter';
-  font-style: normal;
-  font-weight: 400;
-  src: url('../fonts/LTYPE.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Lucida Sans Typewriter';
-  font-style: oblique;
-  font-weight: 400;
-  src: url('../fonts/LTYPEO.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Lucida Sans Typewriter';
-  font-style: normal;
-  font-weight: 700;
-  src: url('../fonts/LTYPEB.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Lucida Sans Typewriter';
-  font-style: oblique;
-  font-weight: 700;
-  src: url('../fonts/LTYPEBO.woff') format('woff');
-}
-
-
-/* --- Lucida Sans Unicode --- */
-
-@font-face {
-  font-family: 'Lucida Sans Unicode';
-  font-style: normal;
-  font-weight: 400;
-  src: url('../fonts/l_10646.woff') format('woff');
+  font-weight: 600 900;
+  font-display: swap;
+  src: url('../fonts/juliamono-bold-latin.woff2') format('woff2');
 }
 ")
 
@@ -557,11 +506,11 @@ say where they came from when one is read on its own."
   (mkdir-p asset-css-dir)
   (mkdir-p asset-font-dir)
 
-  ;; -- The Lucida faces -----------------------------------------------------
-  (log-info "taking the Lucida faces from ~a" lucida-font-base)
+  ;; -- The monospace family ------------------------------------------------
+  (log-info "taking JuliaMono from ~a" juliamono-font-base)
   (fetch-all! (map (lambda (f)
-                     (cons (~ "~a/~a" lucida-font-base f)
-                           (~ "~a/~a" asset-font-dir f))) lucida-fonts))
+                     (cons (~ "~a/~a" juliamono-font-base (car f))
+                           (~ "~a/~a" asset-font-dir (cdr f)))) juliamono-fonts))
 
   ;; -- The two web families ------------------------------------------------
   (log-info "taking the web families from the font service")
@@ -574,12 +523,14 @@ say where they came from when one is read on its own."
                                  "/* The faces this instance serves itself.
 
    Written by `maak fetch-assets' -- edit that task, not this file.  The
-   Lucida faces are taken from ~a, the families below from the font
-   service, and every file is kept beside this sheet in `pub/fonts/'. */
+   monospace face is taken from ~a, the two web families from the
+   font service, and every file is kept beside this sheet in `pub/fonts/'. */
 
 "
-                                 lucida-font-base) lucida-font-face-css "\n"
-                                (string-join families "\n") "\n"))) ;-- The mark a link preview shows --------------------------------------
+                                 juliamono-font-base) juliamono-font-face-css
+                                "\n" (string-join families "\n") "\n")))
+
+  ;; -- The mark a link preview shows ---------------------------------------
   (log-info "taking the project's own mark from ~a" site-logo-base)
   (mkdir-p "pub/img")
   (fetch-all! (list (cons (~ "~a/~a" site-logo-base site-logo-file)

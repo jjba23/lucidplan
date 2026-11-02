@@ -68,9 +68,9 @@
     (site-language . "en")
 
     ;; -- The address this instance's own files are handed out from ---------
-    ;; The shell wears a theme this instance serves itself: the Lucida faces,
-    ;; the web fonts, the icon face and the stylesheets that describe them all
-    ;; live under `pub/' and are refetched by `maak fetch-assets'.  Left
+    ;; The shell wears a theme this instance serves itself: the monospace face,
+    ;; the two web fonts, the icon face and the stylesheets that describe them
+    ;; all live under `pub/' and are refetched by `maak fetch-assets'.  Left
     ;; empty, a page names them by path alone -- "/css/fonts.css" -- and the
     ;; instance that served the page answers for them too, which is what a
     ;; self-hosted deployment wants.  Set it to an absolute base to hand that

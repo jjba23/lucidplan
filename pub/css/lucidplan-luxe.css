@@ -314,7 +314,7 @@
 }
 
 .lp-window-title {
-  font-family: "Intel One Mono", ui-monospace, "Lucida Sans Typewriter", monospace;
+  font-family: "JuliaMono", ui-monospace, monospace;
   font-size: 0.72rem;
   font-weight: 500;
   letter-spacing: 0.05em;
@@ -414,7 +414,7 @@
   background: linear-gradient(to top,
       rgba(255, 255, 255, 0.22),
       rgba(255, 255, 255, 0));
-  font-family: "Intel One Mono", ui-monospace, "Lucida Sans Typewriter", monospace;
+  font-family: "JuliaMono", ui-monospace, monospace;
   font-size: 0.7rem;
   color: rgba(87, 83, 78, 0.78);
 }
@@ -819,7 +819,7 @@
   flex: none;
   border-radius: 9999px;
   overflow: hidden;
-  font-family: "Plus Jakarta Sans", "Lucida Sans", ui-sans-serif, sans-serif;
+  font-family: "Work Sans", ui-sans-serif, sans-serif;
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.01em;
