@@ -78,8 +78,8 @@
                          #:size '(text-sm))
                      (a (@ (href "javascript:void(0)")
                            (class ,(mk-class '(no-underline text-onyx-500
-                                               dark:text-stone-300
-                                               cursor-pointer text-sm)))
+                                                            dark:text-stone-300
+                                                            cursor-pointer text-sm)))
                            (onclick
                             "window.scrollTo({ top: 0, behavior: 'smooth' })"))
                         ,(G_ "back to top")))
@@ -117,7 +117,7 @@
 ;; inside a card, is made of.
 (define-public recessed-tint-classes
   '(bg-stone-200/45 dark:bg-onyx-800/45
-    border-2 border-stone-500/25 dark:border-onyx-100/25))
+                    border-2 border-stone-500/25 dark:border-onyx-100/25))
 
 ;; The surface of a chip: a fact, or a field a reader can change where it
 ;; stands.  It is a tint and nothing else -- no frame, no frost.  Five framed
@@ -161,17 +161,17 @@ which is how the front page's language chooser ends up in its title bar."
   `(div (@ (class ,(mk-class '(lp-titlebar))))
         ,@(window-controls)
         ,@(if (and (string? title)
-                   (not (string-null? title)))
-              `((span (@ (class ,(mk-class '(lp-window-title min-w-0))))
-                      ,title))
-              '())
+                (not (string-null? title)))
+            `((span (@ (class ,(mk-class '(lp-window-title min-w-0))))
+                    ,title))
+            '())
         ,@(if (nil? trailing)
-              '()
-              `((div (@ (class ,(mk-class '(ml-auto flex flex-row flex-wrap
+            '()
+            `((div (@ (class ,(mk-class '(ml-auto flex flex-row flex-wrap
                                                   items-center gap-2))))
-                     ,@(if (list? trailing)
-                           trailing
-                           (list trailing)))))))
+                   ,@(if (list? trailing)
+                       trailing
+                       (list trailing)))))))
 
 ;;; ===== A link in the bar =====
 
@@ -190,8 +190,8 @@ which is how the front page's language chooser ends up in its title bar."
 (define* (bar-link #:key icon label href)
   "A control of the bar: the mark, the word, and no box around either."
   `(a (@ (class ,(mk-class '(lowercase font-sans font-medium flex
-                                      items-center no-underline
-                                      hover:opacity-80)))
+                                       items-center no-underline
+                                       hover:opacity-80)))
          (href ,href))
       ,(icon-button #:icon icon
                     #:content label
@@ -280,7 +280,7 @@ large soft gradients from banding on a wide screen."
                                               hg-blob
                                               bg-jeans-blue-500/50
                                               dark:bg-jeans-blue-700/50)))
-              (style "--hg-blob-duration: 42s; --hg-blob-x: 2rem; --hg-blob-y: 1.5rem")))
+                 (style "--hg-blob-duration: 42s; --hg-blob-x: 2rem; --hg-blob-y: 1.5rem")))
          (div (@ (class ,(mk-class '(absolute top-48
                                               right-0
                                               w-128
@@ -291,7 +291,7 @@ large soft gradients from banding on a wide screen."
                                               hg-blob
                                               bg-asparagus-500/50
                                               dark:bg-asparagus-700/50)))
-              (style "--hg-blob-duration: 58s; --hg-blob-x: -2.5rem; --hg-blob-y: 2rem; animation-delay: -12s")))
+                 (style "--hg-blob-duration: 58s; --hg-blob-x: -2.5rem; --hg-blob-y: 2rem; animation-delay: -12s")))
          (div (@ (class ,(mk-class '(absolute top-1/3
                                               left-1/2
                                               w-96
@@ -302,7 +302,7 @@ large soft gradients from banding on a wide screen."
                                               hg-blob
                                               bg-redwood-500/50
                                               dark:bg-redwood-700/50)))
-              (style "--hg-blob-duration: 36s; --hg-blob-x: -1.5rem; --hg-blob-y: -2rem; animation-delay: -24s")))
+                 (style "--hg-blob-duration: 36s; --hg-blob-x: -1.5rem; --hg-blob-y: -2rem; animation-delay: -24s")))
          (div (@ (class ,(mk-class '(absolute bottom-0
                                               left-64
                                               w-128
@@ -313,7 +313,7 @@ large soft gradients from banding on a wide screen."
                                               hg-blob
                                               bg-olive-500/25
                                               dark:bg-olive-700/50)))
-              (style "--hg-blob-duration: 50s; --hg-blob-x: 3rem; --hg-blob-y: -1.5rem; animation-delay: -6s")))
+                 (style "--hg-blob-duration: 50s; --hg-blob-x: 3rem; --hg-blob-y: -1.5rem; animation-delay: -6s")))
          (div (@ (class ,(mk-class '(absolute bottom-1/4
                                               right-1/4
                                               w-96
@@ -324,7 +324,7 @@ large soft gradients from banding on a wide screen."
                                               hg-blob
                                               bg-naples-yellow-500/50
                                               dark:bg-naples-yellow-700/50)))
-              (style "--hg-blob-duration: 64s; --hg-blob-x: -2rem; --hg-blob-y: 2.5rem; animation-delay: -38s")))
+                 (style "--hg-blob-duration: 64s; --hg-blob-x: -2rem; --hg-blob-y: 2.5rem; animation-delay: -38s")))
          (div (@ (class ,(mk-class '(lp-grain absolute inset-0))))))))
 
 ;;; ===== The page writer =====
@@ -358,14 +358,14 @@ instance's name.  A page with no title of its own, and the front page, is
 titled with the instance's name and its tagline."
   (let ((name (config-ref 'site-name)))
     (cond
-      ((or (not title)
-           (not (string? title))
-           (string-null? title))
+      [(or (not title)
+         (not (string? title))
+         (string-null? title))
        (format #f "~a - ~a" name
-               (config-ref 'site-tagline)))
-      ((string=? title name)
-       name)
-      (else (format #f "~a · ~a" title name)))))
+               (config-ref 'site-tagline))]
+      [(string=? title name)
+       name]
+      [else (format #f "~a · ~a" title name)])))
 
 (define (meta-tag name content)
   "A @code{<meta name=... content=...>} tag."
@@ -387,13 +387,13 @@ instance's own address.  A preview image is fetched by a service that has
 none of this page's context, so it has to be absolute either way."
   (let ((configured (config-ref 'site-logo)))
     (cond
-      ((not (string? configured))
-       #f)
-      ((string-null? configured)
-       #f)
-      ((string-contains configured "://")
-       configured)
-      (else (absolute-url configured)))))
+      [(not (string? configured))
+       #f]
+      [(string-null? configured)
+       #f]
+      [(string-contains configured "://")
+       configured]
+      [else (absolute-url configured)])))
 
 (define* (seo-meta #:key title description canonical-path)
   "The metadata tags a page carries: a description, a canonical address, an
@@ -405,8 +405,8 @@ request arrived on) by @code{absolute-url}.  @var{title} and @var{description}
 fall back to the instance's own when a page has none of its own."
   (let* ((name (config-ref 'site-name))
          (desc (if (and (string? description)
-                        (not (string-null? description))) description
-                   (config-ref 'site-description)))
+                     (not (string-null? description))) description
+                 (config-ref 'site-description)))
          (url (absolute-url (or canonical-path "/")))
          (logo (instance-logo))
          (has-logo (and logo #t))
@@ -424,8 +424,8 @@ fall back to the instance's own when a page has none of its own."
                                            (priceCurrency . "EUR"))))))
     `(,(meta-tag "description" desc) ,(meta-tag "keywords"
                                                 (if (list? keywords)
-                                                    (string-join keywords ", ")
-                                                    keywords))
+                                                  (string-join keywords ", ")
+                                                  keywords))
       ,(meta-tag "author"
                  (config-ref 'copyright-holder))
       (link (@ (rel "canonical")
@@ -439,10 +439,10 @@ fall back to the instance's own when a page has none of its own."
       ,(property-tag "og:locale"
                      (config-ref 'site-language))
       ,@(if has-logo
-            `(,(property-tag "og:image" logo) ,(property-tag "og:image:alt"
-                                                             name)
-              ,(meta-tag "twitter:image" logo))
-            '())
+          `(,(property-tag "og:image" logo) ,(property-tag "og:image:alt"
+                                                           name)
+            ,(meta-tag "twitter:image" logo))
+          '())
       ,(meta-tag "twitter:card"
                  (if has-logo "summary_large_image" "summary"))
       ,(meta-tag "twitter:title"
@@ -476,12 +476,12 @@ path is answered unchanged, which a browser reads against the host that
 served the page and this instance therefore answers itself."
   (let ((base (config-ref 'asset-url)))
     (if (and (string? base)
-             (not (string-null? base)))
-        (string-append (if (string-suffix? "/" base)
-                           (substring base 0
-                                      (- (string-length base) 1)) base)
-                       (if (string-prefix? "/" path) path
-                           (string-append "/" path))) path)))
+          (not (string-null? base)))
+      (string-append (if (string-suffix? "/" base)
+                       (substring base 0
+                                  (- (string-length base) 1)) base)
+                     (if (string-prefix? "/" path) path
+                       (string-append "/" path))) path)))
 
 (define (shell-fonts)
   "The stylesheet that declares the faces the interface is set in.
@@ -553,11 +553,11 @@ there is nothing for it to report to, so it is left out entirely rather than
 run against a default address somebody else runs."
   (let ((endpoint (config-ref 'analytics-endpoint)))
     (if (or (not (string? endpoint))
-            (string-null? endpoint))
-        '()
-        `((script (@ (data-endpoint ,endpoint)
-                     (data-interval ,(number->string (config-ref 'analytics-interval))))
-                  ,(assoc-ref asset-library "pub/js/symbanta.js"))))))
+          (string-null? endpoint))
+      '()
+      `((script (@ (data-endpoint ,endpoint)
+                   (data-interval ,(number->string (config-ref 'analytics-interval))))
+                ,(assoc-ref asset-library "pub/js/symbanta.js"))))))
 
 (begin
   (define* (html-template G_
@@ -568,47 +568,46 @@ run against a default address somebody else runs."
                           (proj '())
                           (is-logged-in #f))
     (let* ((project-select (if (nil? proj)
-                               '()
-                               `(select (@ (onchange
-                                            "window.location.href=this.value;")
-                                           (class ,(mk-class '(text-sm
-                                                               md:text-md
-                                                               text-stone-900
-                                                               dark:text-stone-100
-                                                               bg-transparent
-                                                               rounded-lg
-                                                               px-2
-                                                               py-1
-                                                               border-0
-                                                               font-medium
-                                                               font-sans
-                                                               cursor-pointer
-                                                               hover:bg-stone-300/75
-                                                               dark:hover:bg-onyx-700/75
-                                                               focus:ring-2
-                                                               outline-none))))
-                                        ;; The row the menu opens on is a
-                                        ;; placeholder, so it says so with a
-                                        ;; value of its own: an option
-                                        ;; without one answers with its own
-                                        ;; text, and choosing it would then
-                                        ;; navigate to `/🔗 go to'.
-                                        (option (@ (value "")) "🔗 go to")
-                                        ,@(map (lambda (p)
-                                                 `(option (@ (value ,(format
-                                                                             #f
-                                                                             "/tickets/~a"
-                                                                             (assq-ref
-                                                                              p
-                                                                              'human-id)))
-                                                             (class ,(mk-class '
-                                                                      (text-sm
-                                                                       font-light
-                                                                       lowercase
-                                                                       text-onyx-700))))
-                                                          ,(assq-ref p
-                                                                     'title)))
-                                               proj))))
+                             '()
+                             `(select (@ (onchange
+                                          "window.location.href=this.value;")
+                                         (class ,(mk-class '(text-sm
+                                                             md:text-md
+                                                             text-stone-900
+                                                             dark:text-stone-100
+                                                             bg-transparent
+                                                             rounded-lg
+                                                             px-2
+                                                             py-1
+                                                             border-0
+                                                             font-medium
+                                                             font-sans
+                                                             cursor-pointer
+                                                             hover:bg-stone-300/75
+                                                             dark:hover:bg-onyx-700/75
+                                                             focus:ring-2
+                                                             outline-none))))
+                                      ;; The row the menu opens on is a
+                                      ;; placeholder, so it says so with a
+                                      ;; value of its own: an option
+                                      ;; without one answers with its own
+                                      ;; text, and choosing it would then
+                                      ;; navigate to `/🔗 go to'.
+                                      (option (@ (value "")) "🔗 go to")
+                                      ,@(map (lambda (p)
+                                               `(option (@ (value ,(format
+                                                                    #f
+                                                                    "/tickets/~a"
+                                                                    (assq-ref
+                                                                     p
+                                                                     'human-id)))
+                                                           (class ,(mk-class '(text-sm
+                                                                               font-light
+                                                                               lowercase
+                                                                               text-onyx-700))))
+                                                        ,(assq-ref p
+                                                                   'title)))
+                                             proj))))
 
            ;; The bar is the framework's frosted glass header: the same pane
            ;; the cards wear, tinted with the brand blue, pinned to the top,
@@ -617,40 +616,42 @@ run against a default address somebody else runs."
 
                                ;; Left Section: Brand/Logo
                                (div (@ (class ,(mk-class '(flex items-center
-                                                           justify-center
-                                                           md:justify-start
-                                                           w-full md:w-auto))))
+                                                                justify-center
+                                                                md:justify-start
+                                                                w-full md:w-auto))))
                                     (a (@ (href "/")
                                           (class ,(mk-class '(flex flex-row
-                                                              gap-2
-                                                              items-center
-                                                              no-underline
-                                                              hover:opacity-80
-                                                              transition-opacity))))
-                                       ,(h4 (list `(img (@ (src ,(asset-href
-                                                                 "/img/logo.svg"))
-                                                               (alt "")
-                                                               (loading lazy)
-                                                               (class "h-7 w-auto")))
+                                                                   gap-2
+                                                                   items-center
+                                                                   no-underline
+                                                                   hover:opacity-80
+                                                                   transition-opacity))))
+                                       (div (@ (class ,(mk-class '(flex flex-row gap-2 align-center items-center))))
+                                            (img (@ (src ,(asset-href
+                                                           "/img/logo.png"))
+                                                    (alt "")
+                                                    (loading lazy)
+                                                    (class "h-7 sm:h-8 w-auto")))
+                                            ,(h4 (list
                                                   `(span ,(config-ref 'site-name)))
-                                            #:color '(text-stone-300
-                                                      dark:text-stone-300
-                                                      hover:text-white
-                                                      dark:hover:text-white)
-                                            #:size '(text-xl font-bold))))
+                                                 #:color '(text-stone-300
+                                                           dark:text-stone-300
+                                                           hover:text-white
+                                                           dark:hover:text-white)
+                                                 #:size '(text-xl font-bold)))))
 
                                ;; Right Section: Navigation Links & Controls
                                (div (@ (class ,(mk-class '(flex flex-row
-                                                           flex-wrap
-                                                           items-center
-                                                           justify-center
-                                                           md:flex-nowrap
-                                                           md:justify-end
-                                                           gap-3
-                                                           md:gap-4
-                                                           w-full
-                                                           md:w-auto
-                                                           lp-dock))))
+                                                                flex-wrap
+                                                                items-center
+                                                                justify-center
+                                                                md:flex-nowrap
+                                                                md:justify-end
+                                                                gap-3
+                                                                md:gap-4
+                                                                w-full
+                                                                md:w-auto
+                                                                lp-dock))))
 
                                     ;; The way through the application.  Each
                                     ;; of these is a word with a mark beside
@@ -661,12 +662,12 @@ run against a default address somebody else runs."
                                     ;; `lp-quiet' in
                                     ;; `pub/css/lucidplan-luxe.css'.
                                     ,(if (not is-logged-in)
-                                         (bar-link #:icon 'sign-in
-                                                   #:label (G_ "login")
-                                                   #:href "/login")
-                                         (bar-link #:icon 'user-circle
-                                                   #:label (G_ "me")
-                                                   #:href "/me"))
+                                       (bar-link #:icon 'sign-in
+                                                 #:label (G_ "login")
+                                                 #:href "/login")
+                                       (bar-link #:icon 'user-circle
+                                                 #:label (G_ "me")
+                                                 #:href "/me"))
 
                                     ,(bar-link #:icon 'align-bottom
                                                #:label (G_ "projects")
@@ -698,19 +699,17 @@ run against a default address somebody else runs."
                                                      #:border-color '()
                                                      #:shadow '()
                                                      #:content `((div ,(icon
-                                                                             #:type 'sun
-                                                                             #:icon-css '
-                                                                             (text-md
-                                                                              lg:text-lg
-                                                                              text-stone-300
-                                                                              dark:text-stone-300))
+                                                                        #:type 'sun
+                                                                        #:icon-css '(text-md
+                                                                                     lg:text-lg
+                                                                                     text-stone-300
+                                                                                     dark:text-stone-300))
                                                                       ,(icon
-                                                                             #:type 'moon
-                                                                             #:icon-css '
-                                                                             (text-md
-                                                                              lg:text-lg
-                                                                              text-stone-300
-                                                                              dark:text-stone-300))))
+                                                                        #:type 'moon
+                                                                        #:icon-css '(text-md
+                                                                                     lg:text-lg
+                                                                                     text-stone-300
+                                                                                     dark:text-stone-300))))
                                                      #:color '(text-stone-300
                                                                dark:text-stone-300)
                                                      #:weight '(font-light)
@@ -791,7 +790,7 @@ run against a default address somebody else runs."
 
                                                (script (@ (type
                                                            speculationrules))
-                                                "
+                                                       "
 {
   \"prerender\": [
     {
@@ -827,47 +826,43 @@ run against a default address somebody else runs."
                                                ;; The colour the panes above frost.
                                                ,(aurora-backdrop)
                                                ,notification-tray
-                                               ,(with-footer #:main `((div (@ (class ,
-                                                                               (mk-class '
-                                                                                (flex
-                                                                                 flex-col
-                                                                                 justify-between
-                                                                                 min-h-96
-                                                                                 relative
-                                                                                 z-10))))
+                                               ,(with-footer #:main `((div (@ (class ,(mk-class '(flex
+                                                                                                  flex-col
+                                                                                                  justify-between
+                                                                                                  min-h-96
+                                                                                                  relative
+                                                                                                  z-10))))
                                                                            (div
                                                                             (@
-                                                                             (class ,
-                                                                              (mk-class '
-                                                                               (flex
-                                                                                flex-col
-                                                                                gap-8
-                                                                                justify-start))))
+                                                                             (class ,(mk-class '(flex
+                                                                                                 flex-col
+                                                                                                 gap-8
+                                                                                                 justify-start))))
                                                                             ,@nav
                                                                             ,body)))
                                                              #:footer (page-footer
                                                                        G_))))))))
   (export html-template
-          frosted-tint-classes
-          recessed-tint-classes
-          chip-tint-classes
-          window-controls
-          window-titlebar
-          bar-link
-          quiet-link
-          quiet-submit
-          render-page
-          asset-href
-          emoji-for-ticket-status
-          emoji-for-ticket-type
-          glyph-for-ticket-status
-          glyph-for-ticket-type
-          status-label
-          status-icon-node
-          bucket-heading
-          bucket-icon-node
-          lucidplan-locales
-          locale-choose-form))
+    frosted-tint-classes
+    recessed-tint-classes
+    chip-tint-classes
+    window-controls
+    window-titlebar
+    bar-link
+    quiet-link
+    quiet-submit
+    render-page
+    asset-href
+    emoji-for-ticket-status
+    emoji-for-ticket-type
+    glyph-for-ticket-status
+    glyph-for-ticket-type
+    status-label
+    status-icon-node
+    bucket-heading
+    bucket-icon-node
+    lucidplan-locales
+    locale-choose-form))
 
 ;;; ===== How a status is drawn, from the status itself =====
 ;;;
@@ -886,17 +881,17 @@ run against a default address somebody else runs."
 ;;; it.
 (define (translate-status-label G_ label)
   (cond
-    ((equal? label "To-do")
-     (G_ "To-do"))
-    ((equal? label "Work in Progress")
-     (G_ "Work in Progress"))
-    ((equal? label "In Review")
-     (G_ "In Review"))
-    ((equal? label "Done")
-     (G_ "Done"))
-    ((equal? label "Rejected")
-     (G_ "Rejected"))
-    (else label)))
+    [(equal? label "To-do")
+     (G_ "To-do")]
+    [(equal? label "Work in Progress")
+     (G_ "Work in Progress")]
+    [(equal? label "In Review")
+     (G_ "In Review")]
+    [(equal? label "Done")
+     (G_ "Done")]
+    [(equal? label "Rejected")
+     (G_ "Rejected")]
+    [else label]))
 
 ;; The ladder a planning table deals, said in the reader's language.  It is
 ;; written here beside the status labels because both are the same problem: a
@@ -906,11 +901,11 @@ run against a default address somebody else runs."
 (define-public (deck-label G_ deck)
   "The words a reader is shown for the ladder DECK deals."
   (cond
-    ((equal? deck "sizes")
-     (G_ "t-shirt sizes"))
-    ((equal? deck "points")
-     (G_ "story points"))
-    (else deck)))
+    [(equal? deck "sizes")
+     (G_ "t-shirt sizes")]
+    [(equal? deck "points")
+     (G_ "story points")]
+    [else deck]))
 
 (define-public (status-label G_ specs status)
   "The label a reader is shown for STATUS, resolved through SPECS and
@@ -942,15 +937,15 @@ translated when it is one of the shipped labels."
                                   text-xs px-2 py-1 rounded-lg border-2
                                   font-medium)
                     (case state
-                      ((overdue due-today)
+                      [(overdue due-today)
                        '(text-redwood-700 dark:text-redwood-300
-                         border-redwood-500/75 dark:border-redwood-500/75))
-                      ((due-soon)
+                                          border-redwood-500/75 dark:border-redwood-500/75)]
+                      [(due-soon)
                        '(text-olive-700 dark:text-olive-300
-                         border-olive-500/75 dark:border-olive-500/75))
-                      (else
-                       '(text-onyx-500 dark:text-stone-500
-                         border-stone-300/75 dark:border-onyx-100/75))))))
+                                        border-olive-500/75 dark:border-olive-500/75)]
+                      [else
+                        '(text-onyx-500 dark:text-stone-500
+                                        border-stone-300/75 dark:border-onyx-100/75)]))))
 
 (define-public (render-due-badge G_ due-on . today-arg)
   "Answer the badge a deadline DUE-ON is read as, or nothing to draw.
@@ -961,17 +956,17 @@ rather than a badge saying nothing: the page is laid out as though the
 deadline were not there, which is what it is."
   (let ((state (ticket-due-state due-on
                                  (if (pair? today-arg)
-                                     (car today-arg)
-                                     (today-iso)))))
+                                   (car today-arg)
+                                   (today-iso)))))
     (if state
-        `((span (@ (class ,(due-badge-face state))
-                    (title ,(format #f "~a" due-on)))
-                ,(icon #:type 'calendar-blank
-                       #:icon-css '(text-xs))
-                ,(G_ (due-state-label state))
-                "· "
-                ,due-on))
-        '())))
+      `((span (@ (class ,(due-badge-face state))
+                 (title ,(format #f "~a" due-on)))
+              ,(icon #:type 'calendar-blank
+                     #:icon-css '(text-xs))
+              ,(G_ (due-state-label state))
+              "· "
+              ,due-on))
+      '())))
 
 ;;; ===== A day, typed into a form =====
 ;;;
@@ -1021,10 +1016,10 @@ rather than written into the markup as it is."
   "Answer the node that says MESSAGE -- why a file was not kept -- or nothing
 to draw when MESSAGE is @code{#f}."
   (if message
-      `(p (@ (class ,(mk-class '(text-sm font-medium
-                                          text-redwood-700 dark:text-redwood-300))))
-          ,message)
-      '()))
+    `(p (@ (class ,(mk-class '(text-sm font-medium
+                                       text-redwood-700 dark:text-redwood-300))))
+        ,message)
+    '()))
 
 ;; A closed bucket is titled by the status inside it when it holds exactly
 ;; one -- so renaming that status renames the section -- and by the bucket's
@@ -1032,21 +1027,21 @@ to draw when MESSAGE is @code{#f}."
 (define-public (bucket-heading G_ specs bucket)
   (let ((values (ticket-status-values-in-bucket specs bucket)))
     (if (and (pair? values)
-             (null? (cdr values)))
-        (status-label G_ specs
-                      (car values))
-        (G_ bucket))))
+          (null? (cdr values)))
+      (status-label G_ specs
+                    (car values))
+      (G_ bucket))))
 
 (define-public (bucket-icon-node specs bucket)
   (let ((values (ticket-status-values-in-bucket specs bucket)))
     (if (and (pair? values)
-             (null? (cdr values)))
-        (status-icon-node specs
-                          (car values))
-        (list (icon #:type (if (equal? bucket "rejected")
-                               'x
-                               'check)
-                    #:icon-css '(text-onyx-300 dark:text-stone-300 text-xl))))))
+          (null? (cdr values)))
+      (status-icon-node specs
+                        (car values))
+      (list (icon #:type (if (equal? bucket "rejected")
+                           'x
+                           'check)
+                  #:icon-css '(text-onyx-300 dark:text-stone-300 text-xl))))))
 
 ;; The two the landing page and the ticket badges answer without a project in
 ;; hand: they are drawn from the instance's own ladder.
@@ -1055,22 +1050,22 @@ to draw when MESSAGE is @code{#f}."
 
 (define-public (emoji-for-ticket-type ticket-type)
   (cond
-    ((equal? "task" ticket-type)
+    [(equal? "task" ticket-type)
      `((i (@ (class ,(mk-class '(ph ph-gear-fine text-onyx-300
-                                    dark:text-stone-300 text-xl)))) "")))
-    ((equal? "bug" ticket-type)
+                                    dark:text-stone-300 text-xl)))) ""))]
+    [(equal? "bug" ticket-type)
      `((i (@ (class ,(mk-class '(ph ph-bug text-onyx-300 dark:text-stone-300
-                                    text-xl)))) "")))
-    ((equal? "story" ticket-type)
+                                    text-xl)))) ""))]
+    [(equal? "story" ticket-type)
      `((i (@ (class ,(mk-class '(ph ph-book-open-text text-onyx-300
-                                    dark:text-stone-300 text-xl)))) "")))
-    ((equal? "spike" ticket-type)
+                                    dark:text-stone-300 text-xl)))) ""))]
+    [(equal? "spike" ticket-type)
      `((i (@ (class ,(mk-class '(ph ph-flask text-onyx-300 dark:text-stone-300
-                                    text-xl)))) "")))
-    ((equal? "time-box" ticket-type)
+                                    text-xl)))) ""))]
+    [(equal? "time-box" ticket-type)
      `((i (@ (class ,(mk-class '(ph ph-clock text-onyx-300 dark:text-stone-300
-                                    text-xl)))) "")))
-    (else "")))
+                                    text-xl)))) ""))]
+    [else ""]))
 
 ;;; ===== The same two ladders, as the text a dropdown row can hold =====
 
@@ -1086,17 +1081,17 @@ to draw when MESSAGE is @code{#f}."
 
 (define-public (glyph-for-ticket-type ticket-type)
   (cond
-    ((equal? "task" ticket-type)
-     "🔧")
-    ((equal? "bug" ticket-type)
-     "🐛")
-    ((equal? "story" ticket-type)
-     "📖")
-    ((equal? "spike" ticket-type)
-     "🧪")
-    ((equal? "time-box" ticket-type)
-     "⏳")
-    (else "")))
+    [(equal? "task" ticket-type)
+     "🔧"]
+    [(equal? "bug" ticket-type)
+     "🐛"]
+    [(equal? "story" ticket-type)
+     "📖"]
+    [(equal? "spike" ticket-type)
+     "🧪"]
+    [(equal? "time-box" ticket-type)
+     "⏳"]
+    [else ""]))
 
 (begin
   (define* (search-box G_
@@ -1134,9 +1129,9 @@ function addSearchQueryParam(form) {
                       ,(input #:label ""
                               #:name "search"
                               #:value (cond
-                                        ((equal? #f search-query)
-                                         "")
-                                        (else search-query))
+                                        [(equal? #f search-query)
+                                         ""]
+                                        [else search-query])
                               #:placeholder (G_ "Search...")
                               #:input-css '(p-3 max-w-prose
                                                 rounded-xl
@@ -1162,14 +1157,14 @@ function addSearchQueryParam(form) {
                         (current-sort #f)
                         (option-maker (lambda (s)
                                         (option #:value (format #f
-                                                         "/tickets/~a?sort=~a"
-                                                         project-id
-                                                         (car s))
+                                                                "/tickets/~a?sort=~a"
+                                                                project-id
+                                                                (car s))
                                                 #:content (cdr s)
                                                 #:selected-value (format #f
-                                                                  "/tickets/~a?sort=~a"
-                                                                  project-id
-                                                                  current-sort)))))
+                                                                         "/tickets/~a?sort=~a"
+                                                                         project-id
+                                                                         current-sort)))))
     ;; The control sizes to its own label: hygguile's `select' fills its box
     ;; (`w-full'), so a wrapper a min-content wide would squeeze the chosen
     ;; sort -- the one thing a sort control has to say -- down to its
@@ -1197,9 +1192,7 @@ function addSearchQueryParam(form) {
                                      ("priority-asc" unquote
                                       (G_ "Priority - Ascending"))
                                      ("priority-desc" unquote
-                                      (G_ "Priority - Descending"))
-
-                                     ))))))
+                                      (G_ "Priority - Descending"))))))))
   (export sort-select))
 
 (begin
@@ -1219,25 +1212,25 @@ function addSearchQueryParam(form) {
                                                           text-md leading-7))
                    (unordered-list-classes '(list-disc ml-3))
                    (unordered-list-item-classes '(font-sans text-onyx-500
-                                                  dark:text-stone-500 text-md
-                                                  leading-7))
+                                                            dark:text-stone-500 text-md
+                                                            leading-7))
                    (heading-classes (lambda (level)
                                       (case level
-                                        ((1)
+                                        [(1)
                                          '(my-2 text-4xl font-bold
                                                 text-onyx-300
-                                                dark:text-stone-300))
-                                        ((2)
+                                                dark:text-stone-300)]
+                                        [(2)
                                          '(my-2 text-3xl font-bold
                                                 text-onyx-300
-                                                dark:text-stone-300))
-                                        ((3)
+                                                dark:text-stone-300)]
+                                        [(3)
                                          '(my-2 text-2xl font-bold
                                                 text-onyx-300
-                                                dark:text-stone-300))
-                                        (else '(my-2 text-xl font-bold
+                                                dark:text-stone-300)]
+                                        [else '(my-2 text-xl font-bold
                                                      text-onyx-300
-                                                     dark:text-stone-300)))))
+                                                     dark:text-stone-300)])))
                    (separator-classes '(my-8 mx-4 border-2 border-stone-500/50
                                              dark:border-onyx-100/50))
                    (paragraph-classes (append extra-paragraph-classes
@@ -1360,10 +1353,10 @@ reaches assistive technology as well."
                                               dark:border-jeans-blue-300/25
                                               shadow-md) frosted-tint-classes))))
           ,@(if return-to
-                `((input (@ (type "hidden")
-                            (name "return-to")
-                            (value ,return-to))))
-                '())
+              `((input (@ (type "hidden")
+                          (name "return-to")
+                          (value ,return-to))))
+              '())
           ,(icon #:type 'translate
                  #:icon-css '(text-lg text-jeans-blue-700
                                       dark:text-jeans-blue-300))
