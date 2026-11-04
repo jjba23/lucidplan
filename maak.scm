@@ -207,15 +207,6 @@ Args: update? represents whether we should update a template or create a new one
     ",
     url(\"../fonts/Phosphor.svg#Phosphor\") format(\"svg\")"))
 
-;; The mark a link preview shows when the instance has not been given one of
-;; its own: the project's own, kept as a file of this project so that a fresh
-;; instance describes itself with an image it serves.
-(define site-logo-base
-  "https://jointhefreeworld.org/static-assets/lucidplan/img")
-
-(define site-logo-file
-  "logo-small.jpg")
-
 ;; A font service answers an ordinary browser with woff2 and answers a bare
 ;; HTTP client with something older, so the request wears a browser's name: the
 ;; files are taken in the format the pages will actually use.
@@ -530,11 +521,10 @@ say where they came from when one is read on its own."
                                  juliamono-font-base) juliamono-font-face-css
                                 "\n" (string-join families "\n") "\n")))
 
-  ;; -- The mark a link preview shows ---------------------------------------
-  (log-info "taking the project's own mark from ~a" site-logo-base)
-  (mkdir-p "pub/img")
-  (fetch-all! (list (cons (~ "~a/~a" site-logo-base site-logo-file)
-                          (~ "pub/img/~a" site-logo-file))))
+  ;; The mark a link preview shows is `pub/img/logo.png', drawn from the
+  ;; project's own icon and checked in beside the pages: unlike the typefaces
+  ;; and the icon face, it is this project's own artwork, so a build has
+  ;; nothing to fetch for it.
 
   ;; -- The icon face and its stylesheet ------------------------------------
   (log-info "taking the icon set from ~a" phosphor-font-base)

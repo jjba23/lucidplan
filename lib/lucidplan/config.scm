@@ -58,13 +58,13 @@
     ;; server and for an instance behind a single public name.
     (site-url . "")
     ;; The image a link preview shows.  It may be written either as an
-    ;; absolute URL or as a path on this instance -- "/img/logo-small.jpg",
+    ;; absolute URL or as a path on this instance -- "/img/logo.png",
     ;; the project's own mark, which `maak fetch-assets' keeps beside the
     ;; pages -- and a path is answered on the instance's own address, since a
     ;; preview image has to be absolute for the service that reads it.  Empty
     ;; leaves the tags out rather than pointing them at an image that is not
     ;; there.
-    (site-logo . "/img/logo-small.jpg")
+    (site-logo . "/img/logo.png")
     (site-language . "en")
 
     ;; -- The address this instance's own files are handed out from ---------

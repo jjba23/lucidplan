@@ -382,7 +382,7 @@ titled with the instance's name and its tagline."
 
 The configured @code{site-logo} may be an absolute URL, in which case it is
 answered as it stands, or a path on this instance -- the project's own mark
-lives at @code{/img/logo-small.jpg} -- which is made absolute against the
+lives at @code{/img/logo.png} -- which is made absolute against the
 instance's own address.  A preview image is fetched by a service that has
 none of this page's context, so it has to be absolute either way."
   (let ((configured (config-ref 'site-logo)))
@@ -627,13 +627,11 @@ run against a default address somebody else runs."
                                                               no-underline
                                                               hover:opacity-80
                                                               transition-opacity))))
-                                       ,(h4 (list (icon #:type 'scroll
-                                                        #:icon-css '(text-xl
-                                                                     text-stone-300
-                                                                     dark:text-stone-300
-                                                                     hover:text-white
-                                                                     dark:hover:text-white))
-                                                  "&nbsp;"
+                                       ,(h4 (list (img (@ (src ,(asset-href
+                                                                "/img/logo.svg"))
+                                                              (alt "")
+                                                              (loading lazy)
+                                                              (class "h-7 w-auto")))
                                                   `(span ,(config-ref 'site-name)))
                                             #:color '(text-stone-300
                                                       dark:text-stone-300
@@ -776,6 +774,11 @@ run against a default address somebody else runs."
                                                         (href ,(asset-href
                                                                 "/favicon.ico"))
                                                         (type "image/x-icon"))
+                                                     "")
+                                               (link (@ (rel icon)
+                                                        (type "image/svg+xml")
+                                                        (href ,(asset-href
+                                                                "/img/logo.svg")))
                                                      "")
                                                (link (@ (rel stylesheet)
                                                         (href ,(asset-href
