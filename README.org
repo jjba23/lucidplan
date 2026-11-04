@@ -1469,7 +1469,7 @@ respect is essential to creating excellent free software.
 See the [[https://lucidplan.jointhefreeworld.org/tickets/lucidplan][Backlog and Kanban]] for this project.
 
 #+name: lucidplan-logo
-[[https://jointhefreeworld.org/static-assets/lucidplan/img/logo-small.jpg]]
+[[https://jointhefreeworld.org/static-assets/lucidplan/img/logo.png]]
 
 ** On fonts
 :PROPERTIES:

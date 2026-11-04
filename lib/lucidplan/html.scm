@@ -627,11 +627,11 @@ run against a default address somebody else runs."
                                                               no-underline
                                                               hover:opacity-80
                                                               transition-opacity))))
-                                       ,(h4 (list (img (@ (src ,(asset-href
-                                                                "/img/logo.svg"))
-                                                              (alt "")
-                                                              (loading lazy)
-                                                              (class "h-7 w-auto")))
+                                       ,(h4 (list `(img (@ (src ,(asset-href
+                                                                 "/img/logo.svg"))
+                                                               (alt "")
+                                                               (loading lazy)
+                                                               (class "h-7 w-auto")))
                                                   `(span ,(config-ref 'site-name)))
                                             #:color '(text-stone-300
                                                       dark:text-stone-300
