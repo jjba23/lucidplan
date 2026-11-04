@@ -9,6 +9,9 @@
 [[https://jointhefreeworld.org/ggg/dist/lucidplan.svg]] [[https://jointhefreeworld.org/ggg/dist/scheme-guile.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-guix.svg]] [[https://jointhefreeworld.org/ggg/dist/maak.svg]] [[https://jointhefreeworld.org/ggg/dist/hygguile.svg]] [[https://jointhefreeworld.org/ggg/dist/gnu-artanis.svg]]
 [[https://jointhefreeworld.org/ggg/dist/license-mit.svg]] [[https://img.shields.io/badge/docs%20license-CC%20BY%204.0-2ea44f.svg]] [[https://jointhefreeworld.org/ggg/dist/jointhefreeworld-org.svg]] [[https://img.shields.io/badge/CI-Byggsteg%20%7C%20GitHub-2ea44f.svg]]
 
+#+attr_html: :width 160 :alt LucidPlan logo
+[[file:logo.svg]]
+
 /free and open project management for everyone/
 
 LucidPlan is a project management system for teams of all sizes and all kinds
@@ -38,7 +41,6 @@ This is both the project's README and its manual: the two documents were merged
 into one, so there is a single place to read and a single place to keep in step.
 The published HTML manual at [[https://jointhefreeworld.org/manuals/lucidplan/index.html]]
 is this file exported.
-
 
 ------------------
 
@@ -1132,7 +1134,6 @@ Here follows an example Shepherd service for a Guix System:
                                    shepherd-root-service-type
                                    wolk-jjba-lucidplan-service)))
                 (default-value '())))
-
 
 #+end_src
 
