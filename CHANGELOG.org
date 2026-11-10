@@ -229,6 +229,12 @@ the first time it is downloaded, stored in its row, and never read from a file
 again -- the move migrates itself, one file at a time, instead of depending on
 somebody remembering to run a task first.
 
+* v1.15.4 (2026-11-10)
+
+`.github/FUNDING.yml` now carries a `custom` funding URL that points at
+[[https://buymeacoffee.com/jjbigorra][Buy Me a Coffee]], so GitHub shows a
+Sponsor button on the repository.
+
 * v1.15.3 (2026-11-10)
 
 The repository carries `.github/FUNDING.yml`, so GitHub shows a Sponsor button
