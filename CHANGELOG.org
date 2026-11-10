@@ -229,6 +229,11 @@ the first time it is downloaded, stored in its row, and never read from a file
 again -- the move migrates itself, one file at a time, instead of depending on
 somebody remembering to run a task first.
 
+* v1.15.3 (2026-11-10)
+
+The repository carries `.github/FUNDING.yml`, so GitHub shows a Sponsor button
+on it that points at [[https://buymeacoffee.com/jjbigorra][Buy Me a Coffee]].
+
 * v1.9.0
 
 A ticket is now a place where the work on it happens, not just a card that
