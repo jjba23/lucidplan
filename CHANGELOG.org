@@ -26,6 +26,10 @@ maak migrate
 
 ----------------------------------
 
+* v1.15.5 (2026-11-12)
+
+- Builds against the channels this project builds against: the jointhefreeworld collection at v1.0.4, and Guix master `3b4e873`.
+
 * Unreleased
 
 Four things a board and a backlog were missing, and a handful that had stopped
