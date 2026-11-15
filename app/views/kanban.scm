@@ -68,8 +68,7 @@
                         (span (@ (class ,(mk-class '(text-sm font-medium
                                                              wrap-break-word
                                                              pl-1))))
-                              ,(org2html (html-unescape (assq-ref t
-                                                                  'title)))))
+                              ,(org2html (assq-ref t 'title))))
 
                    (a (@ (class ,(mk-class '(text-md no-underline)))
                          (href ,(format #f "/tickets/~a/id/~a" project

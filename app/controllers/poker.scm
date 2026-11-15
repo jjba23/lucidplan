@@ -267,14 +267,13 @@
 
 ;; A title -- of a meeting or of the thing being estimated -- is read the way
 ;; a name is: the space around it is not part of it, and an empty one is no
-;; title at all.  It is escaped here because this application renders its
-;; text unescaped (see `sxml->xml' in `(hygguile sxml)'), exactly as a sprint
-;; title or a milestone title is.
+;; title at all.  It is stored as it was typed; the page writer escapes it
+;; once, exactly as it does a sprint title or a milestone title.
 (define (parse-table-title value)
   (and (string? value)
        (let ((text (string-trim-both value)))
          (and (not (string-null? text))
-              (html-escape text)))))
+              text))))
 
 ;;; ===== a table opened for one ticket =====
 ;;;
@@ -315,10 +314,9 @@
                   (insert-room room-repo
                                `((id unquote room-id)
                                  ;; The title is the ticket's own, exactly as
-                                 ;; the ticket is shown by: it is already the
-                                 ;; text a page renders, and escaping it a
-                                 ;; second time would show a reader the
-                                 ;; escape.
+                                 ;; the ticket is shown by: both are the text
+                                 ;; a reader wrote, and the page writer
+                                 ;; escapes it once.
                                  (title unquote
                                         (assq-ref ticket 'title))
                                  (deck unquote deck)
@@ -754,7 +752,7 @@
                                       (room-id unquote
                                                room-id)
                                       (name unquote
-                                            (html-escape name))
+                                            name)
                                       (token unquote
                                              token)
                                       (joined-at unquote

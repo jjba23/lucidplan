@@ -172,8 +172,7 @@
                                                    (assq-ref p
                                                              'id))
                                        (title unquote
-                                              (html-escape
-                                               (string-trim-both title)))
+                                              (string-trim-both title))
                                        (sprint-status unquote
                                                       "planned")
                                        (created-at unquote
@@ -182,8 +181,7 @@
                                               (not (string-null? (string-trim-both
                                                                   goal))))
                                          `((goal unquote
-                                                 (html-escape
-                                                  (string-trim-both goal))))
+                                                 (string-trim-both goal)))
                                          '())
                                      (if starts-on
                                          `((starts-on unquote starts-on))
@@ -525,8 +523,7 @@
                                                       (assq-ref p
                                                                 'id))
                                           (title unquote
-                                                 (html-escape
-                                                  (string-trim-both title)))
+                                                 (string-trim-both title))
                                           (created-at unquote
                                                       (current-time)))
                                         (if (and description
@@ -534,9 +531,7 @@
                                                        (string-trim-both
                                                         description))))
                                             `((description unquote
-                                                           (html-escape
-                                                            (string-trim-both
-                                                             description))))
+                                                           (string-trim-both description)))
                                             '())
                                         (if due-on
                                             `((due-on unquote due-on))

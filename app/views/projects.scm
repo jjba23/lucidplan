@@ -137,7 +137,7 @@
                                                              font-medium
                                                              wrap-break-word))))
                                       ,x))
-                                (org2html (html-unescape description)))
+                                (org2html description))
 
            ,(hr #:margin '(my-2 sm:my-3 mx-1 sm:mx-3))
 
@@ -476,8 +476,7 @@ that the letter is still there to be seen while the picture is on its way."
                                      'url)
                      #:vcs-url (proj-ref project
                                          'vcs-url)
-                     #:description (html-unescape (proj-ref project
-                                                            'description))
+                     #:description (proj-ref project 'description)
                      #:ticket-statuses (proj-ref project
                                                  'ticket-statuses)
                      #:action (format #f "/projects/id/~a/edit"
@@ -518,7 +517,7 @@ that the letter is still there to be seen while the picture is on its way."
                                             (action ,action))
                                          ,(input #:label (G_ "title")
                                                  #:name 'title
-                                                 #:value (html-unescape title)
+                                                 #:value title
                                                  #:required #t)
                                          ,(input #:label (G_ "human id")
                                                  #:name 'human-id

@@ -91,7 +91,7 @@ while @var{statuses} is the ladder the project's tickets move through -- the
 status is named to the reader the way the board names it, so a project that
 calls its first column something of its own says that in the mail too.  The
 title and the description reach the message as the reader wrote them: they
-are stored escaped for the pages, and a message is not a page.
+are stored as they were typed, which is what a message wants.
 
 Answer what @code{(lucidplan mail)}'s @code{send-email!} answers:
 @code{#t} when the service took the message, @code{#f} when there was nobody
@@ -101,10 +101,8 @@ business, never a reason to refuse the write that asked for the message."
                                      'human-id))
          (human-id (assq-ref ticket
                              'human-id))
-         (title (html-unescape (or (assq-ref ticket
-                                             'title) "")))
-         (description (html-unescape (or (assq-ref ticket
-                                                   'description) "")))
+         (title (or (assq-ref ticket 'title) ""))
+         (description (or (assq-ref ticket 'description) ""))
          (status (ticket-status-label statuses
                                       (assq-ref ticket
                                                 'ticket-status)))
@@ -118,16 +116,13 @@ business, never a reason to refuse the write that asked for the message."
                                      #:also (list author-id assignee-id))))
     (send-email! #:template 'lucidplan-new-ticket
                  #:subject (format #f "New ticket in ~a"
-                                   (html-unescape (or (assq-ref project
-                                                                'title)
-                                                      project-human-id)))
+                                   (or (assq-ref project 'title)
+                                       project-human-id))
                  #:recipients recipients
                  #:vars `((system-name unquote
                                        (config-ref 'site-name))
                           (project-name unquote
-                                        (html-unescape (or (assq-ref project
-                                                                     'title)
-                                                           "")))
+                                        (or (assq-ref project 'title) ""))
                           (project-human-id unquote project-human-id)
                           (ticket-human-id unquote human-id)
                           (ticket-title unquote title)

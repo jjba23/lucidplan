@@ -439,7 +439,7 @@ at the first of them."
                                                              font-bold
                                                              leading-8
                                                              wrap-break-word))))
-                              ,(org2html (html-unescape title))))
+                              ,(org2html title)))
                         '())
                     (small (@ (class ,%mono-face))
                            ,(format #f "~a-~s" project human-id))))
@@ -620,7 +620,7 @@ at the first of them."
                                                                     whitespace-pre-wrap
                                                                     text-onyx-700
                                                                     dark:text-stone-300))))
-                                             ,(org2html (html-unescape d)))))) desc)
+                                             ,(org2html d))))) desc)
 
           ;; What a reader can do with the ticket: ask the team for an
           ;; estimate, change it, delete it.  The rule above the section is
@@ -778,7 +778,7 @@ at the first of them."
                    '())
                ,(emoji-for-ticket-type type)
                (h5 (@ (class ,%list-title-face))
-                   ,(org2html (html-unescape title)))
+                   ,(org2html title))
 
                ;; The words it is tagged with, in the row as well as in the
                ;; card: a row is what a reader scans, and a tag nobody sees
@@ -1728,9 +1728,6 @@ at the first of them."
          (field-face (mk-class '(max-w-128)))
          (label-face (mk-class '(text-onyx-700 dark:text-stone-300)))
 
-         ;; Format Data Safely
-         (safe-title (html-unescape title))
-         (safe-desc (html-unescape description))
          (safe-prio (or priority 0))
 
          ;; The two ladders every triage control in the app shares
@@ -1773,7 +1770,7 @@ at the first of them."
                                 ;; Title
                                 ,(input #:label (G_ "title")
                                         #:name "title"
-                                        #:value safe-title
+                                        #:value title
                                         #:required #t)
 
                                 ;; Status
@@ -1844,7 +1841,7 @@ at the first of them."
                                 ,(textarea #:label (G_ "description")
                                            #:name "description"
                                            #:required #f
-                                           #:value safe-desc
+                                           #:value description
                                            #:textarea-css '(leading-7 p-4
                                                                       rounded-xl
                                                                       border-stone-700
@@ -2072,7 +2069,7 @@ at the first of them."
                     ,(G_ "[removed]")))
               `((div (@ (class ,(mk-class '(text-md leading-7 max-w-prose
                                                     wrap-break-word))))
-                     ,(org2html (html-unescape body)))))
+                     ,(org2html body))))
           ,@(if (and editable?
                   (not deleted?))
               `((details (summary (@ (class ,(mk-class '(text-sm
@@ -2998,10 +2995,8 @@ run of cards."
                                                                                                          max-w-prose
                                                                                                          wrap-break-word))))
                                                                                     ,(org2html
-                                                                                      (html-unescape
-                                                                                       (assq-ref
-                                                                                        revision
-                                                                                        'description)))))
+                                                                                      (assq-ref revision
+                                                                                                'description))))
                                                                                  '())
                                                                              ,@(if
                                                                                  (and

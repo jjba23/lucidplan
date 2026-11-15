@@ -274,8 +274,7 @@ carries no link and no button."
           (href ,(format #f "/tickets/~a/id/~a" project-human-id human-id)))
         ,(status-icon-node statuses (assq-ref ticket
                                                'ticket-status))
-        (span ,(org2html (html-unescape (assq-ref ticket
-                                                   'title)))))))
+        (span ,(org2html (assq-ref ticket 'title))))))
 
 ;; How far an epic has got, as a bar and a count.  An epic nobody has put a
 ;; ticket in says so in words instead of drawing a bar of nothing.

@@ -168,11 +168,9 @@
                  (project (get-project-by-human-id project-repo human-id))
                  (epic-repo (make-sqlite-epic-repository rc))
                  (body (alist-from-url-encoded-body (rc-body rc)))
-                 (title (html-escape (or (assoc-ref body "title") "")))
+                 (title (or (assoc-ref body "title") ""))
                  (slug (epic-slug (assoc-ref body "human-id")))
-                 (description (html-escape (or (assoc-ref body
-                                                          "description")
-                                               ""))))
+                 (description (or (assoc-ref body "description") "")))
             ;; A title and a slug are what an epic is named by; without either
             ;; there is no row to write, so the form is answered with the list
             ;; rather than with a row no address could reach.
@@ -216,11 +214,9 @@
                                                               (params rc
                                                                "human-id"))))
                  (body (alist-from-url-encoded-body (rc-body rc)))
-                 (title (html-escape (or (assoc-ref body "title") "")))
+                 (title (or (assoc-ref body "title") ""))
                  (slug (epic-slug (assoc-ref body "human-id")))
-                 (description (html-escape (or (assoc-ref body
-                                                          "description")
-                                               ""))))
+                 (description (or (assoc-ref body "description") "")))
             (when (and epic title slug)
               (update-epic-by-id epic-repo
                                  (assq-ref epic

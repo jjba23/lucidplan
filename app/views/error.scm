@@ -179,8 +179,7 @@ untranslated LucidPlan shows anywhere else, and the navigation it carries is
 the one a signed-out reader sees, which is who is met by a refusal."
   (let ((G_ (parameterize ((current-lang ""))
               (make-i18n-handler))))
-    (call-with-output-string (lambda (port)
-                               (sxml->xml (error-page G_ status) port)))))
+    (error-page G_ status)))
 
 (define (register-error-pages!)
   "Give the four refusals a reader can meet LucidPlan's own page.

@@ -337,10 +337,38 @@ large soft gradients from banding on a wide screen."
 ;;; children would then swallow the rest of the document.  A frosted pane is
 ;;; built out of exactly those elements -- the colour washes drifting behind
 ;;; it are childless discs -- so the difference is the whole page.
+;;;
+;;; Text is escaped here and nowhere else: what a repository stores is what a
+;;; reader typed, and this is the one point every page goes through.  The two
+;;; things that are markup already -- the doctype and Org prose -- are spliced
+;;; as `raw-html'.
+(define-public (raw-html html)
+  "HTML that is written to the page as markup rather than as text."
+  (lambda () (display html)))
+
+;; `script' and `style' hold code and CSS, not markup, and are written out as
+;; they are: an escaped `<` in a script is a script with a syntax error.  The
+;; framework's own components carry such bodies, so they are recognised here
+;; rather than at every caller.
+(define (raw-text-bodies tree)
+  (if (pair? tree)
+      (if (and (symbol? (car tree))
+               (memq (car tree) '(script style)))
+          (cons (car tree)
+                (map (lambda (child)
+                       (if (string? child) (raw-html child)
+                           (raw-text-bodies child)))
+                     (cdr tree)))
+          (map raw-text-bodies tree))
+      tree))
+
 (define-public (render-page tree)
-  "Serialize the SXML @var{tree} of a whole page to an HTML string."
+  "Serialize the SXML @var{tree} of a whole page to an HTML string.
+
+Text is escaped exactly once, on the way out; `script' and `style' bodies
+are written as they are."
   (call-with-output-string (lambda (port)
-                             (sxml->xml tree port))))
+                             (sxml->xml (raw-text-bodies tree) port #t))))
 
 ;;; ===== What a page says about itself to a machine =====
 
@@ -749,7 +777,7 @@ run against a default address somebody else runs."
                                                 lp-toolbar))))
 
       ;; Output Page
-      (render-page `(,doctype-html (html (@ (lang ,(config-ref 'site-language)))
+      (render-page `(,(raw-html doctype-html) (html (@ (lang ,(config-ref 'site-language)))
                                          (head (title ,(page-title title))
                                                ,(hygguile-recommended-meta)
                                                ,@(seo-meta #:title title
@@ -1275,7 +1303,7 @@ function addSearchQueryParam(form) {
                                               py-1
                                               font-mono
                                               dark:text-stone-300)))
-      (org->html org)))
+      (raw-html (org->html org))))
   (export org2html))
 
 ;;; The handle a ticket is dragged by.  It is the drag source and the row is

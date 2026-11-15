@@ -298,7 +298,7 @@ history entry that says somebody is better than one that fails to render."
                                ((equal? #f
                                         (get-from-qstr rc "search"))
                                 #f)
-                               (else (html-escape (get-from-qstr rc "search")))))
+                               (else (get-from-qstr rc "search"))))
                 ;; The two narrowings the panel above the backlog offers, read
                 ;; once here: they are handed to the page and they are what a
                 ;; saved filter is made of.
@@ -379,7 +379,7 @@ history entry that says somebody is better than one that fails to render."
                                          (params rc "project") query-sort))
                            (else (search-tickets ticket-repo
                                                  (params rc "project")
-                                                 (html-escape user-search)
+                                                 user-search
                                                  query-sort))))
                 (ticket-id-to-human-id (map (lambda (t)
                                               `(,(assq-ref t
@@ -564,17 +564,15 @@ history entry that says somebody is better than one that fails to render."
                                   (if latest-id latest-id 0)))
                  (_ (write new-human-id))
                  (body (alist-from-url-encoded-body (rc-body rc)))
-                 (title (html-escape (assoc-ref body "title")))
+                 (title (assoc-ref body "title"))
                  ;; The words the ticket is tagged with, kept as the line they
                  ;; were typed as (see `parse-labels').
-                 (labels (labels-text (html-escape (or (assoc-ref body
-                                                                   "labels")
-                                                       ""))))
+                 (labels (labels-text (or (assoc-ref body "labels") "")))
                  (ticket-status (submitted-status statuses
                                                   (assoc-ref body
                                                              "ticket-status")))
                  (ticket-type (assoc-ref body "ticket-type"))
-                 (description (html-escape (assoc-ref body "description")))
+                 (description (assoc-ref body "description"))
                  (priority (string->number (assoc-ref body "priority")))
                  (estimate-points (parse-estimate-points (assoc-ref body
                                                           "estimate-points")))
@@ -1002,13 +1000,11 @@ history entry that says somebody is better than one that fails to render."
                  (statuses (effective-ticket-statuses (get-project-by-human-id
                                                        project-repo proj-human)))
                  (body (alist-from-url-encoded-body (rc-body rc)))
-                 (title (html-escape (assoc-ref body "title")))
-                 (description (html-escape (assoc-ref body "description")))
+                 (title (assoc-ref body "title"))
+                 (description (assoc-ref body "description"))
                  ;; The words it is tagged with, kept as the line they were
                  ;; typed as (see `parse-labels').
-                 (labels (labels-text (html-escape (or (assoc-ref body
-                                                                   "labels")
-                                                       ""))))
+                 (labels (labels-text (or (assoc-ref body "labels") "")))
                  (ticket-status (submitted-status statuses
                                                   (assoc-ref body
                                                              "ticket-status")))
@@ -1191,7 +1187,7 @@ history entry that says somebody is better than one that fails to render."
                                                                #:token-name 'x-bewaking-lucidplan)
                                              ""))
                               (body unquote
-                                    (html-escape text))
+                                    text)
                               (created-at unquote
                                           (current-time)))))
                 (insert-ticket-comment comment-repo
@@ -1647,9 +1643,7 @@ history entry that says somebody is better than one that fails to render."
                  (project (get-project-by-human-id project-repo human-id))
                  (filter-repo (make-sqlite-saved-filter-repository rc))
                  (body (alist-from-url-encoded-body (rc-body rc)))
-                 (name (html-escape (string-trim-both (or (assoc-ref body
-                                                                     "name")
-                                                           ""))))
+                 (name (string-trim-both (or (assoc-ref body "name") "")))
                  (query (or (assoc-ref body "query") "")))
             (when (and project
                        (not (string-null? name))

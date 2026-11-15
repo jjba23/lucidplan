@@ -999,6 +999,13 @@ is the reason migrations are applied by ~maak migrate~ and not by hand: a
 database migrated by hand has no ledger, and its schema can no longer be compared
 with the migrations.
 
+Text is stored as it was typed rather than as HTML.  A ticket's title, a
+description, a comment, a label and every other piece of prose go into the
+database as the reader wrote them, and the page writer escapes them once, when
+the page is drawn; the API and the mail templates read plain text too.  An
+instance upgraded from a release before 1.16.0 runs ~maak migrate~ once to
+decode the entities older versions stored.
+
 An existing deployment that was set up before LucidPlan used mutastructura has
 one of those unledgered databases. Bring it up to date once, by hand, by
 recording what is already applied -- the migration files are not re-run, and

@@ -34,13 +34,13 @@
                                ((equal? #f
                                         (get-from-qstr rc "search"))
                                 #f)
-                               (else (html-escape (get-from-qstr rc "search")))))
+                               (else (get-from-qstr rc "search"))))
                 (project-repo (make-sqlite-project-repository rc))
                 (proj (cond
                         ((nil? user-search)
                          (get-projects project-repo))
                         (else (search-projects project-repo
-                                               (html-escape user-search))))))
+                                               user-search)))))
            (response-emit (:mime rc
                                  (html-from-projects (:i18n rc)
                                                      #:projects proj
@@ -103,8 +103,8 @@
       (lambda (rc)
         (define (do-new)
           (let* ((body (alist-from-url-encoded-body (rc-body rc)))
-                 (title (html-escape (assoc-ref body "title")))
-                 (description (html-escape (assoc-ref body "description")))
+                 (title (assoc-ref body "title"))
+                 (description (assoc-ref body "description"))
                  (url (uri-encode (assoc-ref body "url")))
                  (vcs-url (uri-encode (assoc-ref body "vcs-url")))
                  (human-id (assoc-ref body "human-id"))
@@ -181,8 +181,8 @@
       (lambda (rc)
         (define (do-edit)
           (let* ((body (alist-from-url-encoded-body (rc-body rc)))
-                 (title (html-escape (assoc-ref body "title")))
-                 (description (html-escape (assoc-ref body "description")))
+                 (title (assoc-ref body "title"))
+                 (description (assoc-ref body "description"))
                  (url (uri-encode (assoc-ref body "url")))
                  (vcs-url (uri-encode (assoc-ref body "vcs-url")))
                  (human-id (assoc-ref body "human-id"))
