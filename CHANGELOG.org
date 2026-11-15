@@ -26,6 +26,17 @@ maak migrate
 
 ----------------------------------
 
+* v1.16.1 (2026-11-15)
+
+A `style` attribute is not a `style` element.  The pass that leaves script and
+style bodies unescaped looked at the name alone, so a page carrying an inline
+`style` attribute -- the home page among them -- asked the writer to walk a
+string as if it were a list of children, and every such request failed with a
+500.  The pass now knows where attributes live, skips them, and leaves only
+real `script` and `style` elements raw.
+
+The dotted attribute the home page uses is a test now.
+
 * v1.16.0 (2026-11-15)
 
 Four things a board and a backlog were missing, and a handful that had stopped
