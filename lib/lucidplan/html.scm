@@ -349,18 +349,24 @@ large soft gradients from banding on a wide screen."
 ;; `script' and `style' hold code and CSS, not markup, and are written out as
 ;; they are: an escaped `<` in a script is a script with a syntax error.  The
 ;; framework's own components carry such bodies, so they are recognised here
-;; rather than at every caller.
+;; rather than at every caller.  An attribute lives under `@' and may be dotted
+;; -- `(style . "--x: 1")' -- so it is neither an element nor a list to walk.
 (define (raw-text-bodies tree)
-  (if (pair? tree)
-      (if (and (symbol? (car tree))
-               (memq (car tree) '(script style)))
-          (cons (car tree)
-                (map (lambda (child)
-                       (if (string? child) (raw-html child)
-                           (raw-text-bodies child)))
-                     (cdr tree)))
-          (map raw-text-bodies tree))
-      tree))
+  (define (walk node attribute?)
+    (if (and (pair? node) (list? node))
+        (let ((head (car node)))
+          (cond
+           ((eq? head '@)
+            (cons head (map (lambda (entry) (walk entry #t)) (cdr node))))
+           ((and (not attribute?) (memq head '(script style)))
+            (cons head
+                  (map (lambda (child)
+                         (if (string? child) (raw-html child)
+                             (walk child #f)))
+                       (cdr node))))
+           (else (map (lambda (child) (walk child attribute?)) node))))
+        node))
+  (walk tree #f))
 
 (define-public (render-page tree)
   "Serialize the SXML @var{tree} of a whole page to an HTML string.

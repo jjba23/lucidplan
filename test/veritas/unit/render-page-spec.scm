@@ -33,6 +33,11 @@
                (assert-equal #:name "a child selector in a style stays a selector"
                              #:expect "<style>.a > .b { color: red; }</style>"
                              #:got (render-page '(style ".a > .b { color: red; }"))))
+         (test "a style attribute stays an attribute"
+               (assert-equal #:name "a dotted style attribute is written as it is"
+                             #:expect "<div style=\"color: red\">x</div>"
+                             #:got (render-page '(div (@ (style . "color: red"))
+                                                       "x"))))
          (test "org prose is markup already"
                (assert-equal #:name "org prose keeps the markup org made"
                              #:expect #t
