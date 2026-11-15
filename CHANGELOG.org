@@ -26,11 +26,7 @@ maak migrate
 
 ----------------------------------
 
-* v1.15.5 (2026-11-12)
-
-- Builds against the channels this project builds against: the jointhefreeworld collection at v1.0.4, and Guix master `3b4e873`.
-
-* Unreleased
+* v1.16.0 (2026-11-15)
 
 Four things a board and a backlog were missing, and a handful that had stopped
 working.
@@ -232,6 +228,23 @@ A file uploaded before this change is read from the directory it was written to
 the first time it is downloaded, stored in its row, and never read from a file
 again -- the move migrates itself, one file at a time, instead of depending on
 somebody remembering to run a task first.
+
+**What a reader typed, stored as typed.** A ticket's title, a description, a
+comment, a label, a project's or an epic's prose and every other piece of text
+are now stored exactly as they were typed. Escaping happens once, when a page
+is written, instead of on the way into the database and back: a description can
+mention ~https://example.org/a/b~ without being stored as ~https:&sol;&sol;~,
+the API answers the text a reader wrote, and the mail a change sends no longer
+has to undo the storage to read it. Text that was already stored plainly -- a
+time entry's comment, an uploaded file's name -- is escaped with the rest of the
+page, which is where it was always meant to be escaped.
+
+~maak migrate~ applies the one-shot migration that decodes what older versions
+stored, in a single transaction over every column that was written escaped.
+
+* v1.15.5 (2026-11-12)
+
+- Builds against the channels this project builds against: the jointhefreeworld collection at v1.0.4, and Guix master `3b4e873`.
 
 * v1.15.4 (2026-11-10)
 
