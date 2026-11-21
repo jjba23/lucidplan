@@ -3,6 +3,8 @@
 ;; SPDX-License-Identifier: MIT
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
+;;; Commentary:
+;;;
 ;;; ===== What LucidPlan tells its people, and who it tells =====
 
 ;;; A change somebody made is worth a word to the people it concerns, and the
@@ -26,6 +28,18 @@
 ;;; The address is what makes a person reachable, so a user with no address
 ;;; is passed over rather than counted, and an address is written to once
 ;;; however many times it comes up.
+;;;
+;;; ```mermaid
+;;; flowchart LR
+;;;   ticket["a ticket is written"] --> notify["notify-new-ticket!"]
+;;;   notify --> people["the audience: past assignees, the assignee and the author"]
+;;;   notify --> message["the lucidplan-new-ticket template and its fields"]
+;;;   people --> mail["(lucidplan mail) send-email!"]
+;;;   message --> mail
+;;;   mail --> pingwing["pingwing, retried until it takes it"]
+;;; ```
+;;;
+;;; Code:
 
 (define-module (lucidplan notifications)
   #:declarative? #t

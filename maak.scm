@@ -7,6 +7,8 @@
   #:declarative? #t
   #:use-module (maak maak)
   #:use-module ((ice-9 rdelim) #:select (read-line))
+  ;; `scandir' is what `maak diagrams' lists the mermaid sources with.
+  #:use-module (ice-9 ftw)
   #:use-module (ice-9 regex)
   #:use-module (ice-9 string-fun)
   #:use-module (srfi srfi-1))
@@ -19,6 +21,25 @@
 
 (define deploy-dir
   "/srv/http/jointhefreeworld.org")
+
+;; The stylesheet the API reference is read in, served by the same host the
+;; manual is published to.
+(define api-docs-css-url
+  "https://jointhefreeworld.org/static/css/jointhefreeworld.css")
+
+;; The library, as dokgen is handed it.  dokgen names a module relative to the
+;; parent of the root it is given, so the root is the directory the modules sit
+;; in -- `(lucidplan domain ticket)' is `lib/lucidplan/domain/ticket.scm' -- and
+;; not the project root.  The Artanis web layer under `app/' is named from the
+;; project root instead, and is therefore not part of this chapter.
+(define library-root
+  "./lib/lucidplan")
+
+;; Beside the documentation, where `maak docs' puts the empty `(lucidplan env)'
+;; a checkout that keeps no `env.scm' is read with.  The generator is given this
+;; on its load path, so what it looks for is the run's, not the tree's.
+(define docs-load-path-dir
+  "doc/load-path")
 
 ;; The file where the Lucidplan DB is located.
 (define lucidplan-db
@@ -265,6 +286,88 @@ Args: update? represents whether we should update a template or create a new one
                                      "--eval" (~ "'~s'"
                                                  emacs-lisp-manual-publish-cmd))
                                #:verbose? #t))
+
+(define (docs)
+  "Generate the library's API reference and render it as HTML.
+
+The reference is extracted from the loaded modules by guile-dokgen, so a name a
+caller can reach is a name the reference documents, with the docstring the
+module gives it.  What is documented is the library -- the domain, the storage
+and the services under `lib/lucidplan' -- rather than the Artanis web layer,
+whose controllers and views are named from the project root and answer a
+request rather than being called by one.
+
+The modules are loaded rather than read, so what they import has to be
+findable, and `(lucidplan env)' is the one thing that is not: a deployment
+keeps its keys in an `env.scm' at the root of its checkout, and the repository
+holds no such file.  Nothing in the reference needs the keys, so the run below
+is given an empty module of that name beside the documentation to read -- the
+stub is a stand-in for a deployment's file, not a second answer to what a
+deployment's settings are.
+
+Beside the Texinfo dokgen writes the stylesheet and the script the page is read
+with, and a directory of diagrams for the commentaries that carry one; Texinfo
+copies neither, so both are put beside the page that points at them."
+  (delete-file-recursively "doc")
+  ;; The empty `(lucidplan env)' the run reads when the checkout keeps no
+  ;; `env.scm'.  It is written under `doc/', which this task deletes first, so
+  ;; it is a file of the run rather than of the tree.
+  (let ((stub (~ "~a/lucidplan/env.scm" docs-load-path-dir)))
+    (unless (file-exists? stub)
+      (mkdir-p (~ "~a/lucidplan" docs-load-path-dir))
+      (call-with-output-file stub
+        (lambda (port)
+          (display ";; Written by `maak docs': see the docs task in maak.scm.\n"
+                   port)
+          (display "(define-module (lucidplan env))\n" port)))))
+  (time-machine-manifest-shell
+   (list "dokgen" "api"
+         "--destination" "doc/api"
+         library-root)
+   #:env (list (~ "GUILE_LOAD_PATH=lib:~a" docs-load-path-dir))
+   #:verbose? #t)
+  (mkdir-p "doc/api-dist")
+  ;; `-I doc/api' is what finds the diagrams beside the chapter, and the head
+  ;; below points the pages at the stylesheet and the script dokgen writes
+  ;; there.  `--no-split' keeps the reference one page.
+  (time-machine-manifest-shell
+   (list "texi2any" "-v" "--html" "--no-split"
+         (~ "--css-ref=~a" api-docs-css-url)
+         "-I" "doc/api"
+         "-c" (shell-quote
+               (string-append
+                "EXTRA_HEAD="
+                "<link rel=\"stylesheet\" href=\"dokgen.css\">"
+                "<script src=\"dokgen.js\" defer></script>"))
+         "-o" "doc/api-dist/index.html"
+         "./doc/api/index.texi")
+   #:verbose? #t)
+  (for-each (lambda (asset)
+              (when (file-exists? (~ "doc/api/~a" asset))
+                (cp (~ "doc/api/~a" asset) "doc/api-dist"
+                    #:force? #t #:verbose? #t)))
+            '("dokgen.css" "dokgen.js"))
+  (when (file-exists? "doc/api/diagrams")
+    (cp "doc/api/diagrams" "doc/api-dist" #:force? #t #:verbose? #t)))
+
+(define (diagrams)
+  "Render every mermaid source under resources/diagrams to the SVG beside it.
+
+The images are committed, because the manual shows them and a checkout should
+read without a renderer installed; this task is how they are made again after a
+source changes.  The reference under `doc/api' carries its own diagrams, drawn
+from the modules' commentaries by `maak docs'."
+  (for-each
+   (lambda (name)
+     (let* ((source (in-vicinity "resources/diagrams" name))
+            (image (string-append (string-drop-right source 4) ".svg")))
+       (run (list "mmdc" "-i" source "-o" image
+                  "--backgroundColor" "transparent")
+            #:verbose? #t)))
+   (scandir "resources/diagrams"
+            (lambda (name)
+              (and (not (member name '("." "..")))
+                   (string-suffix? ".mmd" name))))))
 
 (define (deploy)
   "Deploy the project's documentation."

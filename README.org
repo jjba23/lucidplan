@@ -691,6 +691,16 @@ credentials, see [[#configuring-the-instance][Configuring the instance]]) writes
 ticket is created in it -- the news that a board moved is worth having even when
 nobody is looking at it.
 
+#+attr_html: :width 720 :alt A new ticket's path from the write that starts it to the notice pingwing takes
+[[file:resources/diagrams/new-ticket-notification.svg]]
+
+The figure is the whole of it, and the rest of this section says each step in
+words: the audience and the message are both built by ~(lucidplan
+notifications)~, and the handing over is ~(lucidplan mail)~'s.  The figure's
+source is =resources/diagrams/new-ticket-notification.mmd=, rendered with =maak
+diagrams=; =maak docs= generates the library's API reference from the modules
+themselves, with the diagrams their commentaries carry.
+
 Who hears it is everyone who takes part in the project: every user the project
 has assigned a ticket to, together with the ticket's own assignee and the person
 who opened it. LucidPlan keeps no membership list, so participation is read from

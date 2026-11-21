@@ -4,6 +4,7 @@
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
 (use-modules (gnu)
+             (gnu packages)
              (guix utils)
              (guix git-download)
              (guix download)
@@ -280,6 +281,10 @@ SHA256 checksums are tracked in a @code{migrations_history} table.")
                           guile-gcrypt
                           watchexec
                           guile-orgwebalchemy
+                          ;; The reference `maak docs' generates is written by
+                          ;; guile-dokgen, which comes from the
+                          ;; jointhefreeworld channel rather than from Guix.
+                          (specification->package "guile-dokgen")
                           sqlite
                           emacs-no-x
                           glibc-locales

@@ -1,0 +1,7 @@
+flowchart LR
+  ticket["a ticket is written"] --> notify["notify-new-ticket!"]
+  notify --> people["the audience: past assignees, the assignee and the author"]
+  notify --> message["the lucidplan-new-ticket template and its fields"]
+  people --> mail["(lucidplan mail) send-email!"]
+  message --> mail
+  mail --> pingwing["pingwing, retried until it takes it"]
