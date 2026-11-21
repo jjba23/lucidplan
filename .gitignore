@@ -10,3 +10,6 @@ en-GB.html
 env.scm
 .nrepl-port
 README.html
+
+# Generated API reference and its rendered output.
+doc/
