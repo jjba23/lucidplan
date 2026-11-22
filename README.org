@@ -12,6 +12,8 @@
 #+attr_html: :width 160 :alt LucidPlan logo
 [[file:logo.svg]]
 
+- 📖 *API reference:* [[https://jointhefreeworld.org/api-docs/lucidplan/index.html][LucidPlan API reference]]
+
 /free and open project management for everyone/
 
 LucidPlan is a project management system for teams of all sizes and all kinds
