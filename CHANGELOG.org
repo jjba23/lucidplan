@@ -26,6 +26,12 @@ maak migrate
 
 ----------------------------------
 
+* v1.16.8 (2026-11-26)
+
+**Changed.** The pinned Guix channel carries =guile-dokgen= 0.12.0: the
+published API reference folds the source behind each definition into a panel a
+reader opens, and reads on a quieter page with translucent surfaces.
+
 * v1.16.4 (2026-11-21)
 
 - The API reference is rendered with Texinfo 7.3, so dokgen's stylesheet
