@@ -26,6 +26,32 @@ maak migrate
 
 ----------------------------------
 
+* v1.17.0 (2026-11-27)
+
+**Added.** Every menu in the interface is drawn by the page rather than by the
+platform.  A =<select>= is still the control -- the value, the change event,
+form submission, and the platform's own popup for a reader whose script did not
+load -- and =pub/js/lp-select.js= draws a combobox button and a listbox of rows
+over it: the keys a combobox answers (=Up=, =Down=, =Home=, =End=, =Enter=,
+=Space=, =Escape=, =Tab=, and type-ahead), the row a reader is on named with
+=aria-activedescendant=, the field's own label and description carried over, and
+a menu that opens on the side of the control with room for it.  The control
+takes the width the native one had, so no field moves when a menu is drawn.
+=project-go-picker= is the markup the header's *go to* menu is built from, and
+is exported.
+
+**Fixed.** The header's *go to* menu offered entries that could not be read: a
+row carried the page's own ink while the popup around it was the platform's, so
+on a dark page a dark row met a dark list.  Rows carry no ink of their own now;
+the menu's face and ink are named once per theme in
+=pub/css/lucidplan-luxe.css=, and the face is opaque, so a row is never read
+through the tinted bar behind it.
+
+**Changed.** The drawn control reads the =<select>= it was built from rather
+than the other way round, so a value a page puts back -- a ticket field whose
+change the server refused -- is drawn again as well as stored; =tickets.js= says
+=input= where it used to only assign.
+
 * v1.16.8 (2026-11-26)
 
 **Changed.** The pinned Guix channel carries =guile-dokgen= 0.12.0: the
