@@ -257,7 +257,15 @@ async function updateTicketField(select, project, humanId, field) {
                     `${wrapper ? wrapper.dataset.fieldLabel : field}: ${chosenOptionLabel(select)}`);
   } catch (err) {
     console.error('Failed to change the ticket:', err);
-    if (previous !== undefined) select.value = previous;
+
+    if (previous !== undefined) {
+      select.value = previous;
+      // The drawn control reads the select rather than the other way round, so
+      // putting the value back is said out loud: `input' is what the control
+      // listens for, and nothing else on the page answers it.
+      select.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
     showQuietNotice(template ? template.dataset.failedLabel : '',
                     template ? template.dataset.failedBody : '');
   }

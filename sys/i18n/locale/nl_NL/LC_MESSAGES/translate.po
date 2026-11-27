@@ -1,6 +1,6 @@
 # Dutch translations for lucidplan package.
 # lucidplan - free and open project management for everyone
-# 
+#
 # SPDX-License-Identifier: MIT
 # Copyright © Josep Bigorra <jjbigorra@gmail.com>
 #
@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lucidplan\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-22 19:46+0200\n"
+"POT-Creation-Date: 2026-11-27 22:08+0100\n"
 "PO-Revision-Date: 2026-10-12 20:00+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -18,109 +18,233 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: app/controllers/login.scm:49
+#: app/controllers/login.scm:37 app/controllers/login.scm:49
 msgid "that email and password did not match, please try again"
 msgstr ""
 
-#: app/controllers/login.scm:53
+#: app/controllers/login.scm:41 app/controllers/login.scm:53
 msgid "your password was reset, please sign in with the new one"
 msgstr ""
 
-#: app/controllers/login.scm:57
+#: app/controllers/login.scm:45 app/controllers/login.scm:57
 msgid "that password reset link is no longer valid, please request a new one"
 msgstr ""
 
-#: app/controllers/login.scm:61
+#: app/controllers/login.scm:49 app/controllers/login.scm:61
 msgid "if that account exists, a reset link is on its way to its email address"
 msgstr ""
 
-#: app/controllers/me.scm:92
+#: app/controllers/me.scm:80 app/controllers/me.scm:92
 msgid "the account was created and an invite is on its way"
 msgstr ""
 
-#: app/controllers/me.scm:94
+#: app/controllers/me.scm:82 app/controllers/me.scm:94
 msgid "the invite was sent again"
 msgstr ""
 
-#: app/controllers/me.scm:96
+#: app/controllers/me.scm:84 app/controllers/me.scm:96
 msgid "the account was updated"
 msgstr ""
 
-#: app/controllers/me.scm:98
+#: app/controllers/me.scm:86 app/controllers/me.scm:98
 msgid "the account was deleted"
 msgstr ""
 
-#: app/controllers/me.scm:101
+#: app/controllers/me.scm:89 app/controllers/me.scm:101
 msgid ""
 "the account was saved, but the invite email could not be delivered; try "
 "sending it again"
 msgstr ""
 
-#: app/controllers/me.scm:164
+#: app/controllers/me.scm:152 app/controllers/me.scm:164
 msgid "the two passwords did not match, please try again"
 msgstr ""
 
-#: app/controllers/me.scm:171
+#: app/controllers/me.scm:159 app/controllers/me.scm:171
 msgid ""
 "that password was too weak, aim for a longer passphrase mixing words, case, "
 "digits and symbols"
 msgstr ""
 
-#: app/controllers/me.scm:346
+#: app/controllers/me.scm:334 app/controllers/me.scm:346
 msgid "a username and an email are both needed to create an account"
 msgstr ""
 
-#: app/controllers/me.scm:349
+#: app/controllers/me.scm:337 app/controllers/me.scm:349
 msgid "an account with that email already exists"
 msgstr ""
 
-#: app/views/about.scm:54 app/views/error.scm:107 app/views/error.scm:110
-#: app/views/index.scm:75 app/views/index.scm:153 app/views/index.scm:307
+#: app/controllers/poker.scm:547
+msgid ""
+"nothing was written: the room agreed on no single card, so there is no "
+"number to put on a ticket"
+msgstr ""
+
+#: app/controllers/poker.scm:550
+msgid ""
+"nothing was written: the cards are still face down, and a number nobody has "
+"seen is not an answer"
+msgstr ""
+
+#: app/controllers/poker.scm:553
+msgid "nothing was written: that project has no ticket with that number"
+msgstr ""
+
+#: app/controllers/poker.scm:555
+msgid "nothing was written: this table is closed"
+msgstr ""
+
+#: app/controllers/poker.scm:556
+msgid "nothing was written"
+msgstr ""
+
+#: app/views/about.scm:42 app/views/about.scm:54 app/views/error.scm:98
+#: app/views/error.scm:107 app/views/error.scm:110 app/views/index.scm:75
+#: app/views/index.scm:153 app/views/index.scm:157 app/views/index.scm:307
+#: app/views/index.scm:347
 msgid "browse projects"
 msgstr "projecten bekijken"
 
-#: app/views/about.scm:55 lib/lucidplan/html.scm:76
+#: app/views/about.scm:43 app/views/about.scm:55 lib/lucidplan/html.scm:74
+#: lib/lucidplan/html.scm:76
 msgid "source code"
 msgstr ""
 
-#: app/views/about.scm:58 lib/lucidplan/html.scm:79
+#: app/views/about.scm:46 app/views/about.scm:58 lib/lucidplan/html.scm:77
+#: lib/lucidplan/html.scm:79
 msgid "manual"
 msgstr ""
 
-#: app/views/about.scm:61
+#: app/views/about.scm:49 app/views/about.scm:61
 msgid "license"
 msgstr "licentie"
 
-#: app/views/about.scm:76
+#: app/views/about.scm:67 app/views/about.scm:76
 msgid "write to us at"
 msgstr ""
 
-#: app/views/about.scm:83 app/views/index.scm:314 lib/lucidplan/html.scm:73
-#: lib/lucidplan/html.scm:526
+#: app/views/about.scm:74 app/views/about.scm:83 app/views/about.scm:89
+#: app/views/index.scm:314 app/views/index.scm:358 lib/lucidplan/html.scm:71
+#: lib/lucidplan/html.scm:73 lib/lucidplan/html.scm:526
+#: lib/lucidplan/html.scm:738
 msgid "about"
 msgstr ""
 
-#: app/views/about.scm:93
+#: app/views/about.scm:93 app/views/about.scm:94
 msgid "About"
 msgstr ""
 
-#: app/views/error.scm:106 app/views/error.scm:107
+#: app/views/epics.scm:106 app/views/epics.scm:128 app/views/projects.scm:61
+msgid "epics"
+msgstr ""
+
+#: app/views/epics.scm:134 app/views/kanban.scm:275 app/views/kanban.scm:302
+#: app/views/kanban.scm:356 app/views/projects.scm:53 app/views/scrum.scm:678
+msgid "backlog"
+msgstr "backlog"
+
+#: app/views/epics.scm:139
+msgid "board"
+msgstr ""
+
+#: app/views/epics.scm:149 app/views/epics.scm:320
+#, fuzzy
+msgid "new epic"
+msgstr "nieuw ticket"
+
+#: app/views/epics.scm:169
+msgid ""
+"An epic is one body of work: a group of tickets that is finished when they "
+"are."
+msgstr ""
+
+#: app/views/epics.scm:172
+msgid ""
+"Nothing is grouped yet. Open a ticket and name the epic it belongs to, or "
+"start one from here."
+msgstr ""
+
+#: app/views/epics.scm:214
+msgid "no tickets in this epic yet"
+msgstr ""
+
+#: app/views/epics.scm:222 app/views/me.scm:182 app/views/me.scm:186
+#: app/views/me.scm:194 app/views/me.scm:390 app/views/me.scm:478
+#: app/views/me.scm:490 app/views/projects.scm:90 app/views/tickets.scm:692
+msgid "edit"
+msgstr "bewerken"
+
+#: app/views/epics.scm:235 app/views/me.scm:167 app/views/me.scm:171
+#: app/views/me.scm:179 app/views/projects.scm:104 app/views/projects.scm:115
+#: app/views/scrum.scm:445 app/views/scrum.scm:797 app/views/tickets.scm:382
+#: app/views/tickets.scm:485 app/views/tickets.scm:707
+msgid "delete"
+msgstr "verwijderen"
+
+#: app/views/epics.scm:286
+msgid "empty"
+msgstr ""
+
+#: app/views/epics.scm:291
+msgid "of"
+msgstr ""
+
+#: app/views/epics.scm:319
+#, fuzzy
+msgid "edit epic"
+msgstr "ticket bewerken"
+
+#: app/views/epics.scm:333 app/views/projects.scm:353
+#: app/views/projects.scm:364 app/views/projects.scm:518
+#: app/views/tickets.scm:867 app/views/tickets.scm:1081
+#: app/views/tickets.scm:1586 app/views/tickets.scm:1771
+#: app/views/tickets.scm:2889
+msgid "title"
+msgstr "titel"
+
+#: app/views/epics.scm:337
+#, fuzzy
+msgid "short name"
+msgstr "gebruikersnaam"
+
+#: app/views/epics.scm:345
+msgid ""
+"The name this epic is named by in an address -- letters, digits and dashes "
+"-- the way a number names a ticket."
+msgstr ""
+
+#: app/views/epics.scm:346 app/views/scrum.scm:491
+msgid "what it is for"
+msgstr ""
+
+#: app/views/epics.scm:354
+#, fuzzy
+msgid "save epic"
+msgstr "project opslaan"
+
+#: app/views/epics.scm:362 app/views/projects.scm:386
+#: app/views/projects.scm:417 app/views/projects.scm:571
+msgid "cancel"
+msgstr "annuleren"
+
+#: app/views/error.scm:95 app/views/error.scm:106 app/views/error.scm:107
 msgid "sign in"
 msgstr "inloggen"
 
-#: app/views/error.scm:154 app/views/error.scm:170
+#: app/views/error.scm:154 app/views/error.scm:158 app/views/error.scm:170
 msgid "back to the top"
 msgstr "terug naar boven"
 
-#: app/views/index.scm:40 app/views/index.scm:125
+#: app/views/index.scm:40 app/views/index.scm:125 app/views/index.scm:132
 msgid "Welcome to LucidPlan"
 msgstr "Welkom bij LucidPlan"
 
-#: app/views/index.scm:43 app/views/index.scm:129 lib/lucidplan/html.scm:65
+#: app/views/index.scm:43 app/views/index.scm:129 app/views/index.scm:136
+#: lib/lucidplan/html.scm:63 lib/lucidplan/html.scm:65
 msgid "free and open project management for everyone"
 msgstr "vrij en open projectbeheer voor iedereen"
 
-#: app/views/index.scm:63 app/views/index.scm:140
+#: app/views/index.scm:63 app/views/index.scm:140 app/views/index.scm:144
 msgid ""
 "Take control of your projects with LucidPlan, the open and flexible project "
 "management solution built for teams of every shape and size."
@@ -128,7 +252,7 @@ msgstr ""
 "Neem de regie over je projecten met LucidPlan, de open en flexibele "
 "oplossing voor projectbeheer, gemaakt voor teams van elke vorm en grootte."
 
-#: app/views/index.scm:66 app/views/index.scm:144
+#: app/views/index.scm:66 app/views/index.scm:144 app/views/index.scm:148
 msgid ""
 "We believe powerful tools shouldn't be complicated or restricted, so "
 "LucidPlan keeps your workflow simple and approachable."
@@ -136,85 +260,121 @@ msgstr ""
 "Wij vinden dat krachtig gereedschap niet ingewikkeld of beperkt hoort te "
 "zijn, dus LucidPlan houdt je werkwijze eenvoudig en toegankelijk."
 
-#: app/views/index.scm:78 app/views/index.scm:157 app/views/index.scm:312
+#: app/views/index.scm:78 app/views/index.scm:157 app/views/index.scm:161
+#: app/views/index.scm:312 app/views/index.scm:352
 msgid "start a project"
 msgstr "een project starten"
 
-#: app/views/index.scm:87 app/views/index.scm:166 app/views/projects.scm:292
+#: app/views/index.scm:87 app/views/index.scm:166 app/views/index.scm:169
+#: app/views/projects.scm:292 app/views/projects.scm:434
 #: lib/lucidplan/html.scm:301 lib/lucidplan/html.scm:502
+#: lib/lucidplan/html.scm:725
 msgid "projects"
 msgstr "projecten"
 
-#: app/views/index.scm:89 app/views/index.scm:168
+#: app/views/index.scm:89 app/views/index.scm:168 app/views/index.scm:171
 msgid "workflow columns"
 msgstr "werkstroomkolommen"
 
-#: app/views/index.scm:292
+#: app/views/index.scm:117
+msgid "welcome"
+msgstr ""
+
+#: app/views/index.scm:292 app/views/index.scm:332
 msgid "ready to plan something?"
 msgstr ""
 
-#: app/views/index.scm:296
+#: app/views/index.scm:296 app/views/index.scm:336
 msgid ""
 "Start a project in seconds, or read more about what LucidPlan is and how "
 "this instance is run."
 msgstr ""
 
-#: app/views/kanban.scm:275 app/views/kanban.scm:302
-msgid "backlog"
-msgstr "backlog"
-
-#: app/views/kanban.scm:283 app/views/kanban.scm:310 app/views/tickets.scm:698
-#: app/views/tickets.scm:877 app/views/tickets.scm:975
+#: app/views/kanban.scm:283 app/views/kanban.scm:310 app/views/kanban.scm:400
+#: app/views/tickets.scm:698 app/views/tickets.scm:877
+#: app/views/tickets.scm:975 app/views/tickets.scm:1543
+#: app/views/tickets.scm:1661
 msgid "new ticket"
 msgstr "nieuw ticket"
 
-#: app/views/login.scm:44 app/views/me.scm:148 app/views/me.scm:156
-#: app/views/me.scm:276 app/views/me.scm:356 app/views/me.scm:374
-#: app/views/me.scm:456
+#: app/views/kanban.scm:369 app/views/scrum.scm:459 app/views/scrum.scm:470
+#: app/views/tickets.scm:1524
+msgid "sprints"
+msgstr ""
+
+#: app/views/kanban.scm:377 app/views/scrum.scm:811 app/views/scrum.scm:823
+#: app/views/tickets.scm:1534
+msgid "milestones"
+msgstr ""
+
+#: app/views/kanban.scm:386
+msgid "one board"
+msgstr ""
+
+#: app/views/kanban.scm:387
+msgid "swimlanes by epic"
+msgstr ""
+
+#: app/views/kanban.scm:434 app/views/tickets.scm:196 app/views/tickets.scm:554
+msgid "no epic"
+msgstr ""
+
+#: app/views/kanban.scm:441 app/views/scrum.scm:395 app/views/scrum.scm:785
+#, fuzzy
+msgid "tickets"
+msgstr "nieuw ticket"
+
+#: app/views/login.scm:44 app/views/login.scm:49 app/views/me.scm:144
+#: app/views/me.scm:148 app/views/me.scm:156 app/views/me.scm:276
+#: app/views/me.scm:356 app/views/me.scm:362 app/views/me.scm:374
+#: app/views/me.scm:444 app/views/me.scm:456
 msgid "email"
 msgstr "e-mail"
 
-#: app/views/login.scm:49 app/views/login.scm:50
+#: app/views/login.scm:49 app/views/login.scm:50 app/views/login.scm:55
 msgid "password"
 msgstr "wachtwoord"
 
-#: app/views/login.scm:54 app/views/login.scm:56 app/views/login.scm:82
-#: app/views/me.scm:134 app/views/me.scm:142 lib/lucidplan/html.scm:259
-#: lib/lucidplan/html.scm:456
+#: app/views/login.scm:54 app/views/login.scm:56 app/views/login.scm:61
+#: app/views/login.scm:82 app/views/login.scm:86 app/views/login.scm:111
+#: app/views/me.scm:130 app/views/me.scm:134 app/views/me.scm:142
+#: lib/lucidplan/html.scm:259 lib/lucidplan/html.scm:456
+#: lib/lucidplan/html.scm:718
 msgid "login"
 msgstr "inloggen"
 
-#: app/views/login.scm:68 app/views/login.scm:69
+#: app/views/login.scm:68 app/views/login.scm:69 app/views/login.scm:73
 msgid "account to reset (email)"
 msgstr "account om te herstellen (e-mail)"
 
-#: app/views/login.scm:75 app/views/login.scm:77 app/views/me.scm:249
-#: app/views/me.scm:329
+#: app/views/login.scm:75 app/views/login.scm:77 app/views/login.scm:81
+#: app/views/me.scm:249 app/views/me.scm:317 app/views/me.scm:329
 msgid "reset"
 msgstr "herstellen"
 
-#: app/views/login.scm:88 app/views/login.scm:110
+#: app/views/login.scm:88 app/views/login.scm:110 app/views/login.scm:121
 msgid "login to lucidplan"
 msgstr "inloggen bij LucidPlan"
 
-#: app/views/login.scm:93 app/views/login.scm:115 app/views/me.scm:131
-#: app/views/me.scm:139 app/views/me.scm:249
+#: app/views/login.scm:93 app/views/login.scm:115 app/views/login.scm:128
+#: app/views/me.scm:127 app/views/me.scm:131 app/views/me.scm:139
+#: app/views/me.scm:237 app/views/me.scm:249
 msgid "reset password"
 msgstr "wachtwoord herstellen"
 
-#: app/views/me.scm:61 app/views/me.scm:66
+#: app/views/me.scm:54 app/views/me.scm:61 app/views/me.scm:66
 msgid "my unique id:"
 msgstr "mijn unieke id:"
 
-#: app/views/me.scm:71 app/views/me.scm:76
+#: app/views/me.scm:64 app/views/me.scm:71 app/views/me.scm:76
 msgid "my permissions (in database):"
 msgstr "mijn rechten (in de database):"
 
-#: app/views/me.scm:82 app/views/me.scm:87
+#: app/views/me.scm:75 app/views/me.scm:82 app/views/me.scm:87
 msgid "current session permissions (in token):"
 msgstr "rechten van deze sessie (in het token):"
 
-#: app/views/me.scm:89 app/views/me.scm:94
+#: app/views/me.scm:82 app/views/me.scm:89 app/views/me.scm:94
 msgid ""
 "tip: if your session permissions don't match the DB consider logging out and "
 "logging in again"
@@ -222,144 +382,387 @@ msgstr ""
 "tip: komen de rechten van je sessie niet overeen met de database, log dan "
 "uit en weer in"
 
-#: app/views/me.scm:95 app/views/me.scm:101
+#: app/views/me.scm:89 app/views/me.scm:95 app/views/me.scm:101
 msgid "logged in until"
 msgstr "ingelogd tot"
 
-#: app/views/me.scm:113 lib/lucidplan/html.scm:279 lib/lucidplan/html.scm:478
+#: app/views/me.scm:101 app/views/me.scm:113 lib/lucidplan/html.scm:279
+#: lib/lucidplan/html.scm:478 lib/lucidplan/html.scm:721
 msgid "me"
 msgstr "ik"
 
-#: app/views/me.scm:121 app/views/me.scm:129
+#: app/views/me.scm:117 app/views/me.scm:121 app/views/me.scm:129
 msgid "go to user management"
 msgstr "naar gebruikersbeheer"
 
-#: app/views/me.scm:125 app/views/me.scm:133
+#: app/views/me.scm:121 app/views/me.scm:125 app/views/me.scm:133
 msgid "logout"
 msgstr "uitloggen"
 
-#: app/views/me.scm:142 app/views/me.scm:150 app/views/me.scm:273
-#: app/views/me.scm:351 app/views/me.scm:370 app/views/me.scm:451
+#: app/views/me.scm:138 app/views/me.scm:142 app/views/me.scm:150
+#: app/views/me.scm:273 app/views/me.scm:351 app/views/me.scm:358
+#: app/views/me.scm:370 app/views/me.scm:439 app/views/me.scm:451
 msgid "username"
 msgstr "gebruikersnaam"
 
-#: app/views/me.scm:153 app/views/me.scm:161
+#: app/views/me.scm:149 app/views/me.scm:153 app/views/me.scm:161
 msgid "id"
 msgstr "id"
 
-#: app/views/me.scm:159 app/views/me.scm:167
+#: app/views/me.scm:155 app/views/me.scm:159 app/views/me.scm:167
 msgid "permissions"
 msgstr "rechten"
 
-#: app/views/me.scm:171 app/views/me.scm:179 app/views/projects.scm:115
-#: app/views/tickets.scm:382 app/views/tickets.scm:485
-msgid "delete"
-msgstr "verwijderen"
-
-#: app/views/me.scm:177 app/views/me.scm:185
+#: app/views/me.scm:173 app/views/me.scm:177 app/views/me.scm:185
 msgid "are you sure you want to delete this user?"
 msgstr "weet je zeker dat je deze gebruiker wilt verwijderen?"
 
-#: app/views/me.scm:186 app/views/me.scm:194 app/views/me.scm:390
-#: app/views/me.scm:490
-msgid "edit"
-msgstr "bewerken"
-
-#: app/views/me.scm:195 app/views/me.scm:218
-msgid "User management"
-msgstr "Gebruikersbeheer"
-
-#: app/views/me.scm:199 app/views/me.scm:233 app/views/me.scm:340
-msgid "new user"
-msgstr "nieuwe gebruiker"
-
-#: app/views/me.scm:206
+#: app/views/me.scm:194 app/views/me.scm:206
 msgid "resend invite"
 msgstr ""
 
-#: app/views/me.scm:213
+#: app/views/me.scm:195 app/views/me.scm:206 app/views/me.scm:218
+msgid "User management"
+msgstr "Gebruikersbeheer"
+
+#: app/views/me.scm:199 app/views/me.scm:221 app/views/me.scm:233
+#: app/views/me.scm:328 app/views/me.scm:340
+msgid "new user"
+msgstr "nieuwe gebruiker"
+
+#: app/views/me.scm:201 app/views/me.scm:213
 #, fuzzy
 msgid "user management"
 msgstr "Gebruikersbeheer"
 
-#: app/views/me.scm:217 app/views/me.scm:254
+#: app/views/me.scm:217 app/views/me.scm:242 app/views/me.scm:254
 msgid "Reset your password"
 msgstr "Herstel je wachtwoord"
 
-#: app/views/me.scm:220 app/views/me.scm:257
+#: app/views/me.scm:220 app/views/me.scm:245 app/views/me.scm:257
 msgid "perform a password reset for"
 msgstr "herstel het wachtwoord van"
 
-#: app/views/me.scm:238 app/views/me.scm:313
+#: app/views/me.scm:238 app/views/me.scm:301 app/views/me.scm:313
 msgid "new password"
 msgstr "nieuw wachtwoord"
 
-#: app/views/me.scm:244 app/views/me.scm:321
+#: app/views/me.scm:244 app/views/me.scm:309 app/views/me.scm:321
 msgid "confirm password"
 msgstr "wachtwoord bevestigen"
 
-#: app/views/me.scm:262 app/views/me.scm:344
+#: app/views/me.scm:262 app/views/me.scm:332 app/views/me.scm:344
 msgid "New User"
 msgstr "Nieuwe gebruiker"
 
-#: app/views/me.scm:281 app/views/me.scm:363 app/views/me.scm:380
-#: app/views/me.scm:463
+#: app/views/me.scm:281 app/views/me.scm:363 app/views/me.scm:368
+#: app/views/me.scm:380 app/views/me.scm:451 app/views/me.scm:463
 msgid "user permissions"
 msgstr "rechten van de gebruiker"
 
-#: app/views/me.scm:296 app/views/me.scm:395
-msgid "create"
-msgstr "aanmaken"
-
-#: app/views/me.scm:301
+#: app/views/me.scm:289 app/views/me.scm:301
 msgid "very weak"
 msgstr ""
 
-#: app/views/me.scm:303
+#: app/views/me.scm:291 app/views/me.scm:303
 msgid "weak"
 msgstr ""
 
-#: app/views/me.scm:305
+#: app/views/me.scm:293 app/views/me.scm:305
 msgid "fair"
 msgstr ""
 
-#: app/views/me.scm:307
+#: app/views/me.scm:295 app/views/me.scm:307
 msgid "strong"
 msgstr ""
 
-#: app/views/me.scm:309
+#: app/views/me.scm:296 app/views/me.scm:383 app/views/me.scm:395
+msgid "create"
+msgstr "aanmaken"
+
+#: app/views/me.scm:297 app/views/me.scm:309
 msgid "very strong"
 msgstr ""
 
-#: app/views/me.scm:311
+#: app/views/me.scm:299 app/views/me.scm:311
 msgid ""
 "aim for 12 or more characters, mixing words, upper and lower case, digits "
 "and symbols"
 msgstr ""
 
-#: app/views/me.scm:334 app/views/me.scm:434
+#: app/views/me.scm:334 app/views/me.scm:422 app/views/me.scm:434
 msgid "Edit User"
 msgstr "Gebruiker bewerken"
 
-#: app/views/me.scm:430
+#: app/views/me.scm:418 app/views/me.scm:430
 #, fuzzy
 msgid "edit user"
 msgstr "Gebruiker bewerken"
 
+#: app/views/poker.scm:145 app/views/poker.scm:752
+msgid "round"
+msgstr ""
+
+#: app/views/poker.scm:147 app/views/poker.scm:494
+msgid "at the table"
+msgstr ""
+
+#: app/views/poker.scm:166 app/views/poker.scm:173
+msgid "planning poker"
+msgstr ""
+
+#: app/views/poker.scm:176
+msgid ""
+"a table a team estimates at. Somebody opens one and names what is on it, "
+"everybody else takes a seat by typing their name, and each person plays a "
+"card; the cards stay face down until the table turns them over. No account "
+"is needed for any of it."
+msgstr ""
+
+#: app/views/poker.scm:183
+msgid "open a table"
+msgstr ""
+
+#: app/views/poker.scm:188 app/views/poker.scm:242
+#, fuzzy
+msgid "your name"
+msgstr "gebruikersnaam"
+
+#: app/views/poker.scm:193
+msgid "what this meeting is called"
+msgstr ""
+
+#: app/views/poker.scm:197
+msgid "the first thing to estimate"
+msgstr ""
+
+#: app/views/poker.scm:201 app/views/tickets.scm:664
+msgid "how the table estimates"
+msgstr ""
+
+#: app/views/poker.scm:214
+#, fuzzy
+msgid "open it"
+msgstr "open"
+
+#: app/views/poker.scm:215
+msgid "tables you could sit at"
+msgstr ""
+
+#: app/views/poker.scm:223
+msgid "no tables are open. Open one above and share its address with the team."
+msgstr ""
+
+#: app/views/poker.scm:235
+msgid "take a seat"
+msgstr ""
+
+#: app/views/poker.scm:238
+msgid ""
+"type the name the rest of the table should see next to your card. It does "
+"not have to be your real one, and nothing else is asked for."
+msgstr ""
+
+#: app/views/poker.scm:247
+msgid "sit down"
+msgstr ""
+
+#: app/views/poker.scm:270 app/views/poker.scm:296
+msgid "played"
+msgstr ""
+
+#: app/views/poker.scm:271 app/views/poker.scm:297
+msgid "waiting"
+msgstr ""
+
+#: app/views/poker.scm:288
+msgid "did not play"
+msgstr ""
+
+#: app/views/poker.scm:311
+msgid "what the room said"
+msgstr ""
+
+#: app/views/poker.scm:314
+msgid "nobody played a card"
+msgstr ""
+
+#: app/views/poker.scm:346
+msgid "the room agrees on"
+msgstr ""
+
+#: app/views/poker.scm:349
+msgid "the room is split between"
+msgstr ""
+
+#: app/views/poker.scm:358
+msgid "the votes ran from"
+msgstr ""
+
+#: app/views/poker.scm:364
+msgid "everybody played the same card"
+msgstr ""
+
+#: app/views/poker.scm:367
+msgid "average"
+msgstr ""
+
+#: app/views/poker.scm:387
+msgid "written onto"
+msgstr ""
+
+#: app/views/poker.scm:400
+msgid "already estimated"
+msgstr ""
+
+#: app/views/poker.scm:418
+msgid "not turned over"
+msgstr ""
+
+#: app/views/poker.scm:421
+msgid "no cards"
+msgstr ""
+
+#: app/views/poker.scm:508
+msgid "somebody has to go first"
+msgstr ""
+
+#: app/views/poker.scm:511
+msgid "play a card"
+msgstr ""
+
+#: app/views/poker.scm:514
+msgid ""
+"the cards are face down, so nobody sees what anybody chose until the table "
+"is ready. Changing your mind is allowed: play another card and it replaces "
+"the first."
+msgstr ""
+
+#: app/views/poker.scm:532
+msgid "the table"
+msgstr ""
+
+#: app/views/poker.scm:545
+msgid "vote again"
+msgstr ""
+
+#: app/views/poker.scm:547
+msgid "turn the cards over"
+msgstr ""
+
+#: app/views/poker.scm:555
+msgid "the next thing"
+msgstr ""
+
+#: app/views/poker.scm:562
+msgid "what to estimate next"
+msgstr ""
+
+#: app/views/poker.scm:566
+msgid "deal it"
+msgstr ""
+
+#: app/views/poker.scm:579
+msgid "writing it on a ticket"
+msgstr ""
+
+#: app/views/poker.scm:582
+msgid "the room agreed on"
+msgstr ""
+
+#: app/views/poker.scm:585
+msgid ""
+"a table decides, and the backlog is written down after it, so this is where "
+"the number goes onto the ticket it was estimated for."
+msgstr ""
+
+#: app/views/poker.scm:615
+msgid "write it on"
+msgstr ""
+
+#: app/views/poker.scm:623
+msgid ""
+"the ticket this table was opened for is gone, so there is nothing to write "
+"onto"
+msgstr ""
+
+#: app/views/poker.scm:634
+#, fuzzy
+msgid "which project"
+msgstr "nieuw project"
+
+#: app/views/poker.scm:649
+msgid "the ticket's number in that project"
+msgstr ""
+
+#: app/views/poker.scm:655
+#, fuzzy
+msgid "write it on the ticket"
+msgstr "ticket bewerken"
+
+#: app/views/poker.scm:659
+msgid "closing the table"
+msgstr ""
+
+#: app/views/poker.scm:662
+msgid ""
+"closing a table takes it off the list of tables somebody could walk into. "
+"What it estimated and what it decided stay readable, so the record of the "
+"meeting is not lost with it."
+msgstr ""
+
+#: app/views/poker.scm:671
+msgid "close the table"
+msgstr ""
+
+#: app/views/poker.scm:692
+msgid "← all tables"
+msgstr ""
+
+#: app/views/poker.scm:734
+msgid "estimating"
+msgstr ""
+
+#: app/views/poker.scm:747 app/views/scrum.scm:49
+msgid "closed"
+msgstr ""
+
+#: app/views/poker.scm:759
+msgid "this table is asking nothing"
+msgstr ""
+
+#: app/views/projects.scm:56 app/views/tickets.scm:688
+#: app/views/tickets.scm:867 app/views/tickets.scm:1507
+msgid "kanban"
+msgstr "kanban"
+
+#: app/views/projects.scm:65
+msgid "view live"
+msgstr ""
+
+#: app/views/projects.scm:70
+#, fuzzy
+msgid "project code"
+msgstr "projecten"
+
 #: app/views/projects.scm:99 app/views/projects.scm:337
+#: app/views/projects.scm:485
 msgid "edit project"
 msgstr "project bewerken"
 
 #: app/views/projects.scm:241 app/views/projects.scm:242
+#: app/views/projects.scm:293
 msgid "Projects"
 msgstr "Projecten"
 
 #: app/views/projects.scm:245 app/views/projects.scm:246
-#: app/views/projects.scm:314
+#: app/views/projects.scm:297 app/views/projects.scm:314
+#: app/views/projects.scm:456
 msgid "new project"
 msgstr "nieuw project"
 
 #: app/views/projects.scm:266 app/views/projects.scm:267
+#: app/views/projects.scm:318
 msgid ""
 "Tip: Use Tab to navigate projects and Enter/Space to expand or collapse "
 "cards."
@@ -368,337 +771,702 @@ msgstr ""
 "open of dicht te klappen."
 
 #: app/views/projects.scm:277 app/views/projects.scm:278
-#: app/views/tickets.scm:457 app/views/tickets.scm:585
+#: app/views/projects.scm:337 app/views/tickets.scm:457
+#: app/views/tickets.scm:585 app/views/tickets.scm:1171
 msgid "Expand All"
 msgstr "Alles uitklappen"
 
 #: app/views/projects.scm:287 app/views/projects.scm:288
-#: app/views/tickets.scm:460 app/views/tickets.scm:588
+#: app/views/projects.scm:348 app/views/tickets.scm:460
+#: app/views/tickets.scm:588 app/views/tickets.scm:1181
 msgid "Collapse All"
 msgstr "Alles inklappen"
 
-#: app/views/projects.scm:353 app/views/projects.scm:364
-#: app/views/tickets.scm:867 app/views/tickets.scm:1081
-#: app/views/tickets.scm:1586
-msgid "title"
-msgstr "titel"
-
 #: app/views/projects.scm:357 app/views/projects.scm:368
+#: app/views/projects.scm:522
 msgid "human id"
 msgstr "leesbare id"
 
 #: app/views/projects.scm:361 app/views/projects.scm:372
+#: app/views/projects.scm:526
 msgid "homepage url"
 msgstr "url van de website"
 
 #: app/views/projects.scm:366 app/views/projects.scm:377
+#: app/views/projects.scm:531
 msgid "version control url"
 msgstr "url van de versiebeheer"
 
 #: app/views/projects.scm:370 app/views/projects.scm:381
-#: app/views/tickets.scm:335 app/views/tickets.scm:426
+#: app/views/projects.scm:535 app/views/tickets.scm:335
+#: app/views/tickets.scm:426 app/views/tickets.scm:612
 #: app/views/tickets.scm:905 app/views/tickets.scm:1135
+#: app/views/tickets.scm:1841
 msgid "description"
 msgstr "beschrijving"
 
+#: app/views/projects.scm:370
+msgid "nothing was uploaded: choose a picture first"
+msgstr ""
+
+#: app/views/projects.scm:372
+msgid "that picture was not kept: only PNG, JPEG, GIF and WebP are"
+msgstr ""
+
+#: app/views/projects.scm:374
+msgid "that picture was not kept: it is empty"
+msgstr ""
+
+#: app/views/projects.scm:377
+msgid "that picture was not kept: it is larger than this instance keeps"
+msgstr ""
+
+#: app/views/projects.scm:378
+msgid "that picture was not kept"
+msgstr ""
+
 #: app/views/projects.scm:380 app/views/projects.scm:411
+#: app/views/projects.scm:565
 msgid "save project"
 msgstr "project opslaan"
 
-#: app/views/projects.scm:386 app/views/projects.scm:417
-msgid "cancel"
-msgstr "annuleren"
-
-#: app/views/projects.scm:396
+#: app/views/projects.scm:396 app/views/projects.scm:550
 msgid "ticket statuses"
 msgstr ""
 
-#: app/views/projects.scm:404
+#: app/views/projects.scm:397
+#, fuzzy
+msgid "project picture"
+msgstr "projecten"
+
+#: app/views/projects.scm:404 app/views/projects.scm:558
 msgid ""
 "One status to a line: value | label | icon | glyph | bucket, where bucket is "
 "open, done or rejected. Leave empty to use the instance's statuses."
 msgstr ""
 
+#: app/views/projects.scm:410
+msgid "choose a picture"
+msgstr ""
+
+#: app/views/projects.scm:412
+msgid "upload"
+msgstr ""
+
+#: app/views/projects.scm:418
+msgid "remove picture"
+msgstr ""
+
+#: app/views/projects.scm:429
+msgid ""
+"A PNG, JPEG, GIF or WebP picture. Leave it empty and the project is drawn "
+"with the first letter of its name."
+msgstr ""
+
+#: app/views/scrum.scm:45
+msgid "planned"
+msgstr ""
+
+#: app/views/scrum.scm:47
+msgid "active"
+msgstr ""
+
+#: app/views/scrum.scm:80
+msgid "no dates yet"
+msgstr ""
+
+#: app/views/scrum.scm:114
+msgid "how much of the sprint is done"
+msgstr ""
+
+#: app/views/scrum.scm:155
+msgid ""
+"a burndown needs a sprint with dates: give the sprint a start and an end and "
+"it is drawn here"
+msgstr ""
+
+#: app/views/scrum.scm:207 app/views/scrum.scm:662
+msgid "burndown"
+msgstr ""
+
+#: app/views/scrum.scm:305
+msgid "committed"
+msgstr ""
+
+#: app/views/scrum.scm:310 app/views/scrum.scm:399 app/views/scrum.scm:789
+#: app/views/tickets.scm:570 app/views/tickets.scm:637
+#: app/views/tickets.scm:812 app/views/tickets.scm:1449
+msgid "done"
+msgstr "gedaan"
+
+#: app/views/scrum.scm:317
+msgid "left"
+msgstr ""
+
+#: app/views/scrum.scm:324
+msgid "— what is left"
+msgstr ""
+
+#: app/views/scrum.scm:326
+msgid "- - the line the team committed to"
+msgstr ""
+
+#: app/views/scrum.scm:397 app/views/scrum.scm:581 app/views/scrum.scm:787
+msgid "points"
+msgstr ""
+
+#: app/views/scrum.scm:414
+msgid "start"
+msgstr ""
+
+#: app/views/scrum.scm:426
+msgid "close"
+msgstr ""
+
+#: app/views/scrum.scm:438
+#, fuzzy
+msgid "reopen"
+msgstr "open"
+
+#: app/views/scrum.scm:473
+msgid ""
+"a sprint is a stretch of work a team commits to. The kanban board of a "
+"sprint is the board of its tickets, and the burndown of a sprint is drawn "
+"from the audit trail the tickets already leave."
+msgstr ""
+
+#: app/views/scrum.scm:488
+msgid "what it is called"
+msgstr ""
+
+#: app/views/scrum.scm:513
+msgid "starts on"
+msgstr ""
+
+#: app/views/scrum.scm:516
+msgid "ends on"
+msgstr ""
+
+#: app/views/scrum.scm:519
+msgid "plan a sprint"
+msgstr ""
+
+#: app/views/scrum.scm:539
+msgid ""
+"no sprints yet: a project between sprints is a backlog with nowhere to pour "
+"it"
+msgstr ""
+
+#: app/views/scrum.scm:667
+msgid "in this sprint"
+msgstr ""
+
+#: app/views/scrum.scm:673
+msgid "nothing in this sprint yet: add a ticket from the backlog below"
+msgstr ""
+
+#: app/views/scrum.scm:714
+msgid "all sprints"
+msgstr ""
+
+#: app/views/scrum.scm:826
+msgid ""
+"a milestone is a result the project promised by a date. Tickets count toward "
+"it, and a sprint may feed more than one."
+msgstr ""
+
+#: app/views/scrum.scm:838
+msgid "what it is"
+msgstr ""
+
+#: app/views/scrum.scm:841
+msgid "what it means"
+msgstr ""
+
+#: app/views/scrum.scm:857 app/views/tickets.scm:2356
+msgid "due on"
+msgstr ""
+
+#: app/views/scrum.scm:860
+msgid "add a milestone"
+msgstr ""
+
+#: app/views/scrum.scm:880
+msgid "no milestones yet: a date the project promised is what this page keeps"
+msgstr ""
+
 #: app/views/tickets.scm:150 lib/lucidplan/html.scm:707
+#: lib/lucidplan/html.scm:943
 msgid "To-do"
 msgstr "Te doen"
 
 #: app/views/tickets.scm:151 lib/lucidplan/html.scm:709
+#: lib/lucidplan/html.scm:945
 msgid "Work in Progress"
 msgstr "In behandeling"
 
 #: app/views/tickets.scm:152 lib/lucidplan/html.scm:711
+#: lib/lucidplan/html.scm:947
 msgid "In Review"
 msgstr "In beoordeling"
 
 #: app/views/tickets.scm:153 lib/lucidplan/html.scm:713
+#: lib/lucidplan/html.scm:949
 msgid "Done"
 msgstr "Gedaan"
 
 #: app/views/tickets.scm:154 lib/lucidplan/html.scm:715
+#: lib/lucidplan/html.scm:951
 msgid "Rejected"
 msgstr "Afgewezen"
 
 #: app/views/tickets.scm:159 app/views/tickets.scm:162
+#: app/views/tickets.scm:171
 msgid "Task"
 msgstr "Taak"
 
 #: app/views/tickets.scm:160 app/views/tickets.scm:164
+#: app/views/tickets.scm:173
 msgid "Bug"
 msgstr "Fout"
 
 #: app/views/tickets.scm:161 app/views/tickets.scm:166
+#: app/views/tickets.scm:175
 msgid "Story"
 msgstr "Verhaal"
 
 #: app/views/tickets.scm:162 app/views/tickets.scm:168
+#: app/views/tickets.scm:177
 msgid "Spike"
 msgstr "Spike"
 
 #: app/views/tickets.scm:163 app/views/tickets.scm:170
+#: app/views/tickets.scm:179
 msgid "Time Box"
 msgstr "Tijdsbox"
 
-#: app/views/tickets.scm:198
+#: app/views/tickets.scm:198 app/views/tickets.scm:237
 msgid "unestimated"
 msgstr ""
 
 #: app/views/tickets.scm:200 app/views/tickets.scm:235
+#: app/views/tickets.scm:272
 msgid "saved"
 msgstr "opgeslagen"
 
 #: app/views/tickets.scm:201 app/views/tickets.scm:236
+#: app/views/tickets.scm:273
 msgid "not saved"
 msgstr "niet opgeslagen"
 
 #: app/views/tickets.scm:202 app/views/tickets.scm:237
+#: app/views/tickets.scm:274
 msgid "the ticket was left as it was"
 msgstr "het ticket is ongewijzigd gelaten"
 
-#: app/views/tickets.scm:208
+#: app/views/tickets.scm:208 app/views/tickets.scm:246
 msgid "no size"
 msgstr ""
 
 #: app/views/tickets.scm:307 app/views/tickets.scm:325
 #: app/views/tickets.scm:362 app/views/tickets.scm:416
-#: app/views/tickets.scm:875 app/views/tickets.scm:1089
-#: app/views/tickets.scm:1591
+#: app/views/tickets.scm:459 app/views/tickets.scm:518
+#: app/views/tickets.scm:875 app/views/tickets.scm:1085
+#: app/views/tickets.scm:1089 app/views/tickets.scm:1591
+#: app/views/tickets.scm:1779 app/views/tickets.scm:2902
 msgid "status"
 msgstr "status"
 
 #: app/views/tickets.scm:317 app/views/tickets.scm:328
 #: app/views/tickets.scm:374 app/views/tickets.scm:419
+#: app/views/tickets.scm:471 app/views/tickets.scm:522
 #: app/views/tickets.scm:883 app/views/tickets.scm:1097
-#: app/views/tickets.scm:1599
+#: app/views/tickets.scm:1599 app/views/tickets.scm:1787
+#: app/views/tickets.scm:2919
 msgid "type"
 msgstr "type"
 
 #: app/views/tickets.scm:353 app/views/tickets.scm:444
-#: app/views/tickets.scm:890 app/views/tickets.scm:1104
-#: app/views/tickets.scm:1609
+#: app/views/tickets.scm:581 app/views/tickets.scm:890
+#: app/views/tickets.scm:1104 app/views/tickets.scm:1609
+#: app/views/tickets.scm:1794 app/views/tickets.scm:2939
 msgid "priority"
 msgstr "prioriteit"
 
 #: app/views/tickets.scm:357 app/views/tickets.scm:448
-#: app/views/tickets.scm:899 app/views/tickets.scm:1129
+#: app/views/tickets.scm:585 app/views/tickets.scm:899
+#: app/views/tickets.scm:1094 app/views/tickets.scm:1099
+#: app/views/tickets.scm:1129 app/views/tickets.scm:1819
 msgid "assignee"
 msgstr "toegewezene"
 
 #: app/views/tickets.scm:364 app/views/tickets.scm:467
-#: app/views/tickets.scm:1008
+#: app/views/tickets.scm:1008 app/views/tickets.scm:1697
 msgid "edit ticket"
 msgstr "ticket bewerken"
 
 #: app/views/tickets.scm:388 app/views/tickets.scm:456
+#: app/views/tickets.scm:485 app/views/tickets.scm:590
 #: app/views/tickets.scm:1113 app/views/tickets.scm:1619
+#: app/views/tickets.scm:1803 app/views/tickets.scm:2959
+#: lib/lucidplan/html.scm:965
 msgid "story points"
 msgstr ""
 
 #: app/views/tickets.scm:407 app/views/tickets.scm:459
+#: app/views/tickets.scm:503 app/views/tickets.scm:595
 #: app/views/tickets.scm:1121 app/views/tickets.scm:1628
+#: app/views/tickets.scm:1811 app/views/tickets.scm:2979
 msgid "size"
 msgstr ""
 
 #: app/views/tickets.scm:454 app/views/tickets.scm:582
+#: app/views/tickets.scm:1159
 msgid ""
 "Tip: Use Tab to navigate tickets and Enter/Space to expand or collapse cards."
 msgstr ""
 "Tip: gebruik Tab om door tickets te gaan en Enter of spatie om kaarten open "
 "of dicht te klappen."
 
-#: app/views/tickets.scm:570 app/views/tickets.scm:637
-#: app/views/tickets.scm:812
-msgid "done"
-msgstr "gedaan"
+#: app/views/tickets.scm:534 app/views/tickets.scm:1072
+#: app/views/tickets.scm:1078
+msgid "epic"
+msgstr ""
+
+#: app/views/tickets.scm:575 app/views/tickets.scm:2607
+msgid "time logged"
+msgstr ""
 
 #: app/views/tickets.scm:601 app/views/tickets.scm:639
-#: app/views/tickets.scm:815
+#: app/views/tickets.scm:815 app/views/tickets.scm:1452
 msgid "rejected"
 msgstr "afgewezen"
 
 #: app/views/tickets.scm:618 app/views/tickets.scm:795
+#: app/views/tickets.scm:1432
 msgid "Wow.. it's really empty here"
 msgstr "Wauw.. het is hier echt leeg"
 
 #: app/views/tickets.scm:635 app/views/tickets.scm:809
+#: app/views/tickets.scm:1446
 msgid "open"
 msgstr "open"
 
 #: app/views/tickets.scm:641 app/views/tickets.scm:818
+#: app/views/tickets.scm:1455
 msgid "total"
 msgstr "totaal"
 
 #: app/views/tickets.scm:645 app/views/tickets.scm:822
+#: app/views/tickets.scm:1459
 msgid "completion"
 msgstr "voltooid"
 
-#: app/views/tickets.scm:688 app/views/tickets.scm:867
-msgid "kanban"
-msgstr "kanban"
+#: app/views/tickets.scm:652
+msgid "estimate with a table"
+msgstr ""
+
+#: app/views/tickets.scm:680
+msgid "open the table"
+msgstr ""
 
 #: app/views/tickets.scm:729 app/views/tickets.scm:908
+#: app/views/tickets.scm:1572
 msgid "backlog options"
 msgstr "backlogopties"
 
 #: app/views/tickets.scm:752 app/views/tickets.scm:931
+#: app/views/tickets.scm:1594
 msgid "show done?"
 msgstr "gedane tonen?"
 
+#: app/views/tickets.scm:764
+msgid "select"
+msgstr ""
+
 #: app/views/tickets.scm:768 app/views/tickets.scm:947
+#: app/views/tickets.scm:1610
 msgid "show rejected?"
 msgstr "afgewezen tonen?"
 
 #: app/views/tickets.scm:851 app/views/tickets.scm:1064
+#: app/views/tickets.scm:1754
 msgid "unassigned"
 msgstr "niet toegewezen"
 
+#: app/views/tickets.scm:869
+msgid "every label"
+msgstr ""
+
 #: app/views/tickets.scm:923 app/views/tickets.scm:1153
+#: app/views/tickets.scm:1859
 msgid "submit"
 msgstr "verzenden"
 
-#: app/views/tickets.scm:1188
+#: app/views/tickets.scm:958 app/views/tickets.scm:1313
+#: app/views/tickets.scm:1497 app/views/tickets.scm:2112
+#: app/views/tickets.scm:2235 app/views/tickets.scm:2711
+msgid "remove"
+msgstr ""
+
+#: app/views/tickets.scm:990
+msgid "name this view"
+msgstr ""
+
+#: app/views/tickets.scm:1003
+msgid "save this view"
+msgstr ""
+
+#: app/views/tickets.scm:1054
+msgid "select all"
+msgstr ""
+
+#: app/views/tickets.scm:1056
+msgid "change"
+msgstr ""
+
+#: app/views/tickets.scm:1067
+msgid "change nothing"
+msgstr ""
+
+#: app/views/tickets.scm:1071 app/views/tickets.scm:1093
+msgid "clear"
+msgstr ""
+
+#: app/views/tickets.scm:1106
+msgid "add a label"
+msgstr ""
+
+#: app/views/tickets.scm:1113
+msgid "apply"
+msgstr ""
+
+#: app/views/tickets.scm:1123
+msgid "every epic"
+msgstr ""
+
+#: app/views/tickets.scm:1188 app/views/tickets.scm:1914
 #, fuzzy
 msgid "created"
 msgstr "aanmaken"
 
 #: app/views/tickets.scm:1189 app/views/tickets.scm:1577
+#: app/views/tickets.scm:1916 app/views/tickets.scm:2874
 msgid "changed"
 msgstr ""
 
-#: app/views/tickets.scm:1190
+#: app/views/tickets.scm:1190 app/views/tickets.scm:1918
 msgid "moved"
 msgstr ""
 
-#: app/views/tickets.scm:1191
+#: app/views/tickets.scm:1191 app/views/tickets.scm:1920
 msgid "restored"
 msgstr ""
 
-#: app/views/tickets.scm:1192
+#: app/views/tickets.scm:1192 app/views/tickets.scm:1922
 msgid "commented"
 msgstr ""
 
-#: app/views/tickets.scm:1193
+#: app/views/tickets.scm:1193 app/views/tickets.scm:1924
 msgid "removed a comment"
 msgstr ""
 
-#: app/views/tickets.scm:1194
+#: app/views/tickets.scm:1194 app/views/tickets.scm:1926
 msgid "attached"
 msgstr ""
 
-#: app/views/tickets.scm:1195
+#: app/views/tickets.scm:1195 app/views/tickets.scm:1928
 msgid "removed"
 msgstr ""
 
-#: app/views/tickets.scm:1196
+#: app/views/tickets.scm:1196 app/views/tickets.scm:1938
 #, fuzzy
 msgid "deleted"
 msgstr "verwijderen"
 
 #: app/views/tickets.scm:1220 app/views/tickets.scm:1264
-#: app/views/tickets.scm:1570
+#: app/views/tickets.scm:1570 app/views/tickets.scm:1986
+#: app/views/tickets.scm:2061 app/views/tickets.scm:2221
+#: app/views/tickets.scm:2858
 msgid "somebody"
 msgstr ""
 
-#: app/views/tickets.scm:1271
+#: app/views/tickets.scm:1271 app/views/tickets.scm:2069
 msgid "[removed]"
 msgstr ""
 
 #: app/views/tickets.scm:1280 app/views/tickets.scm:1305
+#: app/views/tickets.scm:2078 app/views/tickets.scm:2104
 msgid "reply"
 msgstr ""
 
-#: app/views/tickets.scm:1289
+#: app/views/tickets.scm:1289 app/views/tickets.scm:2088
 msgid "your reply"
 msgstr ""
 
-#: app/views/tickets.scm:1313 app/views/tickets.scm:1497
-msgid "remove"
-msgstr ""
-
-#: app/views/tickets.scm:1360
+#: app/views/tickets.scm:1360 app/views/tickets.scm:2469
 msgid "add a comment"
 msgstr ""
 
-#: app/views/tickets.scm:1376
+#: app/views/tickets.scm:1376 app/views/tickets.scm:2485
 msgid "comment"
 msgstr ""
 
-#: app/views/tickets.scm:1386
+#: app/views/tickets.scm:1386 app/views/tickets.scm:2495
 msgid "attach a file"
 msgstr ""
 
-#: app/views/tickets.scm:1394
+#: app/views/tickets.scm:1394 app/views/tickets.scm:2507
 msgid "attach"
 msgstr ""
 
-#: app/views/tickets.scm:1400
+#: app/views/tickets.scm:1400 app/views/tickets.scm:2515
 msgid "move ticket to another project"
 msgstr ""
 
-#: app/views/tickets.scm:1411
+#: app/views/tickets.scm:1411 app/views/tickets.scm:2530
 #, fuzzy
 msgid "project"
 msgstr "projecten"
 
-#: app/views/tickets.scm:1428
+#: app/views/tickets.scm:1428 app/views/tickets.scm:2556
 msgid "move"
 msgstr ""
 
-#: app/views/tickets.scm:1435
+#: app/views/tickets.scm:1435 app/views/tickets.scm:2628
 msgid "discussion"
 msgstr ""
 
-#: app/views/tickets.scm:1452
+#: app/views/tickets.scm:1452 app/views/tickets.scm:2652
 msgid "no comments yet"
 msgstr ""
 
-#: app/views/tickets.scm:1458
+#: app/views/tickets.scm:1458 app/views/tickets.scm:2658
 msgid "attachments"
 msgstr ""
 
-#: app/views/tickets.scm:1502
+#: app/views/tickets.scm:1502 app/views/tickets.scm:2716
 msgid "no attachments yet"
 msgstr ""
 
-#: app/views/tickets.scm:1508
+#: app/views/tickets.scm:1508 app/views/tickets.scm:2722
 msgid "activity"
 msgstr ""
 
-#: app/views/tickets.scm:1516
+#: app/views/tickets.scm:1516 app/views/tickets.scm:2737
 msgid "nothing recorded yet"
 msgstr ""
 
-#: app/views/tickets.scm:1522
+#: app/views/tickets.scm:1522 app/views/tickets.scm:2743
 #, fuzzy
 msgid "versions"
 msgstr "rechten"
 
-#: app/views/tickets.scm:1654
+#: app/views/tickets.scm:1654 app/views/tickets.scm:3024
 msgid "restore this version"
 msgstr ""
 
-#: app/views/tickets.scm:1659
+#: app/views/tickets.scm:1659 app/views/tickets.scm:3031
 msgid "no versions yet"
+msgstr ""
+
+#: app/views/tickets.scm:1830
+msgid "labels"
+msgstr ""
+
+#: app/views/tickets.scm:1838
+msgid "Words separated by commas: bug, needs-design, blocked-on-ops."
+msgstr ""
+
+#: app/views/tickets.scm:1930
+#, fuzzy
+msgid "logged time"
+msgstr "ingelogd tot"
+
+#: app/views/tickets.scm:1932
+msgid "removed time"
+msgstr ""
+
+#: app/views/tickets.scm:1934
+msgid "took into a sprint"
+msgstr ""
+
+#: app/views/tickets.scm:1936
+msgid "took out of a sprint"
+msgstr ""
+
+#: app/views/tickets.scm:2260
+#, fuzzy
+msgid "how long"
+msgstr "gedane tonen?"
+
+#: app/views/tickets.scm:2265
+msgid "1.5h, 90m, 1h30m or 1:30 all mean the same"
+msgstr ""
+
+#: app/views/tickets.scm:2266
+msgid "which day"
+msgstr ""
+
+#: app/views/tickets.scm:2270
+#, fuzzy
+msgid "what was done"
+msgstr "gedane tonen?"
+
+#: app/views/tickets.scm:2274
+msgid "the note that says what the hours bought"
+msgstr ""
+
+#: app/views/tickets.scm:2287
+msgid "log time"
+msgstr ""
+
+#: app/views/tickets.scm:2304
+msgid "no time logged yet"
+msgstr ""
+
+#: app/views/tickets.scm:2360 app/views/tickets.scm:2410
+msgid "sprint"
+msgstr ""
+
+#: app/views/tickets.scm:2364
+msgid "no sprint"
+msgstr ""
+
+#: app/views/tickets.scm:2382 app/views/tickets.scm:2416
+msgid "milestone"
+msgstr ""
+
+#: app/views/tickets.scm:2386
+msgid "no milestone"
+msgstr ""
+
+#: app/views/tickets.scm:2403
+msgid "save the plan"
+msgstr ""
+
+#: app/views/tickets.scm:2414 app/views/tickets.scm:2420
+msgid "none"
+msgstr ""
+
+#: app/views/tickets.scm:2433
+msgid "nothing was attached: choose a file first"
+msgstr ""
+
+#: app/views/tickets.scm:2435
+msgid "that file was not attached: it is empty"
+msgstr ""
+
+#: app/views/tickets.scm:2438
+msgid "that file was not attached: it is larger than this instance keeps"
+msgstr ""
+
+#: app/views/tickets.scm:2439
+msgid "that file was not attached"
+msgstr ""
+
+#: app/views/tickets.scm:2582
+msgid "plan"
 msgstr ""
 
 #: lib/lucidplan/html.scm:46
@@ -707,8 +1475,7 @@ msgstr "lucidplan - vrij projectbeheer voor iedereen"
 
 #: lib/lucidplan/html.scm:48
 msgid "lucidplan is free software, available under the MIT license"
-msgstr ""
-"lucidplan is vrije software, beschikbaar onder de MIT-licentie"
+msgstr "lucidplan is vrije software, beschikbaar onder de MIT-licentie"
 
 #: lib/lucidplan/html.scm:53 lib/lucidplan/html.scm:59
 msgid "find here the:"
@@ -718,12 +1485,12 @@ msgstr "vind hier de:"
 msgid "Copyright © Josep Bigorra  &lt;jjbigorra@gmail.com&gt;"
 msgstr "Copyright © Josep Bigorra  &lt;jjbigorra@gmail.com&gt;"
 
-#: lib/lucidplan/html.scm:88
+#: lib/lucidplan/html.scm:86 lib/lucidplan/html.scm:88
 #, fuzzy
 msgid "back to top"
 msgstr "terug naar boven"
 
-#: lib/lucidplan/html.scm:91
+#: lib/lucidplan/html.scm:91 lib/lucidplan/html.scm:96
 msgid "MIT license"
 msgstr "MIT-licentie"
 
@@ -732,45 +1499,73 @@ msgid "LucidPlan"
 msgstr "LucidPlan"
 
 #: lib/lucidplan/html.scm:529 lib/lucidplan/html.scm:840
+#: lib/lucidplan/html.scm:1193
 msgid "Search..."
 msgstr "Zoeken..."
 
 #: lib/lucidplan/html.scm:539 lib/lucidplan/html.scm:850
+#: lib/lucidplan/html.scm:1203
 msgid "search"
 msgstr "zoeken"
 
 #: lib/lucidplan/html.scm:572 lib/lucidplan/html.scm:883
+#: lib/lucidplan/html.scm:1236
 msgid "Title - Ascending"
 msgstr "Titel - oplopend"
 
 #: lib/lucidplan/html.scm:574 lib/lucidplan/html.scm:885
+#: lib/lucidplan/html.scm:1238
 msgid "Title - Descending"
 msgstr "Titel - aflopend"
 
 #: lib/lucidplan/html.scm:577 lib/lucidplan/html.scm:888
+#: lib/lucidplan/html.scm:1241
 msgid "Created - Ascending"
 msgstr "Aangemaakt - oplopend"
 
 #: lib/lucidplan/html.scm:579 lib/lucidplan/html.scm:890
+#: lib/lucidplan/html.scm:1243
 msgid "Created - Descending"
 msgstr "Aangemaakt - aflopend"
 
 #: lib/lucidplan/html.scm:582 lib/lucidplan/html.scm:893
+#: lib/lucidplan/html.scm:1246
 msgid "Last edited - Ascending"
 msgstr "Laatst bewerkt - oplopend"
 
 #: lib/lucidplan/html.scm:584 lib/lucidplan/html.scm:895
+#: lib/lucidplan/html.scm:1248
 msgid "Last edited - Descending"
 msgstr "Laatst bewerkt - aflopend"
 
 #: lib/lucidplan/html.scm:587 lib/lucidplan/html.scm:898
+#: lib/lucidplan/html.scm:1251
 msgid "Priority - Ascending"
 msgstr "Prioriteit - oplopend"
 
 #: lib/lucidplan/html.scm:589 lib/lucidplan/html.scm:900
+#: lib/lucidplan/html.scm:1253
 msgid "Priority - Descending"
 msgstr "Prioriteit - aflopend"
 
+#: lib/lucidplan/html.scm:624
+#, fuzzy
+msgid "go to project"
+msgstr "project bewerken"
+
+#: lib/lucidplan/html.scm:646
+msgid "🔗 go to"
+msgstr ""
+
+#: lib/lucidplan/html.scm:734
+msgid "poker"
+msgstr ""
+
 #: lib/lucidplan/html.scm:735 lib/lucidplan/html.scm:1074
+#: lib/lucidplan/html.scm:1425
 msgid "language"
 msgstr "taal"
+
+#: lib/lucidplan/html.scm:963
+msgid "t-shirt sizes"
+msgstr ""

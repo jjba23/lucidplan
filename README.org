@@ -635,6 +635,12 @@ Ticket and project lists are fully keyboard accessible using =Tab= navigation
 with ~Enter~ or ~Space~ for toggling visibility. The UI aims to be accessible to
 all kinds of users and usage patterns.
 
+The *go to* menu in the header is a listbox of its own, and so is every other
+menu in the interface. ~Enter~, ~Space~ or ~Down~ opens one, ~Up~ and ~Down~
+move a row at a time, ~Home~ and ~End~ go to the first and the last, and typing
+the first letters of a row jumps to it. ~Enter~ chooses the row, and ~Escape~
+closes the menu without choosing.
+
 ** Practical usage tips
 :PROPERTIES:
 :CUSTOM_ID: practical-usage-tips

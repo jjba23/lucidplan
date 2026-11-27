@@ -24,10 +24,11 @@
 
    Nothing here is required for the application to work.  A reader with the
    stylesheet blocked gets a plainer LucidPlan, not a broken one: no rule here
-   carries meaning, changes a box's size, or hides a control.  The motion is
-   all of it optional too -- the block at the foot of the sheet stops every
-   transition and animation this file starts, for anyone who asks their
-   system for less movement. */
+   carries meaning or changes a box's size, and the one rule that hides a
+   control hides only the native select the script has already replaced with a
+   control of its own.  The motion is all of it optional too -- the block at the
+   foot of the sheet stops every transition and animation this file starts, for
+   anyone who asks their system for less movement. */
 
 /* ===== 1. The tokens =====
 
@@ -79,6 +80,21 @@
      being worked on. */
   --lp-shadow-open: 0 1.1rem 2.2rem -1.15rem rgba(28, 25, 23, 0.3),
     0 0.35rem 0.8rem -0.55rem rgba(28, 25, 23, 0.16);
+
+  /* The menu a picker opens, and the ink on it.  The face is opaque and is
+     swapped whole with the theme rather than tinted: the bar a picker hangs
+     from is a pane of tinted glass, and a row read *through* that pane is a
+     row whose colour is half the page's and half the platform's -- which is
+     where an unreadable list comes from.  The two face/ink pairs are chosen
+     to clear WCAG AA on their own. */
+  --lp-menu-face: oklch(0.995 0.002 286);
+  --lp-menu-ink: oklch(0.33 0.006 250);
+  --lp-menu-ink-dim: oklch(0.47 0.006 250);
+  --lp-menu-edge: rgba(120, 113, 108, 0.24);
+  --lp-menu-hover: oklch(0.62 0.17 254 / 0.12);
+  --lp-menu-chosen: oklch(0.62 0.17 254 / 0.17);
+  --lp-menu-shadow: 0 1.1rem 2rem -0.9rem rgba(28, 25, 23, 0.4),
+    0 0.3rem 0.7rem -0.4rem rgba(28, 25, 23, 0.28);
 }
 
 [data-theme="dark"] {
@@ -92,6 +108,14 @@
     0 0.5rem 1rem -0.6rem rgba(0, 0, 0, 0.45);
   --lp-shadow-open: 0 1.1rem 2.2rem -1.15rem rgba(0, 0, 0, 0.6),
     0 0.35rem 0.8rem -0.55rem rgba(0, 0, 0, 0.4);
+  --lp-menu-face: oklch(0.3 0.005 250);
+  --lp-menu-ink: oklch(0.965 0.002 286);
+  --lp-menu-ink-dim: oklch(0.82 0.004 250);
+  --lp-menu-edge: rgba(214, 211, 209, 0.2);
+  --lp-menu-hover: oklch(0.78 0.11 254 / 0.2);
+  --lp-menu-chosen: oklch(0.78 0.11 254 / 0.28);
+  --lp-menu-shadow: 0 1.1rem 2rem -0.9rem rgba(0, 0, 0, 0.72),
+    0 0.3rem 0.7rem -0.4rem rgba(0, 0, 0, 0.5);
   color-scheme: dark;
 }
 
@@ -774,6 +798,10 @@
   .lp-disclosure-chevron,
   .lp-disclosure-body,
   .lp-disclosure-inner,
+  .lp-select-control,
+  .lp-select-chevron,
+  .lp-select-list,
+  .lp-select-option,
   .lp-js .lp-rise {
     transition: none !important;
     animation: none !important;
@@ -1016,4 +1044,187 @@ a[aria-current="page"] .lp-epic-chip {
 [data-theme="dark"] .lp-label-chip {
   color: oklch(0.88 0.01 250);
   background: rgba(214, 211, 209, 0.14);
+}
+
+/* ===== 16. A menu that opens =====
+
+   The bar's picker, and every other menu in the application
+   (`lp-select' in `pub/js/lp-select.js'): a `<select>' that the script has
+   drawn a control and a menu for, because the list a platform draws for a
+   select is styled by the platform and not by the page.  The control and the
+   menu are two different surfaces and are said so here: the control belongs to
+   the surface it sits on and inherits its ink, while the menu is its own
+   opaque face with its own ink, taken from the tokens -- which is the whole of
+   why the entries are legible now.  The two themes are two sets of values and
+   not a filter over one.
+
+   Nothing here is what makes the control work.  The script draws these, the
+   `<select>` underneath still holds the value, and a reader whose script did
+   not load is handed the native select with its own popup: the script is what
+   marks the one it hid, so a page without it is a page untouched.
+
+   The element is a box of the control's own size, and it is created where the
+   select was, so the menu hangs from the control rather than from the field
+   around it.  Where that box is a flex item it is blockified by the container
+   and fills the column the select filled; inside a row it takes the width of
+   the control, which is what the control's own classes ask for. */
+
+lp-select {
+  position: relative;
+  display: block;
+}
+
+/* What the script hid, once it had something to put in its place. */
+
+.lp-select-native {
+  display: none;
+}
+
+.lp-select-control {
+  display: inline-flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  gap: 0.4rem;
+  /* The page's own classes decide the ink, the padding and the plate; this is
+     only the shape a control with a value and a chevron in it needs to have. */
+  max-width: 14rem;
+  text-align: start;
+  transition: background var(--lp-quick) var(--lp-ease);
+}
+
+.lp-select-value {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.lp-select-chevron {
+  flex: none;
+  width: 0.8rem;
+  height: 0.8rem;
+  opacity: 0.7;
+  transition: transform var(--lp-quick) var(--lp-ease);
+}
+
+.lp-select-open .lp-select-chevron {
+  transform: rotate(180deg);
+}
+
+/* The menu hangs from the control, on the side the script found room for: it
+   opens to the control's start edge and under it, and the two classes below
+   are the other two sides.  A control at the far end of a bar and a control
+   near the foot of a page both meet the edge of the screen, and a menu that
+   opens past it is a menu a reader cannot reach.
+
+   It is as wide as its widest row within the bounds of the page, and it
+   scrolls rather than reaching the bottom of a screen: a project list is as
+   long as somebody's projects are. */
+
+.lp-select-list {
+  position: absolute;
+  z-index: 30;
+  inset-block-start: calc(100% + 0.35rem);
+  inset-inline-start: 0;
+  min-width: 100%;
+  max-width: min(20rem, 82vw);
+  max-height: min(22rem, 55vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.3rem;
+  border-radius: 0.85rem;
+  list-style: none;
+  background: var(--lp-menu-face);
+  box-shadow: 0 0 0 1px var(--lp-menu-edge), var(--lp-menu-shadow);
+  animation: lp-menu-in var(--lp-quick) var(--lp-ease);
+}
+
+/* No room to the control's end edge: the menu grows the other way. */
+
+lp-select.lp-select-end .lp-select-list {
+  inset-inline-start: auto;
+  inset-inline-end: 0;
+}
+
+/* No room under the control: it opens above it. */
+
+lp-select.lp-select-up .lp-select-list {
+  inset-block-start: auto;
+  inset-block-end: calc(100% + 0.35rem);
+}
+
+/* The element hides the menu with the attribute and not with the class, so a
+   page whose sheet did not load still gets a menu that is open or not. */
+.lp-select-list[hidden] {
+  display: none;
+}
+
+@keyframes lp-menu-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -0.25rem, 0) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.lp-select-option {
+  padding: 0.45rem 0.6rem;
+  border-radius: 0.55rem;
+  font-size: 0.875rem;
+  font-weight: 450;
+  line-height: 1.4;
+  color: var(--lp-menu-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: background var(--lp-quick) var(--lp-ease);
+}
+
+/* The row that is *chosen* and the row the keyboard is *on* are two states
+   and are drawn as two: a tint for what is already true, a ring for what the
+   next Enter would do.  A row under a pointer is a third: it takes the same
+   tint as far as the eye is concerned, because what a mouse is about to do
+   and what the keyboard is about to do are the same thing. */
+
+@media (hover: hover) and (pointer: fine) {
+  .lp-select-option:hover {
+    background: var(--lp-menu-hover);
+  }
+}
+
+.lp-select-option[aria-selected="true"] {
+  background: var(--lp-menu-chosen);
+  font-weight: 600;
+}
+
+.lp-select-option.lp-select-active {
+  background: var(--lp-menu-hover);
+  box-shadow: inset 0 0 0 1px var(--lp-accent-soft);
+}
+
+.lp-select-option[aria-selected="true"].lp-select-active {
+  background: var(--lp-menu-chosen);
+  box-shadow: inset 0 0 0 1px var(--lp-accent-soft);
+}
+
+/* The placeholder that opens the menu is not a place, so it is quieter than
+   the places, and a hairline says so.  It is also never drawn as the chosen
+   row: on the page a reader first meets, the placeholder *is* the selected
+   option, and a chosen-looking row that says "go to" reads as a place
+   already gone to. */
+
+.lp-select-option[data-value=""] {
+  color: var(--lp-menu-ink-dim);
+  border-block-end: 1px solid var(--lp-menu-edge);
+  margin-block-end: 0.25rem;
+}
+
+.lp-select-option[data-value=""][aria-selected="true"] {
+  background: transparent;
+  font-weight: 450;
 }

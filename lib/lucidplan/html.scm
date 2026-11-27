@@ -33,16 +33,17 @@
   #:use-module (artanis route))
 
 ;; The scripts an instance ships, read once at start-up and inlined into the
-;; page that needs them.  Two of them are on every page, because what they do
-;; -- dragging a ticket, saying how strong a password is -- can happen on any
-;; of them; `poker.js' is only on the page of somebody sitting at a table, so
-;; it is read into the library here and spliced in by that page alone.  The
-;; last one is the page's polish (see `pub/js/lucidplan-luxe.js'): it is on
-;; every page too, because every page has a bar, cards and sections that
-;; arrive.
+;; page that needs them.  Three of them are on every page, because what they do
+;; -- dragging a ticket, saying how strong a password is, drawing the bar's
+;; pickers -- can happen on any of them; `poker.js' is only on the page of
+;; somebody sitting at a table, so it is read into the library here and spliced
+;; in by that page alone.  The last one is the page's polish (see
+;; `pub/js/lucidplan-luxe.js'): it is on every page too, because every page has
+;; a bar, cards and sections that arrive.
 (define-public asset-library
   (build-asset-library '("pub/js/tickets.js" "pub/js/symbanta.js"
                          "pub/js/password-strength.js" "pub/js/poker.js"
+                         "pub/js/lp-select.js"
                          "pub/js/lucidplan-luxe.js")))
 
 ;; The footer says only what a footer is for: what this instance is, under
@@ -593,6 +594,59 @@ run against a default address somebody else runs."
                    (data-interval ,(number->string (config-ref 'analytics-interval))))
                 ,(assoc-ref asset-library "pub/js/symbanta.js"))))))
 
+;;; ===== The way to another project =====
+;;;
+;;; The bar's *go to* menu is a `select'.  The value, the change event, the form
+;;; submission and a screen reader's idea of a list of choices are the native
+;;; control's already; what it cannot be told is what its popup looks like, and
+;;; a row carrying the page's own ink was painted into the platform's own dark
+;;; popup, which is how the entries came to be unreadable.  So the row here is a
+;;; bare `option' with no class of its own, and the menu a reader presses is
+;;; drawn by `pub/js/lp-select.js' in the theme's own colours, named once per
+;;; theme in `pub/css/lucidplan-luxe.css'.
+;;;
+;;; The control is named with `aria-label' rather than by its content: the
+;;; words on it are the project that is chosen, so a name read from them would
+;;; change with the choice and never say what the control is for.
+(define* (project-go-picker G_ #:key (projects '()))
+  "The control a reader jumps to another project's board with, as markup.
+
+@code{G_} is the translator the page was built with.  Answers the empty list
+when there is no project to go to, so a page that offers one project says
+nothing about going anywhere."
+  (if (nil? projects)
+      '()
+      `(select (@ (id "project-go")
+                  (aria-label ,(G_ "go to project"))
+                  (onchange "window.location.href=this.value;")
+                  ;; The bar's own quiet control: the ink its links wear, a
+                  ;; plate that appears only under the pointer, and the focus
+                  ;; ring kept.  See `lp-quiet' in
+                  ;; `pub/css/lucidplan-luxe.css'.
+                  (class ,(mk-class '(lp-quiet
+                                      text-sm
+                                      md:text-md
+                                      text-stone-300
+                                      dark:text-stone-300
+                                      font-medium
+                                      font-sans
+                                      cursor-pointer
+                                      rounded-lg
+                                      px-2
+                                      py-1
+                                      focus:ring-2
+                                      outline-none))))
+         ;; The row the menu opens on is a placeholder, so it says so with a
+         ;; value of its own: an option without one answers with its own
+         ;; text, and choosing it would then navigate to `/🔗 go to'.
+         (option (@ (value "")) ,(G_ "🔗 go to"))
+         ,@(map (lambda (p)
+                  `(option (@ (value ,(format #f
+                                              "/tickets/~a"
+                                              (assq-ref p 'human-id))))
+                           ,(assq-ref p 'title)))
+                projects))))
+
 (begin
   (define* (html-template G_
                           #:key (title #f)
@@ -601,47 +655,7 @@ run against a default address somebody else runs."
                           body
                           (proj '())
                           (is-logged-in #f))
-    (let* ((project-select (if (nil? proj)
-                             '()
-                             `(select (@ (onchange
-                                          "window.location.href=this.value;")
-                                         (class ,(mk-class '(text-sm
-                                                             md:text-md
-                                                             text-stone-900
-                                                             dark:text-stone-100
-                                                             bg-transparent
-                                                             rounded-lg
-                                                             px-2
-                                                             py-1
-                                                             border-0
-                                                             font-medium
-                                                             font-sans
-                                                             cursor-pointer
-                                                             hover:bg-stone-300/75
-                                                             dark:hover:bg-onyx-700/75
-                                                             focus:ring-2
-                                                             outline-none))))
-                                      ;; The row the menu opens on is a
-                                      ;; placeholder, so it says so with a
-                                      ;; value of its own: an option
-                                      ;; without one answers with its own
-                                      ;; text, and choosing it would then
-                                      ;; navigate to `/🔗 go to'.
-                                      (option (@ (value "")) "🔗 go to")
-                                      ,@(map (lambda (p)
-                                               `(option (@ (value ,(format
-                                                                    #f
-                                                                    "/tickets/~a"
-                                                                    (assq-ref
-                                                                     p
-                                                                     'human-id)))
-                                                           (class ,(mk-class '(text-sm
-                                                                               font-light
-                                                                               lowercase
-                                                                               text-onyx-700))))
-                                                        ,(assq-ref p
-                                                                   'title)))
-                                             proj))))
+    (let* ((project-select (project-go-picker G_ #:projects proj))
 
            ;; The bar is the framework's frosted glass header: the same pane
            ;; the cards wear, tinted with the brand blue, pinned to the top,
@@ -844,6 +858,11 @@ run against a default address somebody else runs."
                                                (script ,(assoc-ref
                                                          asset-library
                                                          "pub/js/password-strength.js"))
+                                               ;; The bar's pickers: the `<select>` stays the
+                                               ;; control, and this draws the menu it opens.
+                                               (script ,(assoc-ref
+                                                         asset-library
+                                                         "pub/js/lp-select.js"))
                                                ;; The page's polish: the light that follows
                                                ;; the pointer, the lean of a card under it,
                                                ;; the reveal of a section, the shadow the bar
@@ -896,7 +915,8 @@ run against a default address somebody else runs."
     bucket-heading
     bucket-icon-node
     lucidplan-locales
-    locale-choose-form))
+    locale-choose-form
+    project-go-picker))
 
 ;;; ===== How a status is drawn, from the status itself =====
 ;;;
