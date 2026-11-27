@@ -26,6 +26,28 @@ maak migrate
 
 ----------------------------------
 
+* v1.18.0 (2026-11-27)
+
+**Added.** A reader without a script gets a menu that can still be read.  The
+platform draws a =<select>= popup with the ink the select carries, and that ink
+had been picked for a tinted bar or a card, so the entries were unreadable again
+for anybody whose script did not run -- the very thing this work started from.
+The popup's ink and face are now named for the selects the script has not drawn,
+out of the same =--lp-menu-*= tokens the drawn menu uses and once per theme; the
+class the script puts on the select it replaced is what keeps the two apart, so
+a page with a script pays nothing for it.
+
+**Added.** The header's *go to* menu is =js-only= now -- the class the
+framework's no-script stylesheet hides -- and a reader without a script meets the
+same projects as a list of links, folded into a =<details>= that opens with no
+script at all.  A menu whose whole job is to go somewhere cannot do it without
+one, and a menu that cannot go anywhere is worse than a list that can.
+
+**Changed.** =project-go-picker= answers the no-script list of links as well as
+the menu, and the spec that pins its markup covers both: the menu is hidden
+without a script, the links go to each project's board, and the links are inside
+the =<noscript>= block so a reader with a script is never offered both.
+
 * v1.17.1 (2026-11-27)
 
 **Fixed.** A menu a form requires no longer blocks the form in silence.  The
