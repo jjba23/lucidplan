@@ -26,6 +26,21 @@ maak migrate
 
 ----------------------------------
 
+* v1.17.1 (2026-11-27)
+
+**Fixed.** A menu a form requires no longer blocks the form in silence.  The
+platform refuses to submit a form whose required field is empty, and it says so
+by focusing that field -- which is the `<select>` the drawn control replaced, so
+the reader pressed the form's button and nothing happened at all.  The refusal
+is now answered where the platform says it, on the select's =invalid= event: the
+control is marked =aria-invalid=, it wears a ring in =--lp-menu-refused=, and the
+menu opens on the row still to be chosen.  Choosing clears all three, and a form
+marked =novalidate= is left alone, as it was before.
+
+**Fixed.** A click on a `<label for>` reaches the drawn control now.  The
+platform would have forwarded it to the select, which is the one thing the
+script hides, so the label of a field had stopped being a target.
+
 * v1.17.0 (2026-11-27)
 
 **Added.** Every menu in the interface is drawn by the page rather than by the
