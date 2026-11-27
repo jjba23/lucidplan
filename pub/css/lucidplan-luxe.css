@@ -1240,3 +1240,25 @@ lp-select.lp-select-up .lp-select-list {
 lp-select.lp-select-needed .lp-select-control {
   box-shadow: 0 0 0 2px var(--lp-menu-refused);
 }
+
+/* ===== 17. The menu the platform draws =====
+
+   A reader without the script -- or one whose script was blocked -- gets the
+   native `<select>`, and the platform draws its popup with the ink the select
+   carries and the face the platform chose.  A control whose ink was picked for
+   a tinted bar, or for a card, is then read against a face it was never picked
+   for, which is exactly how the entries came to be unreadable in the first
+   place.
+
+   So the popup's two colours are said here, for the selects the script has not
+   drawn, out of the same tokens the drawn menu uses.  It is the no-script
+   answer to the same problem and it costs nothing when the script runs: the
+   select it would colour is the one the script hides.
+
+   `:not(.lp-select-native)' is what keeps the two apart -- the class is added
+   by the script, to the select it has replaced. */
+
+select:not(.lp-select-native) option {
+  color: var(--lp-menu-ink);
+  background-color: var(--lp-menu-face);
+}

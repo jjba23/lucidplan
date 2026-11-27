@@ -608,6 +608,13 @@ run against a default address somebody else runs."
 ;;; The control is named with `aria-label' rather than by its content: the
 ;;; words on it are the project that is chosen, so a name read from them would
 ;;; change with the choice and never say what the control is for.
+;;;
+;;; Going to a project is a navigation, and the only thing on the page that
+;;; knows how to do it is a script: the menu navigates from `onchange'.  So the
+;;; menu is `js-only' -- the class the no-script stylesheet hides -- and what a
+;;; reader without a script gets in its place is the same list of the same
+;;; projects as links, folded into a `<details>' that opens with no script at
+;;; all.  A menu that could not go anywhere is worse than a list that can.
 (define* (project-go-picker G_ #:key (projects '()))
   "The control a reader jumps to another project's board with, as markup.
 
@@ -616,26 +623,27 @@ when there is no project to go to, so a page that offers one project says
 nothing about going anywhere."
   (if (nil? projects)
       '()
-      `(select (@ (id "project-go")
-                  (aria-label ,(G_ "go to project"))
-                  (onchange "window.location.href=this.value;")
-                  ;; The bar's own quiet control: the ink its links wear, a
-                  ;; plate that appears only under the pointer, and the focus
-                  ;; ring kept.  See `lp-quiet' in
-                  ;; `pub/css/lucidplan-luxe.css'.
-                  (class ,(mk-class '(lp-quiet
-                                      text-sm
-                                      md:text-md
-                                      text-stone-300
-                                      dark:text-stone-300
-                                      font-medium
-                                      font-sans
-                                      cursor-pointer
-                                      rounded-lg
-                                      px-2
-                                      py-1
-                                      focus:ring-2
-                                      outline-none))))
+      `((select (@ (id "project-go")
+                   (aria-label ,(G_ "go to project"))
+                   (onchange "window.location.href=this.value;")
+                   ;; The bar's own quiet control: the ink its links wear, a
+                   ;; plate that appears only under the pointer, and the focus
+                   ;; ring kept.  See `lp-quiet' in
+                   ;; `pub/css/lucidplan-luxe.css'.
+                   (class ,(mk-class '(js-only
+                                       lp-quiet
+                                       text-sm
+                                       md:text-md
+                                       text-stone-300
+                                       dark:text-stone-300
+                                       font-medium
+                                       font-sans
+                                       cursor-pointer
+                                       rounded-lg
+                                       px-2
+                                       py-1
+                                       focus:ring-2
+                                       outline-none))))
          ;; The row the menu opens on is a placeholder, so it says so with a
          ;; value of its own: an option without one answers with its own
          ;; text, and choosing it would then navigate to `/🔗 go to'.
@@ -645,7 +653,37 @@ nothing about going anywhere."
                                               "/tickets/~a"
                                               (assq-ref p 'human-id))))
                            ,(assq-ref p 'title)))
-                projects))))
+                projects))
+        (noscript
+         (details (@ (class ,(mk-class '(lp-quiet
+                                         text-sm
+                                         md:text-md
+                                         text-stone-300
+                                         dark:text-stone-300
+                                         font-medium
+                                         font-sans
+                                         cursor-pointer
+                                         rounded-lg
+                                         px-2
+                                         py-1))))
+                  (summary (@ (class ,(mk-class '(cursor-pointer
+                                                  outline-none))))
+                           ,(G_ "🔗 go to"))
+                  (ul (@ (class ,(mk-class '(mt-2 flex flex-col gap-1
+                                                      list-none))))
+                      ,@(map (lambda (p)
+                               `(li (a (@ (href ,(format #f
+                                                         "/tickets/~a"
+                                                         (assq-ref p
+                                                                   'human-id)))
+                                         (class ,(mk-class '(lowercase
+                                                             font-medium
+                                                             text-stone-300
+                                                             dark:text-stone-300
+                                                             no-underline
+                                                             hover:underline))))
+                                      ,(assq-ref p 'title))))
+                             projects)))))))
 
 (begin
   (define* (html-template G_

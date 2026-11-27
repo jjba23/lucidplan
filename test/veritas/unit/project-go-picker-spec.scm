@@ -3,16 +3,21 @@
 ;; SPDX-License-Identifier: MIT
 ;; Copyright © Josep Bigorra <jjbigorra@gmail.com>
 
-;;; What the bar's *go to* menu is made of.
+;;; What the bar's *go to* menu is made of, with a script and without one.
 ;;;
 ;;; The menu is a plain `<select>`: the value, the change event and the form
 ;;; submission are the native control's, and the control and the menu a reader
-;;; presses are drawn around it by `pub/js/lp-select.js'.  Everything that can
-;;; go wrong in the markup is therefore what the page writes into the rows --
-;;; a row carrying the page's own ink was painted into the platform's dark
-;;; popup, which is how the entries came to be unreadable -- and the name of
-;;; the control, which the drawn button borrows because the words on it are the
+;;; presses are drawn around it by `pub/js/lp-select.js'.  What can go wrong in
+;;; the markup is therefore what the page writes into the rows -- a row
+;;; carrying the page's own ink was painted into the platform's dark popup,
+;;; which is how the entries came to be unreadable -- and the name of the
+;;; control, which the drawn button borrows because the words on it are the
 ;;; project that was chosen rather than what the control is for.
+;;;
+;;; Going to a project is the one thing here that needs a script, so it is also
+;;; the one thing that needs a fallback: the menu is hidden without a script
+;;; and the same projects are offered as links, which a reader without one can
+;;; still follow.
 
 (define-module (veritas unit project-go-picker-spec)
   #:use-module (veritas veritas)
@@ -61,5 +66,34 @@
                              #:expect ""
                              #:got (menu-of '())))))
 
+(define no-script-suite
+  (suite "the menu a reader without a script meets"
+         (test "the menu is hidden, because it cannot go anywhere"
+               (assert-equal #:name "the menu carries the class the no-script sheet hides"
+                             #:expect #t
+                             #:got (if (string-contains (menu-of projects)
+                                                        "js-only")
+                                       #t #f)))
+         (test "the projects are offered as links instead"
+               (assert-equal #:name "a project is a link to its board"
+                             #:expect #t
+                             #:got (if (string-contains
+                                        (menu-of projects)
+                                        "<a href=\"/tickets/moon\"")
+                                       #t #f)))
+         (test "the links are inside the no-script block"
+               (assert-equal #:name "a reader with a script is not offered both"
+                             #:expect #t
+                             #:got (if (string-contains
+                                        (menu-of projects) "<noscript><details")
+                                       #t #f)))
+         (test "the list names the same projects the menu does"
+               (assert-equal #:name "the last project is a link too"
+                             #:expect #t
+                             #:got (if (string-contains
+                                        (menu-of projects)
+                                        "<a href=\"/tickets/rocket\"")
+                                       #t #f)))))
+
 (define (spec)
-  (veritas-run picker-suite))
+  (veritas-run picker-suite no-script-suite))

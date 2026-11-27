@@ -1392,6 +1392,14 @@ disabilities, is crucial for equality and helps provide a good user experience.
 LucidPlan chooses lots of its UI to appeal to the widest public possible by
 default, but is very configurable to allow extensibility.
 
+Nothing in the interface needs a script to be readable or to be filled in. The
+menus are the native =select= controls a page is made of, and the menu a script
+draws over one is an addition on top of it: without a script every menu is still
+the platform's own, with the page's own ink and face, and every form still
+submits what it shows. The one thing that cannot work without a script is a menu
+whose whole job is to go somewhere -- the *go to* menu in the header -- so that
+one is offered as a plain list of links instead.
+
 ------------------
 
 * Contributing
