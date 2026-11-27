@@ -95,6 +95,10 @@
   --lp-menu-chosen: oklch(0.62 0.17 254 / 0.17);
   --lp-menu-shadow: 0 1.1rem 2rem -0.9rem rgba(28, 25, 23, 0.4),
     0 0.3rem 0.7rem -0.4rem rgba(28, 25, 23, 0.28);
+  /* The one colour that is not the accent: a control a form refused to send
+     says so in red, and a form that refuses in silence is worse than one that
+     shouts. */
+  --lp-menu-refused: oklch(0.55 0.19 27);
 }
 
 [data-theme="dark"] {
@@ -116,6 +120,7 @@
   --lp-menu-chosen: oklch(0.78 0.11 254 / 0.28);
   --lp-menu-shadow: 0 1.1rem 2rem -0.9rem rgba(0, 0, 0, 0.72),
     0 0.3rem 0.7rem -0.4rem rgba(0, 0, 0, 0.5);
+  --lp-menu-refused: oklch(0.72 0.16 27);
   color-scheme: dark;
 }
 
@@ -1227,4 +1232,11 @@ lp-select.lp-select-up .lp-select-list {
 .lp-select-option[data-value=""][aria-selected="true"] {
   background: transparent;
   font-weight: 450;
+}
+
+/* A menu a form refused to send: the ring sits where the focus ring would, so
+   the control grows no box and moves nothing. */
+
+lp-select.lp-select-needed .lp-select-control {
+  box-shadow: 0 0 0 2px var(--lp-menu-refused);
 }

@@ -122,6 +122,15 @@
       control.style.minWidth = Math.ceil(width) + 'px';
     }
 
+    // A label is a target too: the platform would have forwarded a click on it
+    // to the select, which is the control this script hid.
+    if (tied) {
+      tied.addEventListener('click', (event) => {
+        event.preventDefault();
+        control.focus();
+      });
+    }
+
     const value = document.createElement('span');
     value.className = 'lp-select-value';
 
@@ -190,6 +199,14 @@
           index === select.selectedIndex ? 'true' : 'false'
         );
       });
+
+      // A control that was refused because nothing was chosen stops saying so
+      // as soon as something is.  `validity' is read rather than
+      // `checkValidity()' so that reading it does not fire `invalid' again.
+      if (control.hasAttribute('aria-invalid') && select.validity.valid) {
+        control.removeAttribute('aria-invalid');
+        shell.classList.remove('lp-select-needed');
+      }
     };
 
     const activate = (index) => {
@@ -398,6 +415,36 @@
     });
 
     ['change', 'input'].forEach((type) => select.addEventListener(type, paint));
+
+    // A menu that a form requires is the one thing the platform cannot refuse
+    // out loud: the control it would focus to say so is the one this script
+    // hid, so pressing the form's own button would do nothing at all.  The
+    // refusal is answered where the platform says it -- the `invalid' event,
+    // which fires before any submit does -- and answered the same way: the
+    // control says it is not filled in, and the menu opens on the row still to
+    // be chosen.
+    //
+    // The event does not bubble, so it is heard here; `validity' is read rather
+    // than `checkValidity()' because the latter would fire the event again.
+    if (select.willValidate) {
+      select.addEventListener('invalid', () => {
+        // The first field that is not filled in is the one a reader is sent to,
+        // and it is not this menu's job to take another menu's turn.
+        const first = Array.prototype.find.call(
+          select.form ? select.form.elements : [select],
+          (field) => field.willValidate && !field.validity.valid
+        );
+
+        if (first !== select) {
+          return;
+        }
+
+        control.setAttribute('aria-invalid', 'true');
+        shell.classList.add('lp-select-needed');
+        control.focus();
+        expand();
+      });
+    }
 
     // A browser puts a select's remembered value back after the page has been
     // read, without an event the control could hear.
